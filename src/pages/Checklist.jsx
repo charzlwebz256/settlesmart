@@ -66,9 +66,15 @@ export default function Checklist() {
     const result = await base44.integrations.Core.InvokeLLM({
       prompt: `Generate a "First 90 Days in Canada" settlement checklist ${context}
 
-Create 18-24 actionable checklist items organized by time period. Each item should be specific and practical.
+Create exactly 18 actionable checklist items organized by time period. Each item should be specific and practical.
 
-Return JSON with items array. Each item needs: title (short, actionable), description (1-2 sentences), category (one of: documents, housing, banking, health, education, employment, transportation, social, legal), day_range (one of: week1, week2, week3, week4, month2, month3), order (number 1-24), link (relevant government or resource URL if applicable).`,
+Return JSON with an "items" array. Each item must have these exact fields:
+- title: short actionable string
+- description: 1 sentence string
+- category: one of exactly: documents, housing, banking, health, education, employment, transportation, social, legal
+- day_range: one of exactly: week1, week2, week3, week4, month2, month3
+- order: integer 1 to 18
+- link: a relevant URL string or empty string`,
       response_json_schema: {
         type: 'object',
         properties: {
@@ -88,7 +94,6 @@ Return JSON with items array. Each item needs: title (short, actionable), descri
           },
         },
       },
-      add_context_from_internet: true,
     });
 
     if (result?.items) {
