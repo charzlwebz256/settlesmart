@@ -1,0 +1,90 @@
+{
+  "name": "Service",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Service name"
+    },
+    "organization": {
+      "type": "string",
+      "description": "Organization providing the service"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "education",
+        "language",
+        "housing",
+        "employment",
+        "legal",
+        "health",
+        "transportation",
+        "volunteering",
+        "settlement",
+        "family_support",
+        "financial"
+      ],
+      "description": "Service category"
+    },
+    "description": {
+      "type": "string",
+      "description": "Detailed description of the service"
+    },
+    "eligibility": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Who is eligible: permanent_resident, refugee, international_student, temporary_worker, etc."
+    },
+    "province": {
+      "type": "string",
+      "description": "Province or territory"
+    },
+    "city": {
+      "type": "string",
+      "description": "City"
+    },
+    "address": {
+      "type": "string",
+      "description": "Physical address"
+    },
+    "phone": {
+      "type": "string"
+    },
+    "email": {
+      "type": "string"
+    },
+    "website": {
+      "type": "string"
+    },
+    "languages_offered": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Languages in which the service is available"
+    },
+    "is_free": {
+      "type": "boolean",
+      "default": true
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Additional tags for search"
+    },
+    "source_url": {
+      "type": "string",
+      "description": "URL of the original data source"
+    }
+  },
+  "required": [
+    "name",
+    "category",
+    "province"
+  ]
+}

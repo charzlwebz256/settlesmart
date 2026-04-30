@@ -1,0 +1,49 @@
+{
+  "name": "ChecklistItem",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Checklist item title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Details about this step"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "documents",
+        "housing",
+        "banking",
+        "health",
+        "education",
+        "employment",
+        "transportation",
+        "social",
+        "legal"
+      ],
+      "description": "Category of the checklist item"
+    },
+    "day_range": {
+      "type": "string",
+      "description": "When to complete: week1, week2, week3, week4, month2, month3"
+    },
+    "is_completed": {
+      "type": "boolean",
+      "default": false
+    },
+    "order": {
+      "type": "number",
+      "description": "Sort order"
+    },
+    "link": {
+      "type": "string",
+      "description": "Relevant link or resource URL"
+    }
+  },
+  "required": [
+    "title",
+    "category"
+  ]
+}

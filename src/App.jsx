@@ -5,7 +5,15 @@ import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
-// Add page imports here
+import AppLayout from './components/layout/AppLayout';
+import Home from './pages/Home';
+import Onboarding from './pages/Onboarding';
+import Dashboard from './pages/Dashboard';
+import Services from './pages/Services';
+import Explore from './pages/Explore';
+import Assistant from './pages/Assistant';
+import Checklist from './pages/Checklist';
+import Profile from './pages/Profile';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -33,7 +41,16 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
-      {/* Add your page Route elements here */}
+      <Route element={<AppLayout />}>
+        <Route path="/" element={<Home />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/services" element={<Services />} />
+        <Route path="/explore" element={<Explore />} />
+        <Route path="/assistant" element={<Assistant />} />
+        <Route path="/checklist" element={<Checklist />} />
+        <Route path="/profile" element={<Profile />} />
+      </Route>
+      <Route path="/onboarding" element={<Onboarding />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
   );

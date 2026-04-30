@@ -1,0 +1,27 @@
+{
+  "name": "SavedResource",
+  "type": "object",
+  "properties": {
+    "service_id": {
+      "type": "string",
+      "description": "ID of the saved service"
+    },
+    "notes": {
+      "type": "string",
+      "description": "User's personal notes"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "saved",
+        "contacted",
+        "in_progress",
+        "completed"
+      ],
+      "default": "saved"
+    }
+  },
+  "required": [
+    "service_id"
+  ]
+}

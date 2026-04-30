@@ -1,0 +1,108 @@
+{
+  "name": "UserProfile",
+  "type": "object",
+  "properties": {
+    "immigration_status": {
+      "type": "string",
+      "enum": [
+        "permanent_resident",
+        "refugee",
+        "international_student",
+        "temporary_worker",
+        "asylum_seeker",
+        "citizen",
+        "other"
+      ],
+      "description": "User's immigration status"
+    },
+    "province": {
+      "type": "string",
+      "description": "Province or territory of settlement"
+    },
+    "city": {
+      "type": "string",
+      "description": "City of settlement"
+    },
+    "language_preference": {
+      "type": "string",
+      "enum": [
+        "en",
+        "fr",
+        "ar",
+        "zh",
+        "es",
+        "hi",
+        "tl",
+        "ur",
+        "fa",
+        "so",
+        "other"
+      ],
+      "description": "Preferred language"
+    },
+    "arrival_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date of arrival in Canada"
+    },
+    "interests": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Areas of interest: education, employment, housing, legal, health, volunteering, transportation"
+    },
+    "family_size": {
+      "type": "number",
+      "description": "Number of family members"
+    },
+    "education_level": {
+      "type": "string",
+      "enum": [
+        "none",
+        "primary",
+        "secondary",
+        "diploma",
+        "bachelors",
+        "masters",
+        "doctorate"
+      ],
+      "description": "Highest education level"
+    },
+    "english_level": {
+      "type": "string",
+      "enum": [
+        "none",
+        "beginner",
+        "intermediate",
+        "advanced",
+        "fluent"
+      ],
+      "description": "English proficiency level"
+    },
+    "french_level": {
+      "type": "string",
+      "enum": [
+        "none",
+        "beginner",
+        "intermediate",
+        "advanced",
+        "fluent"
+      ],
+      "description": "French proficiency level"
+    },
+    "onboarding_completed": {
+      "type": "boolean",
+      "default": false
+    },
+    "checklist_progress": {
+      "type": "object",
+      "description": "Tracks completion of settlement checklist items"
+    }
+  },
+  "required": [
+    "immigration_status",
+    "province",
+    "city"
+  ]
+}
