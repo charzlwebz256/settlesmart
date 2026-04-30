@@ -2,6 +2,9 @@ import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Home, Search, MessageCircle, User, Navigation, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { useQuery } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+import NewcomerChatWidget from '@/components/assistant/NewcomerChatWidget';
 
 const navItems = [
   { path: '/', icon: Home, label: 'Home' },
@@ -14,6 +17,15 @@ const navItems = [
 export default function AppLayout() {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+  const { data: profile } = useQuery({
+    queryKey: ['myProfile'],
+    queryFn: async () => {
+      const user = await base44.auth.me();
+      const results = await base44.entities.UserProfile.filter({ created_by: user.email });
+      return results[0] || null;
+    },
+  });
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -84,6 +96,14 @@ export default function AppLayout() {
       <main className="flex-1">
         <Outlet />
       </main>
+
+      {/* Global AI Chat Widget — hidden on /assistant page */}
+      {location.pathname !== '/assistant' && (
+        <NewcomerChatWidget
+          userCity={profile?.city}
+          userProvince={profile?.province}
+        />
+      )}
 
       {/* Mobile Bottom Nav */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-xl border-t border-border/50 safe-area-bottom">
