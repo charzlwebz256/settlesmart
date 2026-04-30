@@ -1,12 +1,12 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, Search, BookOpen, MessageCircle, User, MapPin, Menu, X } from 'lucide-react';
+import { Home, Search, MessageCircle, User, Navigation, Menu, X } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 
 const navItems = [
   { path: '/', icon: Home, label: 'Home' },
   { path: '/services', icon: Search, label: 'Services' },
-  { path: '/explore', icon: MapPin, label: 'Explore' },
+  { path: '/transit-map', icon: Navigation, label: 'Transit Map' },
   { path: '/assistant', icon: MessageCircle, label: 'AI Help' },
   { path: '/profile', icon: User, label: 'Profile' },
 ];
