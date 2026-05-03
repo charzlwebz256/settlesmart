@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import CalendarStrip from '@/components/events/CalendarStrip';
 import EventCard from '@/components/events/EventCard';
 import UpcomingReminders from '@/components/events/UpcomingReminders';
+import EventbriteFeed from '@/components/events/EventbriteFeed';
 
 const CATEGORIES = [
   { value: 'all', label: 'All' },
@@ -146,6 +147,11 @@ export default function Events() {
             {cat.label}
           </button>
         ))}
+      </div>
+
+      {/* Eventbrite Live Feed */}
+      <div className="mb-6">
+        <EventbriteFeed city="Edmonton" />
       </div>
 
       {/* Events Grid */}
