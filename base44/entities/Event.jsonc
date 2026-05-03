@@ -1,0 +1,94 @@
+{
+  "name": "Event",
+  "type": "object",
+  "properties": {
+    "title": {
+      "type": "string",
+      "description": "Event title"
+    },
+    "description": {
+      "type": "string",
+      "description": "Event description"
+    },
+    "category": {
+      "type": "string",
+      "enum": [
+        "workshop",
+        "community",
+        "language",
+        "employment",
+        "health",
+        "legal",
+        "housing",
+        "social",
+        "orientation"
+      ],
+      "description": "Event category"
+    },
+    "date": {
+      "type": "string",
+      "format": "date",
+      "description": "Event date (YYYY-MM-DD)"
+    },
+    "time": {
+      "type": "string",
+      "description": "Event time e.g. 10:00 AM"
+    },
+    "end_time": {
+      "type": "string",
+      "description": "Event end time"
+    },
+    "location": {
+      "type": "string",
+      "description": "Venue name and address"
+    },
+    "city": {
+      "type": "string"
+    },
+    "province": {
+      "type": "string"
+    },
+    "is_online": {
+      "type": "boolean",
+      "default": false
+    },
+    "online_link": {
+      "type": "string"
+    },
+    "organizer": {
+      "type": "string",
+      "description": "Organizing body or agency"
+    },
+    "languages": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Languages available"
+    },
+    "is_free": {
+      "type": "boolean",
+      "default": true
+    },
+    "capacity": {
+      "type": "number"
+    },
+    "registration_url": {
+      "type": "string"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "image_url": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "title",
+    "category",
+    "date"
+  ]
+}

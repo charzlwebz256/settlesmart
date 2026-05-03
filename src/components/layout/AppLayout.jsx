@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, Search, MessageCircle, User, Navigation, Menu, X } from 'lucide-react';
+import { Home, Search, MessageCircle, User, Navigation, Menu, X, CalendarDays } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -9,7 +9,8 @@ import NewcomerChatWidget from '@/components/assistant/NewcomerChatWidget';
 const navItems = [
   { path: '/', icon: Home, label: 'Home' },
   { path: '/services', icon: Search, label: 'Services' },
-  { path: '/transit-map', icon: Navigation, label: 'Transit Map' },
+  { path: '/events', icon: CalendarDays, label: 'Events' },
+  { path: '/transit-map', icon: Navigation, label: 'Transit' },
   { path: '/assistant', icon: MessageCircle, label: 'AI Help' },
   { path: '/profile', icon: User, label: 'Profile' },
 ];

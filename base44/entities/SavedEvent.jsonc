@@ -1,0 +1,22 @@
+{
+  "name": "SavedEvent",
+  "type": "object",
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "description": "ID of the saved event"
+    },
+    "notify": {
+      "type": "boolean",
+      "default": true,
+      "description": "Whether to show reminder notifications"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Personal notes about this event"
+    }
+  },
+  "required": [
+    "event_id"
+  ]
+}

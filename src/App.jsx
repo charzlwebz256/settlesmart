@@ -15,6 +15,7 @@ import Assistant from './pages/Assistant';
 import Checklist from './pages/Checklist';
 import Profile from './pages/Profile';
 import TransitMap from './pages/TransitMap';
+import Events from './pages/Events';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -51,6 +52,7 @@ const AuthenticatedApp = () => {
         <Route path="/checklist" element={<Checklist />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/transit-map" element={<TransitMap />} />
+        <Route path="/events" element={<Events />} />
       </Route>
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="*" element={<PageNotFound />} />
