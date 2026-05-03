@@ -2,13 +2,14 @@ import { useState, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { isSameDay, parseISO, startOfDay } from 'date-fns';
-import { Loader2, Sparkles, CalendarDays, Filter } from 'lucide-react';
+import { Loader2, CalendarDays, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import CalendarStrip from '@/components/events/CalendarStrip';
 import EventCard from '@/components/events/EventCard';
 import UpcomingReminders from '@/components/events/UpcomingReminders';
 import EventbriteFeed from '@/components/events/EventbriteFeed';
+import { useCityDetection } from '@/hooks/useCityDetection';
 
 const CATEGORIES = [
   { value: 'all', label: 'All' },
@@ -27,6 +28,7 @@ export default function Events() {
   const [selectedDate, setSelectedDate] = useState(startOfDay(new Date()));
   const [category, setCategory] = useState('all');
   const [viewAll, setViewAll] = useState(false);
+  const { city, province, source, loading: cityLoading } = useCityDetection();
 
   const { data: events, isLoading } = useQuery({
     queryKey: ['events'],
@@ -70,13 +72,14 @@ export default function Events() {
   const filtered = useMemo(() => {
     return events.filter(e => {
       const catMatch = category === 'all' || e.category === category;
+      const cityMatch = !city || e.city?.toLowerCase() === city.toLowerCase() || !e.city;
       let dateMatch = true;
       if (!viewAll) {
         try { dateMatch = isSameDay(parseISO(e.date), selectedDate); } catch { dateMatch = false; }
       }
-      return catMatch && dateMatch;
+      return catMatch && dateMatch && cityMatch;
     });
-  }, [events, category, selectedDate, viewAll]);
+  }, [events, category, selectedDate, viewAll, city]);
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-8">
@@ -86,7 +89,17 @@ export default function Events() {
           <CalendarDays className="w-6 h-6 text-primary" />
           Community Events
         </h1>
-        <p className="text-muted-foreground text-sm">Newcomer-friendly workshops, gatherings & orientations near you</p>
+        <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
+          {cityLoading ? (
+            <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Detecting your location...</>
+          ) : (
+            <><MapPin className="w-3.5 h-3.5 text-primary" />
+            Showing events near <span className="font-medium text-foreground">{city}{province ? `, ${province}` : ''}</span>
+            {source === 'ip' && <span className="text-[10px] text-muted-foreground/70">(via IP)</span>}
+            {source === 'fallback' && <span className="text-[10px] text-muted-foreground/70">(default)</span>}
+            </>
+          )}
+        </div>
       </div>
 
       {/* Reminders panel */}
@@ -151,7 +164,7 @@ export default function Events() {
 
       {/* Eventbrite Live Feed */}
       <div className="mb-6">
-        <EventbriteFeed city="Edmonton" />
+        {!cityLoading && city && <EventbriteFeed city={city} />}
       </div>
 
       {/* Events Grid */}

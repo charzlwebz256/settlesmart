@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -9,6 +9,14 @@ export default function EventbriteFeed({ city = 'Edmonton' }) {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [loadedCity, setLoadedCity] = useState(null);
+
+  // Auto-load when city becomes available, and reload if city changes
+  useEffect(() => {
+    if (city && city !== loadedCity) {
+      fetchEvents();
+    }
+  }, [city]);
 
   const fetchEvents = async () => {
     setLoading(true);
@@ -54,6 +62,7 @@ For each event return:
     });
     setEvents(result?.events || []);
     setLoaded(true);
+    setLoadedCity(city);
     setLoading(false);
   };
 
@@ -98,7 +107,7 @@ For each event return:
       {!loaded && !loading && (
         <div className="text-center py-8 text-muted-foreground">
           <Calendar className="w-8 h-8 mx-auto mb-3 opacity-30" />
-          <p className="text-sm">Click "Load Events" to fetch live Edmonton events from Eventbrite</p>
+          <p className="text-sm">Detecting your city to load local events...</p>
         </div>
       )}
 
