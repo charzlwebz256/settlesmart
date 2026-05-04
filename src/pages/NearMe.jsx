@@ -33,23 +33,9 @@ export default function NearMe() {
     if (!loc) return;
     setLoading(true);
     const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Find real, currently operating local services for newcomers and immigrants in ${loc}, ${province || 'Canada'}.
-
-Find 16 places total (4 of each type):
-1. Food banks or food pantries
-2. Walk-in clinics or community health centres
-3. Newcomer/immigrant settlement agencies
-4. Community centres or multicultural centres
-
-For each place return:
-- name: place name
-- category: "food_bank", "clinic", "settlement", or "community"  
-- address: full street address in ${loc}
-- phone: phone number (if available)
-- website: website URL (if available)
-- hours: opening hours or "Call to confirm"
-- notes: 1 sentence about what they offer newcomers
-- google_maps_url: Google Maps link for this address`,
+      prompt: `Find 8 real, currently operating local services for newcomers in ${loc}, ${province || 'Canada'}.
+Include 2 of each: food banks, walk-in clinics, settlement agencies, community centres.
+For each return: name, category (food_bank/clinic/settlement/community), address, phone, website, notes (one short sentence).`,
       add_context_from_internet: true,
       response_json_schema: {
         type: 'object',
@@ -64,9 +50,7 @@ For each place return:
                 address: { type: 'string' },
                 phone: { type: 'string' },
                 website: { type: 'string' },
-                hours: { type: 'string' },
                 notes: { type: 'string' },
-                google_maps_url: { type: 'string' },
               },
             },
           },
@@ -179,17 +163,12 @@ For each place return:
                         <a href={`tel:${place.phone}`} className="hover:text-primary transition-colors">{place.phone}</a>
                       </div>
                     )}
-                    {place.hours && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-[10px] font-semibold text-muted-foreground">Hours:</span>
-                        <span>{place.hours}</span>
-                      </div>
-                    )}
+
                   </div>
                   {place.notes && <p className="text-xs text-muted-foreground leading-relaxed">{place.notes}</p>}
                   <div className="flex gap-2 mt-auto">
-                    {place.google_maps_url && (
-                      <a href={place.google_maps_url} target="_blank" rel="noopener noreferrer"
+                    {place.address && (
+                      <a href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place.address)}`} target="_blank" rel="noopener noreferrer"
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/15 transition-colors">
                         <MapPin className="w-3 h-3" /> Directions
                       </a>
