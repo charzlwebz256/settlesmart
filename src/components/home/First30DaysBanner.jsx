@@ -14,7 +14,7 @@ export default function First30DaysBanner() {
               <Calendar className="w-3.5 h-3.5" />
               Guided Checklist
             </div>
-            <h3 className="font-heading font-bold text-2xl md:text-3xl mb-3">Your First 30 Days in Edmonton, Canada
+            <h3 className="font-heading font-bold text-2xl md:text-3xl mb-3">Your First 30 Days in Canada
 
             </h3>
             <p className="text-white/70 text-sm md:text-base leading-relaxed max-w-lg">
