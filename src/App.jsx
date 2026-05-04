@@ -17,6 +17,9 @@ import Profile from './pages/Profile';
 import TransitMap from './pages/TransitMap';
 import Events from './pages/Events';
 import Jobs from './pages/Jobs';
+import Legal from './pages/Legal';
+import Emergency from './pages/Emergency';
+import NearMe from './pages/NearMe';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -55,6 +58,9 @@ const AuthenticatedApp = () => {
         <Route path="/transit-map" element={<TransitMap />} />
         <Route path="/events" element={<Events />} />
         <Route path="/jobs" element={<Jobs />} />
+        <Route path="/legal" element={<Legal />} />
+        <Route path="/emergency" element={<Emergency />} />
+        <Route path="/near-me" element={<NearMe />} />
       </Route>
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="*" element={<PageNotFound />} />

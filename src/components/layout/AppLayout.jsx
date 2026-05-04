@@ -1,10 +1,11 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, Search, MessageCircle, User, Navigation, Menu, X, CalendarDays, Briefcase } from 'lucide-react';
+import { Home, Search, MessageCircle, User, Navigation, Menu, X, CalendarDays, Briefcase, Scale, AlertTriangle, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import NewcomerChatWidget from '@/components/assistant/NewcomerChatWidget';
+import LanguageTranslator from '@/components/layout/LanguageTranslator';
 
 const navItems = [
   { path: '/', icon: Home, label: 'Home' },
@@ -12,6 +13,9 @@ const navItems = [
   { path: '/events', icon: CalendarDays, label: 'Events' },
   { path: '/transit-map', icon: Navigation, label: 'Transit' },
   { path: '/jobs', icon: Briefcase, label: 'Jobs' },
+  { path: '/near-me', icon: MapPin, label: 'Near Me' },
+  { path: '/legal', icon: Scale, label: 'Legal' },
+  { path: '/emergency', icon: AlertTriangle, label: 'Emergency' },
   { path: '/assistant', icon: MessageCircle, label: 'AI Help' },
   { path: '/profile', icon: User, label: 'Profile' },
 ];
@@ -63,12 +67,15 @@ export default function AppLayout() {
             ))}
           </nav>
 
-          <button
-            className="md:hidden p-2 rounded-lg hover:bg-muted"
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-          >
+          <div className="flex items-center gap-1">
+            <LanguageTranslator />
+            <button
+              className="md:hidden p-2 rounded-lg hover:bg-muted"
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+            >
             {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-          </button>
+            </button>
+          </div>
         </div>
 
         {/* Mobile dropdown */}

@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useCityDetection } from '@/hooks/useCityDetection';
 import JobCard from '@/components/jobs/JobCard';
 import JobFilters from '@/components/jobs/JobFilters';
+import JobAlertSubscribe from '@/components/jobs/JobAlertSubscribe';
 
 const SOURCE_TABS = [
   { id: 'all', label: 'All Jobs' },
@@ -138,6 +139,9 @@ For each job return:
           )}
         </div>
       </div>
+
+      {/* Job Alert */}
+      <JobAlertSubscribe defaultCity={city || ''} />
 
       {/* Search Bar */}
       <form onSubmit={handleSearch} className="flex gap-2 mb-4">

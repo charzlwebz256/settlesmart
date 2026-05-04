@@ -1,19 +1,19 @@
 import { Link } from 'react-router-dom';
 import {
   GraduationCap, Home as HomeIcon, Briefcase, Scale, Heart,
-  Bus, Users, MapPin
+  Bus, Users, MapPin, AlertTriangle, Navigation
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const categories = [
   { icon: GraduationCap, label: 'Education & Language', color: 'bg-blue-500/10 text-blue-600', path: '/services?category=education' },
   { icon: HomeIcon, label: 'Housing', color: 'bg-emerald-500/10 text-emerald-600', path: '/services?category=housing' },
-  { icon: Briefcase, label: 'Employment', color: 'bg-amber-500/10 text-amber-600', path: '/services?category=employment' },
-  { icon: Scale, label: 'Legal & Immigration', color: 'bg-purple-500/10 text-purple-600', path: '/services?category=legal' },
+  { icon: Briefcase, label: 'Jobs', color: 'bg-amber-500/10 text-amber-600', path: '/jobs' },
+  { icon: Scale, label: 'Legal & IRCC', color: 'bg-purple-500/10 text-purple-600', path: '/legal' },
   { icon: Heart, label: 'Health & Wellness', color: 'bg-rose-500/10 text-rose-600', path: '/services?category=health' },
-  { icon: Bus, label: 'Transportation', color: 'bg-cyan-500/10 text-cyan-600', path: '/services?category=transportation' },
-  { icon: Users, label: 'Volunteering', color: 'bg-orange-500/10 text-orange-600', path: '/services?category=volunteering' },
-  { icon: MapPin, label: 'Settlement Services', color: 'bg-teal-500/10 text-teal-600', path: '/services?category=settlement' },
+  { icon: AlertTriangle, label: 'Emergency Support', color: 'bg-red-500/10 text-red-600', path: '/emergency' },
+  { icon: Navigation, label: 'Services Near Me', color: 'bg-teal-500/10 text-teal-600', path: '/near-me' },
+  { icon: MapPin, label: 'Settlement Services', color: 'bg-orange-500/10 text-orange-600', path: '/services?category=settlement' },
 ];
 
 export default function QuickAccessGrid() {
