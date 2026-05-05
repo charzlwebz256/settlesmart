@@ -41,7 +41,7 @@ export default function Jobs() {
     const searchTerm = query || 'newcomer immigrant jobs';
 
     const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Find 20 real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Mix sources: LinkedIn, Indeed, Jooble, Job Bank Canada, ZipRecruiter. Focus on newcomer-accessible roles (entry-level, trades, healthcare, IT, customer service). For each job return ONLY these short fields: title, company, location, job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (short string or empty), posted (e.g. "2d ago"), description (max 12 words), url, source (linkedin/indeed/jooble/jobbank/ziprecruiter), is_newcomer_friendly (true/false).`,
+      prompt: `Find 12 real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Mix sources: LinkedIn, Indeed, Job Bank Canada, Indeed, ZipRecruiter. Focus on newcomer-friendly roles. Return ONLY: title (short), company (short), location (city only), job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (very short or empty string), posted (e.g. "2d"), url, source (linkedin/indeed/jooble/jobbank/ziprecruiter), is_newcomer_friendly (true/false). No extra fields.`,
       add_context_from_internet: true,
       response_json_schema: {
         type: 'object',
@@ -58,7 +58,6 @@ export default function Jobs() {
                 experience_level: { type: 'string' },
                 salary: { type: 'string' },
                 posted: { type: 'string' },
-                description: { type: 'string' },
                 url: { type: 'string' },
                 source: { type: 'string' },
                 is_newcomer_friendly: { type: 'boolean' },
