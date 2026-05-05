@@ -17,14 +17,14 @@ export default function HeroSection({ hasProfile }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="max-w-2xl flex-1 px-4 lg:py-0">
+          className="max-w-2xl flex-1 px-4 lg:py-0 flex flex-col items-center lg:items-start">
           
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6">
+          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6 lg:self-start">
             <MapPin className="w-3.5 h-3.5" />
             Your guide to settling in Canada
           </div>
 
-          <h1 className="font-heading font-extrabold text-5xl md:text-6xl lg:text-7xl text-foreground leading-[1.1] mb-5 text-justify">
+          <h1 className="font-heading font-extrabold text-5xl md:text-6xl lg:text-7xl text-foreground leading-[1.1] mb-5 text-center">
             <span className="block">Start Your New Life</span>
             <span className="text-primary">in Canada</span>
             <br />
@@ -33,12 +33,12 @@ export default function HeroSection({ hasProfile }) {
             </span>
           </h1>
 
-          <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-8 max-w-xl">Free settlement services, housing, jobs, education, and more all in one place. Personalized for your journey as a newcomer to Canada.
+          <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-8 max-w-xl text-center lg:text-left">Free settlement services, housing, jobs, education, and more all in one place. Personalized for your journey as a newcomer to Canada.
 
 
           </p>
 
-          <div className="flex flex-wrap gap-3">
+          <div className="flex flex-wrap gap-3 justify-center lg:justify-start">
             {!hasProfile ?
             <Link to="/onboarding">
                 <Button size="lg" className="rounded-xl gap-2 font-semibold text-base h-12 px-6 bg-primary hover:bg-primary/90">
