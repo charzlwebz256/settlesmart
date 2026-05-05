@@ -11,12 +11,12 @@ export default function HeroSection({ hasProfile }) {
       <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
       <div className="absolute bottom-0 left-0 w-72 h-72 bg-accent/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
 
-      <div className="relative max-w-7xl mx-auto px-4 pt-12 pb-16 md:pt-20 md:pb-24 flex flex-col md:flex-row md:items-center gap-8">
+      <div className="relative max-w-7xl mx-auto px-4 pt-12 pb-16 md:pt-20 md:pb-24 flex flex-col sm:flex-row sm:items-start gap-6 md:gap-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="flex-1">
+          className="flex-1 sm:flex-shrink-0 sm:w-1/2 md:w-auto md:flex-1">
           
           <h1 className="font-heading font-extrabold text-4xl md:text-5xl lg:text-6xl text-foreground leading-[1.1] mb-5">
             Start Your New Life{' '}
@@ -27,14 +27,7 @@ export default function HeroSection({ hasProfile }) {
             </span>
           </h1>
 
-          <motion.img
-            src="https://liveassets.ca/wp-content/uploads/2022/01/section-planningforcanada-1.png"
-            alt="Planning for Canada"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="w-full md:hidden object-cover rounded-2xl mb-8"
-          />
+
 
           <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-8 max-w-xl">Free settlement services, housing, jobs, education, and more all in one place. Personalized for your journey as a newcomer to Canada.
 
@@ -72,7 +65,7 @@ export default function HeroSection({ hasProfile }) {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="hidden md:block md:w-2/5 md:ml-auto object-cover rounded-2xl"
+          className="w-1/3 sm:w-2/5 md:w-2/5 md:ml-auto flex-shrink-0 object-cover rounded-2xl"
         />
       </div>
     </section>);
