@@ -36,24 +36,7 @@ export default function Jobs() {
     const searchTerm = query || 'newcomer immigrant jobs';
 
     const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Search LinkedIn Jobs (https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(searchTerm)}&location=${encodeURIComponent(searchLoc + ', Canada')}) and Indeed Canada (https://ca.indeed.com/jobs?q=${encodeURIComponent(searchTerm)}&l=${encodeURIComponent(searchLoc + ', Canada')}) for current job postings.
-
-Find 16 real, current job listings (8 from LinkedIn, 8 from Indeed) for: "${searchTerm}" in ${searchLoc}, Canada.
-
-Focus on jobs accessible to newcomers and immigrants. Include entry-level, skilled trades, healthcare, IT, customer service, and warehouse roles.
-
-For each job return:
-- title: job title
-- company: company name
-- location: city and province
-- job_type: "full_time", "part_time", "contract", or "remote"
-- experience_level: "entry", "mid", "senior", or "any"
-- salary: salary range if visible, else empty string
-- posted: how long ago posted e.g. "2 days ago", "1 week ago"
-- description: 1-2 sentence summary
-- url: direct job URL on LinkedIn or Indeed
-- source: "linkedin" or "indeed"
-- is_newcomer_friendly: true if the job mentions no Canadian experience required, multilingual, or newcomer-friendly`,
+      prompt: `Find 10 real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Mix LinkedIn and Indeed sources. Focus on roles accessible to newcomers (entry-level, trades, healthcare, IT, customer service). For each job provide: title, company, location, job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (or empty), posted (e.g. "2 days ago"), description (one short sentence), url, source (linkedin or indeed), is_newcomer_friendly (boolean).`,
       add_context_from_internet: true,
       response_json_schema: {
         type: 'object',
