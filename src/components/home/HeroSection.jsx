@@ -16,8 +16,8 @@ export default function HeroSection({ hasProfile }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="flex flex-col md:flex-row md:items-center md:gap-12">
-          <div className="max-w-2xl">
+          className="flex flex-col items-center md:flex-row md:items-center md:gap-12">
+          <div className="max-w-2xl md:flex-1">
           
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6">
             <MapPin className="w-3.5 h-3.5" />
