@@ -66,6 +66,10 @@ export default function TransitMap() {
   const [routeData, setRouteData] = useState(null);
   const [busStations, setBusStations] = useState([]);
   const [routeLoading, setRouteLoading] = useState(false);
+  const [startSuggestions, setStartSuggestions] = useState([]);
+  const [endSuggestions, setEndSuggestions] = useState([]);
+  const [showStartSuggestions, setShowStartSuggestions] = useState(false);
+  const [showEndSuggestions, setShowEndSuggestions] = useState(false);
   const watchId = useRef(null);
 
   const modes = [
@@ -104,9 +108,38 @@ export default function TransitMap() {
     };
   }, []);
 
+  const getPlaceSuggestions = async (query, setSuggestions, setShow) => {
+    if (!query.trim() || query.length < 2) {
+      setSuggestions([]);
+      return;
+    }
+    const result = await base44.integrations.Core.InvokeLLM({
+      prompt: `Find 5 real places/addresses in Canada matching "${query}". Return JSON array: [{"name": "Place Name", "address": "Full Address", "lat": number, "lng": number}, ...]`,
+      add_context_from_internet: true,
+      response_json_schema: {
+        type: 'object',
+        properties: {
+          places: {
+            type: 'array',
+            items: {
+              type: 'object',
+              properties: {
+                name: { type: 'string' },
+                address: { type: 'string' },
+                lat: { type: 'number' },
+                lng: { type: 'number' },
+              },
+            },
+          },
+        },
+      },
+    });
+    setSuggestions(result.places || []);
+    setShow(true);
+  };
+
   const geocodeAddress = async (address, setCoords) => {
     if (!address.trim()) return;
-    setRouteLoading(true);
     const result = await base44.integrations.Core.InvokeLLM({
       prompt: `Get the latitude and longitude coordinates for "${address}" in Canada. Return ONLY JSON: {"lat": number, "lng": number}`,
       add_context_from_internet: true,
@@ -119,7 +152,6 @@ export default function TransitMap() {
       },
     });
     setCoords([result.lat, result.lng]);
-    setRouteLoading(false);
   };
 
   const getRoute = async () => {
@@ -127,23 +159,26 @@ export default function TransitMap() {
     setRouteLoading(true);
 
     const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Calculate a route in Canada from coordinates [${startCoords[0]}, ${startCoords[1]}] to [${endCoords[0]}, ${endCoords[1]}] using ${selectedMode} mode (driving/transit/walking/bicycling). Return JSON: {
-        "distance_km": number,
-        "duration_minutes": number,
-        "polyline": "encoded polyline string or comma-separated lat,lng pairs",
-        "mode": "${selectedMode}",
-        "steps": [{"instruction": "turn left at...", "distance_m": 200}, ...],
-        "bus_info": ${selectedMode === 'transit' ? '[{"name": "Bus 42", "route": "Downtown - Airport", "stops": 5}, ...]' : 'null'},
-        "nearby_bus_stations": ${selectedMode === 'transit' ? '[{"name": "Central Station", "lat": 43.6, "lng": -79.3, "buses": ["42", "45"]}, ...]' : 'null'}
-      }`,
+      prompt: `Calculate a detailed route in Canada from coordinates [${startCoords[0].toFixed(5)}, ${startCoords[1].toFixed(5)}] to [${endCoords[0].toFixed(5)}, ${endCoords[1].toFixed(5)}] using ${selectedMode} mode. Return JSON with:
+- distance_km (number)
+- duration_minutes (number)
+- waypoints: array of [lat, lng] coordinates for the exact route path
+- steps: array of turn-by-turn navigation instructions with distance
+- bus_info: for transit, array of bus routes with numbers and names
+- nearby_bus_stations: for transit, array of nearby station coordinates and bus numbers`,
       add_context_from_internet: true,
       response_json_schema: {
         type: 'object',
         properties: {
           distance_km: { type: 'number' },
           duration_minutes: { type: 'number' },
-          polyline: { type: 'string' },
-          mode: { type: 'string' },
+          waypoints: {
+            type: 'array',
+            items: {
+              type: 'array',
+              items: { type: 'number' },
+            },
+          },
           steps: {
             type: 'array',
             items: {
@@ -161,7 +196,6 @@ export default function TransitMap() {
               properties: {
                 name: { type: 'string' },
                 route: { type: 'string' },
-                stops: { type: 'number' },
               },
             },
           },
@@ -189,13 +223,8 @@ export default function TransitMap() {
   const defaultCenter = [43.6532, -79.3832]; // Toronto fallback
   const displayCenter = startCoords || position || defaultCenter;
 
-  // Parse polyline or coordinate pairs
-  const routePath = routeData?.polyline
-    ? routeData.polyline.split(',').map(pair => {
-        const [lat, lng] = pair.trim().split(' ');
-        return [parseFloat(lat), parseFloat(lng)];
-      })
-    : [];
+  // Use waypoints for route path
+  const routePath = routeData?.waypoints || [];
 
   return (
     <div className="flex flex-col h-screen pb-16 md:pb-0">
@@ -258,21 +287,46 @@ export default function TransitMap() {
               </div>
 
               {/* Starting point input */}
-              <div className="space-y-2">
+              <div className="space-y-2 relative">
                 <label className="text-xs font-semibold text-muted-foreground">Starting Point</label>
                 <div className="flex gap-2">
-                  <input
-                    value={startInput}
-                    onChange={e => setStartInput(e.target.value)}
-                    placeholder="Your location or address"
-                    className="flex-1 px-3 py-2 rounded-lg border border-border/60 bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none"
-                  />
+                  <div className="flex-1 relative">
+                    <input
+                      value={startInput}
+                      onChange={e => {
+                        setStartInput(e.target.value);
+                        getPlaceSuggestions(e.target.value, setStartSuggestions, setShowStartSuggestions);
+                      }}
+                      onFocus={() => startSuggestions.length > 0 && setShowStartSuggestions(true)}
+                      placeholder="Your location or address"
+                      className="w-full px-3 py-2 rounded-lg border border-border/60 bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none"
+                    />
+                    {showStartSuggestions && startSuggestions.length > 0 && (
+                      <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border/50 rounded-lg shadow-lg z-50 max-h-40 overflow-y-auto">
+                        {startSuggestions.map((place, i) => (
+                          <button
+                            key={i}
+                            onClick={() => {
+                              setStartInput(place.address);
+                              setStartCoords([place.lat, place.lng]);
+                              setShowStartSuggestions(false);
+                            }}
+                            className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors border-b border-border/30 last:border-0"
+                          >
+                            <div className="font-medium text-foreground">{place.name}</div>
+                            <div className="text-xs text-muted-foreground">{place.address}</div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </div>
                   <Button
                     size="sm"
                     variant="outline"
                     onClick={() => {
                       setStartInput(`${position[0].toFixed(5)}, ${position[1].toFixed(5)}`);
                       setStartCoords(position);
+                      setShowStartSuggestions(false);
                     }}
                     disabled={!position}
                     className="rounded-lg"
@@ -283,14 +337,38 @@ export default function TransitMap() {
               </div>
 
               {/* Destination input */}
-              <div className="space-y-2">
+              <div className="space-y-2 relative">
                 <label className="text-xs font-semibold text-muted-foreground">Destination</label>
-                <input
-                  value={endInput}
-                  onChange={e => setEndInput(e.target.value)}
-                  placeholder="Where to?"
-                  className="w-full px-3 py-2 rounded-lg border border-border/60 bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none"
-                />
+                <div className="relative">
+                  <input
+                    value={endInput}
+                    onChange={e => {
+                      setEndInput(e.target.value);
+                      getPlaceSuggestions(e.target.value, setEndSuggestions, setShowEndSuggestions);
+                    }}
+                    onFocus={() => endSuggestions.length > 0 && setShowEndSuggestions(true)}
+                    placeholder="Where to?"
+                    className="w-full px-3 py-2 rounded-lg border border-border/60 bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none"
+                  />
+                  {showEndSuggestions && endSuggestions.length > 0 && (
+                    <div className="absolute top-full left-0 right-0 mt-1 bg-card border border-border/50 rounded-lg shadow-lg z-50 max-h-40 overflow-y-auto">
+                      {endSuggestions.map((place, i) => (
+                        <button
+                          key={i}
+                          onClick={() => {
+                            setEndInput(place.address);
+                            setEndCoords([place.lat, place.lng]);
+                            setShowEndSuggestions(false);
+                          }}
+                          className="w-full text-left px-3 py-2 text-sm hover:bg-muted transition-colors border-b border-border/30 last:border-0"
+                        >
+                          <div className="font-medium text-foreground">{place.name}</div>
+                          <div className="text-xs text-muted-foreground">{place.address}</div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Transport modes */}
@@ -317,7 +395,12 @@ export default function TransitMap() {
 
               {/* Get route button */}
               <Button
-                onClick={getRoute}
+                onClick={() => {
+                  if (endInput && !endCoords) {
+                    geocodeAddress(endInput, setEndCoords);
+                  }
+                  getRoute();
+                }}
                 disabled={!startCoords || !endInput || routeLoading}
                 className="w-full rounded-lg gap-2 bg-primary hover:bg-primary/90"
               >
