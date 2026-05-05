@@ -65,7 +65,7 @@ export default function HeroSection({ hasProfile }) {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="w-1/2 sm:w-2/5 md:w-2/5 flex-shrink-0 object-cover rounded-2xl"
+          className="w-1/2 sm:w-2/5 md:w-2/5 flex-shrink-0 object-cover rounded-2xl mt-6 sm:mt-0"
         />
       </div>
     </section>);
