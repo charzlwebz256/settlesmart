@@ -99,6 +99,7 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setOpen(true)}
+            aria-label="Open newcomer assistant chat"
             className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-[1100] w-14 h-14 rounded-full bg-primary shadow-lg shadow-primary/30 flex items-center justify-center hover:bg-primary/90 transition-colors"
           >
             <MessageCircle className="w-6 h-6 text-primary-foreground" />
@@ -130,7 +131,7 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
                   <p className="text-[10px] text-white/70">Emergency • Services • Settlement</p>
                 </div>
               </div>
-              <button onClick={() => setOpen(false)} className="p-1.5 rounded-lg hover:bg-white/10 transition-colors">
+              <button onClick={() => setOpen(false)} aria-label="Close chat" className="p-1.5 rounded-lg hover:bg-white/10 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
                 <X className="w-4 h-4" />
               </button>
             </div>

@@ -1,6 +1,7 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Search, MessageCircle, User, Navigation, Menu, X, CalendarDays, Briefcase, Scale, AlertTriangle, MapPin, Newspaper, ChevronLeft } from 'lucide-react';
 import { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
@@ -46,7 +47,8 @@ export default function AppLayout() {
           {!isRootTab ? (
             <button
               onClick={() => navigate(-1)}
-              className="flex items-center gap-1 text-sm font-medium text-primary hover:opacity-70 transition-opacity"
+              aria-label="Go back"
+              className="flex items-center gap-1 text-sm font-medium text-primary hover:opacity-70 transition-opacity min-w-[44px] min-h-[44px]"
             >
               <ChevronLeft className="w-5 h-5" />
               Back
@@ -85,10 +87,11 @@ export default function AppLayout() {
           <div className="flex items-center gap-1">
             <LanguageTranslator />
             <button
-              className="md:hidden p-2 rounded-lg hover:bg-muted"
+              className="md:hidden p-2 rounded-lg hover:bg-muted min-w-[44px] min-h-[44px] flex items-center justify-center"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
             >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
@@ -117,8 +120,19 @@ export default function AppLayout() {
       </header>
 
       {/* Main */}
-      <main className="flex-1">
-        <Outlet />
+      <main className="flex-1 overflow-x-hidden">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={location.pathname}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -8 }}
+            transition={{ duration: 0.18, ease: 'easeInOut' }}
+            className="overflow-x-hidden"
+          >
+            <Outlet />
+          </motion.div>
+        </AnimatePresence>
       </main>
 
       {/* Global AI Chat Widget — hidden on /assistant page */}
@@ -138,6 +152,8 @@ export default function AppLayout() {
               <Link
                 key={item.path}
                 to={item.path}
+                replace={active}
+                aria-label={item.label}
                 className={cn(
                   "flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all min-w-[56px]",
                   active ? "text-primary" : "text-muted-foreground"

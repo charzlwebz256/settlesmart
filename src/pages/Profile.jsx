@@ -6,8 +6,12 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import {
   User, MapPin, Globe, BookOpen, Briefcase, Home as HomeIcon,
-  Scale, Heart, Sparkles, Save, LogOut, Loader2, CheckCircle2, Trash2
+  Scale, Heart, Sparkles, Save, LogOut, Loader2, CheckCircle2, Trash2,
+  ChevronDown
 } from 'lucide-react';
+import {
+  Select, SelectContent, SelectItem, SelectTrigger, SelectValue
+} from '@/components/ui/select';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
@@ -126,15 +130,16 @@ export default function Profile() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Province</label>
-              <select
-                value={form.province || ''}
-                onChange={e => updateField('province', e.target.value)}
-                className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm"
-              >
-                {['Alberta', 'British Columbia', 'Manitoba', 'New Brunswick', 'Newfoundland and Labrador', 'Northwest Territories', 'Nova Scotia', 'Nunavut', 'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan', 'Yukon'].map(p => (
-                  <option key={p} value={p}>{p}</option>
-                ))}
-              </select>
+              <Select value={form.province || ''} onValueChange={v => updateField('province', v)}>
+                <SelectTrigger className="rounded-lg">
+                  <SelectValue placeholder="Select province" />
+                </SelectTrigger>
+                <SelectContent>
+                  {['Alberta', 'British Columbia', 'Manitoba', 'New Brunswick', 'Newfoundland and Labrador', 'Northwest Territories', 'Nova Scotia', 'Nunavut', 'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan', 'Yukon'].map(p => (
+                    <SelectItem key={p} value={p}>{p}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">City</label>
@@ -152,27 +157,29 @@ export default function Profile() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Immigration Status</label>
-              <select
-                value={form.immigration_status || ''}
-                onChange={e => updateField('immigration_status', e.target.value)}
-                className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm"
-              >
-                {['permanent_resident', 'refugee', 'international_student', 'temporary_worker', 'asylum_seeker', 'citizen'].map(s => (
-                  <option key={s} value={s}>{s.replace(/_/g, ' ')}</option>
-                ))}
-              </select>
+              <Select value={form.immigration_status || ''} onValueChange={v => updateField('immigration_status', v)}>
+                <SelectTrigger className="rounded-lg">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent>
+                  {['permanent_resident', 'refugee', 'international_student', 'temporary_worker', 'asylum_seeker', 'citizen'].map(s => (
+                    <SelectItem key={s} value={s}>{s.replace(/_/g, ' ')}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">English Level</label>
-              <select
-                value={form.english_level || ''}
-                onChange={e => updateField('english_level', e.target.value)}
-                className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm"
-              >
-                {['none', 'beginner', 'intermediate', 'advanced', 'fluent'].map(l => (
-                  <option key={l} value={l}>{l}</option>
-                ))}
-              </select>
+              <Select value={form.english_level || ''} onValueChange={v => updateField('english_level', v)}>
+                <SelectTrigger className="rounded-lg">
+                  <SelectValue placeholder="Select level" />
+                </SelectTrigger>
+                <SelectContent>
+                  {['none', 'beginner', 'intermediate', 'advanced', 'fluent'].map(l => (
+                    <SelectItem key={l} value={l}>{l}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>

@@ -108,17 +108,26 @@ export default function Onboarding() {
         <p className="text-muted-foreground">We'll find services near you</p>
       </div>
       <div className="space-y-4 max-w-md mx-auto">
-        <label className="block">
+        <div className="block">
           <span className="text-sm font-medium mb-1.5 block">Province / Territory</span>
-          <select
-            value={data.province}
-            onChange={e => updateField('province', e.target.value)}
-            className="w-full px-4 py-3 rounded-xl border border-border bg-card text-foreground text-sm focus:ring-2 focus:ring-primary/20"
-          >
-            <option value="">Select province</option>
-            {provinces.map(p => <option key={p} value={p}>{p}</option>)}
-          </select>
-        </label>
+          <div className="grid grid-cols-2 gap-2">
+            {provinces.map(p => (
+              <button
+                key={p}
+                type="button"
+                onClick={() => updateField('province', p)}
+                className={cn(
+                  "px-3 py-2.5 rounded-xl border-2 text-sm text-left transition-all font-medium",
+                  data.province === p
+                    ? "border-primary bg-primary/5 text-primary"
+                    : "border-border hover:border-primary/30 text-foreground"
+                )}
+              >
+                {p}
+              </button>
+            ))}
+          </div>
+        </div>
         <label className="block">
           <span className="text-sm font-medium mb-1.5 block">City</span>
           <input

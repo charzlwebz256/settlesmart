@@ -180,7 +180,7 @@ For each job return:
           onClick={() => fetchJobs()}
           disabled={loading}
           className="rounded-xl"
-          title="Refresh jobs"
+          aria-label="Refresh jobs"
         >
           <RefreshCw className={cn("w-4 h-4", loading && "animate-spin")} />
         </Button>
