@@ -69,7 +69,7 @@ export default function HeroSection({ hasProfile }) {
             initial={{ opacity: 0, x: 40 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="hidden md:block flex-1 w-full max-w-2xl object-cover rounded-2xl"
+            className="w-full md:flex-1 md:max-w-2xl object-cover rounded-2xl mt-8 md:mt-0"
           />
         </motion.div>
       </div>
