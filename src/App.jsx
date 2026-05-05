@@ -12,6 +12,8 @@ import Onboarding from './pages/Onboarding';
 import Dashboard from './pages/Dashboard';
 import Services from './pages/Services';
 import Explore from './pages/Explore';
+import Work from './pages/Work';
+import Resources from './pages/Resources';
 import Assistant from './pages/Assistant';
 import Checklist from './pages/Checklist';
 import Profile from './pages/Profile';
@@ -56,6 +58,8 @@ const AuthenticatedApp = () => {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/services" element={<Services />} />
         <Route path="/explore" element={<Explore />} />
+        <Route path="/work" element={<Work />} />
+        <Route path="/resources" element={<Resources />} />
         <Route path="/assistant" element={<Assistant />} />
         <Route path="/checklist" element={<Checklist />} />
         <Route path="/profile" element={<Profile />} />

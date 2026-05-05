@@ -1,5 +1,10 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Search, MessageCircle, User, Navigation, Menu, X, CalendarDays, Briefcase, Scale, AlertTriangle, MapPin, Newspaper, ChevronLeft } from 'lucide-react';
+import {
+  Home, Search, Briefcase, BookOpen, AlertTriangle,
+  Menu, X, ChevronLeft, User, MessageCircle,
+  Navigation, MapPin, CalendarDays, Scale, Newspaper,
+  Info, Mail
+} from 'lucide-react';
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -8,13 +13,45 @@ import { base44 } from '@/api/base44Client';
 import NewcomerChatWidget from '@/components/assistant/NewcomerChatWidget';
 import LanguageTranslator from '@/components/layout/LanguageTranslator';
 
-const navItems = [
+// 5 primary bottom tabs
+const primaryTabs = [
+  { path: '/', icon: Home, label: 'Home' },
+  { path: '/explore', icon: Search, label: 'Explore' },
+  { path: '/work', icon: Briefcase, label: 'Work' },
+  { path: '/resources', icon: BookOpen, label: 'Resources' },
+  { path: '/emergency', icon: AlertTriangle, label: 'Emergency' },
+];
+
+// "Explore" group paths (for active highlight)
+const explorePaths = ['/', '/services', '/near-me', '/transit-map'];
+const workPaths = ['/jobs', '/events'];
+const resourcePaths = ['/legal', '/news'];
+
+// All pages — used for isRootTab check
+const ROOT_PATHS = [
+  '/', '/services', '/near-me', '/transit-map', '/explore',
+  '/jobs', '/events', '/work',
+  '/legal', '/news', '/resources',
+  '/emergency', '/assistant', '/profile',
+  '/about', '/contact',
+];
+
+// Hamburger menu items
+const menuItems = [
+  { path: '/assistant', icon: MessageCircle, label: 'AI Help' },
+  { path: '/profile', icon: User, label: 'Profile' },
+  { path: '/about', icon: Info, label: 'About' },
+  { path: '/contact', icon: Mail, label: 'Contact' },
+];
+
+// Desktop nav — all meaningful links
+const desktopNavItems = [
   { path: '/', icon: Home, label: 'Home' },
   { path: '/services', icon: Search, label: 'Services' },
-  { path: '/events', icon: CalendarDays, label: 'Events' },
+  { path: '/near-me', icon: MapPin, label: 'Near Me' },
   { path: '/transit-map', icon: Navigation, label: 'Transit' },
   { path: '/jobs', icon: Briefcase, label: 'Jobs' },
-  { path: '/near-me', icon: MapPin, label: 'Near Me' },
+  { path: '/events', icon: CalendarDays, label: 'Events' },
   { path: '/legal', icon: Scale, label: 'Legal' },
   { path: '/news', icon: Newspaper, label: 'News' },
   { path: '/emergency', icon: AlertTriangle, label: 'Emergency' },
@@ -22,18 +59,18 @@ const navItems = [
   { path: '/profile', icon: User, label: 'Profile' },
 ];
 
-const footerLinks = [
-  { path: '/about', label: 'About' },
-  { path: '/contact', label: 'Contact' },
-];
-
-const ROOT_TABS = navItems.map(i => i.path);
+function getTabActive(tabPath, currentPath) {
+  if (tabPath === '/explore') return ['/services', '/near-me', '/transit-map'].includes(currentPath);
+  if (tabPath === '/work') return ['/jobs', '/events'].includes(currentPath);
+  if (tabPath === '/resources') return ['/legal', '/news'].includes(currentPath);
+  return currentPath === tabPath;
+}
 
 export default function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const isRootTab = ROOT_TABS.includes(location.pathname);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const isRootTab = ROOT_PATHS.includes(location.pathname);
 
   const { data: profile } = useQuery({
     queryKey: ['myProfile'],
@@ -59,25 +96,25 @@ export default function AppLayout() {
               Back
             </button>
           ) : (
-          <Link to="/" className="flex items-center gap-2.5">
-            <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center overflow-hidden">
-              <img src="https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/34a7de8f6_generated_image.png" alt="SettleSmart logo" className="w-7 h-7 object-contain" />
-            </div>
-            <div>
-              <h1 className="font-heading font-bold text-base leading-tight text-foreground">SettleSmart</h1>
-              <p className="text-[10px] font-medium text-muted-foreground tracking-wider uppercase">Canada</p>
-            </div>
-          </Link>
+            <Link to="/" className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center overflow-hidden">
+                <img src="https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/34a7de8f6_generated_image.png" alt="SettleSmart logo" className="w-7 h-7 object-contain" />
+              </div>
+              <div>
+                <h1 className="font-heading font-bold text-base leading-tight text-foreground">SettleSmart</h1>
+                <p className="text-[10px] font-medium text-muted-foreground tracking-wider uppercase">Canada</p>
+              </div>
+            </Link>
           )}
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1">
-            {navItems.map(item => (
+          <nav className="hidden md:flex items-center gap-1 flex-wrap">
+            {desktopNavItems.map(item => (
               <Link
                 key={item.path}
                 to={item.path}
                 className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                  "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                   location.pathname === item.path
                     ? "bg-primary/10 text-primary"
                     : "text-muted-foreground hover:text-foreground hover:bg-muted"
@@ -91,37 +128,50 @@ export default function AppLayout() {
 
           <div className="flex items-center gap-1">
             <LanguageTranslator />
+            {/* Hamburger — mobile & desktop secondary */}
             <button
-              className="md:hidden p-2 rounded-lg hover:bg-muted min-w-[44px] min-h-[44px] flex items-center justify-center"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
+              className="p-2 rounded-lg hover:bg-muted min-w-[44px] min-h-[44px] flex items-center justify-center"
+              onClick={() => setMenuOpen(!menuOpen)}
+              aria-label={menuOpen ? 'Close menu' : 'Open menu'}
             >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile dropdown */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-border/50 bg-card p-3 space-y-1">
-            {navItems.map(item => (
-              <Link
-                key={item.path}
-                to={item.path}
-                onClick={() => setMobileMenuOpen(false)}
-                className={cn(
-                  "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
-                  location.pathname === item.path
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                )}
-              >
-                <item.icon className="w-5 h-5" />
-                {item.label}
-              </Link>
-            ))}
-          </div>
-        )}
+        {/* Hamburger Dropdown */}
+        <AnimatePresence>
+          {menuOpen && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.15 }}
+              className="border-t border-border/50 bg-card p-3 space-y-1"
+            >
+              {menuItems.map(item => (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  onClick={() => setMenuOpen(false)}
+                  className={cn(
+                    "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                    location.pathname === item.path
+                      ? "bg-primary/10 text-primary"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  )}
+                >
+                  <item.icon className="w-5 h-5" />
+                  {item.label}
+                </Link>
+              ))}
+              <div className="border-t border-border/30 pt-2 mt-1 flex gap-4 px-4 py-1">
+                <Link to="/about" onClick={() => setMenuOpen(false)} className="text-xs text-muted-foreground hover:text-primary transition-colors">About</Link>
+                <Link to="/contact" onClick={() => setMenuOpen(false)} className="text-xs text-muted-foreground hover:text-primary transition-colors">Contact</Link>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </header>
 
       {/* Main */}
@@ -140,16 +190,7 @@ export default function AppLayout() {
         </AnimatePresence>
       </main>
 
-      {/* Footer links — About & Contact */}
-      <footer className="hidden md:flex items-center justify-center gap-6 py-3 border-t border-border/30 bg-card/50 text-xs text-muted-foreground">
-        {footerLinks.map(link => (
-          <Link key={link.path} to={link.path} className="hover:text-primary transition-colors font-medium">
-            {link.label}
-          </Link>
-        ))}
-      </footer>
-
-      {/* Global AI Chat Widget — hidden on /assistant page */}
+      {/* Global AI Chat Widget */}
       {location.pathname !== '/assistant' && (
         <NewcomerChatWidget
           userCity={profile?.city}
@@ -157,24 +198,28 @@ export default function AppLayout() {
         />
       )}
 
-      {/* Mobile Bottom Nav */}
+      {/* Mobile Bottom Nav — 5 tabs */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-xl border-t border-border/50 safe-area-bottom select-none">
         <div className="flex items-center justify-around px-2 py-1">
-          {navItems.map(item => {
-            const active = location.pathname === item.path;
+          {primaryTabs.map(tab => {
+            const active = getTabActive(tab.path, location.pathname);
+            // Explore tab links to /services as the hub
+            const href = tab.path === '/explore' ? '/services'
+              : tab.path === '/work' ? '/jobs'
+              : tab.path === '/resources' ? '/legal'
+              : tab.path;
             return (
               <Link
-                key={item.path}
-                to={item.path}
-                replace={active}
-                aria-label={item.label}
+                key={tab.path}
+                to={href}
+                aria-label={tab.label}
                 className={cn(
                   "flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all min-w-[56px]",
                   active ? "text-primary" : "text-muted-foreground"
                 )}
               >
-                <item.icon className={cn("w-5 h-5", active && "stroke-[2.5]")} />
-                <span className="text-[10px] font-medium">{item.label}</span>
+                <tab.icon className={cn("w-5 h-5", active && "stroke-[2.5]")} />
+                <span className="text-[10px] font-medium">{tab.label}</span>
               </Link>
             );
           })}
