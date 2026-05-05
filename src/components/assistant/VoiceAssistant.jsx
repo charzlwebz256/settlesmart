@@ -1,9 +1,36 @@
 import { useState, useRef, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Loader2, Mic } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
 
+const NAVIGATION_MAP = {
+  'job search': '/jobs',
+  'jobs': '/jobs',
+  'job tracker': '/job-tracker',
+  'interview': '/interview-prep',
+  'resume': '/resume-builder',
+  'work': '/work',
+  'explore': '/explore',
+  'services': '/services',
+  'near me': '/near-me',
+  'transit': '/transit-map',
+  'resources': '/resources',
+  'legal': '/legal',
+  'news': '/news',
+  'events': '/events',
+  'checklist': '/checklist',
+  'profile': '/profile',
+  'emergency': '/emergency',
+  'assistant': '/assistant',
+  'education': '/education',
+  'volunteer': '/volunteer',
+  'home': '/',
+  'dashboard': '/dashboard',
+};
+
 export default function VoiceAssistant() {
+  const navigate = useNavigate();
   const [isListening, setIsListening] = useState(false);
   const [loading, setLoading] = useState(false);
   const [transcript, setTranscript] = useState('');
@@ -97,6 +124,18 @@ export default function VoiceAssistant() {
     setLoading(true);
 
     try {
+      // Check for navigation commands
+      const lowerQuestion = question.toLowerCase();
+      for (const [keyword, path] of Object.entries(NAVIGATION_MAP)) {
+        if (lowerQuestion.includes(keyword)) {
+          navigate(path);
+          speak(`Navigating to ${keyword}`);
+          setLoading(false);
+          setTranscript('');
+          return;
+        }
+      }
+
       const context = siteData
         ? `Available Services: ${siteData.services?.length || 0} | Available Events: ${siteData.events?.length || 0}`
         : '';
