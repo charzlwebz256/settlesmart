@@ -29,14 +29,15 @@ export default function Jobs() {
   const [autoRefreshTimer, setAutoRefreshTimer] = useState(null);
 
   const fetchJobs = useCallback(async (query = searchQuery, location = city) => {
-    if (!location && !query) return;
+    const loc = location || city;
+    if (!loc && !query) return;
     setLoading(true);
 
-    const searchLoc = location || 'Canada';
+    const searchLoc = loc || 'Canada';
     const searchTerm = query || 'newcomer immigrant jobs';
 
     const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Find 10 real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Mix LinkedIn and Indeed sources. Focus on roles accessible to newcomers (entry-level, trades, healthcare, IT, customer service). For each job provide: title, company, location, job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (or empty), posted (e.g. "2 days ago"), description (one short sentence), url, source (linkedin or indeed), is_newcomer_friendly (boolean).`,
+      prompt: `Find 10 real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Mix LinkedIn and Indeed sources. Focus on roles accessible to newcomers (entry-level, trades, healthcare, IT, customer service). For each job provide: title, company, location, job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (or empty string), posted (e.g. "2 days ago"), description (one short sentence), url, source (linkedin or indeed), is_newcomer_friendly (boolean).`,
       add_context_from_internet: true,
       response_json_schema: {
         type: 'object',
@@ -69,19 +70,18 @@ export default function Jobs() {
     setLoading(false);
   }, [searchQuery, city]);
 
-  // Auto-load when city is detected
+  // Auto-load when city is detected (only once)
   useEffect(() => {
-    if (!cityLoading && city && jobs.length === 0) {
+    if (!cityLoading && city && jobs.length === 0 && !loading) {
       fetchJobs('', city);
     }
-  }, [city, cityLoading]);
+  }, [city, cityLoading]); // eslint-disable-line
 
-  // Auto-refresh every 5 minutes
+  // Auto-refresh every 10 minutes (not 5 — reduces unnecessary LLM calls)
   useEffect(() => {
     const timer = setInterval(() => {
-      if (!loading) fetchJobs();
-    }, 5 * 60 * 1000);
-    setAutoRefreshTimer(timer);
+      if (!loading && jobs.length > 0) fetchJobs();
+    }, 10 * 60 * 1000);
     return () => clearInterval(timer);
   }, [fetchJobs, loading]);
 

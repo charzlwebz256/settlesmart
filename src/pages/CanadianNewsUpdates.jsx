@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
@@ -21,7 +21,7 @@ const CATEGORIES = [
 ];
 
 export default function CanadianNewsUpdates() {
-  const { city, province } = useCityDetection();
+  const { city, province, loading: cityLoading } = useCityDetection();
   const [newsData, setNewsData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [activeCategory, setActiveCategory] = useState('all');
@@ -82,6 +82,13 @@ For each news item return: title, summary (2 sentences max), category (breaking/
     setLastUpdated(new Date());
     setLoading(false);
   }, [city, province]);
+
+  // Auto-load news on first visit
+  useEffect(() => {
+    if (!cityLoading && !newsData && !loading) {
+      fetchNews();
+    }
+  }, [cityLoading]); // eslint-disable-line
 
   const { containerRef, pullDistance, isRefreshing, touchHandlers } = usePullToRefresh({
     onRefresh: fetchNews,

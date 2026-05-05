@@ -152,7 +152,7 @@ export default function Services() {
       </div>
 
       {/* Static category panels for rich data tabs */}
-      {['language', 'education', 'legal', 'health', 'transportation', 'housing'].includes(selectedCategory) && !searchQuery ? (
+      {['language', 'education', 'legal', 'health', 'transportation', 'housing', 'volunteering', 'family_support'].includes(selectedCategory) && !searchQuery ? (
         <StaticCategoryPanel category={selectedCategory} />
       ) : isLoading ? (
         <div className="flex items-center justify-center py-20">
