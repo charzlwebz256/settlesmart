@@ -40,37 +40,152 @@ export default function Jobs() {
     const searchLoc = loc || 'Canada';
     const searchTerm = query || 'newcomer immigrant jobs';
 
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Find 50 real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Mix sources: LinkedIn, Indeed, Job Bank Canada, Indeed, ZipRecruiter. Focus on newcomer-friendly roles. Return ONLY: title (short), company (short), location (city only), job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (very short or empty string), posted (e.g. "2d"), url, source (linkedin/indeed/jooble/jobbank/ziprecruiter), is_newcomer_friendly (true/false). No extra fields.`,
-      add_context_from_internet: true,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          jobs: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                title: { type: 'string' },
-                company: { type: 'string' },
-                location: { type: 'string' },
-                job_type: { type: 'string' },
-                experience_level: { type: 'string' },
-                salary: { type: 'string' },
-                posted: { type: 'string' },
-                url: { type: 'string' },
-                source: { type: 'string' },
-                is_newcomer_friendly: { type: 'boolean' },
+    try {
+      // Fetch 5 batches of 10 jobs each = 50 total
+      const batches = await Promise.all([
+        base44.integrations.Core.InvokeLLM({
+          prompt: `Find 10 real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Sources: LinkedIn, Indeed, Job Bank, ZipRecruiter. Newcomer-friendly roles. Return ONLY: title, company, location (city), job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (short or empty), posted (e.g. "2d"), url, source, is_newcomer_friendly (boolean).`,
+          add_context_from_internet: true,
+          response_json_schema: {
+            type: 'object',
+            properties: {
+              jobs: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    title: { type: 'string' },
+                    company: { type: 'string' },
+                    location: { type: 'string' },
+                    job_type: { type: 'string' },
+                    experience_level: { type: 'string' },
+                    salary: { type: 'string' },
+                    posted: { type: 'string' },
+                    url: { type: 'string' },
+                    source: { type: 'string' },
+                    is_newcomer_friendly: { type: 'boolean' },
+                  },
+                },
               },
             },
           },
-        },
-      },
-    });
+        }),
+        base44.integrations.Core.InvokeLLM({
+          prompt: `Find 10 more real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Sources: LinkedIn, Indeed, Job Bank, ZipRecruiter. Newcomer-friendly roles. Return ONLY: title, company, location (city), job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (short or empty), posted (e.g. "2d"), url, source, is_newcomer_friendly (boolean).`,
+          add_context_from_internet: true,
+          response_json_schema: {
+            type: 'object',
+            properties: {
+              jobs: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    title: { type: 'string' },
+                    company: { type: 'string' },
+                    location: { type: 'string' },
+                    job_type: { type: 'string' },
+                    experience_level: { type: 'string' },
+                    salary: { type: 'string' },
+                    posted: { type: 'string' },
+                    url: { type: 'string' },
+                    source: { type: 'string' },
+                    is_newcomer_friendly: { type: 'boolean' },
+                  },
+                },
+              },
+            },
+          },
+        }),
+        base44.integrations.Core.InvokeLLM({
+          prompt: `Find 10 more real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Sources: LinkedIn, Indeed, Job Bank, ZipRecruiter. Newcomer-friendly roles. Return ONLY: title, company, location (city), job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (short or empty), posted (e.g. "2d"), url, source, is_newcomer_friendly (boolean).`,
+          add_context_from_internet: true,
+          response_json_schema: {
+            type: 'object',
+            properties: {
+              jobs: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    title: { type: 'string' },
+                    company: { type: 'string' },
+                    location: { type: 'string' },
+                    job_type: { type: 'string' },
+                    experience_level: { type: 'string' },
+                    salary: { type: 'string' },
+                    posted: { type: 'string' },
+                    url: { type: 'string' },
+                    source: { type: 'string' },
+                    is_newcomer_friendly: { type: 'boolean' },
+                  },
+                },
+              },
+            },
+          },
+        }),
+        base44.integrations.Core.InvokeLLM({
+          prompt: `Find 10 more real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Sources: LinkedIn, Indeed, Job Bank, ZipRecruiter. Newcomer-friendly roles. Return ONLY: title, company, location (city), job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (short or empty), posted (e.g. "2d"), url, source, is_newcomer_friendly (boolean).`,
+          add_context_from_internet: true,
+          response_json_schema: {
+            type: 'object',
+            properties: {
+              jobs: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    title: { type: 'string' },
+                    company: { type: 'string' },
+                    location: { type: 'string' },
+                    job_type: { type: 'string' },
+                    experience_level: { type: 'string' },
+                    salary: { type: 'string' },
+                    posted: { type: 'string' },
+                    url: { type: 'string' },
+                    source: { type: 'string' },
+                    is_newcomer_friendly: { type: 'boolean' },
+                  },
+                },
+              },
+            },
+          },
+        }),
+        base44.integrations.Core.InvokeLLM({
+          prompt: `Find 10 more real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Sources: LinkedIn, Indeed, Job Bank, ZipRecruiter. Newcomer-friendly roles. Return ONLY: title, company, location (city), job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (short or empty), posted (e.g. "2d"), url, source, is_newcomer_friendly (boolean).`,
+          add_context_from_internet: true,
+          response_json_schema: {
+            type: 'object',
+            properties: {
+              jobs: {
+                type: 'array',
+                items: {
+                  type: 'object',
+                  properties: {
+                    title: { type: 'string' },
+                    company: { type: 'string' },
+                    location: { type: 'string' },
+                    job_type: { type: 'string' },
+                    experience_level: { type: 'string' },
+                    salary: { type: 'string' },
+                    posted: { type: 'string' },
+                    url: { type: 'string' },
+                    source: { type: 'string' },
+                    is_newcomer_friendly: { type: 'boolean' },
+                  },
+                },
+              },
+            },
+          },
+        }),
+      ]);
 
-    setJobs(result?.jobs || []);
-    setLastFetched(new Date());
-    setLoading(false);
+      const allJobs = batches.flatMap(batch => batch?.jobs || []);
+      setJobs(allJobs);
+      setLastFetched(new Date());
+    } finally {
+      setLoading(false);
+    }
   }, [searchQuery, city]);
 
   // Auto-load when city is detected (only once)
