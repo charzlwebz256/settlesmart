@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import NewcomerChatWidget from '@/components/assistant/NewcomerChatWidget';
+import VoiceAssistant from '@/components/assistant/VoiceAssistant';
 import LanguageTranslator from '@/components/layout/LanguageTranslator';
 
 // Sub-items for tabs with dropdowns
@@ -298,6 +299,9 @@ export default function AppLayout() {
           userProvince={profile?.province}
         />
       )}
+
+      {/* Voice Assistant */}
+      <VoiceAssistant />
 
       {/* Mobile Bottom Nav — 5 primary tabs */}
       <MobileBottomNav activeTab={activeTab} location={location} />
