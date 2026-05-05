@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Scale, Newspaper, ArrowRight } from 'lucide-react';
+import { Scale, Newspaper, ArrowRight, ShoppingBag } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const sections = [
@@ -17,6 +17,13 @@ const sections = [
     desc: 'Live Canadian news from CBC, CTV, and Global News — with plain-language insights tailored for newcomers.',
     path: '/news',
   },
+  {
+    icon: ShoppingBag,
+    color: 'bg-orange-500/10 text-orange-600',
+    label: 'Shop Smart',
+    desc: 'Access major online shopping platforms — Amazon.ca and eBay.ca for convenient home delivery.',
+    path: '/shop-smart',
+  },
 ];
 
 export default function Resources() {
@@ -24,7 +31,7 @@ export default function Resources() {
     <div className="max-w-3xl mx-auto px-4 py-10 pb-24 md:pb-12">
       <div className="mb-8">
         <h1 className="font-heading font-bold text-2xl md:text-3xl mb-2">Resources</h1>
-        <p className="text-muted-foreground text-sm">Legal information and news to keep you informed.</p>
+        <p className="text-muted-foreground text-sm">Legal information, news, and shopping guides to keep you informed.</p>
       </div>
       <div className="space-y-4">
         {sections.map((s, i) => (

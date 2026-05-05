@@ -463,6 +463,15 @@ export default function TransitMap() {
                       <div className="text-muted-foreground">Buses: {bs.buses.join(', ')}</div>
                     </div>
                   ))}
+                  <a
+                    href="https://www.edmonton.ca/ets/maps-routes-schedules-service"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-[10px] text-primary hover:underline font-semibold flex items-center gap-1"
+                  >
+                    View ETS Routes & Schedules
+                    <ExternalLink className="w-2.5 h-2.5" />
+                  </a>
                 </div>
               )}
             </div>

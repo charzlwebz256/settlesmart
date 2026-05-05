@@ -32,6 +32,7 @@ import Volunteer from './pages/Volunteer';
 import ResumeBuilder from './pages/ResumeBuilder';
 import JobTracker from './pages/JobTracker';
 import InterviewPrep from './pages/InterviewPrep';
+import ShopSmart from './pages/ShopSmart';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -84,6 +85,7 @@ const AuthenticatedApp = () => {
         <Route path="/resume-builder" element={<ResumeBuilder />} />
         <Route path="/job-tracker" element={<JobTracker />} />
         <Route path="/interview-prep" element={<InterviewPrep />} />
+        <Route path="/shop-smart" element={<ShopSmart />} />
       </Route>
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="*" element={<PageNotFound />} />
