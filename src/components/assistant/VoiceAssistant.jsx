@@ -133,9 +133,12 @@ Be friendly, direct, and practical. User: "${question}"`,
       title={isListening ? 'Listening...' : loading ? 'Processing...' : 'Press to speak'}
     >
       <div className="relative flex items-center justify-center">
-        <Mic className={cn('w-6 h-6', isListening && 'animate-pulse')} />
-        {(isListening || loading) && (
-          <div className="absolute inset-0 rounded-full animate-ping bg-red-500/50" />
+        <Mic className={cn('w-6 h-6', isListening && 'animate-bounce text-red-300')} />
+        {isListening && (
+          <>
+            <div className="absolute inset-0 rounded-full animate-ping bg-red-500/60" />
+            <div className="absolute inset-0 rounded-full border-2 border-red-400 animate-pulse opacity-60" />
+          </>
         )}
       </div>
     </button>
