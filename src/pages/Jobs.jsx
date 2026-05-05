@@ -13,8 +13,11 @@ import JobAlertSubscribe from '@/components/jobs/JobAlertSubscribe';
 
 const SOURCE_TABS = [
   { id: 'all', label: 'All Jobs' },
-  { id: 'linkedin', label: 'LinkedIn', color: 'text-blue-600' },
-  { id: 'indeed', label: 'Indeed', color: 'text-indigo-600' },
+  { id: 'linkedin', label: 'LinkedIn' },
+  { id: 'indeed', label: 'Indeed' },
+  { id: 'jooble', label: 'Jooble' },
+  { id: 'jobbank', label: 'Job Bank' },
+  { id: 'ziprecruiter', label: 'ZipRecruiter' },
 ];
 
 export default function Jobs() {
@@ -37,7 +40,7 @@ export default function Jobs() {
     const searchTerm = query || 'newcomer immigrant jobs';
 
     const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Find 10 real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Mix LinkedIn and Indeed sources. Focus on roles accessible to newcomers (entry-level, trades, healthcare, IT, customer service). For each job provide: title, company, location, job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (or empty string), posted (e.g. "2 days ago"), description (one short sentence), url, source (linkedin or indeed), is_newcomer_friendly (boolean).`,
+      prompt: `Find 12 real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Mix sources across LinkedIn, Indeed, Jooble (jooble.org), Job Bank Canada (jobbank.gc.ca), and ZipRecruiter. Focus on roles accessible to newcomers (entry-level, trades, healthcare, IT, customer service). For each job provide: title, company, location, job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (or empty string), posted (e.g. "2 days ago"), description (one short sentence), url (direct link to the job listing), source (linkedin/indeed/jooble/jobbank/ziprecruiter), is_newcomer_friendly (boolean).`,
       add_context_from_internet: true,
       response_json_schema: {
         type: 'object',
@@ -202,26 +205,51 @@ export default function Jobs() {
       </div>
 
       {/* Platform Links */}
-      <div className="flex gap-3 mb-5">
+      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-5">
         <a
           href={`https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(searchQuery || 'jobs')}&location=${encodeURIComponent((city || '') + ' Canada')}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-700 text-xs font-semibold hover:bg-blue-500/15 transition-colors"
+          target="_blank" rel="noopener noreferrer"
+          className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-700 text-xs font-semibold hover:bg-blue-500/15 transition-colors"
         >
-          <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" className="w-4 h-4 rounded" alt="LinkedIn" />
-          Search on LinkedIn
-          <ExternalLink className="w-3 h-3 opacity-60" />
+          <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" className="w-4 h-4 rounded flex-shrink-0" alt="LinkedIn" />
+          <span className="truncate">LinkedIn</span>
+          <ExternalLink className="w-3 h-3 opacity-60 flex-shrink-0 ml-auto" />
         </a>
         <a
           href={`https://ca.indeed.com/jobs?q=${encodeURIComponent(searchQuery || 'jobs')}&l=${encodeURIComponent((city || '') + ', Canada')}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-700 text-xs font-semibold hover:bg-indigo-500/15 transition-colors"
+          target="_blank" rel="noopener noreferrer"
+          className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-700 text-xs font-semibold hover:bg-indigo-500/15 transition-colors"
         >
-          <img src="https://upload.wikimedia.org/wikipedia/commons/f/fc/Indeed_logo.svg" className="w-10 h-4 object-contain" alt="Indeed" />
-          Search on Indeed
-          <ExternalLink className="w-3 h-3 opacity-60" />
+          <img src="https://upload.wikimedia.org/wikipedia/commons/f/fc/Indeed_logo.svg" className="w-10 h-3.5 object-contain flex-shrink-0" alt="Indeed" />
+          <span className="truncate">Indeed</span>
+          <ExternalLink className="w-3 h-3 opacity-60 flex-shrink-0 ml-auto" />
+        </a>
+        <a
+          href={`https://jooble.org/jobs-${encodeURIComponent((searchQuery || 'jobs').replace(/ /g, '-'))}/${encodeURIComponent(city || 'canada')}`}
+          target="_blank" rel="noopener noreferrer"
+          className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-700 text-xs font-semibold hover:bg-orange-500/15 transition-colors"
+        >
+          <img src="https://jooble.org/favicon.ico" className="w-4 h-4 rounded flex-shrink-0" alt="Jooble" />
+          <span className="truncate">Jooble</span>
+          <ExternalLink className="w-3 h-3 opacity-60 flex-shrink-0 ml-auto" />
+        </a>
+        <a
+          href={`https://www.jobbank.gc.ca/jobsearch/jobsearch?searchstring=${encodeURIComponent(searchQuery || '')}&locationstring=${encodeURIComponent(city || 'Canada')}`}
+          target="_blank" rel="noopener noreferrer"
+          className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-700 text-xs font-semibold hover:bg-red-500/15 transition-colors"
+        >
+          <img src="https://www.jobbank.gc.ca/favicon.ico" className="w-4 h-4 rounded flex-shrink-0" alt="Job Bank" />
+          <span className="truncate">Job Bank GC</span>
+          <ExternalLink className="w-3 h-3 opacity-60 flex-shrink-0 ml-auto" />
+        </a>
+        <a
+          href={`https://www.ziprecruiter.com/jobs-search?search=${encodeURIComponent(searchQuery || 'jobs')}&location=${encodeURIComponent((city || '') + ', Canada')}`}
+          target="_blank" rel="noopener noreferrer"
+          className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-green-500/10 border border-green-500/20 text-green-700 text-xs font-semibold hover:bg-green-500/15 transition-colors"
+        >
+          <img src="https://www.ziprecruiter.com/favicon.ico" className="w-4 h-4 rounded flex-shrink-0" alt="ZipRecruiter" />
+          <span className="truncate">ZipRecruiter</span>
+          <ExternalLink className="w-3 h-3 opacity-60 flex-shrink-0 ml-auto" />
         </a>
       </div>
 
@@ -229,7 +257,7 @@ export default function Jobs() {
       {loading && (
         <div className="text-center py-16">
           <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-3" />
-          <p className="text-sm font-medium">Fetching live jobs from LinkedIn & Indeed...</p>
+          <p className="text-sm font-medium">Fetching live jobs from LinkedIn, Indeed, Jooble, Job Bank & ZipRecruiter...</p>
           <p className="text-xs text-muted-foreground mt-1">This may take a moment</p>
         </div>
       )}
