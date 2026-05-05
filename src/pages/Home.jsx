@@ -5,6 +5,8 @@ import QuickAccessGrid from '../components/home/QuickAccessGrid';
 import InfoBanner from '../components/home/InfoBanner';
 import First30DaysBanner from '../components/home/First30DaysBanner';
 import OnboardingWalkthrough from '../components/onboarding/OnboardingWalkthrough';
+import MyProgressSection from '../components/home/MyProgressSection';
+import NotificationCenter from '../components/home/NotificationCenter';
 
 export default function Home() {
   const { data: profiles } = useQuery({
@@ -23,6 +25,12 @@ export default function Home() {
     <div className="pb-24 md:pb-8">
       <OnboardingWalkthrough />
       <HeroSection hasProfile={hasProfile} />
+      {hasProfile && (
+        <>
+          <NotificationCenter />
+          <MyProgressSection />
+        </>
+      )}
       <QuickAccessGrid />
       <First30DaysBanner />
       <InfoBanner />
