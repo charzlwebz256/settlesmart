@@ -1,7 +1,7 @@
 import { MapPin, Phone, Globe, ExternalLink, Bookmark } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { getOrgLogo } from '@/lib/orgLogos';
 
 const categoryIcons = {
   education: '🎓', language: '💬', housing: '🏠', employment: '💼',
@@ -10,11 +10,16 @@ const categoryIcons = {
 };
 
 export default function ServiceCard({ service, onSave, saved }) {
+  const logo = getOrgLogo(service.organization) || getOrgLogo(service.name);
   return (
     <div className="group bg-card rounded-2xl border border-border/50 hover:border-primary/20 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300 p-5">
       <div className="flex items-start justify-between mb-3">
         <div className="flex items-center gap-3">
-          <span className="text-2xl">{categoryIcons[service.category] || '📋'}</span>
+          {logo ? (
+            <img src={logo} alt={service.organization || service.name} className="w-9 h-9 rounded-lg object-contain flex-shrink-0" onError={e => { e.target.style.display='none'; }} />
+          ) : (
+            <span className="text-2xl">{categoryIcons[service.category] || '📋'}</span>
+          )}
           <div>
             <h3 className="font-heading font-bold text-sm leading-tight">{service.name}</h3>
             <p className="text-xs text-muted-foreground mt-0.5">{service.organization}</p>

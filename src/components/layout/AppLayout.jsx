@@ -1,6 +1,7 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, Navigation, MapPin, CalendarDays, ChevronDown } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import MobileBottomNav from '@/components/layout/MobileBottomNav';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -285,27 +286,7 @@ export default function AppLayout() {
       )}
 
       {/* Mobile Bottom Nav — 5 primary tabs */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-xl border-t border-border/50 safe-area-bottom select-none">
-        <div className="flex items-center justify-around px-2 py-1">
-          {primaryNav.map(item => {
-            const active = activeTab === item.path;
-            return (
-              <Link
-                key={item.path}
-                to={item.path}
-                aria-label={item.label}
-                className={cn(
-                  "flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all min-w-[56px]",
-                  active ? "text-primary" : "text-muted-foreground"
-                )}
-              >
-                <item.icon className={cn("w-5 h-5", active && "stroke-[2.5]")} />
-                <span className="text-[10px] font-medium">{item.label}</span>
-              </Link>
-            );
-          })}
-        </div>
-      </nav>
+      <MobileBottomNav activeTab={activeTab} location={location} />
     </div>
   );
 }
