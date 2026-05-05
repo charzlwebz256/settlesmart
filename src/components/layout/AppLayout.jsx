@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, Navigation, MapPin, CalendarDays, ChevronDown } from 'lucide-react';
+import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, Navigation, MapPin, CalendarDays, ChevronDown, Moon, Sun } from 'lucide-react';
 import { useState, useRef, useEffect, useCallback } from 'react';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -113,8 +113,15 @@ export default function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
   const activeTab = getActiveTab(location.pathname);
   const isRootTab = ALL_NAV_PATHS.includes(location.pathname);
+
+  const toggleTheme = () => {
+    const html = document.documentElement;
+    html.classList.toggle('dark');
+    setIsDark(!isDark);
+  };
 
   const { data: profile } = useQuery({
     queryKey: ['myProfile'],
@@ -175,8 +182,15 @@ export default function AppLayout() {
             })}
           </nav>
 
-          {/* Right side: language + hamburger */}
+          {/* Right side: theme + language + hamburger */}
           <div className="flex items-center gap-1">
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg hover:bg-muted min-w-[44px] min-h-[44px] flex items-center justify-center"
+              aria-label="Toggle theme"
+            >
+              {isDark ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
             <LanguageTranslator />
             <button
               className="p-2 rounded-lg hover:bg-muted min-w-[44px] min-h-[44px] flex items-center justify-center"
