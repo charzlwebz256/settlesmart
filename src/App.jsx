@@ -30,6 +30,8 @@ import Education from './pages/Education';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Volunteer from './pages/Volunteer';
 import ResumeBuilder from './pages/ResumeBuilder';
+import JobTracker from './pages/JobTracker';
+import InterviewPrep from './pages/InterviewPrep';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -80,6 +82,8 @@ const AuthenticatedApp = () => {
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/volunteer" element={<Volunteer />} />
         <Route path="/resume-builder" element={<ResumeBuilder />} />
+        <Route path="/job-tracker" element={<JobTracker />} />
+        <Route path="/interview-prep" element={<InterviewPrep />} />
       </Route>
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="*" element={<PageNotFound />} />

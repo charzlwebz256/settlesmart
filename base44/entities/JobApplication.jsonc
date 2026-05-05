@@ -1,0 +1,94 @@
+{
+  "name": "JobApplication",
+  "type": "object",
+  "properties": {
+    "job_title": {
+      "type": "string",
+      "description": "Job title applied for"
+    },
+    "company": {
+      "type": "string",
+      "description": "Company name"
+    },
+    "location": {
+      "type": "string",
+      "description": "Job location"
+    },
+    "job_url": {
+      "type": "string",
+      "description": "Link to the job posting"
+    },
+    "source": {
+      "type": "string",
+      "description": "Where the job was found (LinkedIn, Indeed, etc.)"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "applied",
+        "interviewing",
+        "offer",
+        "rejected",
+        "saved"
+      ],
+      "default": "saved",
+      "description": "Current application status"
+    },
+    "applied_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date applied"
+    },
+    "follow_up_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date to follow up"
+    },
+    "salary_range": {
+      "type": "string",
+      "description": "Salary range for the role"
+    },
+    "notes": {
+      "type": "string",
+      "description": "Personal notes about this application"
+    },
+    "resume_version": {
+      "type": "string",
+      "description": "Label of the resume version sent"
+    },
+    "cover_letter_sent": {
+      "type": "boolean",
+      "default": false
+    },
+    "contact_name": {
+      "type": "string",
+      "description": "Recruiter or hiring manager name"
+    },
+    "contact_email": {
+      "type": "string",
+      "description": "Recruiter or hiring manager email"
+    },
+    "job_description": {
+      "type": "string",
+      "description": "Job description for interview prep"
+    }
+  },
+  "required": [
+    "job_title",
+    "company"
+  ],
+  "rls": {
+    "create": {
+      "created_by": "{{user.email}}"
+    },
+    "read": {
+      "created_by": "{{user.email}}"
+    },
+    "update": {
+      "created_by": "{{user.email}}"
+    },
+    "delete": {
+      "created_by": "{{user.email}}"
+    }
+  }
+}

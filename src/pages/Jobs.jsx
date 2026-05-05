@@ -4,7 +4,7 @@ import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Search, RefreshCw, Briefcase, MapPin, Clock, ExternalLink, Building2, DollarSign, SlidersHorizontal, FileText, ArrowRight } from 'lucide-react';
+import { Loader2, Search, RefreshCw, Briefcase, MapPin, Clock, ExternalLink, Building2, DollarSign, SlidersHorizontal, FileText, ArrowRight, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { useCityDetection } from '@/hooks/useCityDetection';
@@ -41,7 +41,7 @@ export default function Jobs() {
     const searchTerm = query || 'newcomer immigrant jobs';
 
     const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Find 12 real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Mix sources across LinkedIn, Indeed, Jooble (jooble.org), Job Bank Canada (jobbank.gc.ca), and ZipRecruiter. Focus on roles accessible to newcomers (entry-level, trades, healthcare, IT, customer service). For each job provide: title, company, location, job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (or empty string), posted (e.g. "2 days ago"), description (one short sentence), url (direct link to the job listing), source (linkedin/indeed/jooble/jobbank/ziprecruiter), is_newcomer_friendly (boolean).`,
+      prompt: `Find 50 real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Mix sources across LinkedIn, Indeed, Jooble (jooble.org), Job Bank Canada (jobbank.gc.ca), and ZipRecruiter. Focus on roles accessible to newcomers (entry-level, trades, healthcare, IT, customer service). For each job provide: title, company, location, job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (or empty string), posted (e.g. "2 days ago"), description (one short sentence), url (direct link to the job listing), source (linkedin/indeed/jooble/jobbank/ziprecruiter), is_newcomer_friendly (boolean).`,
       add_context_from_internet: true,
       response_json_schema: {
         type: 'object',
@@ -144,19 +144,39 @@ export default function Jobs() {
         </div>
       </div>
 
-      {/* Resume Builder Banner */}
-      <Link to="/resume-builder" className="flex items-center justify-between gap-3 bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-xl px-4 py-3 mb-4 hover:border-primary/40 transition-all group">
-        <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0">
-            <FileText className="w-4.5 h-4.5 w-[18px] h-[18px] text-primary" />
+      {/* Tool Banners */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
+        <Link to="/resume-builder" className="flex items-center gap-3 bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-xl px-4 py-3 hover:border-primary/40 transition-all group">
+          <div className="w-8 h-8 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0">
+            <FileText className="w-4 h-4 text-primary" />
           </div>
-          <div>
-            <p className="text-sm font-semibold text-foreground">🍁 Smart Resume Builder</p>
-            <p className="text-xs text-muted-foreground">AI-powered · Canadian format · ATS-optimized · Cover letter included</p>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-foreground">🍁 Resume Builder</p>
+            <p className="text-[10px] text-muted-foreground">AI · Canadian format · ATS</p>
           </div>
-        </div>
-        <ArrowRight className="w-4 h-4 text-primary flex-shrink-0 group-hover:translate-x-1 transition-transform" />
-      </Link>
+          <ArrowRight className="w-3.5 h-3.5 text-primary flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+        <Link to="/job-tracker" className="flex items-center gap-3 bg-gradient-to-r from-blue-500/10 to-blue-500/5 border border-blue-500/20 rounded-xl px-4 py-3 hover:border-blue-500/40 transition-all group">
+          <div className="w-8 h-8 rounded-xl bg-blue-500/15 flex items-center justify-center flex-shrink-0">
+            <Briefcase className="w-4 h-4 text-blue-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-foreground">📋 Job Tracker</p>
+            <p className="text-[10px] text-muted-foreground">Track applications · Reminders</p>
+          </div>
+          <ArrowRight className="w-3.5 h-3.5 text-blue-600 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+        <Link to="/interview-prep" className="flex items-center gap-3 bg-gradient-to-r from-violet-500/10 to-violet-500/5 border border-violet-500/20 rounded-xl px-4 py-3 hover:border-violet-500/40 transition-all group">
+          <div className="w-8 h-8 rounded-xl bg-violet-500/15 flex items-center justify-center flex-shrink-0">
+            <MessageSquare className="w-4 h-4 text-violet-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-foreground">🎤 Interview Prep</p>
+            <p className="text-[10px] text-muted-foreground">Mock interviews · AI feedback</p>
+          </div>
+          <ArrowRight className="w-3.5 h-3.5 text-violet-600 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+      </div>
 
       {/* Job Alert */}
       <JobAlertSubscribe defaultCity={city || ''} />
@@ -371,20 +391,33 @@ export default function Jobs() {
               >
                 ← Prev
               </button>
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className={cn(
-                    "w-8 h-8 rounded-xl text-xs font-semibold border transition-all",
-                    currentPage === page
-                      ? "bg-primary text-primary-foreground border-primary"
-                      : "border-border/50 bg-card text-muted-foreground hover:border-primary/30"
-                  )}
-                >
-                  {page}
-                </button>
-              ))}
+              {(() => {
+                const pages = [];
+                const delta = 2;
+                const rangeStart = Math.max(2, currentPage - delta);
+                const rangeEnd = Math.min(totalPages - 1, currentPage + delta);
+                pages.push(1);
+                if (rangeStart > 2) pages.push('...');
+                for (let i = rangeStart; i <= rangeEnd; i++) pages.push(i);
+                if (rangeEnd < totalPages - 1) pages.push('...');
+                if (totalPages > 1) pages.push(totalPages);
+                return pages.map((page, i) => page === '...' ? (
+                  <span key={`ellipsis-${i}`} className="text-xs text-muted-foreground px-1">…</span>
+                ) : (
+                  <button
+                    key={page}
+                    onClick={() => setCurrentPage(page)}
+                    className={cn(
+                      "w-8 h-8 rounded-xl text-xs font-semibold border transition-all",
+                      currentPage === page
+                        ? "bg-primary text-primary-foreground border-primary"
+                        : "border-border/50 bg-card text-muted-foreground hover:border-primary/30"
+                    )}
+                  >
+                    {page}
+                  </button>
+                ));
+              })()}
               <button
                 onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
                 disabled={currentPage === totalPages}
