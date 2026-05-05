@@ -16,8 +16,7 @@ export default function HeroSection({ hasProfile }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="flex flex-col items-center md:flex-row md:items-center md:gap-12">
-          <div className="max-w-2xl md:flex-1">
+          className="max-w-2xl">
           
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6">
             <MapPin className="w-3.5 h-3.5" />
@@ -26,7 +25,7 @@ export default function HeroSection({ hasProfile }) {
 
           <h1 className="font-heading font-extrabold text-4xl md:text-5xl lg:text-6xl text-foreground leading-[1.1] mb-5">
             Start Your New Life{' '}
-            <span className="text-4xl font-normal block hidden">Start Your New Life</span>
+            
             <br />
             <span className="text-muted-foreground font-bold text-2xl md:text-3xl lg:text-4xl">
               with Confidence
@@ -61,16 +60,6 @@ export default function HeroSection({ hasProfile }) {
               </Button>
             </Link>
           </div>
-          </div>
-
-          <motion.img
-            src="https://liveassets.ca/wp-content/uploads/2022/01/section-planningforcanada-1.png"
-            alt="Planning for Canada"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="w-full max-w-md md:flex-1 md:max-w-2xl object-cover rounded-2xl mt-8 md:mt-0 md:ml-0"
-          />
         </motion.div>
       </div>
     </section>);
