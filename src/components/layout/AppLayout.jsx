@@ -17,7 +17,7 @@ import LanguageTranslator from '@/components/layout/LanguageTranslator';
 const explorePopup = [
   { path: '/services', icon: Search, label: 'Services' },
   { path: '/events', icon: CalendarDays, label: 'Events' },
-  { path: '/near-me', icon: Heart, label: 'Volunteer & Support' },
+  { path: '/volunteer', icon: Heart, label: 'Volunteer & Support' },
 ];
 
 const resourcesPopup = [
@@ -39,7 +39,7 @@ const primaryTabs = [
 const ROOT_PATHS = [
   '/', '/services', '/near-me', '/transit-map', '/explore',
   '/jobs', '/events', '/work',
-  '/legal', '/news', '/resources', '/education',
+  '/legal', '/news', '/resources', '/education', '/volunteer',
   '/emergency', '/assistant', '/profile',
   '/about', '/contact', '/privacy',
 ];
@@ -53,37 +53,35 @@ const menuItems = [
   { path: '/privacy', icon: Scale, label: 'Privacy Policy' },
 ];
 
-// Desktop nav
+// Desktop nav — mirrors the 5 primary tabs
 const desktopNavItems = [
-  { path: '/', icon: Home, label: 'Home' },
-  { path: '/services', icon: Search, label: 'Services' },
-  { path: '/near-me', icon: MapPin, label: 'Near Me' },
-  { path: '/transit-map', icon: Navigation, label: 'Transit' },
-  { path: '/jobs', icon: Briefcase, label: 'Jobs' },
-  { path: '/events', icon: CalendarDays, label: 'Events' },
-  { path: '/education', icon: GraduationCap, label: 'Education' },
-  { path: '/legal', icon: Scale, label: 'Legal' },
-  { path: '/news', icon: Newspaper, label: 'News' },
-  { path: '/emergency', icon: AlertTriangle, label: 'Emergency' },
-  { path: '/assistant', icon: MessageCircle, label: 'AI Help' },
-  { path: '/profile', icon: User, label: 'Profile' },
+  { path: '/', icon: Home, label: 'Home', popup: null },
+  { path: '/explore', icon: Search, label: 'Explore', popup: explorePopup },
+  { path: '/work', icon: Briefcase, label: 'Work', popup: null },
+  { path: '/resources', icon: BookOpen, label: 'Resources', popup: resourcesPopup },
+  { path: '/emergency', icon: AlertTriangle, label: 'Emergency', popup: null },
 ];
 
 function getTabActive(tabPath, currentPath) {
-  if (tabPath === '/explore') return ['/services', '/near-me', '/transit-map', '/events'].includes(currentPath);
+  if (tabPath === '/explore') return ['/services', '/near-me', '/transit-map', '/events', '/volunteer'].includes(currentPath);
   if (tabPath === '/work') return ['/jobs', '/work'].includes(currentPath);
   if (tabPath === '/resources') return ['/legal', '/news', '/resources', '/education'].includes(currentPath);
   return currentPath === tabPath;
 }
 
-function TabPopup({ items, onClose }) {
+function TabPopup({ items, onClose, align = 'center' }) {
+  const posClass = align === 'right'
+    ? 'right-0'
+    : align === 'left'
+    ? 'left-0'
+    : 'left-1/2 -translate-x-1/2';
   return (
     <motion.div
       initial={{ opacity: 0, y: 8, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
       exit={{ opacity: 0, y: 8, scale: 0.95 }}
       transition={{ duration: 0.15 }}
-      className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-card border border-border rounded-2xl shadow-xl p-2 min-w-[160px] z-[200]"
+      className={`absolute bottom-full mb-2 ${posClass} bg-card border border-border rounded-2xl shadow-xl p-2 min-w-[170px] z-[200]`}
     >
       {items.map(item => (
         <Link
@@ -154,23 +152,41 @@ export default function AppLayout() {
             </Link>
           )}
 
-          {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-1 flex-wrap">
-            {desktopNavItems.map(item => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
-                  location.pathname === item.path
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                )}
-              >
-                <item.icon className="w-4 h-4" />
-                {item.label}
-              </Link>
-            ))}
+          {/* Desktop Nav — mirrors mobile 5 tabs */}
+          <nav className="hidden md:flex items-center gap-1">
+            {desktopNavItems.map(tab => {
+              const active = getTabActive(tab.path, location.pathname) || openPopup === tab.path;
+              return (
+                <div key={tab.path} className="relative">
+                  <AnimatePresence>
+                    {openPopup === tab.path && tab.popup && (
+                      <TabPopup
+                        items={tab.popup}
+                        onClose={() => setOpenPopup(null)}
+                        align={tab.path === '/resources' ? 'right' : 'center'}
+                      />
+                    )}
+                  </AnimatePresence>
+                  <button
+                    onClick={() => {
+                      if (tab.popup) {
+                        setOpenPopup(prev => prev === tab.path ? null : tab.path);
+                      } else {
+                        setOpenPopup(null);
+                        navigate(tab.path);
+                      }
+                    }}
+                    className={cn(
+                      "flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                      active ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                    )}
+                  >
+                    <tab.icon className="w-4 h-4" />
+                    {tab.label}
+                  </button>
+                </div>
+              );
+            })}
           </nav>
 
           <div className="flex items-center gap-1">
@@ -249,7 +265,11 @@ export default function AppLayout() {
               <div key={tab.path} className="relative">
                 <AnimatePresence>
                   {openPopup === tab.path && tab.popup && (
-                    <TabPopup items={tab.popup} onClose={() => setOpenPopup(null)} />
+                    <TabPopup
+                      items={tab.popup}
+                      onClose={() => setOpenPopup(null)}
+                      align={tab.path === '/resources' ? 'right' : tab.path === '/explore' ? 'left' : 'center'}
+                    />
                   )}
                 </AnimatePresence>
                 <button
