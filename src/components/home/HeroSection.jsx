@@ -11,7 +11,7 @@ export default function HeroSection({ hasProfile }) {
       <div className="absolute top-0 right-0 w-96 h-96 bg-primary/10 rounded-full blur-3xl -translate-y-1/2 translate-x-1/4" />
       <div className="absolute bottom-0 left-0 w-72 h-72 bg-accent/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
 
-      <div className="relative max-w-7xl mx-auto px-4 pt-12 pb-16 md:pt-20 md:pb-24">
+      <div className="relative max-w-7xl mx-auto px-4 pt-12 pb-16 md:pt-20 md:pb-24 flex flex-col md:flex-row md:items-center gap-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -61,6 +61,15 @@ export default function HeroSection({ hasProfile }) {
             </Link>
           </div>
         </motion.div>
+
+        <motion.img
+          src="https://liveassets.ca/wp-content/uploads/2022/01/section-planningforcanada-1.png"
+          alt="Planning for Canada"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.2 }}
+          className="w-full md:w-1/2 md:max-w-lg object-cover rounded-2xl"
+        />
       </div>
     </section>);
 
