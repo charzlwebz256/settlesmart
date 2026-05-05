@@ -105,8 +105,18 @@ export default function Jobs() {
     return sourceMatch && typeMatch && expMatch;
   });
 
+  const [currentPage, setCurrentPage] = useState(1);
+  const JOBS_PER_PAGE = 10;
+
   const linkedinCount = jobs.filter(j => j.source === 'linkedin').length;
   const indeedCount = jobs.filter(j => j.source === 'indeed').length;
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / JOBS_PER_PAGE));
+  const paginatedJobs = filtered.slice((currentPage - 1) * JOBS_PER_PAGE, currentPage * JOBS_PER_PAGE);
+
+  // Reset to page 1 when filters/search change
+  const handleFilterChange = (f) => { setFilters(f); setCurrentPage(1); };
+  const handleSourceChange = (s) => { setActiveSource(s); setCurrentPage(1); };
 
   return (
     <div ref={containerRef} className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-8 overflow-y-auto" {...touchHandlers}>
@@ -189,16 +199,16 @@ export default function Jobs() {
 
       {/* Filters */}
       {showFilters && (
-        <JobFilters filters={filters} onChange={setFilters} />
+        <JobFilters filters={filters} onChange={handleFilterChange} />
       )}
 
       {/* Source Tabs + Counts */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex gap-1.5">
+      <div className="flex items-center justify-between mb-4 flex-wrap gap-2">
+        <div className="flex gap-1.5 flex-wrap">
           {SOURCE_TABS.map(tab => (
             <button
               key={tab.id}
-              onClick={() => setActiveSource(tab.id)}
+              onClick={() => handleSourceChange(tab.id)}
               className={cn(
                 "px-3 py-1.5 rounded-xl text-xs font-semibold transition-all",
                 activeSource === tab.id
@@ -219,53 +229,99 @@ export default function Jobs() {
         <span className="text-xs text-muted-foreground">{filtered.length} job{filtered.length !== 1 ? 's' : ''}</span>
       </div>
 
-      {/* Platform Links */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-5">
-        <a
-          href={`https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(searchQuery || 'jobs')}&location=${encodeURIComponent((city || '') + ' Canada')}`}
-          target="_blank" rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-700 text-xs font-semibold hover:bg-blue-500/15 transition-colors"
-        >
-          <img src="https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png" className="w-4 h-4 rounded flex-shrink-0" alt="LinkedIn" />
-          <span className="truncate">LinkedIn</span>
-          <ExternalLink className="w-3 h-3 opacity-60 flex-shrink-0 ml-auto" />
-        </a>
-        <a
-          href={`https://ca.indeed.com/jobs?q=${encodeURIComponent(searchQuery || 'jobs')}&l=${encodeURIComponent((city || '') + ', Canada')}`}
-          target="_blank" rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-700 text-xs font-semibold hover:bg-indigo-500/15 transition-colors"
-        >
-          <img src="https://upload.wikimedia.org/wikipedia/commons/f/fc/Indeed_logo.svg" className="w-10 h-3.5 object-contain flex-shrink-0" alt="Indeed" />
-          <span className="truncate">Indeed</span>
-          <ExternalLink className="w-3 h-3 opacity-60 flex-shrink-0 ml-auto" />
-        </a>
-        <a
-          href={`https://jooble.org/jobs-${encodeURIComponent((searchQuery || 'jobs').replace(/ /g, '-'))}/${encodeURIComponent(city || 'canada')}`}
-          target="_blank" rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-orange-500/10 border border-orange-500/20 text-orange-700 text-xs font-semibold hover:bg-orange-500/15 transition-colors"
-        >
-          <img src="https://jooble.org/favicon.ico" className="w-4 h-4 rounded flex-shrink-0" alt="Jooble" />
-          <span className="truncate">Jooble</span>
-          <ExternalLink className="w-3 h-3 opacity-60 flex-shrink-0 ml-auto" />
-        </a>
-        <a
-          href={`https://www.jobbank.gc.ca/jobsearch/jobsearch?searchstring=${encodeURIComponent(searchQuery || '')}&locationstring=${encodeURIComponent(city || 'Canada')}`}
-          target="_blank" rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-red-500/10 border border-red-500/20 text-red-700 text-xs font-semibold hover:bg-red-500/15 transition-colors"
-        >
-          <img src="https://www.jobbank.gc.ca/favicon.ico" className="w-4 h-4 rounded flex-shrink-0" alt="Job Bank" />
-          <span className="truncate">Job Bank GC</span>
-          <ExternalLink className="w-3 h-3 opacity-60 flex-shrink-0 ml-auto" />
-        </a>
-        <a
-          href={`https://www.ziprecruiter.com/jobs-search?search=${encodeURIComponent(searchQuery || 'jobs')}&location=${encodeURIComponent((city || '') + ', Canada')}`}
-          target="_blank" rel="noopener noreferrer"
-          className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-green-500/10 border border-green-500/20 text-green-700 text-xs font-semibold hover:bg-green-500/15 transition-colors"
-        >
-          <img src="https://www.ziprecruiter.com/favicon.ico" className="w-4 h-4 rounded flex-shrink-0" alt="ZipRecruiter" />
-          <span className="truncate">ZipRecruiter</span>
-          <ExternalLink className="w-3 h-3 opacity-60 flex-shrink-0 ml-auto" />
-        </a>
+      {/* Platform Links — 10 job sites */}
+      <div className="mb-5">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Browse on Job Sites</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">
+          {[
+            {
+              name: 'Job Bank Canada',
+              href: `https://www.jobbank.gc.ca/jobsearch/jobsearch?searchstring=${encodeURIComponent(searchQuery || '')}&locationstring=${encodeURIComponent(city || 'Canada')}`,
+              logo: 'https://www.jobbank.gc.ca/images/jobbank-logo.svg',
+              fallbackLogo: 'https://www.jobbank.gc.ca/favicon.ico',
+              bg: 'bg-red-600/10 border-red-600/25 text-red-700',
+              badge: '🍁 Official',
+            },
+            {
+              name: 'LinkedIn',
+              href: `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(searchQuery || 'jobs')}&location=${encodeURIComponent((city || '') + ' Canada')}`,
+              logo: 'https://upload.wikimedia.org/wikipedia/commons/c/ca/LinkedIn_logo_initials.png',
+              bg: 'bg-blue-600/10 border-blue-600/25 text-blue-700',
+            },
+            {
+              name: 'Indeed',
+              href: `https://ca.indeed.com/jobs?q=${encodeURIComponent(searchQuery || 'jobs')}&l=${encodeURIComponent((city || '') + ', Canada')}`,
+              logo: 'https://upload.wikimedia.org/wikipedia/commons/f/fc/Indeed_logo.svg',
+              logoClass: 'w-12 h-3.5 object-contain',
+              bg: 'bg-indigo-600/10 border-indigo-600/25 text-indigo-700',
+            },
+            {
+              name: 'Jooble',
+              href: `https://jooble.org/jobs-${encodeURIComponent((searchQuery || 'jobs').replace(/ /g, '-'))}/${encodeURIComponent(city || 'canada')}`,
+              logo: 'https://jooble.org/favicon.ico',
+              bg: 'bg-orange-500/10 border-orange-500/25 text-orange-700',
+            },
+            {
+              name: 'ZipRecruiter',
+              href: `https://www.ziprecruiter.com/jobs-search?search=${encodeURIComponent(searchQuery || 'jobs')}&location=${encodeURIComponent((city || '') + ', Canada')}`,
+              logo: 'https://www.ziprecruiter.com/favicon.ico',
+              bg: 'bg-green-600/10 border-green-600/25 text-green-700',
+            },
+            {
+              name: 'Glassdoor',
+              href: `https://www.glassdoor.ca/Job/canada-${encodeURIComponent(searchQuery || 'jobs')}-jobs-SRCH_IL.0,6_IN3_KO7,${7 + (searchQuery || 'jobs').length}.htm`,
+              logo: 'https://www.glassdoor.ca/favicon.ico',
+              bg: 'bg-emerald-600/10 border-emerald-600/25 text-emerald-700',
+            },
+            {
+              name: 'Monster',
+              href: `https://www.monster.ca/jobs/search?q=${encodeURIComponent(searchQuery || 'jobs')}&where=${encodeURIComponent(city || 'Canada')}`,
+              logo: 'https://www.monster.ca/favicon.ico',
+              bg: 'bg-violet-600/10 border-violet-600/25 text-violet-700',
+            },
+            {
+              name: 'Workopolis',
+              href: `https://www.workopolis.com/jobsearch/find-jobs?ak=${encodeURIComponent(searchQuery || 'jobs')}&l=${encodeURIComponent(city || 'Canada')}`,
+              logo: 'https://www.workopolis.com/favicon.ico',
+              bg: 'bg-sky-600/10 border-sky-600/25 text-sky-700',
+            },
+            {
+              name: 'SimplyHired',
+              href: `https://www.simplyhired.ca/search?q=${encodeURIComponent(searchQuery || 'jobs')}&l=${encodeURIComponent(city || 'Canada')}`,
+              logo: 'https://www.simplyhired.ca/favicon.ico',
+              bg: 'bg-teal-600/10 border-teal-600/25 text-teal-700',
+            },
+            {
+              name: 'Eluta',
+              href: `https://www.eluta.ca/search?q=${encodeURIComponent(searchQuery || 'jobs')}&l=${encodeURIComponent(city || 'Canada')}`,
+              logo: 'https://www.eluta.ca/favicon.ico',
+              bg: 'bg-amber-600/10 border-amber-600/25 text-amber-700',
+              badge: '🍁 Canada',
+            },
+          ].map((platform) => (
+            <a
+              key={platform.name}
+              href={platform.href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`relative flex items-center gap-2 px-3 py-2.5 rounded-xl border text-xs font-semibold hover:opacity-80 transition-all ${platform.bg}`}
+            >
+              {platform.badge && (
+                <span className="absolute -top-2 left-2 text-[9px] bg-red-600 text-white px-1.5 py-0.5 rounded-full font-bold leading-none">
+                  {platform.badge}
+                </span>
+              )}
+              <img
+                src={platform.logo}
+                alt={platform.name}
+                className={platform.logoClass || 'w-4 h-4 rounded flex-shrink-0'}
+                onError={e => { if (platform.fallbackLogo) { e.target.src = platform.fallbackLogo; } else { e.target.style.display = 'none'; } }}
+              />
+              <span className="truncate">{platform.name}</span>
+              <ExternalLink className="w-3 h-3 opacity-50 flex-shrink-0 ml-auto" />
+            </a>
+          ))}
+        </div>
       </div>
 
       {/* Loading State */}
@@ -298,11 +354,50 @@ export default function Jobs() {
 
       {/* Jobs Grid */}
       {!loading && filtered.length > 0 && (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filtered.map((job, i) => (
-            <JobCard key={i} job={job} />
-          ))}
-        </div>
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            {paginatedJobs.map((job, i) => (
+              <JobCard key={i} job={job} />
+            ))}
+          </div>
+
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex items-center justify-center gap-1.5 flex-wrap">
+              <button
+                onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                disabled={currentPage === 1}
+                className="px-3 py-1.5 rounded-xl text-xs font-semibold border border-border/50 bg-card text-muted-foreground hover:border-primary/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              >
+                ← Prev
+              </button>
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                <button
+                  key={page}
+                  onClick={() => setCurrentPage(page)}
+                  className={cn(
+                    "w-8 h-8 rounded-xl text-xs font-semibold border transition-all",
+                    currentPage === page
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "border-border/50 bg-card text-muted-foreground hover:border-primary/30"
+                  )}
+                >
+                  {page}
+                </button>
+              ))}
+              <button
+                onClick={() => setCurrentPage(p => Math.min(totalPages, p + 1))}
+                disabled={currentPage === totalPages}
+                className="px-3 py-1.5 rounded-xl text-xs font-semibold border border-border/50 bg-card text-muted-foreground hover:border-primary/30 disabled:opacity-40 disabled:cursor-not-allowed transition-all"
+              >
+                Next →
+              </button>
+            </div>
+          )}
+          <p className="text-center text-xs text-muted-foreground mt-2">
+            Showing {(currentPage - 1) * JOBS_PER_PAGE + 1}–{Math.min(currentPage * JOBS_PER_PAGE, filtered.length)} of {filtered.length} jobs
+          </p>
+        </>
       )}
     </div>
   );
