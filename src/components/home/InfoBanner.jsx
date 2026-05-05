@@ -13,12 +13,12 @@ const sources = [
   },
   {
     name: 'Newcomer Centre',
-    url: 'https://www.centrefornewcomers.ca',
+    url: 'https://newcomercentre.com/',
     logo: 'https://www.centrefornewcomers.ca/images/logo.png',
   },
   {
     name: 'Catholic Social Services',
-    url: 'https://www.cccb.ca',
+    url: 'https://www.cssalberta.ca/',
     logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Cross_Floury.svg/512px-Cross_Floury.svg.png',
   },
 ];
