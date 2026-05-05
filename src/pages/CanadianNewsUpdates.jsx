@@ -30,21 +30,26 @@ export default function CanadianNewsUpdates() {
   const fetchNews = useCallback(async () => {
     setLoading(true);
     const loc = city || 'Edmonton';
+    const currentHour = new Date().getHours();
+    const isDaytime = currentHour >= 6 && currentHour < 18;
+
     const result = await base44.integrations.Core.InvokeLLM({
       prompt: `You are a Canadian news aggregator. Search for today's latest news from CBC News, CTV News, Global News, Edmonton Journal, and CityNews Edmonton.
 
-Find current news stories for ${loc}, ${province || 'Alberta'}, Canada (date: ${new Date().toDateString()}).
+  Find current news stories for ${loc}, ${province || 'Alberta'}, Canada (date: ${new Date().toDateString()}, time: ${new Date().toLocaleTimeString()}).
 
-Return 12 news items total covering these categories:
-- 2 breaking news stories (most urgent/recent)
-- 3 immigration & policy updates (IRCC, government policy changes)
-- 3 jobs & economy stories (employment, wages, businesses)  
-- 2 housing & cost of living stories
-- 2 health & safety stories
+  Return 12 news items total covering these categories:
+  - 2 breaking news stories (most urgent/recent)
+  - 3 immigration & policy updates (IRCC, government policy changes)
+  - 3 jobs & economy stories (employment, wages, businesses)  
+  - 2 housing & cost of living stories
+  - 2 health & safety stories
 
-Also return a "newcomer_insights" array of 3 short plain-language tips explaining what the top stories mean for newcomers.
+  Also return a "newcomer_insights" array of 3 short plain-language tips explaining what the top stories mean for newcomers.
 
-For each news item return: title, summary (2 sentences max), category (breaking/immigration/jobs/housing/health), source (CBC/CTV/GlobalNews/EdmontonJournal/CityNews), url, time_ago (e.g. "2 hours ago"), is_local (true if Edmonton/Alberta specific).`,
+  Also return current_weather with: condition (sunny/cloudy/rainy/snowy/partly_cloudy), is_daytime (${isDaytime}).
+
+  For each news item return: title, summary (2 sentences max), category (breaking/immigration/jobs/housing/health), source (CBC/CTV/GlobalNews/EdmontonJournal/CityNews), url, time_ago (e.g. "2 hours ago"), is_local (true if Edmonton/Alberta specific).`,
       add_context_from_internet: true,
       response_json_schema: {
         type: 'object',
@@ -73,6 +78,13 @@ For each news item return: title, summary (2 sentences max), category (breaking/
                 insight: { type: 'string' },
                 category: { type: 'string' },
               },
+            },
+          },
+          current_weather: {
+            type: 'object',
+            properties: {
+              condition: { type: 'string' },
+              is_daytime: { type: 'boolean' },
             },
           },
         },
@@ -129,7 +141,7 @@ For each news item return: title, summary (2 sentences max), category (breaking/
       </div>
 
       {/* Weather Widget */}
-      <WeatherWidget city={city || 'Edmonton'} province={province} />
+      <WeatherWidget city={city || 'Edmonton'} province={province} weatherCondition={newsData?.current_weather} />
 
       {/* Category Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-2 my-5 scrollbar-hide">

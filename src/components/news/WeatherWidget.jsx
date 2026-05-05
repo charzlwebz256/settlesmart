@@ -1,9 +1,33 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { CloudSun, Loader2, Wind, Droplets, AlertTriangle } from 'lucide-react';
+import { CloudSun, Loader2, Wind, Droplets, AlertTriangle, Sun, Moon, Cloud, CloudRain, CloudSnow } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-export default function WeatherWidget({ city = 'Edmonton', province }) {
+const getWeatherIcon = (condition, isDaytime) => {
+  if (!condition) return <CloudSun className="w-12 h-12 text-blue-500" />;
+  
+  const cond = condition.toLowerCase();
+  
+  if (cond.includes('sunny') || cond.includes('clear')) {
+    return isDaytime ? <Sun className="w-12 h-12 text-yellow-500" /> : <Moon className="w-12 h-12 text-slate-400" />;
+  }
+  if (cond.includes('cloud')) {
+    return <Cloud className="w-12 h-12 text-slate-400" />;
+  }
+  if (cond.includes('rain') || cond.includes('shower')) {
+    return <CloudRain className="w-12 h-12 text-blue-600" />;
+  }
+  if (cond.includes('snow')) {
+    return <CloudSnow className="w-12 h-12 text-blue-200" />;
+  }
+  if (cond.includes('partly')) {
+    return <CloudSun className="w-12 h-12 text-blue-500" />;
+  }
+  
+  return <CloudSun className="w-12 h-12 text-blue-500" />;
+};
+
+export default function WeatherWidget({ city = 'Edmonton', province, weatherCondition }) {
   const [weather, setWeather] = useState(null);
   const [loading, setLoading] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -86,14 +110,17 @@ Return: current_temp (number in Celsius), condition (e.g. "Partly Cloudy"), feel
             <p className="text-sm font-medium">{weather.condition}</p>
             <p className="text-xs text-muted-foreground">{city}{province ? `, ${province}` : ''}</p>
           </div>
-          <div className="text-right space-y-1">
-            <div className="flex items-center gap-1 text-xs text-muted-foreground justify-end">
-              <Droplets className="w-3 h-3" /> {weather.humidity}% humidity
+          <div className="flex flex-col items-end gap-3">
+            {getWeatherIcon(weatherCondition?.condition || weather.condition, weatherCondition?.is_daytime !== false)}
+            <div className="space-y-1">
+              <div className="flex items-center gap-1 text-xs text-muted-foreground justify-end">
+                <Droplets className="w-3 h-3" /> {weather.humidity}% humidity
+              </div>
+              <div className="flex items-center gap-1 text-xs text-muted-foreground justify-end">
+                <Wind className="w-3 h-3" /> {weather.wind_speed} km/h
+              </div>
+              <p className="text-xs text-muted-foreground">Feels like {weather.feels_like}°C</p>
             </div>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground justify-end">
-              <Wind className="w-3 h-3" /> {weather.wind_speed} km/h
-            </div>
-            <p className="text-xs text-muted-foreground">Feels like {weather.feels_like}°C</p>
           </div>
         </div>
 
