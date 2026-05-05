@@ -3,9 +3,9 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Search, Filter, X, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import ServiceCard from '../components/services/ServiceCard';
+import StaticCategoryPanel from '../components/services/StaticCategoryPanel';
 
 const categories = [
   { value: 'all', label: 'All Services' },
@@ -151,8 +151,10 @@ export default function Services() {
         <span className="text-xs text-muted-foreground ml-auto">{filtered.length} results</span>
       </div>
 
-      {/* Results */}
-      {isLoading ? (
+      {/* Static category panels for rich data tabs */}
+      {['language', 'education', 'legal', 'health', 'transportation', 'housing'].includes(selectedCategory) && !searchQuery ? (
+        <StaticCategoryPanel category={selectedCategory} />
+      ) : isLoading ? (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-6 h-6 animate-spin text-primary" />
         </div>

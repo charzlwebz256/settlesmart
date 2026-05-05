@@ -69,19 +69,20 @@ function getTabActive(tabPath, currentPath) {
   return currentPath === tabPath;
 }
 
-function TabPopup({ items, onClose, align = 'center' }) {
+function TabPopup({ items, onClose, align = 'center', direction = 'down' }) {
   const posClass = align === 'right'
     ? 'right-0'
     : align === 'left'
     ? 'left-0'
     : 'left-1/2 -translate-x-1/2';
+  const dirClass = direction === 'up' ? 'bottom-full mb-2' : 'top-full mt-2';
   return (
     <motion.div
-      initial={{ opacity: 0, y: 8, scale: 0.95 }}
+      initial={{ opacity: 0, y: direction === 'up' ? 8 : -8, scale: 0.95 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: 8, scale: 0.95 }}
+      exit={{ opacity: 0, y: direction === 'up' ? 8 : -8, scale: 0.95 }}
       transition={{ duration: 0.15 }}
-      className={`absolute bottom-full mb-2 ${posClass} bg-card border border-border rounded-2xl shadow-xl p-2 min-w-[170px] z-[200]`}
+      className={`absolute ${dirClass} ${posClass} bg-card border border-border rounded-2xl shadow-xl p-2 min-w-[170px] z-[200]`}
     >
       {items.map(item => (
         <Link
@@ -269,6 +270,7 @@ export default function AppLayout() {
                       items={tab.popup}
                       onClose={() => setOpenPopup(null)}
                       align={tab.path === '/resources' ? 'right' : tab.path === '/explore' ? 'left' : 'center'}
+                      direction="up"
                     />
                   )}
                 </AnimatePresence>
