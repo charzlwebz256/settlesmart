@@ -96,6 +96,12 @@
   * {
     @apply border-border outline-ring/50;
   }
+  button, nav, a {
+    @apply select-none;
+  }
+  p, article, span, li {
+    @apply select-auto;
+  }
   body {
     @apply bg-background text-foreground font-body;
     overscroll-behavior-y: none;

@@ -28,10 +28,23 @@ const primaryNav = [
   { path: '/emergency', icon: AlertTriangle, label: 'Emergency' },
 ];
 
+// Store scroll positions per route
+const scrollPositions = new Map();
+
 export default function MobileBottomNav({ activeTab, location }) {
   const [openMenu, setOpenMenu] = useState(null); // which tab's submenu is open
   const navigate = useNavigate();
   const ref = useRef(null);
+
+  // Save scroll position when leaving a route
+  useEffect(() => {
+    return () => {
+      const mainScroll = document.querySelector('main');
+      if (mainScroll) {
+        scrollPositions.set(location.pathname, mainScroll.scrollTop);
+      }
+    };
+  }, [location.pathname]);
 
   // Close on outside tap
   useEffect(() => {
@@ -57,6 +70,14 @@ export default function MobileBottomNav({ activeTab, location }) {
     } else {
       setOpenMenu(null);
       navigate(item.path);
+      // Restore scroll position after navigation
+      setTimeout(() => {
+        const mainScroll = document.querySelector('main');
+        const savedScroll = scrollPositions.get(item.path);
+        if (mainScroll && savedScroll !== undefined) {
+          mainScroll.scrollTop = savedScroll;
+        }
+      }, 0);
     }
   };
 

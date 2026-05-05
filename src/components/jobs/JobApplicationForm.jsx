@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { X, Loader2, Save } from 'lucide-react';
 
 const STATUSES = [
@@ -71,8 +72,8 @@ export default function JobApplicationForm({ application, onClose, onSaved }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm p-4">
-      <div className="bg-card rounded-2xl shadow-2xl border border-border/50 w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm p-4 safe-area-bottom">
+      <div className="bg-card rounded-2xl shadow-2xl border border-border/50 w-full max-w-lg max-h-[90vh] overflow-y-auto safe-area-bottom">
         {/* Header */}
         <div className="sticky top-0 bg-card border-b border-border/50 px-5 py-4 flex items-center justify-between rounded-t-2xl z-10">
           <h2 className="font-heading font-bold text-base">{isEdit ? 'Edit Application' : 'Add Job Application'}</h2>
@@ -102,16 +103,29 @@ export default function JobApplicationForm({ application, onClose, onSaved }) {
           <div className="grid grid-cols-2 gap-3">
             <div>
               <label className="text-xs text-muted-foreground font-medium block mb-1">Status</label>
-              <select value={form.status} onChange={set('status')} className="w-full text-sm px-3 py-2.5 rounded-xl border border-border/60 bg-background focus:ring-2 focus:ring-primary/20 focus:outline-none">
-                {STATUSES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
-              </select>
+              <Select value={form.status} onValueChange={(value) => setForm(prev => ({ ...prev, status: value }))}>
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {STATUSES.map(s => (
+                    <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="text-xs text-muted-foreground font-medium block mb-1">Source</label>
-              <select value={form.source} onChange={set('source')} className="w-full text-sm px-3 py-2.5 rounded-xl border border-border/60 bg-background focus:ring-2 focus:ring-primary/20 focus:outline-none">
-                <option value="">— Select —</option>
-                {SOURCES.map(s => <option key={s} value={s}>{s}</option>)}
-              </select>
+              <Select value={form.source} onValueChange={(value) => setForm(prev => ({ ...prev, source: value }))}>
+                <SelectTrigger className="rounded-xl">
+                  <SelectValue placeholder="— Select —" />
+                </SelectTrigger>
+                <SelectContent>
+                  {SOURCES.map(s => (
+                    <SelectItem key={s} value={s}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
 
