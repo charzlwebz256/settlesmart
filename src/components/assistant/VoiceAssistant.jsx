@@ -97,7 +97,7 @@ export default function VoiceAssistant() {
     if ('speechSynthesis' in window) {
       speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1.2;
+      utterance.rate = 1.0;
       utterance.pitch = 1.5;
       
       // Get female voice with American accent
