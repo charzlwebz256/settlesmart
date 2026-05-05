@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Loader2 } from 'lucide-react';
+import { Loader2, Volume2 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
 
@@ -70,13 +70,19 @@ export default function VoiceAssistant() {
       speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
       utterance.rate = 1.3;
-      utterance.pitch = 1.2;
+      utterance.pitch = 1.5;
       
-      // Try to use American English female voice
+      // Get female voice with American accent
       const voices = speechSynthesis.getVoices();
       const femaleVoice = voices.find(v => 
-        v.lang.includes('en-US') && v.name.includes('female') || v.name.includes('woman')
-      ) || voices.find(v => v.lang.includes('en-US')) || voices[0];
+        v.lang === 'en-US' && (
+          v.name.toLowerCase().includes('female') ||
+          v.name.toLowerCase().includes('woman') ||
+          v.name.toLowerCase().includes('zira') ||
+          v.name.toLowerCase().includes('victoria') ||
+          v.name.toLowerCase().includes('samantha')
+        )
+      ) || voices.find(v => v.lang === 'en-US');
       
       if (femaleVoice) utterance.voice = femaleVoice;
       speechSynthesis.speak(utterance);
@@ -124,11 +130,7 @@ Be friendly, direct, and practical. User: "${question}"`,
       title={isListening ? 'Listening...' : loading ? 'Processing...' : 'Press to speak'}
     >
       <div className="relative flex items-center justify-center">
-        <img 
-          src="https://www.freeiconspng.com/thumbs/microphone-png/microphone-png-16.png" 
-          alt="Microphone"
-          className={cn('w-6 h-6', isListening && 'animate-pulse')}
-        />
+        <Volume2 className={cn('w-6 h-6', isListening && 'animate-pulse')} />
         {(isListening || loading) && (
           <div className="absolute inset-0 rounded-full animate-ping bg-red-500/50" />
         )}
