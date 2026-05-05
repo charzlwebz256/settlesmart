@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
 import { base44 } from '@/api/base44Client';
-import { Loader2, Navigation, Bus, MapPin, RotateCcw, ExternalLink, Info, Clock, Route, Fuel, Footprints, Bike, ArrowLeft } from 'lucide-react';
+import { Loader2, Navigation, Bus, MapPin, RotateCcw, ExternalLink, Info, Clock, Route, Fuel, Footprints, Bike, ArrowLeft, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
@@ -58,6 +58,7 @@ export default function TransitMap() {
   const [error, setError] = useState(null);
   const [accuracy, setAccuracy] = useState(null);
   const [showDirections, setShowDirections] = useState(false);
+  const [directionsOpen, setDirectionsOpen] = useState(false);
   const [startInput, setStartInput] = useState('');
   const [endInput, setEndInput] = useState('');
   const [startCoords, setStartCoords] = useState(null);
@@ -254,19 +255,31 @@ export default function TransitMap() {
       </div>
 
       {/* Directions Panel */}
-      <div className="px-4 py-4 bg-muted/30 border-b border-border/50 flex-shrink-0 max-h-[40vh] overflow-y-auto">
+      <div className={cn("px-4 py-4 bg-muted/30 border-b border-border/50 flex-shrink-0 transition-all", !showDirections ? "py-2" : "max-h-[40vh] overflow-y-auto")}>
         <div className="max-w-7xl mx-auto">
           {!showDirections ? (
             <Button
-              onClick={() => setShowDirections(true)}
+              onClick={() => {
+                setShowDirections(true);
+                setDirectionsOpen(true);
+              }}
               className="w-full rounded-lg gap-2 bg-primary hover:bg-primary/90"
             >
               <Route className="w-4 h-4" />
               Get Directions
             </Button>
           ) : (
-            <div className="space-y-4">
+            <div className={cn("space-y-4 overflow-hidden transition-all", !directionsOpen ? "max-h-0" : "max-h-[50vh]")}>
               <div className="flex items-center gap-2">
+                <Button
+                  size="sm"
+                  variant="ghost"
+                  onClick={() => setDirectionsOpen(!directionsOpen)}
+                  className="rounded-lg"
+                >
+                  {directionsOpen ? '▼' : '▶'}
+                </Button>
+                <h2 className="font-heading font-bold text-sm">Directions</h2>
                 <Button
                   size="sm"
                   variant="ghost"
@@ -278,12 +291,12 @@ export default function TransitMap() {
                     setEndCoords(null);
                     setRouteData(null);
                     setBusStations([]);
+                    setDirectionsOpen(false);
                   }}
-                  className="rounded-lg"
+                  className="rounded-lg ml-auto"
                 >
-                  <ArrowLeft className="w-4 h-4" />
+                  <X className="w-4 h-4" />
                 </Button>
-                <h2 className="font-heading font-bold text-sm">Directions</h2>
               </div>
 
               {/* Starting point input */}
