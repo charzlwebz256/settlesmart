@@ -12,12 +12,12 @@ export default function HeroSection({ hasProfile }) {
       <div className="absolute bottom-0 left-0 w-72 h-72 bg-accent/10 rounded-full blur-3xl translate-y-1/2 -translate-x-1/4" />
 
       <div className="relative max-w-full mx-auto pt-12 pb-16 md:pt-20 md:pb-24">
-        <div className="flex items-center">
+        <div className="flex flex-col lg:flex-row items-center lg:items-stretch gap-0 lg:gap-8">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="max-w-2xl flex-1 px-4">
+          className="max-w-2xl flex-1 px-4 lg:py-0">
           
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6">
             <MapPin className="w-3.5 h-3.5" />
@@ -67,12 +67,12 @@ export default function HeroSection({ hasProfile }) {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="hidden lg:block flex-1 h-full"
+          className="w-full lg:flex-1 h-auto lg:h-screen -mx-4 lg:mx-0 lg:-mr-4"
         >
           <img 
             src="https://liveassets.ca/wp-content/uploads/2022/01/section-planningforcanada-1.png"
             alt="Planning for Canada"
-            className="w-full h-full object-cover"
+            className="w-full h-auto lg:h-full object-cover"
           />
         </motion.div>
         </div>
