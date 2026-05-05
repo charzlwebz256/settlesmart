@@ -25,7 +25,7 @@ export default function HeroSection({ hasProfile }) {
 
           <h1 className="font-heading font-extrabold text-4xl md:text-5xl lg:text-6xl text-foreground leading-[1.1] mb-5">
             Start Your New Life{' '}
-            <span className="text-4xl font-medium block">Start Your New Life</span>
+            <span className="text-4xl font-normal block hidden">Start Your New Life</span>
             <br />
             <span className="text-muted-foreground font-bold text-2xl md:text-3xl lg:text-4xl">
               with Confidence
