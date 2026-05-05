@@ -16,8 +16,8 @@ export default function HeroSection({ hasProfile }) {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
-          className="max-w-2xl"
-        >
+          className="max-w-2xl">
+          
           <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6">
             <MapPin className="w-3.5 h-3.5" />
             Your guide to settling in Canada
@@ -32,28 +32,28 @@ export default function HeroSection({ hasProfile }) {
             </span>
           </h1>
 
-          <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-8 max-w-xl">
-            Free settlement services, housing, jobs, education, and more — all in one place. 
-            Personalized for your journey as a newcomer to Canada.
+          <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-8 max-w-xl">Free settlement services, housing, jobs, education, and more all in one place. Personalized for your journey as a newcomer to Canada.
+
+
           </p>
 
           <div className="flex flex-wrap gap-3">
-            {!hasProfile ? (
-              <Link to="/onboarding">
+            {!hasProfile ?
+            <Link to="/onboarding">
                 <Button size="lg" className="rounded-xl gap-2 font-semibold text-base h-12 px-6 bg-primary hover:bg-primary/90">
                   <Sparkles className="w-4 h-4" />
                   Get Started — It's Free
                   <ArrowRight className="w-4 h-4" />
                 </Button>
-              </Link>
-            ) : (
-              <Link to="/dashboard">
+              </Link> :
+
+            <Link to="/dashboard">
                 <Button size="lg" className="rounded-xl gap-2 font-semibold text-base h-12 px-6 bg-primary hover:bg-primary/90">
                   Go to Dashboard
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </Link>
-            )}
+            }
             <Link to="/services">
               <Button variant="outline" size="lg" className="rounded-xl font-semibold text-base h-12 px-6">
                 Browse Services
@@ -62,6 +62,6 @@ export default function HeroSection({ hasProfile }) {
           </div>
         </motion.div>
       </div>
-    </section>
-  );
+    </section>);
+
 }
