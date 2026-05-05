@@ -21,7 +21,9 @@ import Jobs from './pages/Jobs';
 import Legal from './pages/Legal';
 import Emergency from './pages/Emergency';
 import NearMe from './pages/NearMe';
-import News from './pages/News';
+import CanadianNewsUpdates from './pages/CanadianNewsUpdates';
+import About from './pages/About';
+import Contact from './pages/Contact';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -63,7 +65,9 @@ const AuthenticatedApp = () => {
         <Route path="/legal" element={<Legal />} />
         <Route path="/emergency" element={<Emergency />} />
         <Route path="/near-me" element={<NearMe />} />
-        <Route path="/news" element={<News />} />
+        <Route path="/news" element={<CanadianNewsUpdates />} />
+        <Route path="/about" element={<About />} />
+        <Route path="/contact" element={<Contact />} />
       </Route>
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="*" element={<PageNotFound />} />

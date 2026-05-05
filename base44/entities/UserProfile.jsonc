@@ -98,6 +98,11 @@
     "checklist_progress": {
       "type": "object",
       "description": "Tracks completion of settlement checklist items"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "A short personal bio or note about the user's settlement journey"
     }
   },
   "required": [

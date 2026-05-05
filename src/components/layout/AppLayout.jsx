@@ -22,6 +22,11 @@ const navItems = [
   { path: '/profile', icon: User, label: 'Profile' },
 ];
 
+const footerLinks = [
+  { path: '/about', label: 'About' },
+  { path: '/contact', label: 'Contact' },
+];
+
 const ROOT_TABS = navItems.map(i => i.path);
 
 export default function AppLayout() {
@@ -134,6 +139,15 @@ export default function AppLayout() {
           </motion.div>
         </AnimatePresence>
       </main>
+
+      {/* Footer links — About & Contact */}
+      <footer className="hidden md:flex items-center justify-center gap-6 py-3 border-t border-border/30 bg-card/50 text-xs text-muted-foreground">
+        {footerLinks.map(link => (
+          <Link key={link.path} to={link.path} className="hover:text-primary transition-colors font-medium">
+            {link.label}
+          </Link>
+        ))}
+      </footer>
 
       {/* Global AI Chat Widget — hidden on /assistant page */}
       {location.pathname !== '/assistant' && (

@@ -20,7 +20,7 @@ const CATEGORIES = [
   { id: 'health', label: 'Health & Safety', icon: Heart },
 ];
 
-export default function News() {
+export default function CanadianNewsUpdates() {
   const { city, province } = useCityDetection();
   const [newsData, setNewsData] = useState(null);
   const [loading, setLoading] = useState(false);
