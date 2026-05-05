@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 export default function First30DaysBanner() {
   return (
     <section className="max-w-7xl mx-auto px-4 pb-12">
-      <div className="bg-[hsl(var(--foreground))] text-primary-foreground p-6 rounded-2xl relative overflow-hidden from-foreground to-foreground/90 md:p-10">
+      <div className="bg-[hsl(var(--foreground))] text-primary-foreground p-6 rounded-2xl relative overflow-hidden md:p-10 dark:bg-black dark:text-white">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-3xl -translate-y-1/2 translate-x-1/3" />
         
         <div className="relative flex flex-col md:flex-row md:items-center gap-6">
