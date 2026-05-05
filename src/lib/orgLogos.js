@@ -1,7 +1,6 @@
 /**
  * Centralized logo registry for all organizations used in the app.
  * Uses Google Favicon API as a reliable fallback — always returns an icon.
- * For orgs with known good logo URLs, those are listed directly.
  */
 
 const favicon = (domain) =>
@@ -90,22 +89,56 @@ export const ORG_LOGOS = {
   'NACHA (Northern Alberta Co-op Housing)': favicon('nacha.ca'),
   'SACHA (Southern Alberta Co-op Housing)': favicon('sacha-coop.ca'),
 
+  // ── Settlement / IRCC ────────────────────────────────────────────────────
+  'Immigrant Services Calgary': favicon('immigrantservicescalgary.ca'),
+  'Catholic Social Services (Edmonton)': favicon('catholicsocialservices.ab.ca'),
+  'Catholic Social Services': favicon('catholicsocialservices.ab.ca'),
+  'AAISA (Alberta Association of Immigrant Serving Agencies)': favicon('aaisa.ca'),
+  'ACCES Employment': favicon('accesemployment.ca'),
+  'Edmonton Immigrant Services Association (EISA)': favicon('eisa.ab.ca'),
+  'Calgary Catholic Immigration Society (CCIS)': favicon('ccisab.ca'),
+  'Centre for Newcomers': favicon('centrefornewcomers.ca'),
+  'Government of Canada — IRCC': favicon('canada.ca'),
+  'IRCC (Immigration, Refugees and Citizenship Canada)': favicon('ircc.canada.ca'),
+  'Service Canada': favicon('canada.ca'),
+  'Alberta Immigration': favicon('alberta.ca'),
+  'Multicultural Health Brokers Co-op': favicon('mchb.ab.ca'),
+  'Edmonton Mennonite Centre for Newcomers (EMCN)': favicon('emcn.ab.ca'),
+  'Norwood Child and Family Resource Centre': favicon('norwoodfrc.ca'),
+  'ISANS (Immigrant Services Association of Nova Scotia)': favicon('isans.ca'),
+  'MOSAIC': favicon('mosaicbc.com'),
+  'SUCCESS (Vancouver)': favicon('successbc.ca'),
+  'COSTI Immigrant Services': favicon('costi.org'),
+  'WoodGreen Community Services': favicon('woodgreen.org'),
+  'Mennonite New Life Centre': favicon('mnlct.org'),
+  'New Canadians Centre': favicon('nccpeterborough.ca'),
+
+  // ── Employment / Settlement ───────────────────────────────────────────────
+  'Alberta Works': favicon('alberta.ca'),
+  'Employment and Social Development Canada': favicon('canada.ca'),
+  'Skills for Change': favicon('skillsforchange.org'),
+  'COSTI': favicon('costi.org'),
+  'WES (World Education Services)': favicon('wes.org'),
+  'ICAS (International Credential Assessment Service)': favicon('icascanada.ca'),
+  'Windmill Microlending': favicon('windmillmicrolending.org'),
+  'Immigrant Access Fund': favicon('immigrantaccessfund.ca'),
+  'ACCES Employment (Calgary)': favicon('accesemployment.ca'),
+  'Bow Valley College (Employment)': favicon('bowvalleycollege.ca'),
+
   // ── Volunteering ──────────────────────────────────────────────────────────
   'Project Adult Literacy Society (PALS)': favicon('palsedmonton.ca'),
-  'Edmonton Mennonite Centre for Newcomers (EMCN)': favicon('emcn.ab.ca'),
   'Centre for Family Literacy': favicon('famlit.ca'),
   'Hope Mission': favicon('hopemission.com'),
   'Edmonton Food Bank': favicon('edmontonsfoodbank.com'),
   'YMCA of Northern Alberta': favicon('northernalberta.ymca.ca'),
   'Caregivers Alberta': favicon('caregiversalberta.ca'),
-  'Centre for Newcomers': favicon('centrefornewcomers.ca'),
   "Calgary Immigrant Women's Association (CIWA)": favicon('ciwa-online.com'),
-  'Immigrant Services Calgary': favicon('immigrantservicescalgary.ca'),
   'The Immigrant Education Society (TIES)': favicon('immigrant-education.ca'),
   'Calgary Food Bank': favicon('calgaryfoodbank.com'),
   'Volunteer Connector': favicon('volunteerconnector.org'),
   'United Way Alberta Capital Region': favicon('myunitedway.ca'),
   'Canadian Red Cross (Alberta)': favicon('redcross.ca'),
+  'The Mustard Seed (Calgary)': favicon('theseed.ca'),
 
   // ── Family Support ────────────────────────────────────────────────────────
   'Fiddler Family Services Inc': favicon('fiddlerfamilyservices.ca'),
@@ -135,7 +168,6 @@ export const ORG_LOGOS = {
   'Centre for Addiction and Mental Health': favicon('camh.ca'),
 
   // ── Government / IRCC ────────────────────────────────────────────────────
-  'Service Canada': favicon('canada.ca'),
   'IRCC': favicon('ircc.canada.ca'),
   'Canadian Human Rights Commission': favicon('chrc-ccdp.gc.ca'),
   'CMHC': favicon('cmhc-schl.gc.ca'),

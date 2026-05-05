@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, Navigation, MapPin, CalendarDays } from 'lucide-react';
-import { useState } from 'react';
+import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, Navigation, MapPin, CalendarDays, ChevronDown } from 'lucide-react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -8,7 +8,24 @@ import { base44 } from '@/api/base44Client';
 import NewcomerChatWidget from '@/components/assistant/NewcomerChatWidget';
 import LanguageTranslator from '@/components/layout/LanguageTranslator';
 
-// Primary 5 tabs shown in bottom nav & top nav
+// Sub-items for tabs with dropdowns
+const TAB_CHILDREN = {
+  '/explore': [
+    { path: '/services', icon: Search, label: 'Settlement Services' },
+    { path: '/near-me', icon: MapPin, label: 'Near Me' },
+    { path: '/transit-map', icon: Navigation, label: 'Transit Map' },
+  ],
+  '/work': [
+    { path: '/jobs', icon: Briefcase, label: 'Job Search' },
+    { path: '/events', icon: CalendarDays, label: 'Events' },
+  ],
+  '/resources': [
+    { path: '/legal', icon: Scale, label: 'Legal & IRCC' },
+    { path: '/news', icon: Newspaper, label: 'News & Updates' },
+  ],
+};
+
+// Primary 5 tabs
 const primaryNav = [
   { path: '/', icon: Home, label: 'Home' },
   { path: '/explore', icon: Compass, label: 'Explore' },
@@ -19,23 +36,83 @@ const primaryNav = [
 
 // Secondary items in hamburger menu
 const secondaryNav = [
-  { path: '/services', icon: Search, label: 'Services' },
-  { path: '/near-me', icon: MapPin, label: 'Near Me' },
-  { path: '/transit-map', icon: Navigation, label: 'Transit' },
-  { path: '/jobs', icon: Briefcase, label: 'Jobs' },
-  { path: '/events', icon: CalendarDays, label: 'Events' },
-  { path: '/legal', icon: Scale, label: 'Legal' },
-  { path: '/news', icon: Newspaper, label: 'News' },
   { path: '/assistant', icon: MessageCircle, label: 'AI Assistant' },
   { path: '/profile', icon: User, label: 'Profile' },
+  { path: '/checklist', icon: BookOpen, label: 'Checklist' },
 ];
 
-const ALL_NAV_PATHS = [...primaryNav, ...secondaryNav].map(i => i.path);
+const ALL_NAV_PATHS = [
+  ...primaryNav.map(i => i.path),
+  ...Object.values(TAB_CHILDREN).flat().map(i => i.path),
+  ...secondaryNav.map(i => i.path),
+];
+
+// Which tab is "active" including its children
+function getActiveTab(pathname) {
+  for (const [tabPath, children] of Object.entries(TAB_CHILDREN)) {
+    if (children.some(c => c.path === pathname)) return tabPath;
+  }
+  return pathname;
+}
+
+// Desktop dropdown for a tab with children
+function TabDropdown({ item, isActive }) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  const children = TAB_CHILDREN[item.path];
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        onClick={() => setOpen(o => !o)}
+        className={cn(
+          "flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+          isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+        )}
+      >
+        <item.icon className="w-4 h-4" />
+        {item.label}
+        <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", open && "rotate-180")} />
+      </button>
+
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            initial={{ opacity: 0, y: -4 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -4 }}
+            transition={{ duration: 0.12 }}
+            className="absolute top-full left-0 mt-1.5 w-48 bg-card border border-border/60 rounded-xl shadow-lg overflow-hidden z-50"
+          >
+            {children.map(child => (
+              <Link
+                key={child.path}
+                to={child.path}
+                onClick={() => setOpen(false)}
+                className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+              >
+                <child.icon className="w-4 h-4 text-primary/60" />
+                {child.label}
+              </Link>
+            ))}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export default function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const activeTab = getActiveTab(location.pathname);
   const isRootTab = ALL_NAV_PATHS.includes(location.pathname);
 
   const { data: profile } = useQuery({
@@ -73,23 +150,28 @@ export default function AppLayout() {
             </Link>
           )}
 
-          {/* Desktop Nav — primary tabs */}
+          {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
-            {primaryNav.map(item => (
-              <Link
-                key={item.path}
-                to={item.path}
-                className={cn(
-                  "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
-                  location.pathname === item.path
-                    ? "bg-primary/10 text-primary"
-                    : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                )}
-              >
-                <item.icon className="w-4 h-4" />
-                {item.label}
-              </Link>
-            ))}
+            {primaryNav.map(item => {
+              const hasChildren = !!TAB_CHILDREN[item.path];
+              const isActive = activeTab === item.path;
+              if (hasChildren) {
+                return <TabDropdown key={item.path} item={item} isActive={isActive} />;
+              }
+              return (
+                <Link
+                  key={item.path}
+                  to={item.path}
+                  className={cn(
+                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                    isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  )}
+                >
+                  <item.icon className="w-4 h-4" />
+                  {item.label}
+                </Link>
+              );
+            })}
           </nav>
 
           {/* Right side: language + hamburger */}
@@ -105,7 +187,7 @@ export default function AppLayout() {
           </div>
         </div>
 
-        {/* Slide-down menu — secondary nav */}
+        {/* Slide-down hamburger menu */}
         <AnimatePresence>
           {menuOpen && (
             <motion.div
@@ -115,19 +197,43 @@ export default function AppLayout() {
               transition={{ duration: 0.15 }}
               className="border-t border-border/50 bg-card/95 backdrop-blur-xl p-3"
             >
-              {/* Mobile: show all nav (primary + secondary) */}
+              {/* Mobile: full nav tree */}
               <div className="md:hidden space-y-1">
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 pb-1">Main</p>
-                {primaryNav.map(item => (
-                  <Link key={item.path} to={item.path} onClick={() => setMenuOpen(false)}
-                    className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
-                      location.pathname === item.path ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>
-                    <item.icon className="w-5 h-5" />
-                    {item.label}
-                  </Link>
-                ))}
+                {primaryNav.map(item => {
+                  const children = TAB_CHILDREN[item.path];
+                  const isActive = activeTab === item.path;
+                  return (
+                    <div key={item.path}>
+                      {children ? (
+                        <>
+                          <div className={cn("flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold",
+                            isActive ? "text-primary" : "text-foreground")}>
+                            <item.icon className="w-5 h-5" />
+                            {item.label}
+                          </div>
+                          <div className="ml-9 space-y-0.5">
+                            {children.map(child => (
+                              <Link key={child.path} to={child.path} onClick={() => setMenuOpen(false)}
+                                className={cn("flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
+                                  location.pathname === child.path ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>
+                                <child.icon className="w-4 h-4" />
+                                {child.label}
+                              </Link>
+                            ))}
+                          </div>
+                        </>
+                      ) : (
+                        <Link to={item.path} onClick={() => setMenuOpen(false)}
+                          className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                            location.pathname === item.path ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>
+                          <item.icon className="w-5 h-5" />
+                          {item.label}
+                        </Link>
+                      )}
+                    </div>
+                  );
+                })}
                 <div className="my-2 border-t border-border/40" />
-                <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider px-3 pb-1">More</p>
                 {secondaryNav.map(item => (
                   <Link key={item.path} to={item.path} onClick={() => setMenuOpen(false)}
                     className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
@@ -139,7 +245,7 @@ export default function AppLayout() {
               </div>
 
               {/* Desktop: secondary nav only */}
-              <div className="hidden md:grid grid-cols-3 gap-1 max-w-sm ml-auto">
+              <div className="hidden md:flex gap-1 justify-end">
                 {secondaryNav.map(item => (
                   <Link key={item.path} to={item.path} onClick={() => setMenuOpen(false)}
                     className={cn("flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
@@ -178,16 +284,15 @@ export default function AppLayout() {
         />
       )}
 
-      {/* Mobile Bottom Nav — 5 primary tabs only */}
+      {/* Mobile Bottom Nav — 5 primary tabs */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-xl border-t border-border/50 safe-area-bottom select-none">
         <div className="flex items-center justify-around px-2 py-1">
           {primaryNav.map(item => {
-            const active = location.pathname === item.path;
+            const active = activeTab === item.path;
             return (
               <Link
                 key={item.path}
                 to={item.path}
-                replace={active}
                 aria-label={item.label}
                 className={cn(
                   "flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all min-w-[56px]",
