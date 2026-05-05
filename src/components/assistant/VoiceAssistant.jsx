@@ -185,7 +185,7 @@ User question: "${question}"`,
       onClick={toggleListening}
       disabled={loading}
       className={cn(
-        'fixed bottom-24 left-6 md:bottom-6 z-40 p-4 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300',
+        'fixed bottom-24 left-6 md:bottom-6 z-40 w-10 h-10 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 flex items-center justify-center',
         isListening || loading
           ? 'bg-red-500 hover:bg-red-600 text-white'
           : 'bg-primary hover:bg-primary/90 text-primary-foreground'
@@ -194,7 +194,7 @@ User question: "${question}"`,
       title={isListening ? 'Listening...' : loading ? 'Processing...' : 'Press to speak'}
     >
       <div className="relative flex items-center justify-center">
-        <Mic className={cn('w-6 h-6', isListening && 'animate-bounce text-red-300')} />
+        <Mic className={cn('w-4 h-4', isListening && 'animate-bounce text-red-300')} />
         {isListening && (
           <>
             <div className="absolute inset-0 rounded-full animate-ping bg-red-500/60" />
