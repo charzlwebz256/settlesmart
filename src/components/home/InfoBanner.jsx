@@ -1,5 +1,28 @@
 import { ExternalLink, Shield } from 'lucide-react';
 
+const sources = [
+  {
+    name: 'Government of Canada',
+    url: 'https://www.canada.ca',
+    logo: 'https://www.canada.ca/content/dam/canada/logos/gov_ca_logo_en.svg',
+  },
+  {
+    name: 'IRCC-Funded',
+    url: 'https://www.canada.ca/en/immigration-refugees-citizenship.html',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Coat_of_Arms_of_Canada_%282021%29.svg/512px-Coat_of_Arms_of_Canada_%282021%29.svg.png',
+  },
+  {
+    name: 'Newcomer Centre',
+    url: 'https://www.centrefornewcomers.ca',
+    logo: 'https://www.centrefornewcomers.ca/images/logo.png',
+  },
+  {
+    name: 'Catholic Social Services',
+    url: 'https://www.cccb.ca',
+    logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/0/07/Cross_Floury.svg/512px-Cross_Floury.svg.png',
+  },
+];
+
 export default function InfoBanner() {
   return (
     <section className="max-w-7xl mx-auto px-4 pb-12">
@@ -16,11 +39,23 @@ export default function InfoBanner() {
               <strong className="text-foreground"> free for eligible newcomers</strong>.
             </p>
             <div className="flex flex-wrap gap-2">
-              {['Government of Canada', 'IRCC-Funded', 'Newcomer Centre', 'Catholic Social Services'].map(source => (
-                <span key={source} className="inline-flex items-center gap-1 text-xs font-medium px-3 py-1.5 rounded-full bg-card border border-border text-muted-foreground">
-                  <ExternalLink className="w-3 h-3" />
-                  {source}
-                </span>
+              {sources.map(source => (
+                <a
+                  key={source.name}
+                  href={source.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 text-xs font-medium px-3 py-1.5 rounded-full bg-card border border-border hover:border-primary/30 hover:bg-primary/5 transition-colors group"
+                >
+                  <img
+                    src={source.logo}
+                    alt={source.name}
+                    className="w-4 h-4 object-contain opacity-70 group-hover:opacity-100 transition-opacity"
+                    onError={e => e.target.style.display = 'none'}
+                  />
+                  {source.name}
+                  <ExternalLink className="w-3 h-3 opacity-50" />
+                </a>
               ))}
             </div>
           </div>
