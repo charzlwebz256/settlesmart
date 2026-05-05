@@ -99,5 +99,16 @@
   body {
     @apply bg-background text-foreground font-body;
     overscroll-behavior-y: none;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.03)),
+      url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><rect fill="%23FF0000" width="60" height="200"/><rect fill="%23FFF" x="60" width="180" height="200"/><path fill="%23FF0000" d="M150 40 L160 80 L200 80 L170 110 L180 150 L150 120 L120 150 L130 110 L100 80 L140 80 Z" transform="translate(0 20)"/></svg>');
+    background-size: 300px 200px;
+    background-attachment: fixed;
+    background-repeat: repeat;
+  }
+  .dark body {
+    background-image: 
+      linear-gradient(rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.05)),
+      url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 200"><rect fill="%23FF0000" width="60" height="200"/><rect fill="%23FFF" x="60" width="180" height="200"/><path fill="%23FF0000" d="M150 40 L160 80 L200 80 L170 110 L180 150 L150 120 L120 150 L130 110 L100 80 L140 80 Z" transform="translate(0 20)"/></svg>');
   }
 }
