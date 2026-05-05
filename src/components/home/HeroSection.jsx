@@ -66,10 +66,10 @@ export default function HeroSection({ hasProfile }) {
           <motion.img
             src="https://liveassets.ca/wp-content/uploads/2022/01/section-planningforcanada-1.png"
             alt="Planning for Canada"
-            initial={{ opacity: 0, x: 40 }}
-            animate={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.2 }}
-            className="w-full md:flex-1 md:max-w-2xl object-cover rounded-2xl mt-8 md:mt-0"
+            className="w-full max-w-md md:flex-1 md:max-w-2xl object-cover rounded-2xl mt-8 md:mt-0 md:ml-0"
           />
         </motion.div>
       </div>
