@@ -72,7 +72,7 @@ export default function HeroSection({ hasProfile }) {
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="hidden md:block flex-1 object-cover rounded-2xl"
+          className="hidden md:block md:w-2/5 md:ml-auto object-cover rounded-2xl"
         />
       </div>
     </section>);
