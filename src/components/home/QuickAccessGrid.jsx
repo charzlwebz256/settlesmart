@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom';
 import {
   GraduationCap, Home as HomeIcon, Briefcase, Scale, Heart,
-  Bus, Users, MapPin, AlertTriangle, Navigation
+  Bus, Users, MapPin, AlertTriangle, Navigation, Newspaper
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 
@@ -14,6 +14,7 @@ const categories = [
   { icon: AlertTriangle, label: 'Emergency Support', color: 'bg-red-500/10 text-red-600', path: '/emergency' },
   { icon: Navigation, label: 'Services Near Me', color: 'bg-teal-500/10 text-teal-600', path: '/near-me' },
   { icon: MapPin, label: 'Settlement Services', color: 'bg-orange-500/10 text-orange-600', path: '/services?category=settlement' },
+  { icon: Newspaper, label: 'News & Updates', color: 'bg-slate-500/10 text-slate-600', path: '/news' },
 ];
 
 export default function QuickAccessGrid() {

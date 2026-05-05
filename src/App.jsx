@@ -20,6 +20,7 @@ import Jobs from './pages/Jobs';
 import Legal from './pages/Legal';
 import Emergency from './pages/Emergency';
 import NearMe from './pages/NearMe';
+import News from './pages/News';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -61,6 +62,7 @@ const AuthenticatedApp = () => {
         <Route path="/legal" element={<Legal />} />
         <Route path="/emergency" element={<Emergency />} />
         <Route path="/near-me" element={<NearMe />} />
+        <Route path="/news" element={<News />} />
       </Route>
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="*" element={<PageNotFound />} />

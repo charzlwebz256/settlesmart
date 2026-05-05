@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, Search, MessageCircle, User, Navigation, Menu, X, CalendarDays, Briefcase, Scale, AlertTriangle, MapPin } from 'lucide-react';
+import { Home, Search, MessageCircle, User, Navigation, Menu, X, CalendarDays, Briefcase, Scale, AlertTriangle, MapPin, Newspaper } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -15,6 +15,7 @@ const navItems = [
   { path: '/jobs', icon: Briefcase, label: 'Jobs' },
   { path: '/near-me', icon: MapPin, label: 'Near Me' },
   { path: '/legal', icon: Scale, label: 'Legal' },
+  { path: '/news', icon: Newspaper, label: 'News' },
   { path: '/emergency', icon: AlertTriangle, label: 'Emergency' },
   { path: '/assistant', icon: MessageCircle, label: 'AI Help' },
   { path: '/profile', icon: User, label: 'Profile' },
