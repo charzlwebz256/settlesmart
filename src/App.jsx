@@ -29,6 +29,7 @@ import Contact from './pages/Contact';
 import Education from './pages/Education';
 import PrivacyPolicy from './pages/PrivacyPolicy';
 import Volunteer from './pages/Volunteer';
+import ResumeBuilder from './pages/ResumeBuilder';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -78,6 +79,7 @@ const AuthenticatedApp = () => {
         <Route path="/education" element={<Education />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/volunteer" element={<Volunteer />} />
+        <Route path="/resume-builder" element={<ResumeBuilder />} />
       </Route>
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="*" element={<PageNotFound />} />

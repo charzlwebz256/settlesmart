@@ -4,8 +4,9 @@ import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Search, RefreshCw, Briefcase, MapPin, Clock, ExternalLink, Building2, DollarSign, SlidersHorizontal } from 'lucide-react';
+import { Loader2, Search, RefreshCw, Briefcase, MapPin, Clock, ExternalLink, Building2, DollarSign, SlidersHorizontal, FileText, ArrowRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { Link } from 'react-router-dom';
 import { useCityDetection } from '@/hooks/useCityDetection';
 import JobCard from '@/components/jobs/JobCard';
 import JobFilters from '@/components/jobs/JobFilters';
@@ -132,6 +133,20 @@ export default function Jobs() {
           )}
         </div>
       </div>
+
+      {/* Resume Builder Banner */}
+      <Link to="/resume-builder" className="flex items-center justify-between gap-3 bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-xl px-4 py-3 mb-4 hover:border-primary/40 transition-all group">
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0">
+            <FileText className="w-4.5 h-4.5 w-[18px] h-[18px] text-primary" />
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-foreground">🍁 Smart Resume Builder</p>
+            <p className="text-xs text-muted-foreground">AI-powered · Canadian format · ATS-optimized · Cover letter included</p>
+          </div>
+        </div>
+        <ArrowRight className="w-4 h-4 text-primary flex-shrink-0 group-hover:translate-x-1 transition-transform" />
+      </Link>
 
       {/* Job Alert */}
       <JobAlertSubscribe defaultCity={city || ''} />
