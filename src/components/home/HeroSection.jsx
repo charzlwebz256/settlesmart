@@ -24,7 +24,7 @@ export default function HeroSection({ hasProfile }) {
             Your guide to settling in Canada
           </div>
 
-          <h1 className="font-heading font-extrabold text-5xl md:text-6xl lg:text-7xl text-foreground leading-[1.1] mb-5 text-center">
+          <h1 className="font-heading font-extrabold text-4xl md:text-5xl lg:text-6xl text-foreground leading-[1.1] mb-5 text-center">
             <span className="block">Start Your New Life</span>
             <span className="text-primary">in Canada</span>
             <br />
