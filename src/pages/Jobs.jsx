@@ -41,7 +41,7 @@ export default function Jobs() {
     const searchTerm = query || 'newcomer immigrant jobs';
 
     const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Find 12 real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Mix sources: LinkedIn, Indeed, Job Bank Canada, Indeed, ZipRecruiter. Focus on newcomer-friendly roles. Return ONLY: title (short), company (short), location (city only), job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (very short or empty string), posted (e.g. "2d"), url, source (linkedin/indeed/jooble/jobbank/ziprecruiter), is_newcomer_friendly (true/false). No extra fields.`,
+      prompt: `Find 50 real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Mix sources: LinkedIn, Indeed, Job Bank Canada, Indeed, ZipRecruiter. Focus on newcomer-friendly roles. Return ONLY: title (short), company (short), location (city only), job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (very short or empty string), posted (e.g. "2d"), url, source (linkedin/indeed/jooble/jobbank/ziprecruiter), is_newcomer_friendly (true/false). No extra fields.`,
       add_context_from_internet: true,
       response_json_schema: {
         type: 'object',
@@ -105,7 +105,7 @@ export default function Jobs() {
   });
 
   const [currentPage, setCurrentPage] = useState(1);
-  const JOBS_PER_PAGE = 10;
+  const JOBS_PER_PAGE = 10; // 50 jobs = 5 pages
 
   const linkedinCount = jobs.filter(j => j.source === 'linkedin').length;
   const indeedCount = jobs.filter(j => j.source === 'indeed').length;
