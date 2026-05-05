@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from 'react';
-import { Loader2, Headphones } from 'lucide-react';
+import { Loader2, Mic } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { cn } from '@/lib/utils';
 
@@ -78,7 +78,7 @@ export default function VoiceAssistant() {
     if ('speechSynthesis' in window) {
       speechSynthesis.cancel();
       const utterance = new SpeechSynthesisUtterance(text);
-      utterance.rate = 1.6;
+      utterance.rate = 1.2;
       utterance.pitch = 1.5;
       
       // Get female voice with American accent
@@ -139,7 +139,7 @@ Be friendly, direct, and practical. User: "${question}"`,
       title={isListening ? 'Listening...' : loading ? 'Processing...' : 'Press to speak'}
     >
       <div className="relative flex items-center justify-center">
-        <Headphones className={cn('w-6 h-6', isListening && 'animate-pulse')} />
+        <Mic className={cn('w-6 h-6', isListening && 'animate-pulse')} />
         {(isListening || loading) && (
           <div className="absolute inset-0 rounded-full animate-ping bg-red-500/50" />
         )}
