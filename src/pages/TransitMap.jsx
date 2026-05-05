@@ -5,6 +5,8 @@ import { Loader2, Navigation, Bus, MapPin, RotateCcw, ExternalLink, Info, Clock,
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { useCityDetection } from '@/hooks/useCityDetection';
+import WeatherWidget from '@/components/transit/WeatherWidget';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -53,6 +55,7 @@ function RecenterMap({ position }) {
 }
 
 export default function TransitMap() {
+  const { city, province } = useCityDetection();
   const [position, setPosition] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -607,6 +610,13 @@ export default function TransitMap() {
             </div>
           </div>
         )}
+      </div>
+
+      {/* Weather Widget */}
+      <div className="px-4 py-6 bg-background border-t border-border/50">
+        <div className="max-w-7xl mx-auto">
+          <WeatherWidget city={city} province={province} />
+        </div>
       </div>
     </div>
   );
