@@ -7,7 +7,7 @@ import { Input } from '@/components/ui/input';
 import {
   User, MapPin, Globe, BookOpen, Briefcase, Home as HomeIcon,
   Scale, Heart, Sparkles, Save, LogOut, Loader2, CheckCircle2, Trash2,
-  ChevronDown
+  ChevronDown, ExternalLink
 } from 'lucide-react';
 import {
   Select, SelectContent, SelectItem, SelectTrigger, SelectValue
@@ -18,7 +18,7 @@ import {
   AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 
 const interestOptions = [
   { value: 'education', label: 'Education', icon: BookOpen },
@@ -223,6 +223,21 @@ export default function Profile() {
             <LogOut className="w-4 h-4" />
             Sign Out
           </Button>
+        </div>
+
+        {/* Information */}
+        <div className="bg-card rounded-2xl border border-border/50 p-6">
+          <h3 className="font-heading font-bold text-base mb-4">Information</h3>
+          <div className="space-y-2">
+            <Link to="/about" className="flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors">
+              <span className="text-sm font-medium">About SettleSmart</span>
+              <ExternalLink className="w-4 h-4 text-muted-foreground" />
+            </Link>
+            <Link to="/privacy" className="flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors">
+              <span className="text-sm font-medium">Privacy Policy</span>
+              <ExternalLink className="w-4 h-4 text-muted-foreground" />
+            </Link>
+          </div>
         </div>
 
         {/* Danger Zone */}
