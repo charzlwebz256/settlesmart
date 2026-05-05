@@ -45,14 +45,34 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
 
+  // Load messages from localStorage on mount
+  useEffect(() => {
+    const savedMessages = localStorage.getItem('newcomerChatMessages');
+    if (savedMessages) {
+      try {
+        setMessages(JSON.parse(savedMessages));
+      } catch (e) {
+        console.error('Failed to load chat history:', e);
+      }
+    }
+  }, []);
+
+  // Save messages to localStorage whenever they change
+  useEffect(() => {
+    if (messages.length > 0) {
+      localStorage.setItem('newcomerChatMessages', JSON.stringify(messages));
+    }
+  }, [messages]);
+
   useEffect(() => {
     if (open && messages.length === 0) {
-      setMessages([{
+      const greeting = {
         role: 'assistant',
         content: `Hi! I'm your Canadian Newcomer Assistant 🍁\n\nI can help you find **emergency contacts**, **nearby services**, **transit info**, and answers to common settlement questions${userCity ? ` for **${userCity}**` : ''}.\n\nWhat do you need help with?`,
-      }]);
+      };
+      setMessages([greeting]);
     }
-  }, [open]);
+  }, [open, userCity]);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' });

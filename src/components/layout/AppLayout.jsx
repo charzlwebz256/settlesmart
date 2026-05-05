@@ -115,8 +115,46 @@ export default function AppLayout() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
+  const [detectedCity, setDetectedCity] = useState(null);
+  const [detectedProvince, setDetectedProvince] = useState(null);
   const activeTab = getActiveTab(location.pathname);
   const isRootTab = ALL_NAV_PATHS.includes(location.pathname);
+
+  // Detect user location on mount
+  useEffect(() => {
+    const detectLocation = async () => {
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(
+          async (position) => {
+            const { latitude, longitude } = position.coords;
+            try {
+              const result = await base44.integrations.Core.InvokeLLM({
+                prompt: `Given latitude ${latitude} and longitude ${longitude} in Canada, determine the nearest city and province. Return JSON with city and province fields.`,
+                add_context_from_internet: true,
+                response_json_schema: {
+                  type: 'object',
+                  properties: {
+                    city: { type: 'string' },
+                    province: { type: 'string' },
+                  },
+                },
+              });
+              if (result?.city && result?.province) {
+                setDetectedCity(result.city);
+                setDetectedProvince(result.province);
+              }
+            } catch (e) {
+              console.error('Geolocation lookup failed:', e);
+            }
+          },
+          () => {
+            // Geolocation denied or unavailable - silently fail
+          }
+        );
+      }
+    };
+    detectLocation();
+  }, []);
 
   const toggleTheme = () => {
     const html = document.documentElement;
@@ -295,8 +333,8 @@ export default function AppLayout() {
       {/* Global AI Chat Widget */}
       {location.pathname !== '/assistant' && (
         <NewcomerChatWidget
-          userCity={profile?.city}
-          userProvince={profile?.province}
+          userCity={profile?.city || detectedCity}
+          userProvince={profile?.province || detectedProvince}
         />
       )}
 
