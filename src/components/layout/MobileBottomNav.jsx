@@ -70,7 +70,7 @@ export default function MobileBottomNav({ activeTab, location }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="bg-card/95 backdrop-blur-xl border-t border-border/50 px-4 py-3 flex gap-3 justify-center"
+            className="bg-card/95 backdrop-blur-xl border-t border-border/50 px-3 py-2 flex gap-2 justify-center"
           >
             {TAB_CHILDREN[openMenu].map(child => {
               const isActive = location.pathname === child.path;
@@ -80,13 +80,13 @@ export default function MobileBottomNav({ activeTab, location }) {
                   to={child.path}
                   onClick={() => setOpenMenu(null)}
                   className={cn(
-                    "flex flex-col items-center gap-1 px-4 py-2.5 rounded-2xl text-xs font-semibold transition-all border",
+                    "flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-[11px] font-semibold transition-all border",
                     isActive
                       ? "bg-primary/10 text-primary border-primary/30"
                       : "bg-muted text-muted-foreground border-border/50 hover:text-foreground"
                   )}
                 >
-                  <child.icon className="w-5 h-5" />
+                  <child.icon className="w-3.5 h-3.5" />
                   <span>{child.label}</span>
                 </Link>
               );
