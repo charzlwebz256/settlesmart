@@ -18,10 +18,10 @@ export default function HeroSection({ hasProfile }) {
           transition={{ duration: 0.6 }}
           className="max-w-2xl">
           
-          <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-primary/10 text-primary text-xs font-semibold mb-6 hidden">
-            <MapPin className="w-3.5 h-3.5" />
-            Your guide to settling in Canada
-          </div>
+          
+
+
+          
 
           <h1 className="font-heading font-extrabold text-4xl md:text-5xl lg:text-6xl text-foreground leading-[1.1] mb-5">
             Start Your New Life{' '}
