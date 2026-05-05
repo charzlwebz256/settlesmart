@@ -43,14 +43,6 @@ export default function VoiceAssistant() {
     }
     
     loadSiteData();
-    
-    // Play welcome message on first load
-    setTimeout(() => {
-      if (!welcomeShownRef.current) {
-        welcomeShownRef.current = true;
-        speak("Hello, Welcome to SmartSettle your intelligent guide to settling in Canada. I'm here to help you find resources, navigate services, and make your transition smoother. How can I help you today?");
-      }
-    }, 500);
   }, []);
 
   const loadSiteData = async () => {
@@ -84,14 +76,16 @@ export default function VoiceAssistant() {
       // Get female voice with American accent
       const voices = speechSynthesis.getVoices();
       const femaleVoice = voices.find(v => 
-        v.lang === 'en-US' && (
+        v.lang.startsWith('en-US') && (
           v.name.toLowerCase().includes('female') ||
           v.name.toLowerCase().includes('woman') ||
           v.name.toLowerCase().includes('zira') ||
           v.name.toLowerCase().includes('victoria') ||
-          v.name.toLowerCase().includes('samantha')
+          v.name.toLowerCase().includes('samantha') ||
+          v.name.toLowerCase().includes('moira') ||
+          v.name.toLowerCase().includes('karen')
         )
-      ) || voices.find(v => v.lang === 'en-US');
+      ) || voices.find(v => v.lang.startsWith('en-US'));
       
       if (femaleVoice) utterance.voice = femaleVoice;
       speechSynthesis.speak(utterance);
