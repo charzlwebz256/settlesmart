@@ -32,6 +32,15 @@ export default function HeroSection({ hasProfile }) {
             </span>
           </h1>
 
+          <motion.img
+            src="https://liveassets.ca/wp-content/uploads/2022/01/section-planningforcanada-1.png"
+            alt="Planning for Canada"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+            className="w-full md:hidden object-cover rounded-2xl mb-8"
+          />
+
           <p className="text-muted-foreground text-base md:text-lg leading-relaxed mb-8 max-w-xl">Free settlement services, housing, jobs, education, and more all in one place. Personalized for your journey as a newcomer to Canada.
 
 
@@ -65,10 +74,10 @@ export default function HeroSection({ hasProfile }) {
         <motion.img
           src="https://liveassets.ca/wp-content/uploads/2022/01/section-planningforcanada-1.png"
           alt="Planning for Canada"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
-          className="w-full md:w-1/2 md:max-w-lg object-cover rounded-2xl"
+          className="hidden md:block md:w-1/2 md:max-w-lg object-cover rounded-2xl"
         />
       </div>
     </section>);
