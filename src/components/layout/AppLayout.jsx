@@ -3,9 +3,9 @@ import {
   Home, Search, Briefcase, BookOpen, AlertTriangle,
   Menu, X, ChevronLeft, User, MessageCircle,
   Navigation, MapPin, CalendarDays, Scale, Newspaper,
-  Info, Mail
+  Info, Mail, GraduationCap, Heart
 } from 'lucide-react';
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -13,27 +13,35 @@ import { base44 } from '@/api/base44Client';
 import NewcomerChatWidget from '@/components/assistant/NewcomerChatWidget';
 import LanguageTranslator from '@/components/layout/LanguageTranslator';
 
-// 5 primary bottom tabs
-const primaryTabs = [
-  { path: '/', icon: Home, label: 'Home' },
-  { path: '/explore', icon: Search, label: 'Explore' },
-  { path: '/work', icon: Briefcase, label: 'Work' },
-  { path: '/resources', icon: BookOpen, label: 'Resources' },
-  { path: '/emergency', icon: AlertTriangle, label: 'Emergency' },
+// Popup menus for specific tabs
+const explorePopup = [
+  { path: '/services', icon: Search, label: 'Services' },
+  { path: '/events', icon: CalendarDays, label: 'Events' },
+  { path: '/near-me', icon: Heart, label: 'Volunteer & Support' },
 ];
 
-// "Explore" group paths (for active highlight)
-const explorePaths = ['/', '/services', '/near-me', '/transit-map'];
-const workPaths = ['/jobs', '/events'];
-const resourcePaths = ['/legal', '/news'];
+const resourcesPopup = [
+  { path: '/news', icon: Newspaper, label: 'News' },
+  { path: '/jobs', icon: Briefcase, label: 'Jobs' },
+  { path: '/education', icon: GraduationCap, label: 'Education' },
+];
+
+// 5 primary bottom tabs
+const primaryTabs = [
+  { path: '/', icon: Home, label: 'Home', popup: null },
+  { path: '/explore', icon: Search, label: 'Explore', popup: explorePopup },
+  { path: '/work', icon: Briefcase, label: 'Work', popup: null },
+  { path: '/resources', icon: BookOpen, label: 'Resources', popup: resourcesPopup },
+  { path: '/emergency', icon: AlertTriangle, label: 'Emergency', popup: null },
+];
 
 // All pages — used for isRootTab check
 const ROOT_PATHS = [
   '/', '/services', '/near-me', '/transit-map', '/explore',
   '/jobs', '/events', '/work',
-  '/legal', '/news', '/resources',
+  '/legal', '/news', '/resources', '/education',
   '/emergency', '/assistant', '/profile',
-  '/about', '/contact',
+  '/about', '/contact', '/privacy',
 ];
 
 // Hamburger menu items
@@ -42,9 +50,10 @@ const menuItems = [
   { path: '/profile', icon: User, label: 'Profile' },
   { path: '/about', icon: Info, label: 'About' },
   { path: '/contact', icon: Mail, label: 'Contact' },
+  { path: '/privacy', icon: Scale, label: 'Privacy Policy' },
 ];
 
-// Desktop nav — all meaningful links
+// Desktop nav
 const desktopNavItems = [
   { path: '/', icon: Home, label: 'Home' },
   { path: '/services', icon: Search, label: 'Services' },
@@ -52,6 +61,7 @@ const desktopNavItems = [
   { path: '/transit-map', icon: Navigation, label: 'Transit' },
   { path: '/jobs', icon: Briefcase, label: 'Jobs' },
   { path: '/events', icon: CalendarDays, label: 'Events' },
+  { path: '/education', icon: GraduationCap, label: 'Education' },
   { path: '/legal', icon: Scale, label: 'Legal' },
   { path: '/news', icon: Newspaper, label: 'News' },
   { path: '/emergency', icon: AlertTriangle, label: 'Emergency' },
@@ -60,17 +70,45 @@ const desktopNavItems = [
 ];
 
 function getTabActive(tabPath, currentPath) {
-  if (tabPath === '/explore') return ['/services', '/near-me', '/transit-map'].includes(currentPath);
-  if (tabPath === '/work') return ['/jobs', '/events'].includes(currentPath);
-  if (tabPath === '/resources') return ['/legal', '/news'].includes(currentPath);
+  if (tabPath === '/explore') return ['/services', '/near-me', '/transit-map', '/events'].includes(currentPath);
+  if (tabPath === '/work') return ['/jobs', '/work'].includes(currentPath);
+  if (tabPath === '/resources') return ['/legal', '/news', '/resources', '/education'].includes(currentPath);
   return currentPath === tabPath;
+}
+
+function TabPopup({ items, onClose }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 8, scale: 0.95 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: 8, scale: 0.95 }}
+      transition={{ duration: 0.15 }}
+      className="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 bg-card border border-border rounded-2xl shadow-xl p-2 min-w-[160px] z-[200]"
+    >
+      {items.map(item => (
+        <Link
+          key={item.path}
+          to={item.path}
+          onClick={onClose}
+          className="flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-all whitespace-nowrap"
+        >
+          <item.icon className="w-4 h-4 text-primary" />
+          {item.label}
+        </Link>
+      ))}
+    </motion.div>
+  );
 }
 
 export default function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [openPopup, setOpenPopup] = useState(null); // tab path
   const isRootTab = ROOT_PATHS.includes(location.pathname);
+
+  // Close popup on route change
+  useEffect(() => { setOpenPopup(null); }, [location.pathname]);
 
   const { data: profile } = useQuery({
     queryKey: ['myProfile'],
@@ -80,6 +118,15 @@ export default function AppLayout() {
       return results[0] || null;
     },
   });
+
+  const handleTabPress = (tab) => {
+    if (tab.popup) {
+      setOpenPopup(prev => prev === tab.path ? null : tab.path);
+    } else {
+      setOpenPopup(null);
+      navigate(tab.path);
+    }
+  };
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -128,7 +175,6 @@ export default function AppLayout() {
 
           <div className="flex items-center gap-1">
             <LanguageTranslator />
-            {/* Hamburger — mobile & desktop secondary */}
             <button
               className="p-2 rounded-lg hover:bg-muted min-w-[44px] min-h-[44px] flex items-center justify-center"
               onClick={() => setMenuOpen(!menuOpen)}
@@ -165,17 +211,13 @@ export default function AppLayout() {
                   {item.label}
                 </Link>
               ))}
-              <div className="border-t border-border/30 pt-2 mt-1 flex gap-4 px-4 py-1">
-                <Link to="/about" onClick={() => setMenuOpen(false)} className="text-xs text-muted-foreground hover:text-primary transition-colors">About</Link>
-                <Link to="/contact" onClick={() => setMenuOpen(false)} className="text-xs text-muted-foreground hover:text-primary transition-colors">Contact</Link>
-              </div>
             </motion.div>
           )}
         </AnimatePresence>
       </header>
 
       {/* Main */}
-      <main className="flex-1 overflow-x-hidden">
+      <main className="flex-1 overflow-x-hidden" onClick={() => setOpenPopup(null)}>
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -198,29 +240,30 @@ export default function AppLayout() {
         />
       )}
 
-      {/* Mobile Bottom Nav — 5 tabs */}
+      {/* Mobile Bottom Nav — 5 tabs with popups */}
       <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-xl border-t border-border/50 safe-area-bottom select-none">
         <div className="flex items-center justify-around px-2 py-1">
           {primaryTabs.map(tab => {
-            const active = getTabActive(tab.path, location.pathname);
-            // Explore tab links to /services as the hub
-            const href = tab.path === '/explore' ? '/services'
-              : tab.path === '/work' ? '/jobs'
-              : tab.path === '/resources' ? '/legal'
-              : tab.path;
+            const active = getTabActive(tab.path, location.pathname) || openPopup === tab.path;
             return (
-              <Link
-                key={tab.path}
-                to={href}
-                aria-label={tab.label}
-                className={cn(
-                  "flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all min-w-[56px]",
-                  active ? "text-primary" : "text-muted-foreground"
-                )}
-              >
-                <tab.icon className={cn("w-5 h-5", active && "stroke-[2.5]")} />
-                <span className="text-[10px] font-medium">{tab.label}</span>
-              </Link>
+              <div key={tab.path} className="relative">
+                <AnimatePresence>
+                  {openPopup === tab.path && tab.popup && (
+                    <TabPopup items={tab.popup} onClose={() => setOpenPopup(null)} />
+                  )}
+                </AnimatePresence>
+                <button
+                  onClick={() => handleTabPress(tab)}
+                  aria-label={tab.label}
+                  className={cn(
+                    "flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all min-w-[56px]",
+                    active ? "text-primary" : "text-muted-foreground"
+                  )}
+                >
+                  <tab.icon className={cn("w-5 h-5", active && "stroke-[2.5]")} />
+                  <span className="text-[10px] font-medium">{tab.label}</span>
+                </button>
+              </div>
             );
           })}
         </div>

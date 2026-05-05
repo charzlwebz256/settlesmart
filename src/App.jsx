@@ -26,6 +26,8 @@ import NearMe from './pages/NearMe';
 import CanadianNewsUpdates from './pages/CanadianNewsUpdates';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Education from './pages/Education';
+import PrivacyPolicy from './pages/PrivacyPolicy';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -72,6 +74,8 @@ const AuthenticatedApp = () => {
         <Route path="/news" element={<CanadianNewsUpdates />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
+        <Route path="/education" element={<Education />} />
+        <Route path="/privacy" element={<PrivacyPolicy />} />
       </Route>
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="*" element={<PageNotFound />} />
