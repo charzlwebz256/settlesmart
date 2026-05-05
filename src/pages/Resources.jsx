@@ -76,7 +76,7 @@ export default function Resources() {
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 2 * 0.07 }}
+          transition={{ delay: staticSections.length * 0.07 }}
         >
           <button
             onClick={() => setShopOpen(!shopOpen)}
