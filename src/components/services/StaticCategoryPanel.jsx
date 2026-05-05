@@ -1,40 +1,9 @@
 import React, { useState, lazy, Suspense } from 'react';
 import { Phone, Globe, MapPin, Mail, ExternalLink, Navigation, List, Map } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getOrgLogo } from '@/lib/orgLogos';
 
 const MapView = lazy(() => import('./MapView'));
-
-// ── LOGOS ─────────────────────────────────────────────────────────────────────
-const LOGOS = {
-  'NorQuest College (LINC Program)': 'https://www.norquest.ca/NorquestCollege/media/Images/norquest-logo.png',
-  'ASSIST Community Services Centre': 'https://assistcsc.org/wp-content/uploads/2021/06/ASSIST-Logo.png',
-  'Global TESOL College': 'https://globaltesol.com/wp-content/uploads/2020/07/Global-TESOL-Logo.png',
-  'Edmonton Mennonite Centre for Newcomers': 'https://emcn.ab.ca/wp-content/uploads/2021/01/EMCN-Logo.png',
-  'Calgary Catholic Immigration Society': 'https://www.ccisab.ca/wp-content/uploads/2021/04/CCIS-Logo.png',
-  'University of Alberta': 'https://upload.wikimedia.org/wikipedia/en/thumb/6/6c/University_of_Alberta_Logo.svg/120px-University_of_Alberta_Logo.svg.png',
-  'Concordia University of Edmonton': 'https://concordia.ab.ca/wp-content/uploads/2022/01/CUE-Logo-Primary-RGB.png',
-  'MacEwan University': 'https://www.macewan.ca/Assets/Images/MacEwan-logo-full-colour-RGB.png',
-  'NAIT': 'https://www.nait.ca/content/dam/nait/about-nait/brand-standards/images/nait-logo.png',
-  'University of Calgary': 'https://upload.wikimedia.org/wikipedia/en/thumb/b/b7/University_of_Calgary_Logo.svg/120px-University_of_Calgary_Logo.svg.png',
-  'Mount Royal University': 'https://www.mtroyal.ca/cs/idcplg?IdcService=GET_FILE&dID=101026&dDocName=mtroyal-logo&allowInterrupt=1',
-  'SAIT': 'https://www.sait.ca/assets/images/SAIT_Logo.png',
-  'Bow Valley College': 'https://bowvalleycollege.ca/Content/Images/Logo/bvc-logo.png',
-  'Legal Aid Alberta (LAA)': 'https://www.legalaid.ab.ca/wp-content/uploads/2020/09/LAA-Logo.png',
-  'Edmonton Community Legal Centre (ECLC)': 'https://www.eclc.ca/wp-content/uploads/2021/01/ECLC-Logo.png',
-  'Calgary Legal Guidance (CLG)': 'https://clg.ab.ca/wp-content/uploads/2021/01/CLG-Logo.png',
-  'Law Society of Alberta': 'https://www.lawsociety.ab.ca/wp-content/uploads/2021/08/LSA-Logo.png',
-  'Alberta Human Rights Commission': 'https://albertahumanrights.ab.ca/wp-content/uploads/2021/01/AHRC-Logo.png',
-  'Edmonton Transit Service (ETS)': 'https://www.edmonton.ca/sites/default/files/public/images/ets-logo.png',
-  'Calgary Transit': 'https://www.calgarytransit.com/content/transit/en/home/_jcr_content/root/header/logo.img.png/1616789012000.png',
-  'Civida (Edmonton Community Housing Authority)': 'https://www.civida.ca/wp-content/uploads/2020/08/Civida-Logo.png',
-  'Calgary Homeless Foundation': 'https://calgaryhomeless.com/wp-content/uploads/2021/01/CHF-Logo.png',
-  'Canadian Red Cross (Alberta)': 'https://upload.wikimedia.org/wikipedia/commons/thumb/1/1a/Flag_of_the_Red_Cross.svg/80px-Flag_of_the_Red_Cross.svg.png',
-  'United Way Alberta Capital Region': 'https://www.myunitedway.ca/wp-content/uploads/2021/09/UW-Logo.png',
-  'YMCA of Northern Alberta': 'https://northernalberta.ymca.ca/wp-content/uploads/2020/06/YMCA-logo.png',
-  'Edmonton Food Bank': 'https://www.edmontonsfoodbank.com/wp-content/uploads/2020/01/EFB-Logo.png',
-  'Calgary Food Bank': 'https://www.calgaryfoodbank.com/wp-content/uploads/2020/01/CFB-Logo.png',
-  'Bissell Centre': 'https://bissellcentre.org/wp-content/uploads/2021/01/Bissell-Logo.png',
-};
 
 // ── LANGUAGE DATA ────────────────────────────────────────────────────────────
 const languageOrgs = [
@@ -168,7 +137,7 @@ const familyOrgs = [
 
 // ── SHARED CARD ──────────────────────────────────────────────────────────────
 function OrgCard({ item }) {
-  const logo = LOGOS[item.name];
+  const logo = item.logo || getOrgLogo(item.name);
   const mapQuery = item.address && item.address !== 'Online' && item.address !== '' && item.address !== 'Alberta' && item.address.length > 5
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address)}`
     : null;
@@ -294,7 +263,7 @@ function SectionedGrid({ items, sectionKey = 'section', cityField = 'city', show
       <ViewToggle view={view} setView={setView} cityFilter={cityFilter} setCityFilter={setCityFilter} cities={cities} />
       {view === 'map' ? (
         <Suspense fallback={<div className="h-96 flex items-center justify-center text-muted-foreground text-sm">Loading map...</div>}>
-          <MapView items={filtered.map(i => ({ ...i, logo: LOGOS[i.name] }))} cityFilter={cityFilter} />
+          <MapView items={filtered.map(i => ({ ...i, logo: getOrgLogo(i.name) }))} cityFilter={cityFilter} />
         </Suspense>
       ) : (
         <div className="space-y-8">
@@ -303,8 +272,8 @@ function SectionedGrid({ items, sectionKey = 'section', cityField = 'city', show
               <h2 className="font-heading font-bold text-sm text-muted-foreground uppercase tracking-wider mb-3 px-1">{sec}</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filtered.filter(i => i[sectionKey] === sec).map((item, idx) => (
-                  <OrgCard key={idx} item={item} />
-                ))}
+                      <OrgCard key={idx} item={{ ...item, logo: getOrgLogo(item.name) }} />
+                    ))}
               </div>
             </div>
           ))}
@@ -370,12 +339,12 @@ function EducationPanel() {
 
       {view === 'map' ? (
         <Suspense fallback={<div className="h-96 flex items-center justify-center text-muted-foreground text-sm">Loading map...</div>}>
-          <MapView items={filtered.map(i => ({ ...i, logo: LOGOS[i.name] }))} cityFilter={cityFilter} />
+          <MapView items={filtered.map(i => ({ ...i, logo: getOrgLogo(i.name) }))} cityFilter={cityFilter} />
         </Suspense>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((inst, i) => {
-            const logo = LOGOS[inst.name];
+            const logo = getOrgLogo(inst.name);
             return (
               <div key={i} className="bg-card rounded-2xl border border-border/50 p-4 flex flex-col gap-3 hover:border-primary/20 hover:shadow-sm transition-all">
                 <div className="flex items-start gap-3">

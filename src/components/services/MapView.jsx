@@ -92,7 +92,7 @@ export default function MapView({ items, cityFilter = 'all' }) {
               <Popup maxWidth={260}>
                 <div className="p-1 space-y-2">
                   {item.logo && (
-                    <img src={item.logo} alt={item.name} className="h-8 object-contain mb-1" onError={e => e.target.style.display='none'} />
+                    <img src={item.logo} alt={item.name} className="w-8 h-8 object-contain rounded mb-1" onError={e => e.target.style.display='none'} />
                   )}
                   <p className="font-bold text-sm leading-snug">{item.name}</p>
                   {item.address && <p className="text-xs text-gray-500">{item.address}</p>}

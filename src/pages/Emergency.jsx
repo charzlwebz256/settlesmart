@@ -1,4 +1,5 @@
 import { Phone, MapPin, Scale, Heart, Home, Shield, ExternalLink, AlertTriangle } from 'lucide-react';
+import { getOrgLogo } from '@/lib/orgLogos';
 
 const EMERGENCY = [
   { label: 'Police / Fire / Ambulance', number: '911', color: 'bg-red-500', note: 'For immediate life-threatening emergencies' },
@@ -34,21 +35,28 @@ const MENTAL_HEALTH = [
 function LinkList({ items }) {
   return (
     <div className="space-y-2">
-      {items.map(item => (
-        <a
-          key={item.url}
-          href={item.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="flex items-start gap-3 p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors group"
-        >
-          <ExternalLink className="w-4 h-4 text-primary/50 flex-shrink-0 mt-0.5 group-hover:text-primary" />
-          <div>
-            <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{item.label}</p>
-            <p className="text-xs text-muted-foreground">{item.note}</p>
-          </div>
-        </a>
-      ))}
+      {items.map(item => {
+        const logo = getOrgLogo(item.label);
+        return (
+          <a
+            key={item.url}
+            href={item.url}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-start gap-3 p-3 rounded-xl bg-muted/50 hover:bg-muted transition-colors group"
+          >
+            {logo ? (
+              <img src={logo} alt={item.label} className="w-6 h-6 rounded object-contain flex-shrink-0 mt-0.5" onError={e => { e.target.style.display='none'; }} />
+            ) : (
+              <ExternalLink className="w-4 h-4 text-primary/50 flex-shrink-0 mt-0.5 group-hover:text-primary" />
+            )}
+            <div>
+              <p className="text-sm font-semibold text-foreground group-hover:text-primary transition-colors">{item.label}</p>
+              <p className="text-xs text-muted-foreground">{item.note}</p>
+            </div>
+          </a>
+        );
+      })}
     </div>
   );
 }

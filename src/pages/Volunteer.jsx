@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Phone, Globe, MapPin, Mail, ExternalLink, Heart } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getOrgLogo } from '@/lib/orgLogos';
 
 const organizations = [
   // Edmonton
@@ -83,12 +84,17 @@ export default function Volunteer() {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filtered.map((org, i) => (
           <div key={i} className="bg-card rounded-2xl border border-border/50 p-5 flex flex-col gap-3 hover:border-primary/20 hover:shadow-sm transition-all">
-            <div>
-              <div className="flex items-center gap-2 flex-wrap mb-1.5">
-                <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-md border", categoryColors[org.category])}>{org.category}</span>
-                <span className="text-[10px] text-muted-foreground font-medium">{org.city}</span>
+            <div className="flex items-start gap-3">
+              {getOrgLogo(org.name) && (
+                <img src={getOrgLogo(org.name)} alt={org.name} className="w-8 h-8 rounded object-contain flex-shrink-0 mt-0.5" onError={e => e.target.style.display='none'} />
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap mb-1.5">
+                  <span className={cn("text-[10px] font-semibold px-2 py-0.5 rounded-md border", categoryColors[org.category])}>{org.category}</span>
+                  <span className="text-[10px] text-muted-foreground font-medium">{org.city}</span>
+                </div>
+                <h2 className="font-heading font-bold text-sm leading-snug">{org.name}</h2>
               </div>
-              <h2 className="font-heading font-bold text-sm leading-snug">{org.name}</h2>
             </div>
 
             <ul className="space-y-0.5">
