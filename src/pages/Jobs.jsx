@@ -1,4 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -100,6 +102,10 @@ For each job return:
     return () => clearInterval(timer);
   }, [fetchJobs, loading]);
 
+  const { containerRef, pullDistance, isRefreshing, touchHandlers } = usePullToRefresh({
+    onRefresh: () => fetchJobs(searchQuery, city),
+  });
+
   const handleSearch = (e) => {
     e.preventDefault();
     fetchJobs(searchQuery, city);
@@ -116,7 +122,8 @@ For each job return:
   const indeedCount = jobs.filter(j => j.source === 'indeed').length;
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-8">
+    <div ref={containerRef} className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-8 overflow-y-auto" {...touchHandlers}>
+      <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
       {/* Header */}
       <div className="mb-6">
         <h1 className="font-heading font-bold text-2xl md:text-3xl mb-1 flex items-center gap-2">

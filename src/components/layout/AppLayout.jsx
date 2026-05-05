@@ -1,5 +1,5 @@
-import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Home, Search, MessageCircle, User, Navigation, Menu, X, CalendarDays, Briefcase, Scale, AlertTriangle, MapPin, Newspaper } from 'lucide-react';
+import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { Home, Search, MessageCircle, User, Navigation, Menu, X, CalendarDays, Briefcase, Scale, AlertTriangle, MapPin, Newspaper, ChevronLeft } from 'lucide-react';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -21,9 +21,13 @@ const navItems = [
   { path: '/profile', icon: User, label: 'Profile' },
 ];
 
+const ROOT_TABS = navItems.map(i => i.path);
+
 export default function AppLayout() {
   const location = useLocation();
+  const navigate = useNavigate();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const isRootTab = ROOT_TABS.includes(location.pathname);
 
   const { data: profile } = useQuery({
     queryKey: ['myProfile'],
@@ -37,8 +41,17 @@ export default function AppLayout() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top Bar */}
-      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border/50">
+      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border/50 safe-top select-none">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
+          {!isRootTab ? (
+            <button
+              onClick={() => navigate(-1)}
+              className="flex items-center gap-1 text-sm font-medium text-primary hover:opacity-70 transition-opacity"
+            >
+              <ChevronLeft className="w-5 h-5" />
+              Back
+            </button>
+          ) : (
           <Link to="/" className="flex items-center gap-2.5">
             <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
               <span className="text-primary-foreground font-heading font-bold text-sm">SS</span>
@@ -48,6 +61,7 @@ export default function AppLayout() {
               <p className="text-[10px] font-medium text-muted-foreground tracking-wider uppercase">Canada</p>
             </div>
           </Link>
+          )}
 
           {/* Desktop Nav */}
           <nav className="hidden md:flex items-center gap-1">
@@ -116,7 +130,7 @@ export default function AppLayout() {
       )}
 
       {/* Mobile Bottom Nav */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-xl border-t border-border/50 safe-area-bottom">
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-card/90 backdrop-blur-xl border-t border-border/50 safe-area-bottom select-none">
         <div className="flex items-center justify-around px-2 py-1">
           {navItems.map(item => {
             const active = location.pathname === item.path;

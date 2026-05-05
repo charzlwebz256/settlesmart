@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Search, Filter, X, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -22,6 +22,7 @@ const categories = [
 ];
 
 export default function Services() {
+  const queryClient = useQueryClient();
   const urlParams = new URLSearchParams(window.location.search);
   const initialCategory = urlParams.get('category') || 'all';
 
@@ -46,14 +47,36 @@ export default function Services() {
 
   const savedIds = new Set(savedResources.map(r => r.service_id));
 
-  const handleSave = async (service) => {
-    if (savedIds.has(service.id)) {
-      const existing = savedResources.find(r => r.service_id === service.id);
-      if (existing) await base44.entities.SavedResource.delete(existing.id);
-    } else {
-      await base44.entities.SavedResource.create({ service_id: service.id });
-    }
-  };
+  const saveMutation = useMutation({
+    mutationFn: async (service) => {
+      if (savedIds.has(service.id)) {
+        const existing = savedResources.find(r => r.service_id === service.id);
+        if (existing) await base44.entities.SavedResource.delete(existing.id);
+      } else {
+        await base44.entities.SavedResource.create({ service_id: service.id });
+      }
+    },
+    onMutate: async (service) => {
+      await queryClient.cancelQueries({ queryKey: ['savedResources'] });
+      const previous = queryClient.getQueryData(['savedResources']);
+      if (savedIds.has(service.id)) {
+        queryClient.setQueryData(['savedResources'], old =>
+          (old || []).filter(r => r.service_id !== service.id)
+        );
+      } else {
+        queryClient.setQueryData(['savedResources'], old =>
+          [...(old || []), { service_id: service.id, id: `optimistic-${service.id}` }]
+        );
+      }
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      queryClient.setQueryData(['savedResources'], ctx.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['savedResources'] }),
+  });
+
+  const handleSave = (service) => saveMutation.mutate(service);
 
   const provinces = useMemo(() => {
     const set = new Set(services.map(s => s.province).filter(Boolean));

@@ -54,7 +54,18 @@ export default function Checklist() {
 
   const toggleMutation = useMutation({
     mutationFn: ({ id, is_completed }) => base44.entities.ChecklistItem.update(id, { is_completed }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['myChecklist'] }),
+    onMutate: async ({ id, is_completed }) => {
+      await queryClient.cancelQueries({ queryKey: ['myChecklist'] });
+      const previous = queryClient.getQueryData(['myChecklist']);
+      queryClient.setQueryData(['myChecklist'], old =>
+        (old || []).map(item => item.id === id ? { ...item, is_completed } : item)
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      queryClient.setQueryData(['myChecklist'], ctx.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['myChecklist'] }),
   });
 
   const generateChecklist = async () => {

@@ -1,4 +1,6 @@
 import { useState, useCallback } from 'react';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -81,12 +83,17 @@ For each news item return: title, summary (2 sentences max), category (breaking/
     setLoading(false);
   }, [city, province]);
 
+  const { containerRef, pullDistance, isRefreshing, touchHandlers } = usePullToRefresh({
+    onRefresh: fetchNews,
+  });
+
   const filteredArticles = newsData?.articles?.filter(a =>
     activeCategory === 'all' || a.category === activeCategory
   ) || [];
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-8">
+    <div ref={containerRef} className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-8 overflow-y-auto" {...touchHandlers}>
+      <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
       {/* Header */}
       <div className="mb-6 flex items-start justify-between flex-wrap gap-3">
         <div>

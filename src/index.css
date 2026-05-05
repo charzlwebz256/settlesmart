@@ -4,6 +4,18 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer utilities {
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+}
+
 @layer base {
   :root {
     --font-heading: 'Plus Jakarta Sans', sans-serif;
@@ -86,5 +98,6 @@
   }
   body {
     @apply bg-background text-foreground font-body;
+    overscroll-behavior-y: none;
   }
 }

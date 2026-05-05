@@ -6,8 +6,13 @@ import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import {
   User, MapPin, Globe, BookOpen, Briefcase, Home as HomeIcon,
-  Scale, Heart, Sparkles, Save, LogOut, Loader2, CheckCircle2
+  Scale, Heart, Sparkles, Save, LogOut, Loader2, CheckCircle2, Trash2
 } from 'lucide-react';
+import {
+  AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
+  AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
+  AlertDialogTitle, AlertDialogTrigger,
+} from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import { useNavigate } from 'react-router-dom';
 
@@ -68,6 +73,13 @@ export default function Profile() {
   };
 
   const handleLogout = () => {
+    base44.auth.logout('/');
+  };
+
+  const handleDeleteAccount = async () => {
+    if (profile) {
+      await base44.entities.UserProfile.delete(profile.id);
+    }
     base44.auth.logout('/');
   };
 
@@ -204,6 +216,37 @@ export default function Profile() {
             <LogOut className="w-4 h-4" />
             Sign Out
           </Button>
+        </div>
+
+        {/* Danger Zone */}
+        <div className="bg-destructive/5 border border-destructive/20 rounded-2xl p-5">
+          <h3 className="font-heading font-bold text-sm text-destructive mb-1">Danger Zone</h3>
+          <p className="text-xs text-muted-foreground mb-4">Permanently delete your account and all associated data. This cannot be undone.</p>
+          <AlertDialog>
+            <AlertDialogTrigger asChild>
+              <Button variant="destructive" size="sm" className="rounded-xl gap-2">
+                <Trash2 className="w-4 h-4" />
+                Delete Account
+              </Button>
+            </AlertDialogTrigger>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Delete your account?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  This will permanently delete your profile, preferences, and all saved data. You will be signed out immediately. This action cannot be undone.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel className="rounded-xl">Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={handleDeleteAccount}
+                  className="rounded-xl bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Yes, delete my account
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
         </div>
       </div>
     </div>
