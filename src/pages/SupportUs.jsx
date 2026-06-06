@@ -48,7 +48,7 @@ export default function SupportUs() {
             Support SettleSmart
           </div>
           <h1 className="font-heading font-bold text-3xl md:text-4xl text-foreground mb-4 leading-tight">
-            Help Us Support SettleSmart
+            Support SettleSmart
           </h1>
           <p className="text-muted-foreground text-base md:text-lg leading-relaxed max-w-2xl mx-auto">
             SettleSmart is a free platform built with passion and purpose. Your support, whether financial, 
