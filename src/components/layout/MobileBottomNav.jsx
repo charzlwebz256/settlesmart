@@ -4,6 +4,9 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
+// Persist the last visited sub-path per primary tab across renders
+const tabHistory = new Map();
+
 const TAB_CHILDREN = {
   '/explore': [
     { path: '/services', icon: Search, label: 'Settlement Services' },
@@ -59,23 +62,46 @@ export default function MobileBottomNav({ activeTab, location }) {
     };
   }, []);
 
+  // Track last visited sub-path for each tab
+  useEffect(() => {
+    // Record current path as last visited for its parent tab
+    for (const [tabPath, children] of Object.entries(TAB_CHILDREN)) {
+      if (children.some(c => c.path === location.pathname)) {
+        tabHistory.set(tabPath, location.pathname);
+        return;
+      }
+    }
+    // For top-level tabs, record the path itself
+    if (primaryNav.some(n => n.path === location.pathname)) {
+      tabHistory.set(location.pathname, location.pathname);
+    }
+  }, [location.pathname]);
+
   // Close submenu on route change
   useEffect(() => { setOpenMenu(null); }, [location.pathname]);
 
   const handleTabPress = (item) => {
     const children = TAB_CHILDREN[item.path];
     if (children) {
-      // If already on this tab and submenu is open, navigate to root path
       if (activeTab === item.path && openMenu === item.path) {
+        // Second tap while submenu open: go to root
         setOpenMenu(null);
         navigate(item.path);
+      } else if (activeTab !== item.path) {
+        // Switching to a new tab: restore last sub-page if available
+        const lastPath = tabHistory.get(item.path);
+        if (lastPath && lastPath !== item.path) {
+          setOpenMenu(null);
+          navigate(lastPath);
+        } else {
+          setOpenMenu(prev => prev === item.path ? null : item.path);
+        }
       } else {
         setOpenMenu(prev => prev === item.path ? null : item.path);
       }
     } else {
       setOpenMenu(null);
       navigate(item.path);
-      // Restore scroll position after navigation
       setTimeout(() => {
         const mainScroll = document.querySelector('main');
         const savedScroll = scrollPositions.get(item.path);

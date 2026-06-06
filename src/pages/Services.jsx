@@ -3,7 +3,7 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Search, Filter, X, Loader2 } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { MobileSelect as Select, MobileSelectContent as SelectContent, MobileSelectItem as SelectItem, MobileSelectTrigger as SelectTrigger, MobileSelectValue as SelectValue } from '@/components/ui/mobile-select';
 import { cn } from '@/lib/utils';
 import ServiceCard from '../components/services/ServiceCard';
 import StaticCategoryPanel from '../components/services/StaticCategoryPanel';
@@ -144,7 +144,7 @@ export default function Services() {
           <SelectTrigger className="w-44 min-h-[44px] rounded-xl text-sm">
             <SelectValue />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent label="Filter by Province">
             {provinces.map(p => (
               <SelectItem key={p} value={p}>{p === 'all' ? 'All Provinces' : p}</SelectItem>
             ))}

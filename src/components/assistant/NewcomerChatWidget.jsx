@@ -120,7 +120,7 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setOpen(true)}
             aria-label="Open newcomer assistant chat"
-            className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 w-10 h-10 rounded-full bg-primary shadow-lg shadow-primary/30 flex items-center justify-center hover:bg-primary/90 transition-colors"
+            className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] right-4 md:bottom-6 md:right-6 z-40 w-10 h-10 rounded-full bg-primary shadow-lg shadow-primary/30 flex items-center justify-center hover:bg-primary/90 transition-colors"
           >
             <MessageCircle className="w-4 h-4 text-primary-foreground" />
             <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-accent flex items-center justify-center">
@@ -138,7 +138,7 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 w-[calc(100vw-2rem)] max-w-sm h-[520px] bg-card rounded-2xl shadow-2xl border border-border/50 flex flex-col overflow-hidden"
+            className="fixed bottom-[calc(4.5rem+env(safe-area-inset-bottom))] right-4 md:bottom-6 md:right-6 z-40 w-[calc(100vw-2rem)] max-w-sm h-[520px] bg-card rounded-2xl shadow-2xl border border-border/50 flex flex-col overflow-hidden"
           >
             {/* Header */}
             <div className="flex items-center justify-between px-4 py-3 bg-primary text-primary-foreground flex-shrink-0">

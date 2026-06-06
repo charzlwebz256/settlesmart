@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { MobileSelect as Select, MobileSelectContent as SelectContent, MobileSelectItem as SelectItem, MobileSelectTrigger as SelectTrigger, MobileSelectValue as SelectValue } from '@/components/ui/mobile-select';
 import { Loader2, Mic, Send, RefreshCw, ChevronDown, ChevronUp, Lightbulb, Star, MessageSquare, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
@@ -201,7 +201,7 @@ Keep it concise, warm, and encouraging.`,
                   <SelectTrigger className="w-full min-h-[44px] rounded-xl text-sm">
                     <SelectValue placeholder="— Select a saved application —" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent label="Pick from Job Tracker">
                     {applications.map(a => (
                       <SelectItem key={a.id} value={a.id}>{a.job_title} @ {a.company}</SelectItem>
                     ))}
