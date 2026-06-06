@@ -45,13 +45,13 @@ export default function About() {
             <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
               Moving to a new country is one of the most challenging experiences a person can face. Language barriers, 
               unfamiliar government systems, and the pressure of finding housing, employment, and healthcare can feel 
-              overwhelming — especially for refugees, newcomers with limited English, and those arriving without support networks.
+              overwhelming, especially for refugees, newcomers with limited English, and those arriving without support networks.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-3 text-sm md:text-base">
               SettleSmart Canada was created by <strong className="text-foreground">Lwebuga Charles</strong>, a newcomer 
               himself originally from Uganda, who experienced firsthand the difficulty of navigating Canada's settlement 
               systems. Drawing on his background in technology and his lived experience in refugee settings, Charles built 
-              SettleSmart to be the platform he wished had existed when he arrived — a single, reliable, and free resource 
+              SettleSmart to be the platform he wished had existed when he arrived: a single, reliable, and free resource 
               that puts everything newcomers need in one place.
             </p>
           </div>
@@ -65,13 +65,13 @@ export default function About() {
             <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
               Our platform aggregates hundreds of verified, free settlement services from government agencies, non-profit 
               organizations, and community groups across all provinces and territories in Canada. Whether you need to find 
-              a language class, a food bank, legal aid, a transit card, or a family doctor — we help you find it fast, 
+              a language class, a food bank, legal aid, a transit card, or a family doctor. We help you find it fast, 
               in one place, tailored to your city and immigration status.
             </p>
             <p className="text-muted-foreground leading-relaxed mt-3 text-sm md:text-base">
               Beyond resource discovery, SettleSmart includes an AI-powered settlement assistant available 24/7, a 
               personalized 90-day checklist, live local news for newcomers, real-time job listings, a community events 
-              calendar, a job application tracker, an interview prep tool, and a resume builder — all in a single, 
+              calendar, a job application tracker, an interview prep tool, and a resume builder, all in a single 
               mobile-friendly app.
             </p>
           </div>

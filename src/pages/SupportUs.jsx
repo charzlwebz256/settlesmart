@@ -51,8 +51,8 @@ export default function SupportUs() {
             Help Us Support Canada's Newcomers
           </h1>
           <p className="text-muted-foreground text-base md:text-lg leading-relaxed max-w-2xl mx-auto">
-            SettleSmart is a free platform built with passion and purpose. Your support — whether financial, 
-            through partnership, or through volunteering — directly helps immigrants and refugees access the 
+            SettleSmart is a free platform built with passion and purpose. Your support, whether financial, 
+            through partnership, or through volunteering, directly helps immigrants and refugees access the 
             resources they need to build better lives in Canada.
           </p>
         </div>
@@ -105,7 +105,7 @@ export default function SupportUs() {
           </h2>
           <p className="text-muted-foreground text-sm mb-6 leading-relaxed">
             Interested in donating, partnering, or learning more about how you can support this initiative? 
-            Reach out directly to the developer — we welcome all conversations about collaboration and funding.
+            Reach out directly to the developer. We welcome all conversations about collaboration and funding.
           </p>
 
           <div className="space-y-4">

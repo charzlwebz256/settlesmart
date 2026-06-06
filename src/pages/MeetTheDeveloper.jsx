@@ -21,7 +21,7 @@ const HIGHLIGHTS = [
   },
   {
     title: 'PALS & Edmonton Food Bank',
-    desc: 'Volunteered to support vulnerable individuals and families through community settlement programs.',
+    desc: 'Volunteered with Project Adult Literacy Society and the Edmonton Food Bank to support vulnerable individuals and families.',
     color: 'bg-green-50 text-green-700 border-green-200 dark:bg-green-950/30 dark:text-green-400 dark:border-green-800',
   },
   {
@@ -129,7 +129,7 @@ export default function MeetTheDeveloper() {
 
           <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
             He has also contributed to community development initiatives through volunteering with 
-            <strong className="text-foreground"> PALS (Partnership for Local Affordable Settlement Services)</strong> and the 
+            <strong className="text-foreground"> PALS (Project Adult Literacy Society)</strong> and the 
             <strong className="text-foreground"> Edmonton Food Bank</strong>, supporting efforts that assist vulnerable individuals 
             and families. In addition, he has been involved in entrepreneurship support work with organizations such as 
             <strong className="text-foreground"> MAAK Impact</strong>, helping small business owners improve visibility and growth 
