@@ -1,5 +1,5 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
-import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, Navigation, MapPin, CalendarDays, ChevronDown, Moon, Sun } from 'lucide-react';
+import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, Navigation, MapPin, CalendarDays, ChevronDown, Moon, Sun, Heart, Info } from 'lucide-react';
 import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -36,11 +36,14 @@ const primaryNav = [
   { path: '/emergency', icon: AlertTriangle, label: 'Emergency' },
 ];
 
-// Secondary items in hamburger menu
+// Secondary items in hamburger menu (no duplicates with primary nav)
 const secondaryNav = [
   { path: '/assistant', icon: MessageCircle, label: 'AI Assistant' },
-  { path: '/profile', icon: User, label: 'Profile' },
   { path: '/checklist', icon: BookOpen, label: 'Checklist' },
+  { path: '/profile', icon: User, label: 'My Profile' },
+  { path: '/support-us', icon: Heart, label: 'Support Us' },
+  { path: '/meet-the-developer', icon: Info, label: 'Meet the Developer' },
+  { path: '/about', icon: Info, label: 'About SettleSmart' },
 ];
 
 const ALL_NAV_PATHS = [
@@ -250,24 +253,16 @@ export default function AppLayout() {
                     </div>
                   );
                 })}
-                <div className="my-2 border-t border-border/40" />
+
+              </div>
+
+              {/* Secondary nav */}
+              <div className="border-t border-border/40 pt-2 mt-1 space-y-0.5">
                 {secondaryNav.map(item => (
                   <Link key={item.path} to={item.path} onClick={() => setMenuOpen(false)}
                     className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
                       location.pathname === item.path ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>
                     <item.icon className="w-5 h-5" />
-                    {item.label}
-                  </Link>
-                ))}
-              </div>
-
-              {/* Secondary nav for all screens */}
-              <div className="flex flex-col md:flex-row gap-1 md:justify-end border-t border-border/40 pt-2 mt-1">
-                {secondaryNav.map(item => (
-                  <Link key={item.path} to={item.path} onClick={() => setMenuOpen(false)}
-                    className={cn("flex items-center gap-3 md:gap-2 px-4 md:px-3 py-3 md:py-2.5 rounded-xl text-sm font-medium transition-all",
-                      location.pathname === item.path ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>
-                    <item.icon className="w-5 h-5 md:w-4 md:h-4" />
                     {item.label}
                   </Link>
                 ))}
