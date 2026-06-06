@@ -7,7 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { Loader2, Search, RefreshCw, Briefcase, MapPin, Clock, ExternalLink, Building2, DollarSign, SlidersHorizontal, FileText, ArrowRight, MessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
-import { useCityDetection } from '@/hooks/useCityDetection';
+import { useLocation_ } from '@/lib/LocationContext';
 import JobCard from '@/components/jobs/JobCard';
 import JobFilters from '@/components/jobs/JobFilters';
 import JobAlertSubscribe from '@/components/jobs/JobAlertSubscribe';
@@ -22,7 +22,7 @@ const SOURCE_TABS = [
 ];
 
 export default function Jobs() {
-  const { city, province, loading: cityLoading } = useCityDetection();
+  const { city, province, isDetecting: cityLoading } = useLocation_();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSource, setActiveSource] = useState('all');
   const [jobs, setJobs] = useState([]);
@@ -233,7 +233,7 @@ export default function Jobs() {
   const handleSourceChange = (s) => { setActiveSource(s); setCurrentPage(1); };
 
   return (
-    <div ref={containerRef} className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-8 overflow-y-auto" {...touchHandlers}>
+    <div ref={containerRef} className="max-w-5xl mx-auto px-4 py-6 pb-8 overflow-y-auto" {...touchHandlers}>
       <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
       {/* Header */}
       <div className="mb-6">

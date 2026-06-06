@@ -6,6 +6,7 @@ import { Bell, X, AlertTriangle, CalendarDays, CheckCircle2, ChevronRight, Loade
 import { motion, AnimatePresence } from 'framer-motion';
 import { differenceInDays, parseISO, isAfter, isBefore, addDays } from 'date-fns';
 import { cn } from '@/lib/utils';
+import EmailNotificationSetup from './EmailNotificationSetup';
 
 function buildNotifications(savedEvents, allEvents, checklist) {
   const notifications = [];
@@ -97,13 +98,17 @@ export default function NotificationCenter() {
   const all = buildNotifications(savedEvents, allEvents, checklist);
   const visible = all.filter(n => !dismissed.has(n.id));
 
-  if (visible.length === 0) return null;
-
   const shown = expanded ? visible : visible.slice(0, 2);
   const hasMore = visible.length > 2;
 
   return (
     <section className="max-w-7xl mx-auto px-4 pb-6">
+      {/* Email notification opt-in */}
+      <EmailNotificationSetup
+        savedEvents={savedEvents}
+        allEvents={allEvents}
+        checklist={checklist}
+      />
       {/* Header */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">

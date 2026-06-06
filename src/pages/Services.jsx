@@ -1,12 +1,13 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { Search, Filter, X, Loader2 } from 'lucide-react';
+import { Search, Filter, X, Loader2, MapPin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { MobileSelect as Select, MobileSelectContent as SelectContent, MobileSelectItem as SelectItem, MobileSelectTrigger as SelectTrigger, MobileSelectValue as SelectValue } from '@/components/ui/mobile-select';
 import { cn } from '@/lib/utils';
 import ServiceCard from '../components/services/ServiceCard';
 import StaticCategoryPanel from '../components/services/StaticCategoryPanel';
+import { useLocation_ } from '@/lib/LocationContext';
 
 const categories = [
   { value: 'all', label: 'All Services' },
@@ -24,12 +25,20 @@ const categories = [
 
 export default function Services() {
   const queryClient = useQueryClient();
+  const { city: locationCity, province: locationProvince } = useLocation_();
   const urlParams = new URLSearchParams(window.location.search);
   const initialCategory = urlParams.get('category') || 'all';
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedProvince, setSelectedProvince] = useState('all');
+
+  // Auto-set province when location is detected
+  useEffect(() => {
+    if (locationProvince && selectedProvince === 'all') {
+      setSelectedProvince(locationProvince);
+    }
+  }, [locationProvince]);
 
   const { data: services, isLoading } = useQuery({
     queryKey: ['services'],
@@ -97,10 +106,17 @@ export default function Services() {
   }, [services, selectedCategory, selectedProvince, searchQuery]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 pb-24 md:pb-8">
-      <div className="mb-8">
-        <h1 className="font-heading font-bold text-2xl md:text-3xl mb-2">Settlement Services</h1>
-        <p className="text-muted-foreground text-sm">Browse free services for newcomers across Canada</p>
+    <div className="max-w-7xl mx-auto px-4 py-6 pb-8">
+      <div className="mb-6">
+        <h1 className="font-heading font-bold text-2xl md:text-3xl mb-1">Settlement Services</h1>
+        {locationCity || locationProvince ? (
+          <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
+            <MapPin className="w-3.5 h-3.5 text-primary" />
+            <span>Showing services near <span className="font-semibold text-primary">{locationCity ? `${locationCity}, ` : ''}{locationProvince}</span></span>
+          </div>
+        ) : (
+          <p className="text-muted-foreground text-sm">Browse free services for newcomers across Canada</p>
+        )}
       </div>
 
       {/* Search */}

@@ -140,7 +140,7 @@ Return JSON with an "items" array. Each item must have these exact fields:
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 pb-24 md:pb-8">
+    <div className="max-w-3xl mx-auto px-4 py-6 pb-8">
       <div className="mb-8">
         <h1 className="font-heading font-bold text-2xl md:text-3xl mb-2">Your First 90 Days 🍁</h1>
         <p className="text-muted-foreground text-sm">

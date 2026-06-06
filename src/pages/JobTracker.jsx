@@ -155,7 +155,7 @@ export default function JobTracker() {
     .slice(0, 3);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-8">
+    <div className="max-w-5xl mx-auto px-4 py-6 pb-8">
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>

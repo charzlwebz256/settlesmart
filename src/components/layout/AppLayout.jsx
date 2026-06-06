@@ -1,12 +1,12 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, Navigation, MapPin, CalendarDays, ChevronDown, Moon, Sun } from 'lucide-react';
-import { useState, useRef, useEffect, useCallback } from 'react';
-import MobileBottomNav from '@/components/layout/MobileBottomNav';
+import { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import NewcomerChatWidget from '@/components/assistant/NewcomerChatWidget';
+import { useLocation_ } from '@/lib/LocationContext';
 
 import LanguageTranslator from '@/components/layout/LanguageTranslator';
 
@@ -115,46 +115,9 @@ export default function AppLayout() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
-  const [detectedCity, setDetectedCity] = useState(null);
-  const [detectedProvince, setDetectedProvince] = useState(null);
+  const { city: detectedCity, province: detectedProvince } = useLocation_();
   const activeTab = getActiveTab(location.pathname);
   const isRootTab = ALL_NAV_PATHS.includes(location.pathname);
-
-  // Detect user location on mount
-  useEffect(() => {
-    const detectLocation = async () => {
-      if ('geolocation' in navigator) {
-        navigator.geolocation.getCurrentPosition(
-          async (position) => {
-            const { latitude, longitude } = position.coords;
-            try {
-              const result = await base44.integrations.Core.InvokeLLM({
-                prompt: `Given latitude ${latitude} and longitude ${longitude} in Canada, determine the nearest city and province. Return JSON with city and province fields.`,
-                add_context_from_internet: true,
-                response_json_schema: {
-                  type: 'object',
-                  properties: {
-                    city: { type: 'string' },
-                    province: { type: 'string' },
-                  },
-                },
-              });
-              if (result?.city && result?.province) {
-                setDetectedCity(result.city);
-                setDetectedProvince(result.province);
-              }
-            } catch (e) {
-              console.error('Geolocation lookup failed:', e);
-            }
-          },
-          () => {
-            // Geolocation denied or unavailable - silently fail
-          }
-        );
-      }
-    };
-    detectLocation();
-  }, []);
 
   const toggleTheme = () => {
     const html = document.documentElement;
@@ -197,7 +160,7 @@ export default function AppLayout() {
             </Link>
           )}
 
-          {/* Desktop Nav */}
+          {/* Desktop + Mobile Nav */}
           <nav className="hidden md:flex items-center gap-1">
             {primaryNav.map(item => {
               const hasChildren = !!TAB_CHILDREN[item.path];
@@ -251,8 +214,8 @@ export default function AppLayout() {
               transition={{ duration: 0.15 }}
               className="border-t border-border/50 bg-card/95 backdrop-blur-xl p-3"
             >
-              {/* Mobile: full nav tree */}
-              <div className="md:hidden space-y-1">
+              {/* All screens: full nav tree */}
+              <div className="space-y-1">
                 {primaryNav.map(item => {
                   const children = TAB_CHILDREN[item.path];
                   const isActive = activeTab === item.path;
@@ -298,13 +261,13 @@ export default function AppLayout() {
                 ))}
               </div>
 
-              {/* Desktop: secondary nav only */}
-              <div className="hidden md:flex gap-1 justify-end">
+              {/* Secondary nav for all screens */}
+              <div className="flex flex-col md:flex-row gap-1 md:justify-end border-t border-border/40 pt-2 mt-1">
                 {secondaryNav.map(item => (
                   <Link key={item.path} to={item.path} onClick={() => setMenuOpen(false)}
-                    className={cn("flex items-center gap-2 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
+                    className={cn("flex items-center gap-3 md:gap-2 px-4 md:px-3 py-3 md:py-2.5 rounded-xl text-sm font-medium transition-all",
                       location.pathname === item.path ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>
-                    <item.icon className="w-4 h-4" />
+                    <item.icon className="w-5 h-5 md:w-4 md:h-4" />
                     {item.label}
                   </Link>
                 ))}
@@ -315,7 +278,7 @@ export default function AppLayout() {
       </header>
 
       {/* Main */}
-      <main className="flex-1 overflow-x-hidden">
+      <main className="flex-1 overflow-x-hidden pb-safe">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -337,9 +300,6 @@ export default function AppLayout() {
           userProvince={profile?.province || detectedProvince}
         />
       )}
-
-      {/* Mobile Bottom Nav — 5 primary tabs */}
-      <MobileBottomNav activeTab={activeTab} location={location} />
     </div>
   );
 }

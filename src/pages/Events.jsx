@@ -9,7 +9,7 @@ import CalendarStrip from '@/components/events/CalendarStrip';
 import EventCard from '@/components/events/EventCard';
 import UpcomingReminders from '@/components/events/UpcomingReminders';
 import EventbriteFeed from '@/components/events/EventbriteFeed';
-import { useCityDetection } from '@/hooks/useCityDetection';
+import { useLocation_ } from '@/lib/LocationContext';
 
 const CATEGORIES = [
   { value: 'all', label: 'All' },
@@ -28,7 +28,8 @@ export default function Events() {
   const [selectedDate, setSelectedDate] = useState(startOfDay(new Date()));
   const [category, setCategory] = useState('all');
   const [viewAll, setViewAll] = useState(false);
-  const { city, province, source, loading: cityLoading } = useCityDetection();
+  const { city, province, isDetecting: cityLoading } = useLocation_();
+  const source = city ? 'gps' : null;
 
   const { data: events, isLoading } = useQuery({
     queryKey: ['events'],
@@ -82,7 +83,7 @@ export default function Events() {
   }, [events, category, selectedDate, viewAll, city]);
 
   return (
-    <div className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-8">
+    <div className="max-w-5xl mx-auto px-4 py-6 pb-8">
       {/* Header */}
       <div className="mb-6">
         <h1 className="font-heading font-bold text-2xl md:text-3xl mb-1 flex items-center gap-2">
