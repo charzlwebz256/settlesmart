@@ -1,6 +1,7 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
+import { useEffect } from 'react';
 import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, Navigation, MapPin, CalendarDays, ChevronDown, Moon, Sun, Heart, Info } from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -122,6 +123,11 @@ export default function AppLayout() {
   const activeTab = getActiveTab(location.pathname);
   const isRootTab = ALL_NAV_PATHS.includes(location.pathname);
 
+  // Scroll to top on every route change
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [location.pathname]);
+
   const toggleTheme = () => {
     const html = document.documentElement;
     html.classList.toggle('dark');
@@ -217,24 +223,26 @@ export default function AppLayout() {
               transition={{ duration: 0.15 }}
               className="border-t border-border/50 bg-card/95 backdrop-blur-xl p-3"
             >
-              {/* All screens: full nav tree */}
-              <div className="space-y-1">
+              {/* Mobile only: full primary nav tree. Desktop: only Emergency (others are in the top nav) */}
+              <div className="space-y-0.5">
                 {primaryNav.map(item => {
                   const children = TAB_CHILDREN[item.path];
                   const isActive = activeTab === item.path;
+                  // On desktop, skip Home/Explore/Work/Resources (they're in the top nav bar)
+                  const isDesktopOnly = ['/', '/explore', '/work', '/resources'].includes(item.path);
                   return (
-                    <div key={item.path}>
+                    <div key={item.path} className={isDesktopOnly ? 'md:hidden' : ''}>
                       {children ? (
                         <>
-                          <div className={cn("flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold",
+                          <div className={cn("flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-semibold",
                             isActive ? "text-primary" : "text-foreground")}>
-                            <item.icon className="w-5 h-5" />
+                            <item.icon className="w-4 h-4" />
                             {item.label}
                           </div>
-                          <div className="ml-9 space-y-0.5">
+                          <div className="ml-8 space-y-0.5">
                             {children.map(child => (
                               <Link key={child.path} to={child.path} onClick={() => setMenuOpen(false)}
-                                className={cn("flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
+                                className={cn("flex items-center gap-2.5 px-4 py-2 rounded-xl text-sm font-medium transition-all",
                                   location.pathname === child.path ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>
                                 <child.icon className="w-4 h-4" />
                                 {child.label}
@@ -244,25 +252,24 @@ export default function AppLayout() {
                         </>
                       ) : (
                         <Link to={item.path} onClick={() => setMenuOpen(false)}
-                          className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                          className={cn("flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition-all",
                             location.pathname === item.path ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>
-                          <item.icon className="w-5 h-5" />
+                          <item.icon className="w-4 h-4" />
                           {item.label}
                         </Link>
                       )}
                     </div>
                   );
                 })}
-
               </div>
 
               {/* Secondary nav */}
-              <div className="border-t border-border/40 pt-2 mt-1 space-y-0.5">
+              <div className="border-t border-border/40 pt-1.5 mt-1 space-y-0.5">
                 {secondaryNav.map(item => (
                   <Link key={item.path} to={item.path} onClick={() => setMenuOpen(false)}
-                    className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                    className={cn("flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition-all",
                       location.pathname === item.path ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>
-                    <item.icon className="w-5 h-5" />
+                    <item.icon className="w-4 h-4" />
                     {item.label}
                   </Link>
                 ))}
