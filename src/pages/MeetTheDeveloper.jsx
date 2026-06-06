@@ -130,7 +130,7 @@ export default function MeetTheDeveloper() {
           <p className="text-muted-foreground leading-relaxed text-sm md:text-base">
             He has also contributed to community development initiatives through volunteering with 
             <strong className="text-foreground"> PALS (Project Adult Literacy Society)</strong> and the 
-            <strong className="text-foreground"> Edmonton Food Bank</strong>, supporting efforts that assist vulnerable individuals 
+            <strong className="text-foreground"> Edmonton's Food Bank</strong>, supporting efforts that assist vulnerable individuals 
             and families. In addition, he has been involved in entrepreneurship support work with organizations such as 
             <strong className="text-foreground"> MAAK Impact</strong>, helping small business owners improve visibility and growth 
             through digital tools.
