@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Loader2, Mic, Send, RefreshCw, ChevronDown, ChevronUp, Lightbulb, Star, MessageSquare, BookOpen } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import ReactMarkdown from 'react-markdown';
@@ -190,22 +191,22 @@ Keep it concise, warm, and encouraging.`,
             {applications.length > 0 && (
               <div className="mb-3">
                 <label className="text-xs text-muted-foreground font-medium block mb-1">Pick from Job Tracker</label>
-                <select
-                  className="w-full text-sm px-3 py-2 rounded-xl border border-border/60 bg-background focus:ring-2 focus:ring-primary/20 focus:outline-none"
-                  onChange={e => {
-                    const app = applications.find(a => a.id === e.target.value);
-                    if (app) {
-                      setJobTitle(app.job_title + (app.company ? ` at ${app.company}` : ''));
-                      setJobDescription(app.job_description || '');
-                    }
-                  }}
-                  defaultValue=""
-                >
-                  <option value="" disabled>— Select a saved application —</option>
-                  {applications.map(a => (
-                    <option key={a.id} value={a.id}>{a.job_title} @ {a.company}</option>
-                  ))}
-                </select>
+                <Select onValueChange={id => {
+                  const app = applications.find(a => a.id === id);
+                  if (app) {
+                    setJobTitle(app.job_title + (app.company ? ` at ${app.company}` : ''));
+                    setJobDescription(app.job_description || '');
+                  }
+                }}>
+                  <SelectTrigger className="w-full min-h-[44px] rounded-xl text-sm">
+                    <SelectValue placeholder="— Select a saved application —" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {applications.map(a => (
+                      <SelectItem key={a.id} value={a.id}>{a.job_title} @ {a.company}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
               </div>
             )}
 

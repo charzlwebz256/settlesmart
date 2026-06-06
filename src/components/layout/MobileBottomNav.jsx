@@ -65,8 +65,13 @@ export default function MobileBottomNav({ activeTab, location }) {
   const handleTabPress = (item) => {
     const children = TAB_CHILDREN[item.path];
     if (children) {
-      // Toggle submenu; if already open, close it
-      setOpenMenu(prev => prev === item.path ? null : item.path);
+      // If already on this tab and submenu is open, navigate to root path
+      if (activeTab === item.path && openMenu === item.path) {
+        setOpenMenu(null);
+        navigate(item.path);
+      } else {
+        setOpenMenu(prev => prev === item.path ? null : item.path);
+      }
     } else {
       setOpenMenu(null);
       navigate(item.path);

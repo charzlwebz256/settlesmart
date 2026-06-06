@@ -124,7 +124,18 @@ export default function JobTracker() {
 
   const statusMutation = useMutation({
     mutationFn: ({ id, status }) => base44.entities.JobApplication.update(id, { status }),
-    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['jobApplications'] }),
+    onMutate: async ({ id, status }) => {
+      await queryClient.cancelQueries({ queryKey: ['jobApplications'] });
+      const previous = queryClient.getQueryData(['jobApplications']);
+      queryClient.setQueryData(['jobApplications'], old =>
+        (old || []).map(app => app.id === id ? { ...app, status } : app)
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      queryClient.setQueryData(['jobApplications'], ctx.previous);
+    },
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['jobApplications'] }),
   });
 
   const filtered = activeColumn === 'all' ? applications : applications.filter(a => a.status === activeColumn);
