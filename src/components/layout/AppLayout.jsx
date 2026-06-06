@@ -117,6 +117,11 @@ export default function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+
+  // Scroll to top on every route change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }, [location.pathname]);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
   const { city: detectedCity, province: detectedProvince } = useLocation_();
   const activeTab = getActiveTab(location.pathname);
@@ -163,14 +168,10 @@ export default function AppLayout() {
             </Link>
           )}
 
-          {/* Desktop + Mobile Nav */}
+          {/* Desktop Nav — only Home & Emergency shown; rest via hamburger */}
           <nav className="hidden md:flex items-center gap-1">
-            {primaryNav.map(item => {
-              const hasChildren = !!TAB_CHILDREN[item.path];
+            {primaryNav.filter(item => !TAB_CHILDREN[item.path]).map(item => {
               const isActive = activeTab === item.path;
-              if (hasChildren) {
-                return <TabDropdown key={item.path} item={item} isActive={isActive} />;
-              }
               return (
                 <Link
                   key={item.path}
@@ -217,50 +218,33 @@ export default function AppLayout() {
               transition={{ duration: 0.15 }}
               className="border-t border-border/50 bg-card/95 backdrop-blur-xl p-3"
             >
-              {/* All screens: full nav tree */}
-              <div className="space-y-1">
-                {primaryNav.map(item => {
-                  const children = TAB_CHILDREN[item.path];
-                  const isActive = activeTab === item.path;
-                  return (
-                    <div key={item.path}>
-                      {children ? (
-                        <>
-                          <div className={cn("flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-semibold",
-                            isActive ? "text-primary" : "text-foreground")}>
-                            <item.icon className="w-5 h-5" />
-                            {item.label}
-                          </div>
-                          <div className="ml-9 space-y-0.5">
-                            {children.map(child => (
-                              <Link key={child.path} to={child.path} onClick={() => setMenuOpen(false)}
-                                className={cn("flex items-center gap-2.5 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
-                                  location.pathname === child.path ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>
-                                <child.icon className="w-4 h-4" />
-                                {child.label}
-                              </Link>
-                            ))}
-                          </div>
-                        </>
-                      ) : (
-                        <Link to={item.path} onClick={() => setMenuOpen(false)}
-                          className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
-                            location.pathname === item.path ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>
-                          <item.icon className="w-5 h-5" />
-                          {item.label}
-                        </Link>
-                      )}
-                    </div>
-                  );
-                })}
-
+              {/* Flat nav: primary non-parent items + all children + secondary */}
+              <div className="space-y-0.5">
+                {/* Home & Emergency */}
+                {primaryNav.filter(i => !TAB_CHILDREN[i.path]).map(item => (
+                  <Link key={item.path} to={item.path} onClick={() => setMenuOpen(false)}
+                    className={cn("flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
+                      location.pathname === item.path ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>
+                    <item.icon className="w-5 h-5" />
+                    {item.label}
+                  </Link>
+                ))}
+                {/* All children of Explore / Work / Resources flattened */}
+                {Object.values(TAB_CHILDREN).flat().map(child => (
+                  <Link key={child.path} to={child.path} onClick={() => setMenuOpen(false)}
+                    className={cn("flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
+                      location.pathname === child.path ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>
+                    <child.icon className="w-5 h-5" />
+                    {child.label}
+                  </Link>
+                ))}
               </div>
 
               {/* Secondary nav */}
               <div className="border-t border-border/40 pt-2 mt-1 space-y-0.5">
                 {secondaryNav.map(item => (
                   <Link key={item.path} to={item.path} onClick={() => setMenuOpen(false)}
-                    className={cn("flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all",
+                    className={cn("flex items-center gap-3 px-4 py-2.5 rounded-xl text-sm font-medium transition-all",
                       location.pathname === item.path ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>
                     <item.icon className="w-5 h-5" />
                     {item.label}
