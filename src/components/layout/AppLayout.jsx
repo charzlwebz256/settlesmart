@@ -79,7 +79,7 @@ function TabDropdown({ item, isActive }) {
       <button
         onClick={() => setOpen(o => !o)}
         className={cn(
-          "flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+          "nav-pulse-btn flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
           isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"
         )}
       >
@@ -184,7 +184,7 @@ export default function AppLayout() {
                   key={item.path}
                   to={item.path}
                   className={cn(
-                    "flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+                    "nav-pulse-btn flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
                     isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"
                   )}
                 >

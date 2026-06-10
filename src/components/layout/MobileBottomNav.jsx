@@ -4,6 +4,18 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
+// Pulse animation style injected once
+const PULSE_STYLE = `
+@keyframes nav-pulse {
+  0% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.45); }
+  70% { box-shadow: 0 0 0 8px hsl(var(--primary) / 0); }
+  100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0); }
+}
+.nav-pulse-btn:active, .nav-pulse-btn:focus-visible {
+  animation: nav-pulse 0.5s ease-out forwards;
+}
+`;
+
 // Persist the last visited sub-path per primary tab across renders
 const tabHistory = new Map();
 
@@ -114,6 +126,7 @@ export default function MobileBottomNav({ activeTab, location }) {
 
   return (
     <div ref={ref} className="md:hidden fixed bottom-0 left-0 right-0 z-50 safe-area-bottom select-none">
+      <style>{PULSE_STYLE}</style>
       {/* Sub-menu popup */}
       <AnimatePresence>
         {openMenu && TAB_CHILDREN[openMenu] && (
@@ -161,7 +174,7 @@ export default function MobileBottomNav({ activeTab, location }) {
                 onClick={() => handleTabPress(item)}
                 aria-label={item.label}
                 className={cn(
-                  "flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all min-w-[56px] relative",
+                  "nav-pulse-btn flex flex-col items-center gap-0.5 px-3 py-2 rounded-xl transition-all min-w-[56px] relative",
                   active || isMenuOpen ? "text-primary" : "text-muted-foreground"
                 )}
               >

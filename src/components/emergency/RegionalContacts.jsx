@@ -132,17 +132,25 @@ export function RegionalContacts({ province }) {
           Crisis Lines in {name}
         </h3>
         <div className="space-y-2">
-          {data.crisis.map(item => (
-            <div key={item.label} className="flex items-center gap-3 p-3 rounded-xl bg-rose-500/5 border border-rose-100 dark:border-rose-900/30">
-              <div className="bg-rose-500 text-white px-2.5 py-1 rounded-lg text-xs font-bold font-mono flex-shrink-0 min-w-[80px] text-center">
-                {item.number}
-              </div>
-              <div>
-                <p className="text-sm font-semibold">{item.label}</p>
-                <p className="text-xs text-muted-foreground">{item.note}</p>
-              </div>
-            </div>
-          ))}
+          {data.crisis.map(item => {
+            const tel = item.number.replace(/[^0-9]/g, '');
+            return (
+              <a
+                key={item.label}
+                href={`tel:${tel}`}
+                className="flex items-center gap-3 p-3 rounded-xl bg-rose-500/5 border border-rose-100 dark:border-rose-900/30 hover:border-rose-300 hover:bg-rose-50/50 dark:hover:bg-rose-900/20 transition-colors active:scale-[0.98]"
+              >
+                <div className="bg-rose-500 text-white px-2.5 py-1 rounded-lg text-xs font-bold font-mono flex-shrink-0 min-w-[80px] text-center">
+                  {item.number}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold">{item.label}</p>
+                  <p className="text-xs text-muted-foreground">{item.note}</p>
+                </div>
+                <ExternalLink className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
+              </a>
+            );
+          })}
         </div>
       </div>
     </div>

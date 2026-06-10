@@ -120,7 +120,7 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setOpen(true)}
             aria-label="Open newcomer assistant chat"
-            className="fixed bottom-6 right-4 md:right-6 z-40 w-10 h-10 rounded-full bg-primary shadow-lg shadow-primary/30 flex items-center justify-center hover:bg-primary/90 transition-colors"
+            className="fixed bottom-24 right-4 md:bottom-8 md:right-6 z-40 w-12 h-12 rounded-full bg-primary shadow-lg shadow-primary/30 flex items-center justify-center hover:bg-primary/90 transition-colors"
           >
             <MessageCircle className="w-4 h-4 text-primary-foreground" />
             <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-accent flex items-center justify-center">

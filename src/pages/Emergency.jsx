@@ -6,11 +6,12 @@ import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 
 const EMERGENCY = [
-  { label: 'Police / Fire / Ambulance', number: '911', color: 'bg-red-500', note: 'For immediate life-threatening emergencies' },
-  { label: '211 — Social Services Helpline', number: '211', color: 'bg-blue-500', note: 'Housing, food, crisis, mental health — 24/7' },
-  { label: 'Kids Help Phone', number: '1-800-668-6868', color: 'bg-pink-500', note: 'For youth in crisis — 24/7' },
-  { label: 'Crisis Text Line (Canada)', number: 'Text HOME to 686868', color: 'bg-purple-500', note: 'Free, confidential crisis support' },
-  { label: 'Suicide Crisis Helpline', number: '9-8-8', color: 'bg-rose-600', note: 'Dial 9-8-8 for suicide crisis support' },
+  { label: 'Police / Fire / Ambulance', number: '911', tel: '911', color: 'bg-red-500', note: 'For immediate life-threatening emergencies' },
+  { label: '211 — Social Services Helpline', number: '211', tel: '211', color: 'bg-blue-500', note: 'Housing, food, crisis, mental health — 24/7' },
+  { label: 'Kids Help Phone', number: '1-800-668-6868', tel: '18006686868', color: 'bg-pink-500', note: 'For youth in crisis — 24/7' },
+  { label: 'Crisis Text Line (Canada)', number: 'Text HOME to 686868', sms: '686868', smsBody: 'HOME', color: 'bg-purple-500', note: 'Free, confidential crisis support' },
+  { label: 'Suicide Crisis Helpline', number: '9-8-8', tel: '988', color: 'bg-rose-600', note: 'Dial 9-8-8 for suicide crisis support' },
+  { label: 'IRCC — Immigration Canada', number: '1-888-242-2100', tel: '18882422100', color: 'bg-teal-600', note: 'Canada only — immigration inquiries & urgent help' },
 ];
 
 const SHELTERS = [
@@ -31,9 +32,10 @@ const LEGAL_AID = [
 ];
 
 const MENTAL_HEALTH = [
-  { label: 'Canadian Mental Health Association', url: 'https://cmha.ca/', note: 'Mental health resources and support' },
-  { label: 'Newcomer & Refugee Mental Health (CAMH)', url: 'https://www.camh.ca/en/camh-news-and-stories/mental-health-resources-for-newcomers', note: 'Toronto-based, newcomer focused' },
-  { label: 'Centre for Addiction and Mental Health', url: 'https://www.camh.ca/', note: 'National mental health leader' },
+  { label: 'Canadian Mental Health Association', url: 'https://cmha.ca/', note: 'Mental health resources and support across Canada' },
+  { label: 'Newcomer & Refugee Mental Health (CAMH)', url: 'https://www.camh.ca/en/camh-news-and-stories/mental-health-resources-for-newcomers', note: 'Free mental health resources tailored for newcomers & refugees in Canada' },
+  { label: 'CAMH — Centre for Addiction & Mental Health', url: 'https://www.camh.ca/', note: "Canada's largest mental health teaching hospital & research centre" },
+  { label: 'CAMH Mental Health Line', url: 'https://www.camh.ca/en/health-info/mental-health-and-covid-19/covid-19-resources-for-newcomers', note: 'COVID-19 & ongoing support resources for newcomers' },
 ];
 
 function LinkList({ items }) {
@@ -103,17 +105,30 @@ export default function Emergency() {
           <Phone className="w-5 h-5" /> Emergency Hotlines
         </h2>
         <div className="space-y-3">
-          {EMERGENCY.map(e => (
-            <div key={e.label} className="flex items-center gap-3 p-3 rounded-xl bg-white/60 dark:bg-card border border-red-100 dark:border-border">
-              <div className={`${e.color} text-white px-3 py-1.5 rounded-lg text-sm font-bold font-mono flex-shrink-0 min-w-[80px] text-center`}>
-                {e.number}
+          {EMERGENCY.map(e => {
+            const href = e.tel ? `tel:${e.tel}` : e.sms ? `sms:${e.sms}${e.smsBody ? `?body=${encodeURIComponent(e.smsBody)}` : ''}` : null;
+            const Inner = (
+              <>
+                <div className={`${e.color} text-white px-3 py-1.5 rounded-lg text-sm font-bold font-mono flex-shrink-0 min-w-[80px] text-center`}>
+                  {e.number}
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-semibold">{e.label}</p>
+                  <p className="text-xs text-muted-foreground">{e.note}</p>
+                </div>
+                <Phone className="w-4 h-4 text-muted-foreground/50 flex-shrink-0" />
+              </>
+            );
+            return href ? (
+              <a key={e.label} href={href} className="flex items-center gap-3 p-3 rounded-xl bg-white/60 dark:bg-card border border-red-100 dark:border-border hover:border-red-300 hover:bg-red-50/50 dark:hover:bg-red-900/10 transition-colors active:scale-[0.98]">
+                {Inner}
+              </a>
+            ) : (
+              <div key={e.label} className="flex items-center gap-3 p-3 rounded-xl bg-white/60 dark:bg-card border border-red-100 dark:border-border">
+                {Inner}
               </div>
-              <div>
-                <p className="text-sm font-semibold">{e.label}</p>
-                <p className="text-xs text-muted-foreground">{e.note}</p>
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       </div>
 
