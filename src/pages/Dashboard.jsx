@@ -11,6 +11,7 @@ import {
 import { motion } from 'framer-motion';
 import DashboardCalendar from '@/components/dashboard/DashboardCalendar';
 import AIRecommendations from '@/components/dashboard/AIRecommendations';
+import WeatherWidget from '@/components/news/WeatherWidget';
 
 const interestConfig = {
   education: { icon: BookOpen, color: 'text-blue-600 bg-blue-500/10', label: 'Education & Language' },
@@ -188,6 +189,12 @@ export default function Dashboard() {
                 Edit Profile
               </Button>
             </Link>
+          </div>
+
+          {/* Live Weather */}
+          <div>
+            <h3 className="font-heading font-bold text-base mb-3">Live Weather</h3>
+            <WeatherWidget city={profile.city} province={profile.province} />
           </div>
 
           {/* Calendar */}

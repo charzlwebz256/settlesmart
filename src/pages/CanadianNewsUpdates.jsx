@@ -1,4 +1,4 @@
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, } from 'react';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
@@ -17,7 +17,7 @@ const TABS = [
     icon: Zap,
     color: 'text-red-600',
     activeBg: 'bg-red-600 text-white',
-    prompt: (loc, prov) => `You are a LIVE breaking news reporter. Today is ${new Date().toISOString()}. Search for the MOST URGENT breaking news stories published in the LAST 6 HOURS globally and in Canada.
+    prompt: (loc, prov) => `You are a LIVE breaking news reporter. Today is ${new Date().toISOString()}. Search for the MOST URGENT breaking news stories published in the LAST 6 HOURS globally and in Canada. CRITICAL: Only include stories published within the last 7 days. For each article, provide an EXACT time_ago in format like "12 minutes ago", "3 hours ago", "2 days ago". Do NOT include stories older than 7 days.
 
 Location context: ${loc}, ${prov || 'Canada'}
 
@@ -35,7 +35,7 @@ Also return 3 newcomer_insights: what these breaking stories mean for newcomers 
     icon: AlertTriangle,
     color: 'text-purple-600',
     activeBg: 'bg-purple-600 text-white',
-    prompt: (loc, prov) => `You are an immigration news specialist. Today is ${new Date().toISOString()}. Search for the LATEST immigration and visa policy news from the last 48 hours.
+    prompt: (loc, prov) => `You are an immigration news specialist. Today is ${new Date().toISOString()}. Search for the LATEST immigration and visa policy news from the last 48 hours. CRITICAL: Only include stories published within the last 7 days. For each article, provide an EXACT time_ago in format like "45 minutes ago", "6 hours ago", "1 day ago". Do NOT include stories older than 7 days.
 
 Sources: IRCC Canada (canada.ca/ircc), CIC News (cicnews.com), Immigration.ca, CBC News, Reuters, BBC, Al Jazeera, Globe and Mail.
 
@@ -57,7 +57,7 @@ Also return 3 newcomer_insights specific to immigration impacts.`,
     icon: Briefcase,
     color: 'text-amber-600',
     activeBg: 'bg-amber-600 text-white',
-    prompt: (loc, prov) => `You are a jobs and economy reporter. Today is ${new Date().toISOString()}. Search for LATEST jobs and economic news published in last 48 hours.
+    prompt: (loc, prov) => `You are a jobs and economy reporter. Today is ${new Date().toISOString()}. Search for LATEST jobs and economic news published in last 48 hours. CRITICAL: Only include stories published within the last 7 days. For each article, provide an EXACT time_ago in format like "30 minutes ago", "4 hours ago", "3 days ago". Do NOT include stories older than 7 days.
 
 Location: ${loc}, ${prov || 'Canada'}
 
@@ -82,7 +82,7 @@ Return 3 newcomer_insights about what these economic stories mean for newcomers 
     icon: HomeIcon,
     color: 'text-emerald-600',
     activeBg: 'bg-emerald-600 text-white',
-    prompt: (loc, prov) => `You are a housing and real estate reporter. Today is ${new Date().toISOString()}. Search for the LATEST housing and real estate news from the last 48-72 hours.
+    prompt: (loc, prov) => `You are a housing and real estate reporter. Today is ${new Date().toISOString()}. Search for the LATEST housing and real estate news from the last 48-72 hours. CRITICAL: Only include stories published within the last 7 days. For each article, provide an EXACT time_ago in format like "1 hour ago", "5 hours ago", "4 days ago". Do NOT include stories older than 7 days.
 
 Location focus: ${loc}, ${prov || 'Canada'} — but include national news.
 
@@ -107,7 +107,7 @@ Return 3 newcomer_insights about housing tips and what these stories mean for ne
     icon: Heart,
     color: 'text-rose-600',
     activeBg: 'bg-rose-600 text-white',
-    prompt: (loc, prov) => `You are a health and safety reporter. Today is ${new Date().toISOString()}. Search for LATEST health and safety news from the last 48 hours globally and in Canada.
+    prompt: (loc, prov) => `You are a health and safety reporter. Today is ${new Date().toISOString()}. Search for LATEST health and safety news from the last 48 hours globally and in Canada. CRITICAL: Only include stories published within the last 7 days. For each article, provide an EXACT time_ago in format like "20 minutes ago", "2 hours ago", "6 days ago". Do NOT include stories older than 7 days.
 
 Location: ${loc}, ${prov || 'Canada'}
 
@@ -167,6 +167,13 @@ export default function CanadianNewsUpdates() {
   const [loadingTabs, setLoadingTabs] = useState({});
   const loadedRef = useRef({});
 
+  // Live clock tick for "X ago" freshness display
+  const [, setTick] = useState(0);
+  useEffect(() => {
+    const t = setInterval(() => setTick(n => n + 1), 30000);
+    return () => clearInterval(t);
+  }, []);
+
   const fetchTab = useCallback(async (tabId) => {
     const tab = TABS.find(t => t.id === tabId);
     if (!tab) return;
@@ -177,7 +184,17 @@ export default function CanadianNewsUpdates() {
       add_context_from_internet: true,
       response_json_schema: ARTICLE_SCHEMA,
     });
-    setTabData(prev => ({ ...prev, [tabId]: { ...result, loadedAt: new Date() } }));
+    // Filter out any articles older than 7 days by checking time_ago text
+    const filtered = (result?.articles || []).filter(a => {
+      if (!a.time_ago) return true;
+      const t = a.time_ago.toLowerCase();
+      // Reject anything explicitly saying 8+ days, weeks, months
+      if (/(\d+)\s*(week|month|year)/.test(t)) return false;
+      const dayMatch = t.match(/(\d+)\s*day/);
+      if (dayMatch && parseInt(dayMatch[1]) > 7) return false;
+      return true;
+    });
+    setTabData(prev => ({ ...prev, [tabId]: { ...result, articles: filtered, loadedAt: new Date() } }));
     setLoadingTabs(prev => ({ ...prev, [tabId]: false }));
     loadedRef.current[tabId] = true;
   }, [city, province]);
