@@ -74,41 +74,45 @@ export default function ChecklistWizard({ onComplete }) {
     const arrivalDate = new Date();
     arrivalDate.setDate(arrivalDate.getDate() - (arrivalOpt?.days || 0));
     const arrivalDateStr = arrivalDate.toISOString().split('T')[0];
-
     const statusLabel = STATUSES.find(s => s.value === status)?.label || status;
+    const location = city ? `${city}, ${province}` : province;
 
-    // Kick off profile fetch + LLM generation in parallel
-    const user = await base44.auth.me();
-    const [existingProfiles, existingItems, result] = await Promise.all([
-      base44.entities.UserProfile.filter({ created_by: user.email }),
-      base44.entities.ChecklistItem.filter({ created_by: user.email }),
-      base44.integrations.Core.InvokeLLM({
-        prompt: `Generate a "First 90 Days in Canada" settlement checklist for a ${statusLabel} settling in ${city || province}, ${province}. Arrival: ${arrivalOpt?.label || 'recently'}.
-Create exactly 12 concise, actionable items. Be brief.
-Return JSON with "items" array. Each item: title (short), description (1 sentence), category (documents|housing|banking|health|education|employment|transportation|social|legal), day_range (week1|week2|week3|week4|month2|month3), order (1-12), link (URL or "").`,
-        response_json_schema: {
-          type: 'object',
-          properties: {
+    // Fire LLM + user fetch simultaneously — don't wait for profile before starting LLM
+    const llmPromise = base44.integrations.Core.InvokeLLM({
+      model: 'gpt_5_mini',
+      prompt: `Settlement checklist for a ${statusLabel} in ${location}, Canada. Arrival: ${arrivalOpt?.label}.
+Return JSON "items" array, exactly 12 items. Each: title (5 words max), description (1 short sentence), category (documents|housing|banking|health|education|employment|transportation|social|legal), day_range (week1|week2|week3|week4|month2|month3), order (1-12), link (relevant gov/org URL or "").`,
+      response_json_schema: {
+        type: 'object',
+        properties: {
+          items: {
+            type: 'array',
             items: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  title: { type: 'string' },
-                  description: { type: 'string' },
-                  category: { type: 'string' },
-                  day_range: { type: 'string' },
-                  order: { type: 'number' },
-                  link: { type: 'string' },
-                },
+              type: 'object',
+              properties: {
+                title: { type: 'string' },
+                description: { type: 'string' },
+                category: { type: 'string' },
+                day_range: { type: 'string' },
+                order: { type: 'number' },
+                link: { type: 'string' },
               },
             },
           },
         },
-      }),
-    ]);
+      },
+    });
 
-    // Save profile + clear old checklist in parallel
+    const userPromise = base44.auth.me().then(user =>
+      Promise.all([
+        base44.entities.UserProfile.filter({ created_by: user.email }),
+        base44.entities.ChecklistItem.filter({ created_by: user.email }),
+      ])
+    );
+
+    // Wait for both in parallel
+    const [result, [existingProfiles, existingItems]] = await Promise.all([llmPromise, userPromise]);
+
     const profileData = {
       immigration_status: status,
       province,
@@ -116,6 +120,8 @@ Return JSON with "items" array. Each item: title (short), description (1 sentenc
       arrival_date: arrivalDateStr,
       onboarding_completed: true,
     };
+
+    // Save profile + clear old items in parallel
     await Promise.all([
       existingProfiles.length > 0
         ? base44.entities.UserProfile.update(existingProfiles[0].id, profileData)
@@ -123,7 +129,7 @@ Return JSON with "items" array. Each item: title (short), description (1 sentenc
       ...existingItems.map(i => base44.entities.ChecklistItem.delete(i.id)),
     ]);
 
-    // Bulk create new checklist
+    // Bulk create new checklist items
     if (result?.items?.length) {
       await base44.entities.ChecklistItem.bulkCreate(
         result.items.map(item => ({ ...item, is_completed: false }))

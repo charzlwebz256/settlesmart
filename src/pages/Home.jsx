@@ -42,7 +42,7 @@ export default function Home() {
       <OnboardingWalkthrough />
       <LocationBanner city={city} province={province} isDetecting={isDetecting} />
 
-      {!hasProfile && showWizard ? (
+      {showWizard ? (
         <div className="max-w-xl mx-auto px-4 py-8">
           <ChecklistWizard onComplete={handleWizardComplete} />
         </div>

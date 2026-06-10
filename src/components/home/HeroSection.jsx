@@ -46,12 +46,15 @@ export default function HeroSection({ hasProfile, onStartWizard }) {
               <ArrowRight className="w-4 h-4" />
             </Button> :
 
-            <Link to="/dashboard">
-                <Button size="lg" className="rounded-xl gap-2 font-semibold text-base h-12 px-6 bg-primary hover:bg-primary/90">
-                  Go to Dashboard
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link>
+            <Button
+              size="lg"
+              onClick={onStartWizard}
+              className="rounded-xl gap-2 font-semibold text-base h-12 px-6 bg-primary hover:bg-primary/90"
+            >
+              <Sparkles className="w-4 h-4" />
+              Build My Checklist — Free
+              <ArrowRight className="w-4 h-4" />
+            </Button>
             }
             <Link to="/services">
               <Button variant="outline" size="lg" className="rounded-xl font-semibold text-base h-12 px-6">
