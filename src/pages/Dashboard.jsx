@@ -1,5 +1,8 @@
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { Link, useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -25,6 +28,15 @@ const interestConfig = {
 
 export default function Dashboard() {
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
+
+  const handleRefresh = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: ['myProfile'] });
+    await queryClient.invalidateQueries({ queryKey: ['myChecklist'] });
+    await queryClient.invalidateQueries({ queryKey: ['savedResources'] });
+  }, [queryClient]);
+
+  const { containerRef, pullDistance, isRefreshing, touchHandlers } = usePullToRefresh({ onRefresh: handleRefresh });
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ['myProfile'],
@@ -71,7 +83,8 @@ export default function Dashboard() {
   const checklistProgress = totalChecklist > 0 ? (completedChecklist / totalChecklist) * 100 : 0;
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 pb-24 md:pb-8">
+    <div ref={containerRef} {...touchHandlers} className="max-w-7xl mx-auto px-4 py-6 pb-24 md:pb-8">
+      <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
       {/* Greeting */}
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="mb-8">
         <div className="flex items-center gap-2 text-muted-foreground text-sm mb-1">

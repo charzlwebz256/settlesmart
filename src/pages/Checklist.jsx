@@ -1,5 +1,7 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
@@ -34,6 +36,12 @@ export default function Checklist() {
   const queryClient = useQueryClient();
   const [generating, setGenerating] = useState(false);
   const [expandedPeriod, setExpandedPeriod] = useState('week1');
+
+  const handleRefresh = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: ['myChecklist'] });
+  }, [queryClient]);
+
+  const { containerRef, pullDistance, isRefreshing, touchHandlers } = usePullToRefresh({ onRefresh: handleRefresh });
 
   const { data: profile } = useQuery({
     queryKey: ['myProfile'],
@@ -141,7 +149,8 @@ Return JSON with an "items" array. Each item must have these exact fields:
   }
 
   return (
-    <div className="max-w-3xl mx-auto px-4 py-6 pb-8">
+    <div ref={containerRef} {...touchHandlers} className="max-w-3xl mx-auto px-4 py-6 pb-8">
+      <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
       <div className="mb-8 flex items-start justify-between flex-wrap gap-3">
         <div>
           <h1 className="font-heading font-bold text-2xl md:text-3xl mb-2">Your First 90 Days 🍁</h1>

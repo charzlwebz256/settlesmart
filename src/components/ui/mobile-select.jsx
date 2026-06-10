@@ -188,3 +188,13 @@ export const MobileSelectValue = SelectPrimitive.Value
 export const MobileSelectGroup = SelectPrimitive.Group
 export const MobileSelectLabel = SelectPrimitive.Label
 export const MobileSelectSeparator = SelectPrimitive.Separator
+
+// Aliases for drop-in compatibility with @/components/ui/select import names
+export const Select = MobileSelect
+export const SelectTrigger = MobileSelectTrigger
+export const SelectContent = MobileSelectContent
+export const SelectItem = MobileSelectItem
+export const SelectValue = MobileSelectValue
+export const SelectGroup = MobileSelectGroup
+export const SelectLabel = MobileSelectLabel
+export const SelectSeparator = MobileSelectSeparator

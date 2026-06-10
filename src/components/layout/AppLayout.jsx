@@ -122,7 +122,8 @@ export default function AppLayout() {
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
   const { city: detectedCity, province: detectedProvince } = useLocation_();
   const activeTab = getActiveTab(location.pathname);
-  const isRootTab = ALL_NAV_PATHS.includes(location.pathname);
+  const ROOT_TABS = ['/', '/explore', '/work', '/resources', '/emergency'];
+  const isRootTab = ROOT_TABS.includes(location.pathname);
 
   // Scroll to top on every route change
   useEffect(() => {
@@ -281,7 +282,7 @@ export default function AppLayout() {
       </header>
 
       {/* Main */}
-      <main className="flex-1 overflow-x-hidden pb-safe md:pb-0 pb-20">
+      <main className="flex-1 overflow-x-hidden md:pb-0 pb-[calc(5rem+env(safe-area-inset-bottom))]">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}

@@ -1,5 +1,7 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useCallback } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { usePullToRefresh } from '@/hooks/usePullToRefresh';
+import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
 import { Search, Filter, X, Loader2, MapPin } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -25,6 +27,13 @@ const categories = [
 
 export default function Services() {
   const queryClient = useQueryClient();
+
+  const handleRefresh = useCallback(async () => {
+    await queryClient.invalidateQueries({ queryKey: ['services'] });
+    await queryClient.invalidateQueries({ queryKey: ['savedResources'] });
+  }, [queryClient]);
+
+  const { containerRef, pullDistance, isRefreshing, touchHandlers } = usePullToRefresh({ onRefresh: handleRefresh });
   const { city: locationCity, province: locationProvince } = useLocation_();
   const urlParams = new URLSearchParams(window.location.search);
   const initialCategory = urlParams.get('category') || 'all';
@@ -130,7 +139,8 @@ export default function Services() {
   }, [services, selectedCategory, selectedProvince, locationScope, effectiveCity, effectiveProvince, searchQuery]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-6 pb-8">
+    <div ref={containerRef} {...touchHandlers} className="max-w-7xl mx-auto px-4 py-6 pb-8">
+      <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
       <div className="mb-6">
         <h1 className="font-heading font-bold text-2xl md:text-3xl mb-1">Settlement Services</h1>
         {effectiveCity || effectiveProvince ? (
