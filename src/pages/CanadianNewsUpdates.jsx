@@ -1,196 +1,304 @@
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Loader2, RefreshCw, Newspaper, CloudSun, Zap, TrendingUp, Home as HomeIcon, Heart, Briefcase, Scale, AlertTriangle, Lightbulb } from 'lucide-react';
+import { Loader2, RefreshCw, Newspaper, Zap, Briefcase, Home as HomeIcon, Heart, AlertTriangle, Globe } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useCityDetection } from '@/hooks/useCityDetection';
 import NewsSection from '@/components/news/NewsSection';
 import WeatherWidget from '@/components/news/WeatherWidget';
 import NewcomerInsights from '@/components/news/NewcomerInsights';
 
-const CATEGORIES = [
-  { id: 'all', label: 'All News', icon: Newspaper },
-  { id: 'breaking', label: 'Breaking', icon: Zap },
-  { id: 'immigration', label: 'Immigration', icon: AlertTriangle },
-  { id: 'jobs', label: 'Jobs & Economy', icon: Briefcase },
-  { id: 'housing', label: 'Housing', icon: HomeIcon },
-  { id: 'health', label: 'Health & Safety', icon: Heart },
+const TABS = [
+  {
+    id: 'breaking',
+    label: 'Breaking',
+    icon: Zap,
+    color: 'text-red-600',
+    activeBg: 'bg-red-600 text-white',
+    prompt: (loc, prov) => `You are a LIVE breaking news reporter. Today is ${new Date().toISOString()}. Search for the MOST URGENT breaking news stories published in the LAST 6 HOURS globally and in Canada.
+
+Location context: ${loc}, ${prov || 'Canada'}
+
+Sources to search: BBC News (bbc.com), CNN (cnn.com), Reuters (reuters.com), Al Jazeera (aljazeera.com), CBC News (cbc.ca), CTV News, AP News, The Guardian, Globe and Mail, National Post.
+
+Return 10 breaking news stories published TODAY — prioritize stories from the last 1-6 hours. Include: major world events, Canadian emergencies, political crises, natural disasters, major policy changes, major crimes, wars/conflicts, economic shocks.
+
+For each: exact real headline, 2-sentence factual summary, source name, realistic time_ago (e.g. "12 min ago", "2 hrs ago", "4 hrs ago"), real or likely URL, is_local flag.
+
+Also return 3 newcomer_insights: what these breaking stories mean for newcomers in Canada specifically.`,
+  },
+  {
+    id: 'immigration',
+    label: 'Immigration',
+    icon: AlertTriangle,
+    color: 'text-purple-600',
+    activeBg: 'bg-purple-600 text-white',
+    prompt: (loc, prov) => `You are an immigration news specialist. Today is ${new Date().toISOString()}. Search for the LATEST immigration and visa policy news from the last 48 hours.
+
+Sources: IRCC Canada (canada.ca/ircc), CIC News (cicnews.com), Immigration.ca, CBC News, Reuters, BBC, Al Jazeera, Globe and Mail.
+
+Return 10 immigration stories — must include:
+- IRCC Express Entry draws, PNP updates, work permit changes
+- International student policy changes
+- Refugee and asylum updates globally
+- Visa policy changes for any country affecting newcomers
+- Immigration court rulings or policy shifts
+- Travel advisories affecting immigrants
+
+Each article: exact headline, 2-sentence factual summary, source name, realistic time_ago (hours/days ago), URL, is_local (Canada-specific = true).
+
+Also return 3 newcomer_insights specific to immigration impacts.`,
+  },
+  {
+    id: 'jobs',
+    label: 'Jobs & Economy',
+    icon: Briefcase,
+    color: 'text-amber-600',
+    activeBg: 'bg-amber-600 text-white',
+    prompt: (loc, prov) => `You are a jobs and economy reporter. Today is ${new Date().toISOString()}. Search for LATEST jobs and economic news published in last 48 hours.
+
+Location: ${loc}, ${prov || 'Canada'}
+
+Sources: Statistics Canada, CBC News, BNN Bloomberg, Globe and Mail, Financial Post, Reuters, BBC Business, CNN Business, Indeed Canada, LinkedIn News.
+
+Return 10 economy/jobs stories — must include:
+- Canadian employment data, job numbers, unemployment stats
+- Minimum wage changes by province
+- Major layoffs or hiring announcements
+- Cost of living, inflation, grocery price changes
+- Canadian dollar / interest rate news
+- Major company news affecting workers in Canada
+- Gig economy / newcomer employment opportunities
+
+Each article: exact headline, 2-sentence factual summary, source, realistic time_ago, URL, is_local.
+
+Return 3 newcomer_insights about what these economic stories mean for newcomers job-hunting in Canada.`,
+  },
+  {
+    id: 'housing',
+    label: 'Housing',
+    icon: HomeIcon,
+    color: 'text-emerald-600',
+    activeBg: 'bg-emerald-600 text-white',
+    prompt: (loc, prov) => `You are a housing and real estate reporter. Today is ${new Date().toISOString()}. Search for the LATEST housing and real estate news from the last 48-72 hours.
+
+Location focus: ${loc}, ${prov || 'Canada'} — but include national news.
+
+Sources: CBC News, CTV News, Globe and Mail, Toronto Star, CMHC Canada, Canada Mortgage Housing, Bloomberg, Reuters, local real estate boards.
+
+Return 10 housing stories — must include:
+- Rent price changes and rental market updates
+- Home buying/selling market data
+- Eviction protection news
+- Affordable housing programs (federal, provincial, municipal)
+- Shelter and housing support for newcomers
+- Mortgage rate changes
+- New housing construction announcements
+
+Each article: exact headline, 2-sentence factual summary, source, realistic time_ago, URL, is_local.
+
+Return 3 newcomer_insights about housing tips and what these stories mean for newly arrived immigrants renting or buying.`,
+  },
+  {
+    id: 'health',
+    label: 'Health & Safety',
+    icon: Heart,
+    color: 'text-rose-600',
+    activeBg: 'bg-rose-600 text-white',
+    prompt: (loc, prov) => `You are a health and safety reporter. Today is ${new Date().toISOString()}. Search for LATEST health and safety news from the last 48 hours globally and in Canada.
+
+Location: ${loc}, ${prov || 'Canada'}
+
+Sources: Health Canada, CBC News, WHO (who.int), Reuters Health, BBC Health, CNN Health, Al Jazeera, Canadian Press, provincial health authorities.
+
+Return 10 health & safety stories — must include:
+- Disease outbreaks, pandemics, new health alerts
+- Drug recalls or food safety warnings in Canada
+- Mental health resources and announcements
+- Healthcare system updates (wait times, doctor shortages, OHIP/provincial health coverage news)
+- Vaccines, immunization program updates
+- Global health emergencies affecting Canada
+- Safety alerts (weather, crime, environmental hazards) in ${prov || 'Canada'}
+
+Each article: exact headline, 2-sentence factual summary, source, realistic time_ago, URL, is_local.
+
+Return 3 newcomer_insights about health/safety topics newcomers should know.`,
+  },
 ];
+
+const ARTICLE_SCHEMA = {
+  type: 'object',
+  properties: {
+    articles: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          title: { type: 'string' },
+          summary: { type: 'string' },
+          category: { type: 'string' },
+          source: { type: 'string' },
+          url: { type: 'string' },
+          time_ago: { type: 'string' },
+          is_local: { type: 'boolean' },
+        },
+      },
+    },
+    newcomer_insights: {
+      type: 'array',
+      items: {
+        type: 'object',
+        properties: {
+          headline: { type: 'string' },
+          insight: { type: 'string' },
+          category: { type: 'string' },
+        },
+      },
+    },
+  },
+};
 
 export default function CanadianNewsUpdates() {
   const { city, province, loading: cityLoading } = useCityDetection();
-  const [newsData, setNewsData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [activeCategory, setActiveCategory] = useState('all');
-  const [lastUpdated, setLastUpdated] = useState(null);
+  const [activeTab, setActiveTab] = useState('breaking');
+  const [tabData, setTabData] = useState({}); // { [tabId]: { articles, newcomer_insights, loadedAt } }
+  const [loadingTabs, setLoadingTabs] = useState({});
+  const loadedRef = useRef({});
 
-  const fetchNews = useCallback(async () => {
-    setLoading(true);
+  const fetchTab = useCallback(async (tabId) => {
+    const tab = TABS.find(t => t.id === tabId);
+    if (!tab) return;
+    setLoadingTabs(prev => ({ ...prev, [tabId]: true }));
     const loc = city || 'Edmonton';
-
     const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are a global news aggregator focused on Canadian newcomers. Today is ${new Date().toDateString()} at ${new Date().toLocaleTimeString()}.
-
-Search and retrieve REAL, CURRENT news stories published today or in the last 48 hours from these sources:
-- Canada: CBC News (cbc.ca), CTV News (ctvnews.ca), Global News (globalnews.ca), Toronto Star, National Post, Vancouver Sun, Calgary Herald
-- World: Reuters (reuters.com), BBC News (bbc.com/news), AP News (apnews.com), Al Jazeera English, The Guardian
-- Immigration-specific: CIC News (cicnews.com), Immigration.ca, IRCC Canada official announcements
-
-Location focus: ${loc}, ${province || 'Canada'} — but include world news relevant to newcomers.
-
-Return 15 real news items total:
-- 2 breaking news (most urgent from Canada or world)
-- 4 immigration & visa policy updates (IRCC, Express Entry, PNP, work permit changes, any country)
-- 3 Canadian jobs & economy (employment data, minimum wage, cost of living)
-- 2 housing & real estate (Canada-wide or local ${province || 'Canada'})
-- 2 world news relevant to newcomers (home countries, international events affecting diaspora)
-- 2 health & safety (Canada or global public health)
-
-Return 4 newcomer_insights: plain-language tips explaining what these stories mean for someone newly arrived in Canada.
-
-For EACH news item: title (exact real headline), summary (2 sentences, factual), category, source (exact outlet name), url (real URL if known), time_ago, is_local (true if ${province || 'Canada'}-specific).`,
+      prompt: tab.prompt(loc, province),
       add_context_from_internet: true,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          articles: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                title: { type: 'string' },
-                summary: { type: 'string' },
-                category: { type: 'string' },
-                source: { type: 'string' },
-                url: { type: 'string' },
-                time_ago: { type: 'string' },
-                is_local: { type: 'boolean' },
-              },
-            },
-          },
-          newcomer_insights: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                headline: { type: 'string' },
-                insight: { type: 'string' },
-                category: { type: 'string' },
-              },
-            },
-          },
-        },
-      },
+      response_json_schema: ARTICLE_SCHEMA,
     });
-    setNewsData(result);
-    setLastUpdated(new Date());
-    setLoading(false);
+    setTabData(prev => ({ ...prev, [tabId]: { ...result, loadedAt: new Date() } }));
+    setLoadingTabs(prev => ({ ...prev, [tabId]: false }));
+    loadedRef.current[tabId] = true;
   }, [city, province]);
 
-  // Auto-load news on first visit
+  // Auto-load breaking news on mount
   useEffect(() => {
-    if (!cityLoading && !newsData && !loading) {
-      fetchNews();
+    if (!cityLoading && !loadedRef.current['breaking']) {
+      fetchTab('breaking');
     }
   }, [cityLoading]); // eslint-disable-line
 
+  // Load tab when switching if not yet loaded
+  const handleTabSwitch = (tabId) => {
+    setActiveTab(tabId);
+    if (!loadedRef.current[tabId] && !loadingTabs[tabId]) {
+      fetchTab(tabId);
+    }
+  };
+
   const { containerRef, pullDistance, isRefreshing, touchHandlers } = usePullToRefresh({
-    onRefresh: fetchNews,
+    onRefresh: () => fetchTab(activeTab),
   });
 
-  const filteredArticles = newsData?.articles?.filter(a =>
-    activeCategory === 'all' || a.category === activeCategory
-  ) || [];
+  const currentData = tabData[activeTab];
+  const isLoading = loadingTabs[activeTab];
+  const currentTab = TABS.find(t => t.id === activeTab);
 
   return (
     <div ref={containerRef} className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-8 overflow-y-auto" {...touchHandlers}>
       <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
+
       {/* Header */}
-      <div className="mb-6 flex items-start justify-between flex-wrap gap-3">
+      <div className="mb-5 flex items-start justify-between flex-wrap gap-3">
         <div>
           <h1 className="font-heading font-bold text-2xl md:text-3xl mb-1 flex items-center gap-2">
-            <Newspaper className="w-6 h-6 text-primary" />
+            <Globe className="w-6 h-6 text-primary" />
             News & Updates
           </h1>
-          <p className="text-muted-foreground text-sm">
-            Live feeds from CBC, Reuters, BBC, IRCC & more
-            {lastUpdated && (
-              <span className="ml-2 text-[11px] text-muted-foreground/60">
-                · Updated {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+          <p className="text-muted-foreground text-sm flex items-center gap-1.5 flex-wrap">
+            <span>BBC · CNN · Al Jazeera · Reuters · CBC · IRCC</span>
+            {currentData?.loadedAt && (
+              <span className="text-[11px] text-muted-foreground/60">
+                · Updated {currentData.loadedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
             )}
           </p>
         </div>
         <Button
-          onClick={fetchNews}
-          disabled={loading}
+          onClick={() => fetchTab(activeTab)}
+          disabled={isLoading}
           className="rounded-xl gap-2 bg-primary"
           size="sm"
         >
-          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-          {newsData ? 'Refresh' : 'Load News'}
+          {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+          Refresh
         </Button>
       </div>
 
-      {/* Weather Widget */}
+      {/* Weather */}
       <WeatherWidget city={city || 'Edmonton'} province={province} />
 
-      {/* Category Tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-2 my-5 scrollbar-hide">
-        {CATEGORIES.map(cat => {
-          const Icon = cat.icon;
+      {/* Tab Bar */}
+      <div className="flex gap-2 overflow-x-auto pb-2 mt-5 mb-4 scrollbar-hide">
+        {TABS.map(tab => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          const hasData = !!tabData[tab.id];
+          const isTabLoading = loadingTabs[tab.id];
           return (
             <button
-              key={cat.id}
-              onClick={() => setActiveCategory(cat.id)}
+              key={tab.id}
+              onClick={() => handleTabSwitch(tab.id)}
               className={cn(
-                "flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap",
-                activeCategory === cat.id
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card border border-border/50 text-muted-foreground hover:border-primary/30"
+                "flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap relative",
+                isActive ? tab.activeBg : "bg-card border border-border/50 text-muted-foreground hover:border-primary/30"
               )}
             >
-              <Icon className="w-3.5 h-3.5" />
-              {cat.label}
+              {isTabLoading ? (
+                <Loader2 className="w-3.5 h-3.5 animate-spin" />
+              ) : (
+                <Icon className="w-3.5 h-3.5" />
+              )}
+              {tab.label}
+              {hasData && !isActive && (
+                <span className="w-1.5 h-1.5 rounded-full bg-primary absolute -top-0.5 -right-0.5" />
+              )}
             </button>
           );
         })}
       </div>
 
-      {/* Not loaded state */}
-      {!loading && !newsData && (
-        <div className="text-center py-20">
-          <div className="text-5xl mb-4">📰</div>
-          <h3 className="font-heading font-bold text-lg mb-2">Load Today's News</h3>
-          <p className="text-muted-foreground text-sm mb-6">Get live updates from CBC, Reuters, BBC, IRCC and more — tailored for newcomers.</p>
-          <Button onClick={fetchNews} className="rounded-xl gap-2 bg-primary">
-            <Newspaper className="w-4 h-4" /> Load News Feed
+      {/* Loading state */}
+      {isLoading && (
+        <div className="text-center py-16">
+          <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-3" />
+          <p className="text-sm font-medium">Fetching latest {currentTab?.label} news...</p>
+          <p className="text-xs text-muted-foreground mt-1">Searching BBC · CNN · Al Jazeera · Reuters · CBC · IRCC</p>
+        </div>
+      )}
+
+      {/* No data yet */}
+      {!isLoading && !currentData && (
+        <div className="text-center py-16">
+          <div className="text-5xl mb-4">
+            {activeTab === 'breaking' ? '⚡' : activeTab === 'immigration' ? '🛂' : activeTab === 'jobs' ? '💼' : activeTab === 'housing' ? '🏠' : '🏥'}
+          </div>
+          <h3 className="font-heading font-bold text-lg mb-2">Load {currentTab?.label} News</h3>
+          <p className="text-muted-foreground text-sm mb-6">Get the latest {currentTab?.label?.toLowerCase()} updates from global and Canadian sources.</p>
+          <Button onClick={() => fetchTab(activeTab)} className="rounded-xl gap-2 bg-primary">
+            <Newspaper className="w-4 h-4" /> Load Now
           </Button>
         </div>
       )}
 
-      {/* Loading */}
-      {loading && (
-        <div className="text-center py-16">
-          <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-3" />
-          <p className="text-sm font-medium">Fetching live news from Canadian & world outlets...</p>
-          <p className="text-xs text-muted-foreground mt-1">CBC · CTV · Reuters · BBC · IRCC · Al Jazeera</p>
-        </div>
-      )}
-
-      {/* News content */}
-      {!loading && newsData && (
+      {/* Content */}
+      {!isLoading && currentData && (
         <div className="space-y-6">
-          {/* Newcomer Insights */}
-          {newsData.newcomer_insights?.length > 0 && (
-            <NewcomerInsights insights={newsData.newcomer_insights} />
+          {currentData.newcomer_insights?.length > 0 && (
+            <NewcomerInsights insights={currentData.newcomer_insights} />
           )}
-
-          {/* Articles */}
-          <NewsSection articles={filteredArticles} category={activeCategory} />
+          <NewsSection articles={currentData.articles || []} category={activeTab} />
         </div>
       )}
     </div>
