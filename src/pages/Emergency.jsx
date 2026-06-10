@@ -33,9 +33,9 @@ const LEGAL_AID = [
 
 const MENTAL_HEALTH = [
   { label: 'Canadian Mental Health Association', url: 'https://cmha.ca/', note: 'Mental health resources and support across Canada' },
-  { label: 'Newcomer & Refugee Mental Health (CAMH)', url: 'https://www.camh.ca/en/camh-news-and-stories/mental-health-resources-for-newcomers', note: 'Free mental health resources tailored for newcomers & refugees in Canada' },
+  { label: 'Newcomer & Refugee Mental Health (CAMH)', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/settle-canada/health-care/mental-health.html', note: 'Free mental health resources tailored for newcomers & refugees in Canada' },
   { label: 'CAMH — Centre for Addiction & Mental Health', url: 'https://www.camh.ca/', note: "Canada's largest mental health teaching hospital & research centre" },
-  { label: 'CAMH Mental Health Line', url: 'https://www.camh.ca/en/health-info/mental-health-and-covid-19/covid-19-resources-for-newcomers', note: 'COVID-19 & ongoing support resources for newcomers' },
+  { label: 'CAMH Mental Health Line', url: 'https://www.camh.ca/en/patients-and-families/access-camh', note: 'COVID-19 & ongoing support resources for newcomers' },
 ];
 
 function LinkList({ items }) {
