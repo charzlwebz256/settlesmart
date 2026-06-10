@@ -32,6 +32,7 @@ export default function Services() {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedProvince, setSelectedProvince] = useState('all');
+  const [locationScope, setLocationScope] = useState('all'); // 'all' | 'province' | 'city'
 
   // Auto-set province when location is detected
   useEffect(() => {
@@ -97,13 +98,17 @@ export default function Services() {
     return services.filter(s => {
       const catMatch = selectedCategory === 'all' || s.category === selectedCategory;
       const provMatch = selectedProvince === 'all' || s.province === selectedProvince;
+      const locationMatch = locationScope === 'all' ? true
+        : locationScope === 'province' ? (locationProvince ? s.province === locationProvince : true)
+        : locationScope === 'city' ? (locationCity ? s.city?.toLowerCase() === locationCity.toLowerCase() : true)
+        : true;
       const searchMatch = !searchQuery ||
         s.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         s.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
         s.organization?.toLowerCase().includes(searchQuery.toLowerCase());
-      return catMatch && provMatch && searchMatch;
+      return catMatch && provMatch && locationMatch && searchMatch;
     });
-  }, [services, selectedCategory, selectedProvince, searchQuery]);
+  }, [services, selectedCategory, selectedProvince, locationScope, locationCity, locationProvince, searchQuery]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 pb-8">
@@ -118,6 +123,32 @@ export default function Services() {
           <p className="text-muted-foreground text-sm">Browse free services for newcomers across Canada</p>
         )}
       </div>
+
+      {/* Location scope toggle — only show if we have location data */}
+      {(locationCity || locationProvince) && (
+        <div className="flex items-center gap-2 mb-4 flex-wrap">
+          <MapPin className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+          <span className="text-xs text-muted-foreground font-medium">Show:</span>
+          {[
+            { value: 'all', label: 'All Canada' },
+            ...(locationProvince ? [{ value: 'province', label: locationProvince }] : []),
+            ...(locationCity ? [{ value: 'city', label: locationCity }] : []),
+          ].map(opt => (
+            <button
+              key={opt.value}
+              onClick={() => setLocationScope(opt.value)}
+              className={cn(
+                "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border",
+                locationScope === opt.value
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "bg-card border-border/50 text-muted-foreground hover:border-primary/30"
+              )}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Search */}
       <div className="relative mb-6">

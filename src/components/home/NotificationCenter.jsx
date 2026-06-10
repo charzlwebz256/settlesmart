@@ -11,6 +11,7 @@ import EmailNotificationSetup from './EmailNotificationSetup';
 function buildNotifications(savedEvents, allEvents, checklist) {
   const notifications = [];
   const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   // Upcoming saved events within 7 days
   savedEvents.forEach(se => {
@@ -20,22 +21,25 @@ function buildNotifications(savedEvents, allEvents, checklist) {
     if (!isAfter(eventDate, today)) return;
     const daysAway = differenceInDays(eventDate, today);
     if (daysAway <= 7) {
+      const isTomorrow = daysAway === 1;
       notifications.push({
         id: `event-${se.id}`,
         type: 'event',
         icon: CalendarDays,
-        color: daysAway <= 2 ? 'text-red-500 bg-red-500/10' : 'text-violet-600 bg-violet-500/10',
-        title: `"${event.title}" is ${daysAway === 0 ? 'today' : daysAway === 1 ? 'tomorrow' : `in ${daysAway} days`}`,
-        subtitle: `${event.city || ''} · ${event.date}`,
+        color: daysAway === 0 ? 'text-red-600 bg-red-500/10' : isTomorrow ? 'text-orange-500 bg-orange-500/10' : 'text-violet-600 bg-violet-500/10',
+        title: `"${event.title}" is ${daysAway === 0 ? 'today!' : isTomorrow ? 'tomorrow — reminder!' : `in ${daysAway} days`}`,
+        subtitle: `${event.city ? event.city + ' · ' : ''}${event.date}`,
         path: '/events',
         urgency: daysAway,
+        badge: isTomorrow ? '⏰ Tomorrow' : daysAway === 0 ? '🔴 Today' : null,
       });
     }
   });
 
-  // Overdue / incomplete checklist items (have a link = actionable)
-  const incompleteTasks = checklist.filter(c => !c.is_completed && c.link);
-  incompleteTasks.slice(0, 2).forEach(task => {
+  // Checklist items due tomorrow (by day_range or link presence)
+  const incompleteTasks = checklist.filter(c => !c.is_completed);
+  // Show up to 2 pending actionable tasks
+  incompleteTasks.filter(c => c.link).slice(0, 2).forEach(task => {
     notifications.push({
       id: `task-${task.id}`,
       type: 'checklist',
@@ -145,7 +149,14 @@ export default function NotificationCenter() {
                 <n.icon className="w-4 h-4" />
               </div>
               <Link to={n.path} className="flex-1 min-w-0">
-                <p className="text-xs font-semibold leading-snug truncate">{n.title}</p>
+                <div className="flex items-center gap-1.5">
+                  <p className="text-xs font-semibold leading-snug truncate">{n.title}</p>
+                  {n.badge && (
+                    <span className="flex-shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400">
+                      {n.badge}
+                    </span>
+                  )}
+                </div>
                 <p className="text-[10px] text-muted-foreground truncate mt-0.5">{n.subtitle}</p>
               </Link>
               <div className="flex items-center gap-1 flex-shrink-0">
