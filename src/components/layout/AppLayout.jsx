@@ -7,6 +7,7 @@ import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import NewcomerChatWidget from '@/components/assistant/NewcomerChatWidget';
+import MobileBottomNav from '@/components/layout/MobileBottomNav';
 import { useLocation_ } from '@/lib/LocationContext';
 
 import LanguageTranslator from '@/components/layout/LanguageTranslator';
@@ -228,11 +229,10 @@ export default function AppLayout() {
                 {primaryNav.map(item => {
                   const children = TAB_CHILDREN[item.path];
                   const isActive = activeTab === item.path;
-                  // On desktop, hide Home/Explore/Work/Resources (they're in the top nav bar already)
-                  // md:hidden = hidden on desktop, visible on mobile — so these still show in mobile hamburger
+                  // Hide on desktop (top nav) AND on mobile (bottom nav handles these)
                   const isDesktopOnly = ['/', '/explore', '/work', '/resources'].includes(item.path);
                   return (
-                    <div key={item.path} className={isDesktopOnly ? 'md:hidden' : ''}>
+                    <div key={item.path} className={isDesktopOnly ? 'hidden' : ''}>
                       {children ? (
                         <>
                           <div className={cn("flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-semibold",
@@ -281,7 +281,7 @@ export default function AppLayout() {
       </header>
 
       {/* Main */}
-      <main className="flex-1 overflow-x-hidden pb-safe">
+      <main className="flex-1 overflow-x-hidden pb-safe md:pb-0 pb-20">
         <AnimatePresence mode="wait">
           <motion.div
             key={location.pathname}
@@ -295,6 +295,9 @@ export default function AppLayout() {
           </motion.div>
         </AnimatePresence>
       </main>
+
+      {/* Mobile Bottom Nav */}
+      <MobileBottomNav activeTab={activeTab} location={location} />
 
       {/* Global AI Chat Widget */}
       {location.pathname !== '/assistant' && (
