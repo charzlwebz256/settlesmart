@@ -18,8 +18,8 @@ const TAB_CHILDREN = {
     { path: '/events', icon: CalendarDays, label: 'Events' },
   ],
   '/resources': [
-    { path: '/legal', icon: Scale, label: 'Legal & IRCC' },
-    { path: '/news', icon: Newspaper, label: 'News & Updates' },
+    { path: '/legal', icon: Scale, label: 'Legal and IRCC' },
+    { path: '/news', icon: Newspaper, label: 'News and Updates' },
   ],
 };
 

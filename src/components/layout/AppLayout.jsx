@@ -24,8 +24,8 @@ const TAB_CHILDREN = {
     { path: '/events', icon: CalendarDays, label: 'Events' },
   ],
   '/resources': [
-    { path: '/legal', icon: Scale, label: 'Legal & IRCC' },
-    { path: '/news', icon: Newspaper, label: 'News & Updates' },
+    { path: '/legal', icon: Scale, label: 'Legal and IRCC' },
+    { path: '/news', icon: Newspaper, label: 'News and Updates' },
   ],
 };
 
@@ -123,6 +123,11 @@ export default function AppLayout() {
   const { city: detectedCity, province: detectedProvince } = useLocation_();
   const activeTab = getActiveTab(location.pathname);
   const isRootTab = ALL_NAV_PATHS.includes(location.pathname);
+
+  // Close menu on route change
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [location.pathname]);
 
   // Scroll to top on every route change
   useEffect(() => {
@@ -222,17 +227,15 @@ export default function AppLayout() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.15 }}
-              className="border-t border-border/50 bg-card/95 backdrop-blur-xl p-3"
+              className="border-t border-border/50 bg-card/95 backdrop-blur-xl p-3 max-h-[70vh] overflow-y-auto"
             >
-              {/* Mobile only: full primary nav tree. Desktop: only Emergency (others are in the top nav) */}
-              <div className="space-y-0.5">
+              {/* All primary nav items */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-0.5">
                 {primaryNav.map(item => {
                   const children = TAB_CHILDREN[item.path];
                   const isActive = activeTab === item.path;
-                  // Hide on desktop (top nav) AND on mobile (bottom nav handles these)
-                  const isDesktopOnly = ['/', '/explore', '/work', '/resources', '/emergency'].includes(item.path);
                   return (
-                    <div key={item.path} className={isDesktopOnly ? 'hidden' : ''}>
+                    <div key={item.path}>
                       {children ? (
                         <>
                           <div className={cn("flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-semibold",
@@ -265,7 +268,7 @@ export default function AppLayout() {
               </div>
 
               {/* Secondary nav */}
-              <div className="border-t border-border/40 pt-1.5 mt-1 space-y-0.5">
+              <div className="border-t border-border/40 pt-1.5 mt-1 grid grid-cols-1 sm:grid-cols-2 gap-0.5">
                 {secondaryNav.map(item => (
                   <Link key={item.path} to={item.path} onClick={() => setMenuOpen(false)}
                     className={cn("flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition-all",
