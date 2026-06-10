@@ -33,13 +33,28 @@ export default function Services() {
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedProvince, setSelectedProvince] = useState('all');
   const [locationScope, setLocationScope] = useState('all'); // 'all' | 'province' | 'city'
+  const [autoFiltered, setAutoFiltered] = useState(false);
 
-  // Auto-set province when location is detected
+  // Fetch user profile to get their saved province
+  const { data: profile } = useQuery({
+    queryKey: ['myProfile'],
+    queryFn: async () => {
+      const user = await base44.auth.me();
+      const results = await base44.entities.UserProfile.filter({ created_by: user.email });
+      return results[0] || null;
+    },
+  });
+
+  // Auto-apply province filter: profile province takes priority, then GPS/IP detected province
   useEffect(() => {
-    if (locationProvince && selectedProvince === 'all') {
-      setSelectedProvince(locationProvince);
+    if (autoFiltered) return;
+    const province = profile?.province || locationProvince;
+    if (province) {
+      setSelectedProvince(province);
+      setLocationScope('province');
+      setAutoFiltered(true);
     }
-  }, [locationProvince]);
+  }, [profile, locationProvince, autoFiltered]);
 
   const { data: services, isLoading } = useQuery({
     queryKey: ['services'],
@@ -94,13 +109,17 @@ export default function Services() {
     return ['all', ...Array.from(set).sort()];
   }, [services]);
 
+  // The effective province for display (profile > GPS)
+  const effectiveProvince = profile?.province || locationProvince;
+  const effectiveCity = profile?.city || locationCity;
+
   const filtered = useMemo(() => {
     return services.filter(s => {
       const catMatch = selectedCategory === 'all' || s.category === selectedCategory;
       const provMatch = selectedProvince === 'all' || s.province === selectedProvince;
       const locationMatch = locationScope === 'all' ? true
-        : locationScope === 'province' ? (locationProvince ? s.province === locationProvince : true)
-        : locationScope === 'city' ? (locationCity ? s.city?.toLowerCase() === locationCity.toLowerCase() : true)
+        : locationScope === 'province' ? (effectiveProvince ? s.province === effectiveProvince : true)
+        : locationScope === 'city' ? (effectiveCity ? s.city?.toLowerCase() === effectiveCity.toLowerCase() : true)
         : true;
       const searchMatch = !searchQuery ||
         s.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -108,16 +127,17 @@ export default function Services() {
         s.organization?.toLowerCase().includes(searchQuery.toLowerCase());
       return catMatch && provMatch && locationMatch && searchMatch;
     });
-  }, [services, selectedCategory, selectedProvince, locationScope, locationCity, locationProvince, searchQuery]);
+  }, [services, selectedCategory, selectedProvince, locationScope, effectiveCity, effectiveProvince, searchQuery]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 py-6 pb-8">
       <div className="mb-6">
         <h1 className="font-heading font-bold text-2xl md:text-3xl mb-1">Settlement Services</h1>
-        {locationCity || locationProvince ? (
+        {effectiveCity || effectiveProvince ? (
           <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
             <MapPin className="w-3.5 h-3.5 text-primary" />
-            <span>Showing services near <span className="font-semibold text-primary">{locationCity ? `${locationCity}, ` : ''}{locationProvince}</span></span>
+            <span>Showing services near <span className="font-semibold text-primary">{effectiveCity ? `${effectiveCity}, ` : ''}{effectiveProvince}</span></span>
+            {profile?.province && <span className="text-[10px] text-muted-foreground">(from your profile)</span>}
           </div>
         ) : (
           <p className="text-muted-foreground text-sm">Browse free services for newcomers across Canada</p>
@@ -125,18 +145,22 @@ export default function Services() {
       </div>
 
       {/* Location scope toggle — only show if we have location data */}
-      {(locationCity || locationProvince) && (
+      {(effectiveCity || effectiveProvince) && (
         <div className="flex items-center gap-2 mb-4 flex-wrap">
           <MapPin className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
           <span className="text-xs text-muted-foreground font-medium">Show:</span>
           {[
             { value: 'all', label: 'All Canada' },
-            ...(locationProvince ? [{ value: 'province', label: locationProvince }] : []),
-            ...(locationCity ? [{ value: 'city', label: locationCity }] : []),
+            ...(effectiveProvince ? [{ value: 'province', label: effectiveProvince }] : []),
+            ...(effectiveCity ? [{ value: 'city', label: effectiveCity }] : []),
           ].map(opt => (
             <button
               key={opt.value}
-              onClick={() => setLocationScope(opt.value)}
+              onClick={() => {
+                setLocationScope(opt.value);
+                if (opt.value === 'province' && effectiveProvince) setSelectedProvince(effectiveProvince);
+                if (opt.value === 'all') setSelectedProvince('all');
+              }}
               className={cn(
                 "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border",
                 locationScope === opt.value
@@ -147,6 +171,11 @@ export default function Services() {
               {opt.label}
             </button>
           ))}
+          {profile?.province && (
+            <span className="text-[10px] text-muted-foreground bg-muted px-2 py-1 rounded-lg">
+              from your profile
+            </span>
+          )}
         </div>
       )}
 
