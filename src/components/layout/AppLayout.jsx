@@ -228,7 +228,8 @@ export default function AppLayout() {
                 {primaryNav.map(item => {
                   const children = TAB_CHILDREN[item.path];
                   const isActive = activeTab === item.path;
-                  // On desktop, skip Home/Explore/Work/Resources (they're in the top nav bar)
+                  // On desktop, hide Home/Explore/Work/Resources (they're in the top nav bar already)
+                  // md:hidden = hidden on desktop, visible on mobile — so these still show in mobile hamburger
                   const isDesktopOnly = ['/', '/explore', '/work', '/resources'].includes(item.path);
                   return (
                     <div key={item.path} className={isDesktopOnly ? 'md:hidden' : ''}>
