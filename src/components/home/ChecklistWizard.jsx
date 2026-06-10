@@ -75,9 +75,40 @@ export default function ChecklistWizard({ onComplete }) {
     arrivalDate.setDate(arrivalDate.getDate() - (arrivalOpt?.days || 0));
     const arrivalDateStr = arrivalDate.toISOString().split('T')[0];
 
-    // Save profile
+    const statusLabel = STATUSES.find(s => s.value === status)?.label || status;
+
+    // Kick off profile fetch + LLM generation in parallel
     const user = await base44.auth.me();
-    const existing = await base44.entities.UserProfile.filter({ created_by: user.email });
+    const [existingProfiles, existingItems, result] = await Promise.all([
+      base44.entities.UserProfile.filter({ created_by: user.email }),
+      base44.entities.ChecklistItem.filter({ created_by: user.email }),
+      base44.integrations.Core.InvokeLLM({
+        prompt: `Generate a "First 90 Days in Canada" settlement checklist for a ${statusLabel} settling in ${city || province}, ${province}. Arrival: ${arrivalOpt?.label || 'recently'}.
+Create exactly 12 concise, actionable items. Be brief.
+Return JSON with "items" array. Each item: title (short), description (1 sentence), category (documents|housing|banking|health|education|employment|transportation|social|legal), day_range (week1|week2|week3|week4|month2|month3), order (1-12), link (URL or "").`,
+        response_json_schema: {
+          type: 'object',
+          properties: {
+            items: {
+              type: 'array',
+              items: {
+                type: 'object',
+                properties: {
+                  title: { type: 'string' },
+                  description: { type: 'string' },
+                  category: { type: 'string' },
+                  day_range: { type: 'string' },
+                  order: { type: 'number' },
+                  link: { type: 'string' },
+                },
+              },
+            },
+          },
+        },
+      }),
+    ]);
+
+    // Save profile + clear old checklist in parallel
     const profileData = {
       immigration_status: status,
       province,
@@ -85,54 +116,15 @@ export default function ChecklistWizard({ onComplete }) {
       arrival_date: arrivalDateStr,
       onboarding_completed: true,
     };
-    let profileId;
-    if (existing.length > 0) {
-      await base44.entities.UserProfile.update(existing[0].id, profileData);
-      profileId = existing[0].id;
-    } else {
-      const created = await base44.entities.UserProfile.create(profileData);
-      profileId = created.id;
-    }
+    await Promise.all([
+      existingProfiles.length > 0
+        ? base44.entities.UserProfile.update(existingProfiles[0].id, profileData)
+        : base44.entities.UserProfile.create(profileData),
+      ...existingItems.map(i => base44.entities.ChecklistItem.delete(i.id)),
+    ]);
 
-    // Generate checklist
-    const statusLabel = STATUSES.find(s => s.value === status)?.label || status;
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Generate a "First 90 Days in Canada" settlement checklist for a ${statusLabel} settling in ${city || province}, ${province}. Arrival: approximately ${arrivalOpt?.label || 'recently'}.
-
-Create exactly 18 actionable checklist items organized by time period. Each item should be specific and practical for their immigration status.
-
-Return JSON with an "items" array. Each item must have:
-- title: short actionable string
-- description: 1 sentence string
-- category: one of: documents, housing, banking, health, education, employment, transportation, social, legal
-- day_range: one of: week1, week2, week3, week4, month2, month3
-- order: integer 1 to 18
-- link: a relevant government or resource URL string or empty string`,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          items: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                title: { type: 'string' },
-                description: { type: 'string' },
-                category: { type: 'string' },
-                day_range: { type: 'string' },
-                order: { type: 'number' },
-                link: { type: 'string' },
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (result?.items) {
-      // Clear old checklist first
-      const oldItems = await base44.entities.ChecklistItem.filter({ created_by: user.email });
-      await Promise.all(oldItems.map(i => base44.entities.ChecklistItem.delete(i.id)));
+    // Bulk create new checklist
+    if (result?.items?.length) {
       await base44.entities.ChecklistItem.bulkCreate(
         result.items.map(item => ({ ...item, is_completed: false }))
       );
@@ -143,7 +135,7 @@ Return JSON with an "items" array. Each item must have:
 
     setGenerating(false);
     setDone(true);
-    setTimeout(() => onComplete?.(), 1800);
+    setTimeout(() => onComplete?.(), 1200);
   };
 
   const progressPct = (step / 3) * 100;
