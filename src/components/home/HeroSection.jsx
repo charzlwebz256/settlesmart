@@ -3,7 +3,7 @@ import { ArrowRight, MapPin, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { motion } from 'framer-motion';
 
-export default function HeroSection({ hasProfile }) {
+export default function HeroSection({ hasProfile, onStartWizard }) {
   return (
     <section className="relative overflow-hidden">
       {/* Gradient Background */}
@@ -36,13 +36,15 @@ export default function HeroSection({ hasProfile }) {
 
           <div className="flex flex-wrap gap-3">
             {!hasProfile ?
-            <Link to="/onboarding">
-                <Button size="lg" className="rounded-xl gap-2 font-semibold text-base h-12 px-6 bg-primary hover:bg-primary/90">
-                  <Sparkles className="w-4 h-4" />
-                  Get Started — It's Free
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </Link> :
+            <Button
+              size="lg"
+              onClick={onStartWizard}
+              className="rounded-xl gap-2 font-semibold text-base h-12 px-6 bg-primary hover:bg-primary/90"
+            >
+              <Sparkles className="w-4 h-4" />
+              Build My Checklist — Free
+              <ArrowRight className="w-4 h-4" />
+            </Button> :
 
             <Link to="/dashboard">
                 <Button size="lg" className="rounded-xl gap-2 font-semibold text-base h-12 px-6 bg-primary hover:bg-primary/90">
