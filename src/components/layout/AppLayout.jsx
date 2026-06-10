@@ -1,7 +1,7 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, Navigation, MapPin, CalendarDays, ChevronDown, Moon, Sun, Heart, Info } from 'lucide-react';
-import { useState, useRef } from 'react';
+import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
@@ -120,6 +120,7 @@ export default function AppLayout() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
+  const menuRef = useRef(null);
   const { city: detectedCity, province: detectedProvince } = useLocation_();
   const activeTab = getActiveTab(location.pathname);
   const ROOT_TABS = ['/', '/explore', '/work', '/resources', '/emergency'];
@@ -129,6 +130,22 @@ export default function AppLayout() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  // Close menu when clicking outside
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handler = (e) => {
+      if (menuRef.current && !menuRef.current.contains(e.target)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handler);
+    document.addEventListener('touchstart', handler);
+    return () => {
+      document.removeEventListener('mousedown', handler);
+      document.removeEventListener('touchstart', handler);
+    };
+  }, [menuOpen]);
 
   const toggleTheme = () => {
     const html = document.documentElement;
@@ -148,7 +165,7 @@ export default function AppLayout() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top Bar */}
-      <header className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border/50 safe-top select-none">
+      <header ref={menuRef} className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border/50 safe-top select-none">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           {!isRootTab ? (
             <button
