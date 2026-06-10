@@ -8,6 +8,7 @@ import OnboardingWalkthrough from '../components/onboarding/OnboardingWalkthroug
 import MyProgressSection from '../components/home/MyProgressSection';
 import NotificationCenter from '../components/home/NotificationCenter';
 import LocationBanner from '../components/home/LocationBanner';
+import WhyCanadaSection from '../components/home/WhyCanadaSection';
 import { useLocation_ } from '@/lib/LocationContext';
 
 export default function Home() {
@@ -36,6 +37,7 @@ export default function Home() {
           <MyProgressSection />
         </>
       )}
+      <WhyCanadaSection />
       <QuickAccessGrid />
       <First30DaysBanner />
       <InfoBanner />
