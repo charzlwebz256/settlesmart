@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, Circle, Sparkles, Loader2, ChevronDown, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import ExportRoadmapPDF from '@/components/checklist/ExportRoadmapPDF';
 
 const dayRangeLabels = {
   week1: 'Week 1 — First Steps',
@@ -141,11 +142,16 @@ Return JSON with an "items" array. Each item must have these exact fields:
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-6 pb-8">
-      <div className="mb-8">
-        <h1 className="font-heading font-bold text-2xl md:text-3xl mb-2">Your First 90 Days 🍁</h1>
-        <p className="text-muted-foreground text-sm">
-          A personalized step-by-step guide to getting settled in Canada
-        </p>
+      <div className="mb-8 flex items-start justify-between flex-wrap gap-3">
+        <div>
+          <h1 className="font-heading font-bold text-2xl md:text-3xl mb-2">Your First 90 Days 🍁</h1>
+          <p className="text-muted-foreground text-sm">
+            A personalized step-by-step guide to getting settled in Canada
+          </p>
+        </div>
+        {checklist.length > 0 && (
+          <ExportRoadmapPDF checklist={checklist} profile={profile} />
+        )}
       </div>
 
       {checklist.length === 0 ? (

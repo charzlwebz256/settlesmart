@@ -30,26 +30,28 @@ export default function CanadianNewsUpdates() {
   const fetchNews = useCallback(async () => {
     setLoading(true);
     const loc = city || 'Edmonton';
-    const currentHour = new Date().getHours();
-    const isDaytime = currentHour >= 6 && currentHour < 18;
 
     const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are a Canadian news aggregator. Search for today's latest news from CBC News, CTV News, Global News, Edmonton Journal, and CityNews Edmonton.
+      prompt: `You are a global news aggregator focused on Canadian newcomers. Today is ${new Date().toDateString()} at ${new Date().toLocaleTimeString()}.
 
-  Find current news stories for ${loc}, ${province || 'Alberta'}, Canada (date: ${new Date().toDateString()}, time: ${new Date().toLocaleTimeString()}).
+Search and retrieve REAL, CURRENT news stories published today or in the last 48 hours from these sources:
+- Canada: CBC News (cbc.ca), CTV News (ctvnews.ca), Global News (globalnews.ca), Toronto Star, National Post, Vancouver Sun, Calgary Herald
+- World: Reuters (reuters.com), BBC News (bbc.com/news), AP News (apnews.com), Al Jazeera English, The Guardian
+- Immigration-specific: CIC News (cicnews.com), Immigration.ca, IRCC Canada official announcements
 
-  Return 12 news items total covering these categories:
-  - 2 breaking news stories (most urgent/recent)
-  - 3 immigration & policy updates (IRCC, government policy changes)
-  - 3 jobs & economy stories (employment, wages, businesses)  
-  - 2 housing & cost of living stories
-  - 2 health & safety stories
+Location focus: ${loc}, ${province || 'Canada'} — but include world news relevant to newcomers.
 
-  Also return a "newcomer_insights" array of 3 short plain-language tips explaining what the top stories mean for newcomers.
+Return 15 real news items total:
+- 2 breaking news (most urgent from Canada or world)
+- 4 immigration & visa policy updates (IRCC, Express Entry, PNP, work permit changes, any country)
+- 3 Canadian jobs & economy (employment data, minimum wage, cost of living)
+- 2 housing & real estate (Canada-wide or local ${province || 'Canada'})
+- 2 world news relevant to newcomers (home countries, international events affecting diaspora)
+- 2 health & safety (Canada or global public health)
 
-  Also return current_weather with: condition (sunny/cloudy/rainy/snowy/partly_cloudy), is_daytime (${isDaytime}).
+Return 4 newcomer_insights: plain-language tips explaining what these stories mean for someone newly arrived in Canada.
 
-  For each news item return: title, summary (2 sentences max), category (breaking/immigration/jobs/housing/health), source (CBC/CTV/GlobalNews/EdmontonJournal/CityNews), url, time_ago (e.g. "2 hours ago"), is_local (true if Edmonton/Alberta specific).`,
+For EACH news item: title (exact real headline), summary (2 sentences, factual), category, source (exact outlet name), url (real URL if known), time_ago, is_local (true if ${province || 'Canada'}-specific).`,
       add_context_from_internet: true,
       response_json_schema: {
         type: 'object',
@@ -78,13 +80,6 @@ export default function CanadianNewsUpdates() {
                 insight: { type: 'string' },
                 category: { type: 'string' },
               },
-            },
-          },
-          current_weather: {
-            type: 'object',
-            properties: {
-              condition: { type: 'string' },
-              is_daytime: { type: 'boolean' },
             },
           },
         },
@@ -121,7 +116,7 @@ export default function CanadianNewsUpdates() {
             News & Updates
           </h1>
           <p className="text-muted-foreground text-sm">
-            Live news from CBC, CTV, Global News & Edmonton outlets
+            Live feeds from CBC, Reuters, BBC, IRCC & more
             {lastUpdated && (
               <span className="ml-2 text-[11px] text-muted-foreground/60">
                 · Updated {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -141,7 +136,7 @@ export default function CanadianNewsUpdates() {
       </div>
 
       {/* Weather Widget */}
-      <WeatherWidget city={city || 'Edmonton'} province={province} weatherCondition={newsData?.current_weather} />
+      <WeatherWidget city={city || 'Edmonton'} province={province} />
 
       {/* Category Tabs */}
       <div className="flex gap-2 overflow-x-auto pb-2 my-5 scrollbar-hide">
@@ -170,7 +165,7 @@ export default function CanadianNewsUpdates() {
         <div className="text-center py-20">
           <div className="text-5xl mb-4">📰</div>
           <h3 className="font-heading font-bold text-lg mb-2">Load Today's News</h3>
-          <p className="text-muted-foreground text-sm mb-6">Get live updates from trusted Canadian news sources, tailored for newcomers.</p>
+          <p className="text-muted-foreground text-sm mb-6">Get live updates from CBC, Reuters, BBC, IRCC and more — tailored for newcomers.</p>
           <Button onClick={fetchNews} className="rounded-xl gap-2 bg-primary">
             <Newspaper className="w-4 h-4" /> Load News Feed
           </Button>
@@ -181,8 +176,8 @@ export default function CanadianNewsUpdates() {
       {loading && (
         <div className="text-center py-16">
           <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-3" />
-          <p className="text-sm font-medium">Fetching live news from Canadian outlets...</p>
-          <p className="text-xs text-muted-foreground mt-1">CBC, CTV, Global News, Edmonton Journal</p>
+          <p className="text-sm font-medium">Fetching live news from Canadian & world outlets...</p>
+          <p className="text-xs text-muted-foreground mt-1">CBC · CTV · Reuters · BBC · IRCC · Al Jazeera</p>
         </div>
       )}
 
