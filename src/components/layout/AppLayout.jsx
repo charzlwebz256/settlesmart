@@ -230,7 +230,7 @@ export default function AppLayout() {
                   const children = TAB_CHILDREN[item.path];
                   const isActive = activeTab === item.path;
                   // Hide on desktop (top nav) AND on mobile (bottom nav handles these)
-                  const isDesktopOnly = ['/', '/explore', '/work', '/resources'].includes(item.path);
+                  const isDesktopOnly = ['/', '/explore', '/work', '/resources', '/emergency'].includes(item.path);
                   return (
                     <div key={item.path} className={isDesktopOnly ? 'hidden' : ''}>
                       {children ? (
