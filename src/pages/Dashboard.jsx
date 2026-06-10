@@ -9,6 +9,7 @@ import {
   Home as HomeIcon, Scale, Heart, Loader2, MessageCircle
 } from 'lucide-react';
 import { motion } from 'framer-motion';
+import DashboardCalendar from '@/components/dashboard/DashboardCalendar';
 
 const interestConfig = {
   education: { icon: BookOpen, color: 'text-blue-600 bg-blue-500/10', label: 'Education & Language' },
@@ -182,6 +183,9 @@ export default function Dashboard() {
               </Button>
             </Link>
           </div>
+
+          {/* Calendar */}
+          <DashboardCalendar />
 
           {/* AI Assistant CTA */}
           <div className="bg-gradient-to-br from-primary/10 to-accent/10 rounded-2xl border border-primary/10 p-6">
