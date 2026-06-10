@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import DashboardCalendar from '@/components/dashboard/DashboardCalendar';
+import AIRecommendations from '@/components/dashboard/AIRecommendations';
 
 const interestConfig = {
   education: { icon: BookOpen, color: 'text-blue-600 bg-blue-500/10', label: 'Education & Language' },
@@ -125,31 +126,36 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Recommended Categories */}
-          <div className="bg-card rounded-2xl border border-border/50 p-6">
-            <h2 className="font-heading font-bold text-lg mb-4">Recommended for You</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-              {(profile.interests || []).map(interest => {
-                const config = interestConfig[interest];
-                if (!config) return null;
-                const Icon = config.icon;
-                return (
-                  <Link key={interest} to={`/services?category=${interest}`}>
-                    <div className="flex items-center gap-3 p-4 rounded-xl border border-border/50 hover:border-primary/20 hover:shadow-md transition-all group">
-                      <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${config.color}`}>
-                        <Icon className="w-5 h-5" />
+          {/* AI Recommendations */}
+          <AIRecommendations profile={profile} />
+
+          {/* Interest-based quick links */}
+          {(profile.interests || []).length > 0 && (
+            <div className="bg-card rounded-2xl border border-border/50 p-6">
+              <h2 className="font-heading font-bold text-lg mb-4">Your Interest Areas</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {(profile.interests || []).map(interest => {
+                  const config = interestConfig[interest];
+                  if (!config) return null;
+                  const Icon = config.icon;
+                  return (
+                    <Link key={interest} to={`/services?category=${interest}`}>
+                      <div className="flex items-center gap-3 p-4 rounded-xl border border-border/50 hover:border-primary/20 hover:shadow-md transition-all group">
+                        <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${config.color}`}>
+                          <Icon className="w-5 h-5" />
+                        </div>
+                        <div className="flex-1">
+                          <p className="font-semibold text-sm">{config.label}</p>
+                          <p className="text-xs text-muted-foreground">Explore services</p>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
                       </div>
-                      <div className="flex-1">
-                        <p className="font-semibold text-sm">{config.label}</p>
-                        <p className="text-xs text-muted-foreground">Explore services</p>
-                      </div>
-                      <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors" />
-                    </div>
-                  </Link>
-                );
-              })}
+                    </Link>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Sidebar */}

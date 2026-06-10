@@ -1,5 +1,9 @@
-import { Phone, MapPin, Scale, Heart, Home, Shield, ExternalLink, AlertTriangle } from 'lucide-react';
+import { useState } from 'react';
+import { Phone, MapPin, Scale, Heart, Home, Shield, ExternalLink, AlertTriangle, ChevronDown } from 'lucide-react';
 import { getOrgLogo } from '@/lib/orgLogos';
+import { RegionalContacts } from '@/components/emergency/RegionalContacts';
+import { useQuery } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
 
 const EMERGENCY = [
   { label: 'Police / Fire / Ambulance', number: '911', color: 'bg-red-500', note: 'For immediate life-threatening emergencies' },
@@ -61,7 +65,27 @@ function LinkList({ items }) {
   );
 }
 
+const PROVINCES = [
+  'Ontario', 'British Columbia', 'Alberta', 'Quebec',
+  'Manitoba', 'Saskatchewan', 'Nova Scotia',
+];
+
 export default function Emergency() {
+  const [selectedProvince, setSelectedProvince] = useState('');
+  const [showProvinceMenu, setShowProvinceMenu] = useState(false);
+
+  const { data: profile } = useQuery({
+    queryKey: ['myProfile'],
+    queryFn: async () => {
+      const user = await base44.auth.me();
+      const results = await base44.entities.UserProfile.filter({ created_by: user.email });
+      return results[0] || null;
+    },
+  });
+
+  // Auto-set province from profile
+  const activeProvince = selectedProvince || profile?.province || '';
+
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 pb-24 md:pb-8">
       {/* Header */}
@@ -110,11 +134,52 @@ export default function Emergency() {
       </div>
 
       {/* Mental Health */}
-      <div className="bg-card rounded-2xl border border-border/50 p-5">
+      <div className="bg-card rounded-2xl border border-border/50 p-5 mb-5">
         <h2 className="font-heading font-bold text-base mb-4 flex items-center gap-2">
           <Heart className="w-5 h-5 text-rose-600" /> Mental Health Support
         </h2>
         <LinkList items={MENTAL_HEALTH} />
+      </div>
+
+      {/* Regional Resources */}
+      <div className="bg-card rounded-2xl border border-border/50 p-5">
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-heading font-bold text-base flex items-center gap-2">
+            <MapPin className="w-5 h-5 text-primary" /> Regional Resources
+          </h2>
+          {/* Province selector */}
+          <div className="relative">
+            <button
+              onClick={() => setShowProvinceMenu(p => !p)}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border/60 text-xs font-medium bg-muted/50 hover:bg-muted transition-colors"
+            >
+              {activeProvince || 'Select Province'}
+              <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showProvinceMenu ? 'rotate-180' : ''}`} />
+            </button>
+            {showProvinceMenu && (
+              <div className="absolute right-0 top-full mt-1 w-44 bg-card border border-border/60 rounded-xl shadow-lg z-20 overflow-hidden">
+                {PROVINCES.map(p => (
+                  <button
+                    key={p}
+                    onClick={() => { setSelectedProvince(p); setShowProvinceMenu(false); }}
+                    className={`w-full text-left px-4 py-2 text-xs font-medium hover:bg-muted transition-colors ${activeProvince === p ? 'text-primary bg-primary/5' : 'text-foreground'}`}
+                  >
+                    {p}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {activeProvince ? (
+          <RegionalContacts province={activeProvince} />
+        ) : (
+          <div className="text-center py-8">
+            <MapPin className="w-8 h-8 text-muted-foreground/40 mx-auto mb-2" />
+            <p className="text-sm text-muted-foreground">Select your province to see local crisis lines and settlement services</p>
+          </div>
+        )}
       </div>
     </div>
   );
