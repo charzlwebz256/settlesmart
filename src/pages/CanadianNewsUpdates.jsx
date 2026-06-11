@@ -180,6 +180,7 @@ export default function CanadianNewsUpdates() {
     setLoadingTabs(prev => ({ ...prev, [tabId]: true }));
     const loc = city || 'Edmonton';
     const result = await base44.integrations.Core.InvokeLLM({
+      model: 'gemini_3_flash',
       prompt: tab.prompt(loc, province),
       add_context_from_internet: true,
       response_json_schema: ARTICLE_SCHEMA,
@@ -199,11 +200,14 @@ export default function CanadianNewsUpdates() {
     loadedRef.current[tabId] = true;
   }, [city, province]);
 
-  // Auto-load breaking news on mount
+  // Pre-fetch ALL tabs in parallel on mount for instant tab switching
   useEffect(() => {
-    if (!cityLoading && !loadedRef.current['breaking']) {
-      fetchTab('breaking');
-    }
+    if (cityLoading) return;
+    TABS.forEach(tab => {
+      if (!loadedRef.current[tab.id]) {
+        fetchTab(tab.id);
+      }
+    });
   }, [cityLoading]); // eslint-disable-line
 
   // Load tab when switching if not yet loaded

@@ -239,8 +239,8 @@ Return JSON "items" array, exactly 12 items. Each: title (5 words max), descript
                 </div>
                 <h2 className="font-heading font-bold text-xl mb-2">Building your checklist...</h2>
                 <p className="text-sm text-muted-foreground">
-                  Personalizing 18 steps for a <span className="font-medium text-foreground">{STATUSES.find(s => s.value === status)?.label}</span> in <span className="font-medium text-foreground">{city || province}</span>
-                </p>
+                   Personalizing your checklist for a <span className="font-medium text-foreground">{STATUSES.find(s => s.value === status)?.label}</span> in <span className="font-medium text-foreground">{city || province}</span>
+                 </p>
               </>
             ) : (
               <motion.div initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
