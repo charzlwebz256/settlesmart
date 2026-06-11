@@ -29,14 +29,34 @@ const sourceConfig = {
   },
 };
 
+function buildJobUrl(job) {
+  const q = encodeURIComponent(`${job.title} ${job.company}`.trim());
+  const loc = encodeURIComponent(job.location || 'Canada');
+
+  // If the URL looks like a real direct job link (not a bare domain), use it
+  if (job.url && /^https?:\/\/.+\/.+/.test(job.url) && !job.url.match(/^https?:\/\/[^/]+\/?$/)) {
+    return job.url;
+  }
+
+  const src = (job.source || '').toLowerCase();
+  if (src === 'linkedin') return `https://www.linkedin.com/jobs/search/?keywords=${q}&location=${loc}`;
+  if (src === 'jobbank') return `https://www.jobbank.gc.ca/jobsearch/jobsearch?searchstring=${q}&locationstring=${loc}`;
+  if (src === 'ziprecruiter') return `https://www.ziprecruiter.com/jobs-search?search=${q}&location=${loc}`;
+  if (src === 'jooble') return `https://jooble.org/jobs/${q}/${loc}`;
+  if (src === 'glassdoor') return `https://www.glassdoor.ca/Job/jobs.htm?sc.keyword=${q}&locT=C&locId=0`;
+  // Default: Indeed Canada
+  return `https://ca.indeed.com/jobs?q=${q}&l=${loc}`;
+}
+
 export default function JobCard({ job }) {
   const src = sourceConfig[job.source] || sourceConfig.indeed;
   const typeStyle = typeLabels[job.job_type] || { label: job.job_type, color: 'bg-muted text-muted-foreground' };
   const expStyle = expLabels[job.experience_level] || expLabels.any;
+  const jobUrl = buildJobUrl(job);
 
   return (
     <a
-      href={job.url}
+      href={jobUrl}
       target="_blank"
       rel="noopener noreferrer"
       className="group flex flex-col gap-3 p-4 rounded-2xl border border-border/50 bg-card hover:border-primary/20 hover:shadow-md transition-all"
