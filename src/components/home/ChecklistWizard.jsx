@@ -141,7 +141,7 @@ Return JSON "items" array, exactly 12 items. Each: title (5 words max), descript
 
     setGenerating(false);
     setDone(true);
-    setTimeout(() => onComplete?.(), 1200);
+    onComplete?.();
   };
 
   const progressPct = (step / 3) * 100;

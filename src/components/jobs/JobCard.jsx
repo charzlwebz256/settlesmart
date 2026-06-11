@@ -32,19 +32,15 @@ const sourceConfig = {
 function buildJobUrl(job) {
   const q = encodeURIComponent(`${job.title} ${job.company}`.trim());
   const loc = encodeURIComponent(job.location || 'Canada');
-
-  // If the URL looks like a real direct job link (not a bare domain), use it
-  if (job.url && /^https?:\/\/.+\/.+/.test(job.url) && !job.url.match(/^https?:\/\/[^/]+\/?$/)) {
-    return job.url;
-  }
-
   const src = (job.source || '').toLowerCase();
+
+  // Always build reliable search URLs per platform — LLM-generated direct links often 404
   if (src === 'linkedin') return `https://www.linkedin.com/jobs/search/?keywords=${q}&location=${loc}`;
   if (src === 'jobbank') return `https://www.jobbank.gc.ca/jobsearch/jobsearch?searchstring=${q}&locationstring=${loc}`;
   if (src === 'ziprecruiter') return `https://www.ziprecruiter.com/jobs-search?search=${q}&location=${loc}`;
   if (src === 'jooble') return `https://jooble.org/jobs/${q}/${loc}`;
-  if (src === 'glassdoor') return `https://www.glassdoor.ca/Job/jobs.htm?sc.keyword=${q}&locT=C&locId=0`;
-  // Default: Indeed Canada
+  if (src === 'glassdoor') return `https://www.glassdoor.ca/Job/jobs.htm?sc.keyword=${q}`;
+  // Indeed Canada (default) — always goes to a live search results page for that exact job
   return `https://ca.indeed.com/jobs?q=${q}&l=${loc}`;
 }
 
