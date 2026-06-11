@@ -36,6 +36,7 @@ import InterviewPrep from './pages/InterviewPrep';
 import ShopSmart from './pages/ShopSmart';
 import SupportUs from './pages/SupportUs';
 import MeetTheDeveloper from './pages/MeetTheDeveloper';
+import JobCoach from './pages/JobCoach';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -91,6 +92,7 @@ const AuthenticatedApp = () => {
         <Route path="/shop-smart" element={<ShopSmart />} />
         <Route path="/support-us" element={<SupportUs />} />
         <Route path="/meet-the-developer" element={<MeetTheDeveloper />} />
+        <Route path="/job-coach" element={<JobCoach />} />
       </Route>
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="*" element={<PageNotFound />} />

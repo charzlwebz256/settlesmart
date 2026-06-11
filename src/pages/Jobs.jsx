@@ -4,7 +4,7 @@ import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Loader2, Search, RefreshCw, Briefcase, MapPin, Clock, ExternalLink, Building2, DollarSign, SlidersHorizontal, FileText, ArrowRight, MessageSquare } from 'lucide-react';
+import { Loader2, Search, RefreshCw, Briefcase, MapPin, Clock, ExternalLink, Building2, DollarSign, SlidersHorizontal, FileText, ArrowRight, MessageSquare, BotMessageSquare } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { useLocation_ } from '@/lib/LocationContext';
@@ -289,6 +289,16 @@ export default function Jobs() {
             <p className="text-[10px] text-muted-foreground">Mock interviews · AI feedback</p>
           </div>
           <ArrowRight className="w-3.5 h-3.5 text-violet-600 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
+        </Link>
+        <Link to="/job-coach" className="flex items-center gap-3 bg-gradient-to-r from-amber-500/10 to-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-3 hover:border-amber-500/40 transition-all group sm:col-span-3">
+          <div className="w-8 h-8 rounded-xl bg-amber-500/15 flex items-center justify-center flex-shrink-0">
+            <BotMessageSquare className="w-4 h-4 text-amber-600" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-semibold text-foreground">🤖 AI Job Coach</p>
+            <p className="text-[10px] text-muted-foreground">Review applications · Personalized advice</p>
+          </div>
+          <ArrowRight className="w-3.5 h-3.5 text-amber-600 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
         </Link>
       </div>
 
