@@ -282,10 +282,19 @@ export default function ProvinceServicePanel({ category, province, cityFilter = 
   }
 
   let items = provinceData[category] || [];
-
+  
   // Apply city filter if selected
   if (cityFilter) {
     items = items.filter(i => i.city === cityFilter || i.city === 'Province-Wide' || !i.city);
+  }
+
+  if (!category) {
+    return (
+      <div className="text-center py-12 text-muted-foreground">
+        <p className="text-3xl mb-3">🗂️</p>
+        <p className="font-semibold text-sm">Select a service type to browse resources.</p>
+      </div>
+    );
   }
 
   if (items.length === 0) {

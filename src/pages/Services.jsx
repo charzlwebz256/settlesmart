@@ -69,14 +69,14 @@ export default function Services() {
     },
   });
 
-  // Auto-set province from profile or GPS
+  // Auto-set province from profile or GPS (only if user hasn't manually selected)
   useEffect(() => {
     if (selectedProvince) return;
     const province = profile?.province || locationProvince;
     if (province) setSelectedProvince(province);
   }, [profile, locationProvince, selectedProvince]);
 
-  // Reset city when province changes
+  // Reset city when province changes (preserve category)
   useEffect(() => {
     setSelectedCity('');
   }, [selectedProvince]);
