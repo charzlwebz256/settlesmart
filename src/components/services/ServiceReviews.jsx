@@ -68,7 +68,7 @@ export default function ServiceReviews({ serviceKey, serviceName, province }) {
         const replyBody = encodeURIComponent(`Hi ${data.reviewer_name},\n\nThank you for your review of ${data.service_name}!\n\n`);
         const gmailReplyLink = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(data.reviewer_email || '')}&su=${replySubject}&body=${replyBody}`;
         await base44.integrations.Core.SendEmail({
-          to: 'charzlwebz256@gmail.com',
+          to: import.meta.env.VITE_ADMIN_EMAIL || '',
           subject: `New Review: ${data.service_name} — ${stars}`,
           body: `
 <h2>New Service Review Submitted</h2>
