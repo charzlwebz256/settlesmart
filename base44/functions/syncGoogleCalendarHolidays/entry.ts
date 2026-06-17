@@ -67,42 +67,40 @@ Deno.serve(async (req) => {
       pageData = await nextRes.json();
     }
 
-    // Filter and import holiday events
-    const holidaysToImport = allItems.filter(event => {
-      // Look for holiday indicators in event summary or description
-      const summary = (event.summary || '').toLowerCase();
-      const desc = (event.description || '').toLowerCase();
-      return summary.includes('holiday') || 
-             summary.includes('canada') || 
-             summary.includes('uganda') ||
-             desc.includes('holiday') ||
-             desc.includes('canada') ||
-             desc.includes('uganda');
-    });
-
-    // Import holidays as Event records
+    // Import all events from Google Calendar (including birthdays and holidays)
     const imported = [];
-    for (const event of holidaysToImport) {
+    for (const event of allItems) {
       if (!event.start?.date) continue;
       
-      const holidayDate = event.start.date;
-      const title = event.summary || 'Holiday';
+      const eventDate = event.start.date;
+      const title = event.summary || 'Event';
+      const summary = (event.summary || '').toLowerCase();
       
-      // Check if this holiday already exists
+      // Determine category based on event summary
+      let category = 'community';
+      if (summary.includes('birthday')) {
+        category = 'social';
+      } else if (summary.includes('holiday')) {
+        category = 'community';
+      } else if (summary.includes('meeting') || summary.includes('work')) {
+        category = 'employment';
+      }
+      
+      // Check if this event already exists
       const existingEvents = await base44.asServiceRole.entities.Event.filter({ 
         title: title,
-        date: holidayDate 
+        date: eventDate 
       });
       
       if (existingEvents.length === 0) {
         await base44.asServiceRole.entities.Event.create({
           title: title,
-          description: event.description || `Public holiday from Google Calendar`,
-          category: 'community',
-          date: holidayDate,
+          description: event.description || `Event from Google Calendar`,
+          category: category,
+          date: eventDate,
           is_free: true,
-          organizer: 'Google Calendar Sync',
-          tags: ['holiday', 'google-calendar-sync']
+          organizer: event.organizer?.displayName || 'Google Calendar Sync',
+          tags: ['google-calendar-sync', summary.includes('birthday') ? 'birthday' : 'event']
         });
         imported.push(title);
       }
@@ -125,7 +123,7 @@ Deno.serve(async (req) => {
     return Response.json({
       status: 'success',
       imported: imported.length,
-      holidays: imported,
+      events: imported,
       last_sync: now
     });
   } catch (error) {

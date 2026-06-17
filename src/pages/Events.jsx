@@ -9,6 +9,7 @@ import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import CalendarStrip from '@/components/events/CalendarStrip';
 import MonthCalendarView from '@/components/events/MonthCalendarView';
+import YearCalendarView from '@/components/events/YearCalendarView';
 import EventCard from '@/components/events/EventCard';
 import UpcomingReminders from '@/components/events/UpcomingReminders';
 import EventbriteFeed from '@/components/events/EventbriteFeed';
@@ -31,7 +32,7 @@ export default function Events() {
   const [selectedDate, setSelectedDate] = useState(startOfDay(new Date()));
   const [category, setCategory] = useState('all');
   const [viewAll, setViewAll] = useState(false);
-  const [calView, setCalView] = useState('strip'); // 'strip' | 'month'
+  const [calView, setCalView] = useState('strip'); // 'strip' | 'month' | 'year'
   const [showAddModal, setShowAddModal] = useState(false);
   const [syncing, setSyncing] = useState(false);
   const [syncStatus, setSyncStatus] = useState(null);
@@ -96,7 +97,7 @@ export default function Events() {
     setSyncing(true);
     try {
       const res = await base44.functions.invoke('syncGoogleCalendarHolidays', {});
-      setSyncStatus({ success: true, count: res.data.imported, holidays: res.data.holidays });
+      setSyncStatus({ success: true, count: res.data.imported, events: res.data.events });
       queryClient.invalidateQueries({ queryKey: ['events'] });
       setTimeout(() => setSyncStatus(null), 5000);
     } catch (error) {
@@ -171,7 +172,7 @@ export default function Events() {
             : "bg-red-500/10 text-red-700 dark:text-red-400 border border-red-500/20"
         )}>
           {syncStatus.success 
-            ? `✅ Successfully imported ${syncStatus.count} holiday${syncStatus.count !== 1 ? 's' : ''} from Google Calendar: ${syncStatus.holidays.join(', ')}`
+            ? `✅ Successfully imported ${syncStatus.count} event${syncStatus.count !== 1 ? 's' : ''} from Google Calendar: ${syncStatus.events.join(', ')}`
             : `❌ Sync failed: ${syncStatus.error}`
           }
         </div>
@@ -201,6 +202,11 @@ export default function Events() {
             calView === 'month' ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}>
           Month View
         </button>
+        <button onClick={() => setCalView('year')}
+          className={cn("text-xs px-3 py-1.5 rounded-lg font-semibold transition-all",
+            calView === 'year' ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}>
+          Year View
+        </button>
       </div>
 
       {/* Calendar */}
@@ -213,8 +219,14 @@ export default function Events() {
               eventDates={eventDates}
             />
           </div>
-        ) : (
+        ) : calView === 'month' ? (
           <MonthCalendarView
+            events={events}
+            selectedDate={selectedDate}
+            onSelectDate={(d) => { setSelectedDate(d); setViewAll(false); }}
+          />
+        ) : (
+          <YearCalendarView
             events={events}
             selectedDate={selectedDate}
             onSelectDate={(d) => { setSelectedDate(d); setViewAll(false); }}
