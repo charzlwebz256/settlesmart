@@ -34,9 +34,10 @@ const MobileSelectCtx = React.createContext(null)
 export function MobileSelect({ children, value, onValueChange, defaultValue, ...props }) {
   const isMobile = useIsMobile()
   const [open, setOpen] = React.useState(false)
+  // Registry: value -> label string, populated by MobileSelectItem on render
+  const labelRegistry = React.useRef({})
 
   if (!isMobile) {
-    // Desktop: standard Radix Select
     return (
       <SelectPrimitive.Root value={value} onValueChange={onValueChange} defaultValue={defaultValue} {...props}>
         {children}
@@ -44,13 +45,22 @@ export function MobileSelect({ children, value, onValueChange, defaultValue, ...
     )
   }
 
+  const registerLabel = (v, label) => { labelRegistry.current[v] = label }
+
+  const handleValueChange = (v) => {
+    onValueChange?.(v)
+    setOpen(false)
+  }
+
+  const displayLabel = value ? (labelRegistry.current[value] || value) : null
+
   return (
-    <MobileSelectCtx.Provider value={{ open, setOpen, value, onValueChange }}>
+    <MobileSelectCtx.Provider value={{ open, setOpen, value, displayLabel, onValueChange: handleValueChange, registerLabel }}>
       <SelectPrimitive.Root
         value={value}
         onValueChange={(v) => { onValueChange?.(v); setOpen(false) }}
         defaultValue={defaultValue}
-        open={false} // prevent radix from opening its own popover on mobile
+        open={false}
         {...props}
       >
         {children}
@@ -82,19 +92,27 @@ export const MobileSelectTrigger = React.forwardRef(({ className, children, ...p
   }
 
   // Mobile path — button that opens the vaul drawer
+  // Extract placeholder from SelectValue child if present
+  const placeholder = React.Children.toArray(children).find(
+    (child) => React.isValidElement(child) && child.type === SelectPrimitive.Value
+  )?.props?.placeholder
+
   return (
-    <SelectPrimitive.Trigger
+    <button
       ref={ref}
+      type="button"
+      disabled={props.disabled}
       className={cn(
-        "flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm ring-offset-background data-[placeholder]:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+        "flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
         className
       )}
-      onClick={(e) => { e.preventDefault(); ctx.setOpen(true) }}
-      {...props}
+      onClick={() => ctx.setOpen(true)}
     >
-      {children}
-      <ChevronDown className="h-4 w-4 opacity-50" />
-    </SelectPrimitive.Trigger>
+      <span className={cn("line-clamp-1", !ctx.value && "text-muted-foreground")}>
+        {ctx.value ? (ctx.displayLabel || ctx.value) : (placeholder || "Select…")}
+      </span>
+      <ChevronDown className="h-4 w-4 opacity-50 flex-shrink-0" />
+    </button>
   )
 })
 MobileSelectTrigger.displayName = "MobileSelectTrigger"
@@ -169,6 +187,9 @@ export function MobileSelectItem({ className, children, value, ...props }) {
 
   // Mobile — tappable row in the bottom sheet
   const isSelected = ctx.value === value
+  const labelText = typeof children === 'string' ? children : value
+  // Register this item's label so the trigger can display it
+  if (ctx.registerLabel) ctx.registerLabel(value, labelText)
   return (
     <button
       className={cn(
@@ -176,7 +197,7 @@ export function MobileSelectItem({ className, children, value, ...props }) {
         isSelected ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted",
         className
       )}
-      onClick={() => { ctx.onValueChange?.(value); ctx.setOpen(false) }}
+      onClick={() => ctx.onValueChange?.(value)}
     >
       <span>{children}</span>
       {isSelected && <Check className="h-4 w-4 text-primary flex-shrink-0" />}
