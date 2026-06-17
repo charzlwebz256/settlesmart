@@ -27,6 +27,7 @@ const TAB_CHILDREN = {
   ],
   '/work': [
     { path: '/jobs', icon: Briefcase, label: 'Job Search' },
+    { path: '/events', icon: CalendarDays, label: 'Events' },
   ],
   '/resources': [
     { path: '/legal', icon: Scale, label: 'Legal & IRCC' },
