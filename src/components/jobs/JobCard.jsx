@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, MapPin, Clock, Building2, DollarSign } from 'lucide-react';
+import { ExternalLink, MapPin, Clock, Building2, DollarSign, PlusCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const typeLabels = {
@@ -33,30 +33,22 @@ function buildJobUrl(job) {
   const q = encodeURIComponent(`${job.title} ${job.company}`.trim());
   const loc = encodeURIComponent(job.location || 'Canada');
   const src = (job.source || '').toLowerCase();
-
-  // Always build reliable search URLs per platform — LLM-generated direct links often 404
   if (src === 'linkedin') return `https://www.linkedin.com/jobs/search/?keywords=${q}&location=${loc}`;
   if (src === 'jobbank') return `https://www.jobbank.gc.ca/jobsearch/jobsearch?searchstring=${q}&locationstring=${loc}`;
   if (src === 'ziprecruiter') return `https://www.ziprecruiter.com/jobs-search?search=${q}&location=${loc}`;
   if (src === 'jooble') return `https://jooble.org/jobs/${q}/${loc}`;
   if (src === 'glassdoor') return `https://www.glassdoor.ca/Job/jobs.htm?sc.keyword=${q}`;
-  // Indeed Canada (default) — always goes to a live search results page for that exact job
   return `https://ca.indeed.com/jobs?q=${q}&l=${loc}`;
 }
 
-export default function JobCard({ job }) {
+export default function JobCard({ job, onAddToTracker }) {
   const src = sourceConfig[job.source] || sourceConfig.indeed;
   const typeStyle = typeLabels[job.job_type] || { label: job.job_type, color: 'bg-muted text-muted-foreground' };
   const expStyle = expLabels[job.experience_level] || expLabels.any;
   const jobUrl = buildJobUrl(job);
 
   return (
-    <a
-      href={jobUrl}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="group flex flex-col gap-3 p-4 rounded-2xl border border-border/50 bg-card hover:border-primary/20 hover:shadow-md transition-all"
-    >
+    <div className="flex flex-col gap-3 p-4 rounded-2xl border border-border/50 bg-card hover:border-primary/20 hover:shadow-md transition-all">
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
@@ -71,11 +63,18 @@ export default function JobCard({ job }) {
               <Badge className="text-[10px] border-0 px-2 py-0 bg-primary/10 text-primary">🍁 Newcomer Friendly</Badge>
             )}
           </div>
-          <h3 className="font-heading font-bold text-sm leading-snug group-hover:text-primary transition-colors">
-            {job.title}
-          </h3>
+          <h3 className="font-heading font-bold text-sm leading-snug">{job.title}</h3>
         </div>
-        <ExternalLink className="w-4 h-4 text-muted-foreground/40 flex-shrink-0 group-hover:text-primary transition-colors mt-0.5" />
+        <a
+          href={jobUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={e => e.stopPropagation()}
+          className="p-1.5 rounded-lg hover:bg-muted transition-colors flex-shrink-0"
+          title="View on job site"
+        >
+          <ExternalLink className="w-4 h-4 text-muted-foreground/60 hover:text-primary transition-colors" />
+        </a>
       </div>
 
       {/* Company & Meta */}
@@ -108,6 +107,17 @@ export default function JobCard({ job }) {
       {job.description && (
         <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{job.description}</p>
       )}
-    </a>
+
+      {/* Add to Tracker */}
+      {onAddToTracker && (
+        <button
+          onClick={() => onAddToTracker(job)}
+          className="mt-auto flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 transition-colors self-start"
+        >
+          <PlusCircle className="w-3.5 h-3.5" />
+          Add to Tracker
+        </button>
+      )}
+    </div>
   );
 }

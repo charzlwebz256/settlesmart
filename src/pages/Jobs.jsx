@@ -11,6 +11,7 @@ import { useLocation_ } from '@/lib/LocationContext';
 import JobCard from '@/components/jobs/JobCard';
 import JobFilters from '@/components/jobs/JobFilters';
 import JobAlertSubscribe from '@/components/jobs/JobAlertSubscribe';
+import JobApplicationForm from '@/components/jobs/JobApplicationForm';
 
 const SOURCE_TABS = [
   { id: 'all', label: 'All Jobs' },
@@ -31,6 +32,19 @@ export default function Jobs() {
   const [filters, setFilters] = useState({ type: 'all', experience: 'all' });
   const [showFilters, setShowFilters] = useState(false);
   const [autoRefreshTimer, setAutoRefreshTimer] = useState(null);
+  const [trackerJob, setTrackerJob] = useState(null);
+
+  const handleAddToTracker = (job) => {
+    setTrackerJob({
+      job_title: job.title,
+      company: job.company,
+      location: job.location || '',
+      job_url: job.url || '',
+      source: job.source ? job.source.charAt(0).toUpperCase() + job.source.slice(1) : '',
+      salary_range: job.salary || '',
+      status: 'saved',
+    });
+  };
 
   const fetchJobs = useCallback(async (query = searchQuery, location = city) => {
     const loc = location || city;
@@ -501,7 +515,7 @@ export default function Jobs() {
         <>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             {paginatedJobs.map((job, i) => (
-              <JobCard key={i} job={job} />
+              <JobCard key={i} job={job} onAddToTracker={handleAddToTracker} />
             ))}
           </div>
 
@@ -555,6 +569,13 @@ export default function Jobs() {
             Showing {(currentPage - 1) * JOBS_PER_PAGE + 1}–{Math.min(currentPage * JOBS_PER_PAGE, filtered.length)} of {filtered.length} jobs
           </p>
         </>
+      )}
+      {trackerJob && (
+        <JobApplicationForm
+          application={trackerJob}
+          onClose={() => setTrackerJob(null)}
+          onSaved={() => setTrackerJob(null)}
+        />
       )}
     </div>
   );
