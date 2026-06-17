@@ -2,16 +2,11 @@ import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
-import { Input } from '@/components/ui/input';
 import {
   User, MapPin, Globe, BookOpen, Briefcase, Home as HomeIcon,
   Scale, Heart, Sparkles, Save, LogOut, Loader2, CheckCircle2, Trash2,
   ChevronDown, ExternalLink
 } from 'lucide-react';
-import {
-  Select, SelectContent, SelectItem, SelectTrigger, SelectValue
-} from '@/components/ui/mobile-select';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
   AlertDialogDescription, AlertDialogFooter, AlertDialogHeader,
@@ -42,6 +37,23 @@ const PROVINCES = [
   'Nunavut', 'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan', 'Yukon'
 ];
 
+const IMMIGRATION_STATUSES = [
+  { value: 'permanent_resident', label: 'Permanent Resident' },
+  { value: 'refugee', label: 'Refugee' },
+  { value: 'international_student', label: 'International Student' },
+  { value: 'temporary_worker', label: 'Temporary Worker' },
+  { value: 'asylum_seeker', label: 'Asylum Seeker' },
+  { value: 'citizen', label: 'Citizen' },
+];
+
+const ENGLISH_LEVELS = [
+  { value: 'none', label: 'None' },
+  { value: 'beginner', label: 'Beginner' },
+  { value: 'intermediate', label: 'Intermediate' },
+  { value: 'advanced', label: 'Advanced' },
+  { value: 'fluent', label: 'Fluent' },
+];
+
 const interestOptions = [
   { value: 'education', label: 'Education', icon: BookOpen },
   { value: 'employment', label: 'Employment', icon: Briefcase },
@@ -50,6 +62,31 @@ const interestOptions = [
   { value: 'health', label: 'Health', icon: Heart },
   { value: 'volunteering', label: 'Community', icon: Sparkles },
 ];
+
+// Simple native select — works reliably on all devices, always shows selected value
+function NativeSelect({ value, onChange, options, placeholder, disabled }) {
+  return (
+    <div className="relative">
+      <select
+        value={value || ''}
+        onChange={e => onChange(e.target.value)}
+        disabled={disabled}
+        className={cn(
+          "w-full h-9 appearance-none rounded-lg border border-input bg-transparent px-3 pr-8 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+          !value && "text-muted-foreground"
+        )}
+      >
+        <option value="" disabled>{placeholder || 'Select…'}</option>
+        {options.map(opt => (
+          <option key={opt.value ?? opt} value={opt.value ?? opt}>
+            {opt.label ?? opt}
+          </option>
+        ))}
+      </select>
+      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50 pointer-events-none" />
+    </div>
+  );
+}
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -73,12 +110,12 @@ export default function Profile() {
 
   const [form, setForm] = useState(null);
 
-  // Initialize form when profile loads
+  // Sync form whenever profile data changes (initial load + after save)
   useEffect(() => {
-    if (profile && !form) {
+    if (profile) {
       setForm({ ...profile });
     }
-  }, [profile]); // eslint-disable-line
+  }, [profile]);
 
   const cities = useMemo(() => PROVINCE_CITIES[form?.province] || [], [form?.province]);
 
@@ -94,27 +131,24 @@ export default function Profile() {
   };
 
   const handleSave = async () => {
-    if (!form || !form.id) return;
+    if (!form?.id) return;
     setSaving(true);
     const { id, created_date, updated_date, created_by_id, ...payload } = form;
     try {
       await base44.entities.UserProfile.update(id, payload);
-      queryClient.invalidateQueries({ queryKey: ['myProfile'] });
+      // Update the query cache directly so the form re-syncs with saved data
+      queryClient.setQueryData(['myProfile'], { ...form });
       setSaved(true);
-      setTimeout(() => setSaved(false), 2000);
+      setTimeout(() => setSaved(false), 2500);
     } finally {
       setSaving(false);
     }
   };
 
-  const handleLogout = () => {
-    base44.auth.logout('/');
-  };
+  const handleLogout = () => base44.auth.logout('/');
 
   const handleDeleteAccount = async () => {
-    if (profile) {
-      await base44.entities.UserProfile.delete(profile.id);
-    }
+    if (profile) await base44.entities.UserProfile.delete(profile.id);
     base44.auth.logout('/');
   };
 
@@ -146,9 +180,7 @@ export default function Profile() {
     <div className="max-w-2xl mx-auto px-4 py-6 pb-24 md:pb-8">
       <div className="mb-8">
         <h1 className="font-heading font-bold text-2xl md:text-3xl mb-2">Your Profile</h1>
-        <p className="text-muted-foreground text-sm">
-          {user?.full_name || user?.email}
-        </p>
+        <p className="text-muted-foreground text-sm">{user?.full_name || user?.email}</p>
       </div>
 
       <div className="space-y-6">
@@ -161,29 +193,22 @@ export default function Profile() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Province</label>
-              <Select value={form.province || ''} onValueChange={updateProvince}>
-                <SelectTrigger className="rounded-lg">
-                  <SelectValue placeholder="Select province" />
-                </SelectTrigger>
-                <SelectContent>
-                  {PROVINCES.map(p => (
-                    <SelectItem key={p} value={p}>{p}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <NativeSelect
+                value={form.province}
+                onChange={updateProvince}
+                options={PROVINCES.map(p => ({ value: p, label: p }))}
+                placeholder="Select province"
+              />
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">City</label>
-              <Select value={form.city || ''} onValueChange={v => updateField('city', v)} disabled={!form.province}>
-                <SelectTrigger className="rounded-lg">
-                  <SelectValue placeholder={form.province ? 'Select city' : 'Select province first'} />
-                </SelectTrigger>
-                <SelectContent>
-                  {cities.map(c => (
-                    <SelectItem key={c} value={c}>{c}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <NativeSelect
+                value={form.city}
+                onChange={v => updateField('city', v)}
+                options={cities.map(c => ({ value: c, label: c }))}
+                placeholder={form.province ? 'Select city' : 'Select province first'}
+                disabled={!form.province}
+              />
             </div>
           </div>
         </div>
@@ -197,29 +222,21 @@ export default function Profile() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Immigration Status</label>
-              <Select value={form.immigration_status || ''} onValueChange={v => updateField('immigration_status', v)}>
-                <SelectTrigger className="rounded-lg">
-                  <SelectValue placeholder="Select status" />
-                </SelectTrigger>
-                <SelectContent>
-                  {['permanent_resident', 'refugee', 'international_student', 'temporary_worker', 'asylum_seeker', 'citizen'].map(s => (
-                    <SelectItem key={s} value={s}>{s.replace(/_/g, ' ')}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <NativeSelect
+                value={form.immigration_status}
+                onChange={v => updateField('immigration_status', v)}
+                options={IMMIGRATION_STATUSES}
+                placeholder="Select status"
+              />
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">English Level</label>
-              <Select value={form.english_level || ''} onValueChange={v => updateField('english_level', v)}>
-                <SelectTrigger className="rounded-lg">
-                  <SelectValue placeholder="Select level" />
-                </SelectTrigger>
-                <SelectContent>
-                  {['none', 'beginner', 'intermediate', 'advanced', 'fluent'].map(l => (
-                    <SelectItem key={l} value={l}>{l}</SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+              <NativeSelect
+                value={form.english_level}
+                onChange={v => updateField('english_level', v)}
+                options={ENGLISH_LEVELS}
+                placeholder="Select level"
+              />
             </div>
           </div>
         </div>
