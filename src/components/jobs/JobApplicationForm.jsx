@@ -69,6 +69,7 @@ export default function JobApplicationForm({ application, onClose, onSaved }) {
         await base44.entities.JobApplication.create(form);
       }
       onSaved();
+      onClose();
     } finally {
       setSaving(false);
     }
