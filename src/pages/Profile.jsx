@@ -44,7 +44,7 @@ export default function Profile() {
     queryKey: ['myProfile'],
     queryFn: async () => {
       const u = await base44.auth.me();
-      const results = await base44.entities.UserProfile.filter({ created_by: u.email });
+      const results = await base44.entities.UserProfile.filter({ created_by_id: u.id });
       return results[0] || null;
     },
   });
@@ -69,11 +69,14 @@ export default function Profile() {
   const handleSave = async () => {
     if (!form || !profile) return;
     setSaving(true);
-    await base44.entities.UserProfile.update(profile.id, form);
-    queryClient.invalidateQueries({ queryKey: ['myProfile'] });
-    setSaving(false);
-    setSaved(true);
-    setTimeout(() => setSaved(false), 2000);
+    try {
+      await base44.entities.UserProfile.update(profile.id, form);
+      queryClient.invalidateQueries({ queryKey: ['myProfile'] });
+      setSaved(true);
+      setTimeout(() => setSaved(false), 2000);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleLogout = () => {
