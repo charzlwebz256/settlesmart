@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,28 @@ import {
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 import { useNavigate, Link } from 'react-router-dom';
+
+const PROVINCE_CITIES = {
+  'Alberta': ['Calgary', 'Edmonton', 'Lethbridge', 'Red Deer', 'Athabasca'],
+  'British Columbia': ['Burnaby', 'Kelowna', 'Kamloops', 'New Westminster', 'North Vancouver', 'Prince George', 'Surrey', 'Vancouver', 'Victoria'],
+  'Manitoba': ['Brandon', 'Winnipeg'],
+  'New Brunswick': ['Fredericton', 'Moncton', 'Saint John', 'Sackville'],
+  'Newfoundland and Labrador': ["St. John's", 'Labrador City', 'Happy Valley-Goose Bay'],
+  'Nova Scotia': ['Halifax', 'Sydney', 'Truro', 'Wolfville'],
+  'Ontario': ['Barrie', 'Belleville', 'Brampton', 'Guelph', 'Hamilton', 'Kingston', 'Kitchener', 'London', 'Mississauga', 'North Bay', 'Oakville', 'Oshawa', 'Ottawa', 'Peterborough', 'Sarnia', 'Sault Ste. Marie', 'St. Catharines', 'Sudbury', 'Thunder Bay', 'Timmins', 'Toronto', 'Waterloo', 'Windsor'],
+  'Prince Edward Island': ['Charlottetown', 'Summerside'],
+  'Quebec': ['Montreal', 'Quebec City', 'Sherbrooke'],
+  'Saskatchewan': ['Melville', 'Moose Jaw', 'Regina', 'Saskatoon'],
+  'Northwest Territories': ['Yellowknife'],
+  'Nunavut': ['Iqaluit'],
+  'Yukon': ['Whitehorse'],
+};
+
+const PROVINCES = [
+  'Alberta', 'British Columbia', 'Manitoba', 'New Brunswick',
+  'Newfoundland and Labrador', 'Northwest Territories', 'Nova Scotia',
+  'Nunavut', 'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan', 'Yukon'
+];
 
 const interestOptions = [
   { value: 'education', label: 'Education', icon: BookOpen },
@@ -56,7 +78,10 @@ export default function Profile() {
     setForm({ ...profile });
   }
 
+  const cities = useMemo(() => PROVINCE_CITIES[form?.province] || [], [form?.province]);
+
   const updateField = (field, value) => setForm(prev => ({ ...prev, [field]: value }));
+  const updateProvince = (value) => setForm(prev => ({ ...prev, province: value, city: '' }));
   const toggleInterest = (val) => {
     setForm(prev => ({
       ...prev,
@@ -133,12 +158,12 @@ export default function Profile() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Province</label>
-              <Select value={form.province || ''} onValueChange={v => updateField('province', v)}>
+              <Select value={form.province || ''} onValueChange={updateProvince}>
                 <SelectTrigger className="rounded-lg">
                   <SelectValue placeholder="Select province" />
                 </SelectTrigger>
                 <SelectContent>
-                  {['Alberta', 'British Columbia', 'Manitoba', 'New Brunswick', 'Newfoundland and Labrador', 'Northwest Territories', 'Nova Scotia', 'Nunavut', 'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan', 'Yukon'].map(p => (
+                  {PROVINCES.map(p => (
                     <SelectItem key={p} value={p}>{p}</SelectItem>
                   ))}
                 </SelectContent>
@@ -146,7 +171,16 @@ export default function Profile() {
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">City</label>
-              <Input value={form.city || ''} onChange={e => updateField('city', e.target.value)} className="rounded-lg" />
+              <Select value={form.city || ''} onValueChange={v => updateField('city', v)} disabled={!form.province}>
+                <SelectTrigger className="rounded-lg">
+                  <SelectValue placeholder={form.province ? 'Select city' : 'Select province first'} />
+                </SelectTrigger>
+                <SelectContent>
+                  {cities.map(c => (
+                    <SelectItem key={c} value={c}>{c}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
