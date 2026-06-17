@@ -81,32 +81,33 @@ const CATEGORIES = [
   },
 ];
 
-function StoreCard({ store }) {
+function StoreCard({ store, index }) {
   return (
     <a
       href={store.url}
       target="_blank"
       rel="noopener noreferrer"
-      className={`flex flex-col items-center justify-between gap-3 p-4 rounded-2xl border ${store.bg} ${store.border} hover:shadow-md transition-all group`}
+      style={{ animationDelay: `${index * 40}ms` }}
+      className={`store-card flex flex-col items-center justify-between gap-2 p-3 rounded-2xl border ${store.bg} ${store.border} hover:shadow-xl hover:-translate-y-1 hover:scale-105 transition-all duration-200 group animate-fade-in`}
     >
-      <div className="h-10 w-full flex items-center justify-center">
+      <div className="w-full h-16 flex items-center justify-center overflow-hidden rounded-xl">
         {store.logo ? (
           <img
             src={store.logo}
             alt={store.name}
-            className="max-h-8 max-w-[120px] object-contain"
-            onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'block'; }}
+            className="w-full h-full object-contain p-1"
+            onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
           />
         ) : null}
         <span
-          className={`font-heading font-bold text-sm text-center ${store.text} ${store.logo ? 'hidden' : ''}`}
+          className={`font-heading font-bold text-sm text-center leading-tight px-1 ${store.text} ${store.logo ? 'hidden' : 'flex items-center justify-center w-full h-full'}`}
         >
           {store.name}
         </span>
       </div>
-      <div className={`flex items-center gap-1 text-xs font-semibold ${store.text}`}>
-        {store.logo && <span className="text-center leading-tight">{store.name}</span>}
-        <ExternalLink className="w-3 h-3 opacity-60 group-hover:opacity-100 flex-shrink-0" />
+      <div className={`flex items-center gap-1 text-xs font-semibold ${store.text} w-full justify-center`}>
+        <span className="text-center leading-tight truncate">{store.name}</span>
+        <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100 flex-shrink-0 transition-opacity" />
       </div>
     </a>
   );
@@ -128,8 +129,8 @@ export default function ShopSmart() {
           <div key={cat.label}>
             <h2 className="font-heading font-bold text-base mb-3 text-foreground">{cat.label}</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
-              {cat.stores.map(store => (
-                <StoreCard key={store.name} store={store} />
+              {cat.stores.map((store, i) => (
+                <StoreCard key={store.name} store={store} index={i} />
               ))}
             </div>
           </div>
