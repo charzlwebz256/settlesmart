@@ -24,7 +24,7 @@ const CATEGORIES = [
     label: '🏠 Home Improvement & Furniture',
     stores: [
       { name: 'Home Depot Canada', url: 'https://www.homedepot.ca', logo: 'https://blog.logomyway.com/wp-content/uploads/2022/01/home-depot-logo.png', bg: 'bg-orange-50 dark:bg-orange-950/30', border: 'border-orange-200 dark:border-orange-800', text: 'text-orange-700 dark:text-orange-300' },
-      { name: 'RONA', url: 'https://www.rona.ca', logo: null, bg: 'bg-green-50 dark:bg-green-950/30', border: 'border-green-200 dark:border-green-800', text: 'text-green-700 dark:text-green-300' },
+      { name: 'RONA', url: 'https://www.rona.ca', logo: 'https://www.vmcdn.ca/f/files/elorafergustoday/images/business-listings/_logo_rona_elorafergus_1500x600_clp.jpg', bg: 'bg-green-50 dark:bg-green-950/30', border: 'border-green-200 dark:border-green-800', text: 'text-green-700 dark:text-green-300' },
       { name: 'IKEA Canada', url: 'https://www.ikea.com/ca/en', logo: 'https://mma.prnewswire.com/media/2058195/IKEA_Canada_IKEA_named_one_of_Canada_s_Greenest_Employers_for_it.jpg?p=facebook', bg: 'bg-yellow-50 dark:bg-yellow-950/30', border: 'border-yellow-200 dark:border-yellow-800', text: 'text-yellow-700 dark:text-yellow-300' },
       { name: "Leon's", url: 'https://www.leons.ca', logo: 'https://images.squarespace-cdn.com/content/v1/5e9901ef8a3476717a295443/1587086075484-6040XGCSYPG6PH3WXY41/Leon_s_Logo_ellipse.png', bg: 'bg-slate-50 dark:bg-slate-800/40', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-300' },
       { name: 'Wayfair Canada', url: 'https://www.wayfair.ca', logo: 'https://assets.wfcdn.com/im/52964026/resize-h360-w672%5Ecompr-r85/3143/314310074/default_name.jpg', bg: 'bg-purple-50 dark:bg-purple-950/30', border: 'border-purple-200 dark:border-purple-800', text: 'text-purple-700 dark:text-purple-300' },
@@ -87,25 +87,27 @@ function StoreCard({ store, index }) {
       href={store.url}
       target="_blank"
       rel="noopener noreferrer"
-      style={{ animationDelay: `${index * 40}ms` }}
-      className={`store-card flex flex-col items-center justify-between gap-2 p-3 rounded-2xl border ${store.bg} ${store.border} hover:shadow-xl hover:-translate-y-1 hover:scale-105 transition-all duration-200 group animate-fade-in`}
+      style={{ animationDelay: `${index * 50}ms` }}
+      className={`flex flex-col items-center justify-between gap-2 p-2 rounded-2xl border ${store.bg} ${store.border} hover:shadow-xl hover:-translate-y-1 hover:scale-105 transition-all duration-200 group animate-fade-in`}
     >
-      <div className="w-full h-16 flex items-center justify-center overflow-hidden rounded-xl">
+      {/* Logo area — landscape fill */}
+      <div className="w-full aspect-[16/7] flex items-center justify-center overflow-hidden rounded-xl bg-white/60 dark:bg-white/10">
         {store.logo ? (
           <img
             src={store.logo}
             alt={store.name}
-            className="w-full h-full object-contain p-1"
+            className="w-full h-full object-cover"
             onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
           />
         ) : null}
         <span
-          className={`font-heading font-bold text-sm text-center leading-tight px-1 ${store.text} ${store.logo ? 'hidden' : 'flex items-center justify-center w-full h-full'}`}
+          className={`font-heading font-bold text-sm text-center leading-tight px-2 ${store.text} ${store.logo ? 'hidden' : 'flex items-center justify-center w-full h-full'}`}
         >
           {store.name}
         </span>
       </div>
-      <div className={`flex items-center gap-1 text-xs font-semibold ${store.text} w-full justify-center`}>
+      {/* Label */}
+      <div className={`flex items-center gap-1 text-xs font-semibold ${store.text} w-full justify-center pb-1`}>
         <span className="text-center leading-tight truncate">{store.name}</span>
         <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100 flex-shrink-0 transition-opacity" />
       </div>
