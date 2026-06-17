@@ -1,0 +1,47 @@
+{
+  "name": "ServiceReview",
+  "type": "object",
+  "properties": {
+    "service_key": {
+      "type": "string",
+      "description": "Unique key identifying the service (province+category+name)"
+    },
+    "service_name": {
+      "type": "string",
+      "description": "Name of the service/organization"
+    },
+    "province": {
+      "type": "string"
+    },
+    "rating": {
+      "type": "number",
+      "description": "Star rating 1-5"
+    },
+    "review": {
+      "type": "string",
+      "maxLength": 500,
+      "description": "Short review text"
+    },
+    "reviewer_name": {
+      "type": "string",
+      "description": "Display name of reviewer"
+    }
+  },
+  "required": [
+    "service_key",
+    "service_name",
+    "rating"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {},
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

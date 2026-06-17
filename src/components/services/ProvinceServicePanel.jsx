@@ -3,12 +3,14 @@ import { Phone, Globe, MapPin, Mail, ExternalLink, Navigation, List, Map, Chevro
 import { cn } from '@/lib/utils';
 import { getOrgLogo } from '@/lib/orgLogos';
 import { PROVINCE_DATA } from '@/lib/provinceServicesData';
+import ServiceReviews from './ServiceReviews';
 
 const MapView = lazy(() => import('./MapView'));
 
 // ── SHARED ORG CARD ──────────────────────────────────────────────────────────
-function OrgCard({ item }) {
+function OrgCard({ item, province }) {
   const logo = item.logo || getOrgLogo(item.name);
+  const serviceKey = `${province}__${item.name}`.toLowerCase().replace(/\s+/g, '_');
   const mapQuery = item.address && item.address.length > 10 && !['Province-wide', 'Multiple', 'Online'].some(x => item.address.startsWith(x))
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address)}`
     : null;
@@ -95,13 +97,16 @@ function OrgCard({ item }) {
             </a>
           )}
         </div>
+
+        {/* Reviews */}
+        <ServiceReviews serviceKey={serviceKey} serviceName={item.name} province={province} />
       </div>
     </div>
   );
 }
 
 // ── SECTIONED GRID ────────────────────────────────────────────────────────────
-function SectionedGrid({ items }) {
+function SectionedGrid({ items, province }) {
   const [view, setView] = useState('list');
   const [search, setSearch] = useState('');
   const [openSections, setOpenSections] = useState({});
@@ -181,7 +186,7 @@ function SectionedGrid({ items }) {
                 {open && (
                   <div className="bg-muted/20 px-4 pb-4 border-t border-border/30">
                     <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 pt-4">
-                      {sectionItems.map((item, idx) => <OrgCard key={idx} item={item} />)}
+                      {sectionItems.map((item, idx) => <OrgCard key={idx} item={item} province={province} />)}
                     </div>
                   </div>
                 )}
@@ -299,5 +304,5 @@ export default function ProvinceServicePanel({ category, province, cityFilter = 
 
   if (category === 'education') return <EducationGrid items={items} />;
 
-  return <SectionedGrid items={items} />;
+  return <SectionedGrid items={items} province={province} />;
 }
