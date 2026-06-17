@@ -113,7 +113,7 @@ export default function WhyCanadaSection() {
       <p className="text-center text-[10px] text-muted-foreground mt-6">
         Sources:{' '}
         <a href="https://www.canada.ca/en.html" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary transition-colors">Canada.ca</a>
-        {' · '}
+        {' | '}
         <a href="https://caps-i.ca/living-in-canada/culture-recreation/" target="_blank" rel="noopener noreferrer" className="underline hover:text-primary transition-colors">CAPS-I Living in Canada</a>
       </p>
     </section>

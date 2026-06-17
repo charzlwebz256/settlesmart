@@ -28,7 +28,7 @@ export default function ResumeBuilder() {
           </div>
           <div>
             <h1 className="font-heading font-bold text-2xl md:text-3xl">Smart Resume Builder</h1>
-            <p className="text-muted-foreground text-sm">Canadian Format · ATS-Optimized · AI-Powered</p>
+            <p className="text-muted-foreground text-sm">Canadian Format, ATS-Optimized, AI-Powered</p>
           </div>
         </div>
       </div>

@@ -12,12 +12,12 @@ import { motion } from 'framer-motion';
 import ExportRoadmapPDF from '@/components/checklist/ExportRoadmapPDF';
 
 const dayRangeLabels = {
-  week1: 'Week 1 — First Steps',
-  week2: 'Week 2 — Getting Settled',
-  week3: 'Week 3 — Building Connections',
-  week4: 'Week 4 — Moving Forward',
-  month2: 'Month 2 — Deepening Roots',
-  month3: 'Month 3 — Growing Independence',
+  week1: 'Week 1: First Steps',
+  week2: 'Week 2: Getting Settled',
+  week3: 'Week 3: Building Connections',
+  week4: 'Week 4: Moving Forward',
+  month2: 'Month 2: Deepening Roots',
+  month3: 'Month 3: Growing Independence',
 };
 
 const categoryColors = {

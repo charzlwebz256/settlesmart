@@ -238,10 +238,10 @@ export default function CanadianNewsUpdates() {
             News & Updates
           </h1>
           <p className="text-muted-foreground text-sm flex items-center gap-1.5 flex-wrap">
-            <span>BBC · CNN · Al Jazeera · Reuters · CBC · IRCC</span>
+            <span>BBC, CNN, Al Jazeera, Reuters, CBC, IRCC</span>
             {currentData?.loadedAt && (
               <span className="text-[11px] text-muted-foreground/60">
-                · Updated {currentData.loadedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                Updated {currentData.loadedAt.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
               </span>
             )}
           </p>
@@ -295,7 +295,7 @@ export default function CanadianNewsUpdates() {
         <div className="text-center py-16">
           <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-3" />
           <p className="text-sm font-medium">Fetching latest {currentTab?.label} news...</p>
-          <p className="text-xs text-muted-foreground mt-1">Searching BBC · CNN · Al Jazeera · Reuters · CBC · IRCC</p>
+          <p className="text-xs text-muted-foreground mt-1">Searching BBC, CNN, Al Jazeera, Reuters, CBC, IRCC</p>
         </div>
       )}
 

@@ -59,7 +59,7 @@ export default function Contact() {
                 support@settlesmart.ca
               </a>
               <p className="text-xs text-muted-foreground mt-1">
-                We typically respond within 1–2 business days.
+                We typically respond within 1 to 2 business days.
               </p>
             </div>
 
@@ -82,9 +82,9 @@ export default function Contact() {
                 For urgent settlement needs, please contact:
               </p>
               <ul className="text-xs space-y-1 text-muted-foreground">
-                <li><span className="font-semibold text-foreground">911</span> — Police, Fire, Ambulance</li>
-                <li><span className="font-semibold text-foreground">211</span> — Social Services Helpline</li>
-                <li><span className="font-semibold text-foreground">1-800-O-Canada</span> — Government Info</li>
+                <li><span className="font-semibold text-foreground">911</span>: Police, Fire, Ambulance</li>
+                <li><span className="font-semibold text-foreground">211</span>: Social Services Helpline</li>
+                <li><span className="font-semibold text-foreground">1-800-O-Canada</span>: Government Info</li>
               </ul>
             </div>
           </div>

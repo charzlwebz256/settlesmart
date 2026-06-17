@@ -296,8 +296,8 @@ Keep it concise, warm, and encouraging.`,
 
               {/* Navigation */}
               <div className="flex gap-2 pt-2 border-t border-border/30">
-                <Button variant="outline" onClick={prevQuestion} disabled={currentQIdx === 0} className="flex-1 rounded-xl">← Previous</Button>
-                <Button variant="outline" onClick={nextQuestion} disabled={currentQIdx === questions.length - 1} className="flex-1 rounded-xl">Next →</Button>
+                <Button variant="outline" onClick={prevQuestion} disabled={currentQIdx === 0} className="flex-1 rounded-xl">Previous</Button>
+                <Button variant="outline" onClick={nextQuestion} disabled={currentQIdx === questions.length - 1} className="flex-1 rounded-xl">Next</Button>
               </div>
             </div>
           )}

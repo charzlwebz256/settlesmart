@@ -39,7 +39,7 @@ function ApplicationCard({ app, onEdit, onDelete, onStatusChange }) {
             {app.source && <span className="text-[10px] text-muted-foreground font-medium bg-muted px-2 py-0.5 rounded-full">{app.source}</span>}
           </div>
           <h3 className="font-heading font-bold text-sm leading-snug">{app.job_title}</h3>
-          <p className="text-xs text-muted-foreground mt-0.5">{app.company}{app.location ? ` · ${app.location}` : ''}</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{app.company}{app.location ? `, ${app.location}` : ''}</p>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
           <button onClick={() => onEdit(app)} className="p-1.5 rounded-lg hover:bg-muted transition-colors">
@@ -76,7 +76,7 @@ function ApplicationCard({ app, onEdit, onDelete, onStatusChange }) {
             onClick={() => onStatusChange(app.id, s.id)}
             className="text-[10px] px-2 py-1 rounded-lg border border-border/50 text-muted-foreground hover:border-primary/30 hover:text-foreground transition-all"
           >
-            → {s.label}
+            {s.label}
           </button>
         ))}
       </div>
@@ -90,7 +90,7 @@ function ApplicationCard({ app, onEdit, onDelete, onStatusChange }) {
 
       {expanded && (
         <div className="mt-3 space-y-2 border-t border-border/40 pt-3">
-          {app.contact_name && <p className="text-xs text-muted-foreground">👤 {app.contact_name}{app.contact_email ? ` · ${app.contact_email}` : ''}</p>}
+          {app.contact_name && <p className="text-xs text-muted-foreground">👤 {app.contact_name}{app.contact_email ? `, ${app.contact_email}` : ''}</p>}
           {app.notes && <p className="text-xs text-muted-foreground italic">📝 {app.notes}</p>}
           {app.job_url && (
             <a href={app.job_url} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 text-xs text-primary hover:underline">

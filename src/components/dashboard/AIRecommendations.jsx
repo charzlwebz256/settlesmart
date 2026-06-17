@@ -151,7 +151,7 @@ Return EXACTLY 4 targeted recommendations. Each must be specific and actionable 
       )}
 
       <p className="text-xs text-muted-foreground mt-4 text-center">
-        AI-generated · Based on your profile · <Link to="/profile" className="underline hover:text-primary">Update profile</Link> to improve results
+        AI-generated. Based on your profile. <Link to="/profile" className="underline hover:text-primary">Update profile</Link> to improve results
       </p>
     </div>
   );
