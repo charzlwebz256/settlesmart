@@ -153,7 +153,7 @@ export default function MyProgressSection() {
               </div>
               <div>
                 <p className="font-heading font-bold text-lg leading-tight">{s.value}</p>
-                <p className="text-[10px] text-muted-foreground font-medium">{s.label}</p>
+                <p className="text-xs text-muted-foreground font-medium">{s.label}</p>
               </div>
             </Link>
           </motion.div>
@@ -193,7 +193,7 @@ export default function MyProgressSection() {
               {/* Centre label */}
               <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
                 <span className="font-heading font-bold text-2xl text-foreground">{progressPct}%</span>
-                <span className="text-[10px] text-muted-foreground">complete</span>
+                <span className="text-xs text-muted-foreground">complete</span>
               </div>
             </div>
             <p className="text-xs text-muted-foreground mt-1">{completedTasks} of {totalTasks} tasks done</p>
@@ -242,7 +242,7 @@ export default function MyProgressSection() {
               <CalendarDays className="w-4 h-4 text-violet-600" />
               Upcoming Saved Events
             </p>
-            <Link to="/events" className="text-[11px] text-primary font-semibold hover:opacity-70">View all</Link>
+            <Link to="/events" className="text-xs text-primary font-semibold hover:opacity-70">View all</Link>
           </div>
 
           {/* Visual timeline bars */}
@@ -258,7 +258,7 @@ export default function MyProgressSection() {
                 <div key={event.id}>
                   <div className="flex items-center justify-between gap-2 mb-1">
                     <p className="text-xs font-semibold truncate flex-1">{event.title}</p>
-                    <span className={`text-[10px] font-bold flex-shrink-0 ${textColor}`}>
+                    <span className={`text-xs font-bold flex-shrink-0 ${textColor}`}>
                       {daysAway === 0 ? 'Today' : daysAway === 1 ? 'Tomorrow' : `in ${daysAway}d`}
                     </span>
                   </div>
@@ -270,7 +270,7 @@ export default function MyProgressSection() {
                       transition={{ duration: 0.7, ease: 'easeOut' }}
                     />
                   </div>
-                  <p className="text-[10px] text-muted-foreground mt-0.5">
+                  <p className="text-xs text-muted-foreground mt-0.5">
                     {format(parseISO(event.date), 'EEE, MMM d')}{event.city ? ` · ${event.city}` : ''}
                   </p>
                 </div>

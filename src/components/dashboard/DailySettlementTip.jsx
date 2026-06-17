@@ -118,7 +118,7 @@ Return JSON with:
           </div>
           <div>
             <p className="text-xs font-bold text-primary uppercase tracking-wide">Daily Tip</p>
-            <p className="text-[10px] text-muted-foreground flex items-center gap-1">
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
               <Calendar className="w-3 h-3" /> {arrivalCtx.label}
             </p>
           </div>

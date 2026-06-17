@@ -86,7 +86,7 @@ Return EXACTLY 4 targeted recommendations. Each must be specific and actionable 
           </div>
           <div>
             <h2 className="font-heading font-bold text-base leading-tight">AI Recommendations</h2>
-            <p className="text-[10px] text-muted-foreground">Personalized for your profile</p>
+            <p className="text-xs text-muted-foreground">Personalized for your profile</p>
           </div>
         </div>
         <Button
@@ -125,12 +125,12 @@ Return EXACTLY 4 targeted recommendations. Each must be specific and actionable 
                   <p className="font-semibold text-sm leading-snug">{rec.title}</p>
                   <div className="flex gap-1 flex-shrink-0">
                     {rec.urgency && (
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize ${urgencyBadge[rec.urgency]}`}>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${urgencyBadge[rec.urgency]}`}>
                         {rec.urgency}
                       </span>
                     )}
                     {rec.category && (
-                      <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full capitalize ${categoryColors[rec.category] || 'bg-muted text-muted-foreground'}`}>
+                      <span className={`text-xs font-semibold px-2 py-0.5 rounded-full capitalize ${categoryColors[rec.category] || 'bg-muted text-muted-foreground'}`}>
                         {rec.category}
                       </span>
                     )}
@@ -150,7 +150,7 @@ Return EXACTLY 4 targeted recommendations. Each must be specific and actionable 
         </AnimatePresence>
       )}
 
-      <p className="text-[10px] text-muted-foreground mt-4 text-center">
+      <p className="text-xs text-muted-foreground mt-4 text-center">
         AI-generated · Based on your profile · <Link to="/profile" className="underline hover:text-primary">Update profile</Link> to improve results
       </p>
     </div>

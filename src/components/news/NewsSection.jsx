@@ -80,12 +80,12 @@ export default function NewsSection({ articles, category }) {
             <div className="flex items-start justify-between gap-2">
               <div className="flex flex-wrap gap-1.5">
                 {fresh && (
-                  <span className="flex items-center gap-1 text-[10px] font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full animate-pulse">
+                  <span className="flex items-center gap-1 text-xs font-bold text-red-600 bg-red-50 border border-red-200 px-2 py-0.5 rounded-full animate-pulse">
                     <Radio className="w-2.5 h-2.5" /> LIVE
                   </span>
                 )}
                 {article.is_local && (
-                  <Badge className="text-[10px] border px-2 py-0.5 bg-teal-500/10 text-teal-700 border-teal-200 flex items-center gap-1">
+                  <Badge className="text-xs border px-2 py-0.5 bg-teal-500/10 text-teal-700 border-teal-200 flex items-center gap-1">
                     <MapPin className="w-2.5 h-2.5" /> Local
                   </Badge>
                 )}
@@ -103,11 +103,11 @@ export default function NewsSection({ articles, category }) {
 
             {/* Footer */}
             <div className="flex items-center justify-between mt-auto pt-1">
-              <span className={cn("text-[10px] font-bold px-2 py-0.5 rounded-md", getSourceStyle(article.source))}>
+              <span className={cn("text-xs font-bold px-2 py-0.5 rounded-md", getSourceStyle(article.source))}>
                 {article.source}
               </span>
               {article.time_ago && (
-                <span className={cn("flex items-center gap-1 text-[10px]", fresh ? "text-red-500 font-semibold" : "text-muted-foreground")}>
+                <span className={cn("flex items-center gap-1 text-xs", fresh ? "text-red-500 font-semibold" : "text-muted-foreground")}>
                   <Clock className="w-3 h-3" /> {article.time_ago}
                 </span>
               )}

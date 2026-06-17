@@ -122,7 +122,7 @@ The SettleSmart Team`;
       </div>
       <div className="flex-1 min-w-0">
         <p className="text-xs font-semibold text-foreground">Email Reminders</p>
-        <p className="text-[10px] text-muted-foreground">Get daily updates on events & checklist tasks</p>
+        <p className="text-xs text-muted-foreground">Get daily updates on events & checklist tasks</p>
       </div>
       {status === 'sent' ? (
         <span className="flex items-center gap-1 text-xs text-primary font-semibold">

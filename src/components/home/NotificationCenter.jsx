@@ -152,12 +152,12 @@ export default function NotificationCenter() {
                 <div className="flex items-center gap-1.5">
                   <p className="text-xs font-semibold leading-snug truncate">{n.title}</p>
                   {n.badge && (
-                    <span className="flex-shrink-0 text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400">
+                    <span className="flex-shrink-0 text-xs font-bold px-1.5 py-0.5 rounded-full bg-orange-100 text-orange-600 dark:bg-orange-500/20 dark:text-orange-400">
                       {n.badge}
                     </span>
                   )}
                 </div>
-                <p className="text-[10px] text-muted-foreground truncate mt-0.5">{n.subtitle}</p>
+                <p className="text-xs text-muted-foreground truncate mt-0.5">{n.subtitle}</p>
               </Link>
               <div className="flex items-center gap-1 flex-shrink-0">
                 <Link to={n.path}>
