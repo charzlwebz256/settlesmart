@@ -10,6 +10,11 @@
       "type": "string",
       "format": "date-time",
       "description": "Last successful sync timestamp"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional description or notes about this sync state"
     }
   },
   "required": []
