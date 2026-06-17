@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
@@ -74,9 +74,11 @@ export default function Profile() {
   const [form, setForm] = useState(null);
 
   // Initialize form when profile loads
-  if (profile && !form) {
-    setForm({ ...profile });
-  }
+  useEffect(() => {
+    if (profile && !form) {
+      setForm({ ...profile });
+    }
+  }, [profile]); // eslint-disable-line
 
   const cities = useMemo(() => PROVINCE_CITIES[form?.province] || [], [form?.province]);
 
