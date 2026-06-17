@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import { isSameDay, parseISO, startOfDay } from 'date-fns';
+import { isSameDay, parseISO, startOfDay, format } from 'date-fns';
 import { Loader2, CalendarDays, MapPin, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AddEventModal from '@/components/events/AddEventModal';
@@ -178,7 +178,7 @@ export default function Events() {
         )}
       </div>
 
-      {/* View toggle */}
+      {/* View toggle with date display */}
       <div className="flex items-center justify-between mb-3">
         <div className="flex gap-2">
           <button
@@ -196,8 +196,28 @@ export default function Events() {
             All Upcoming
           </button>
         </div>
-        <span className="text-xs text-muted-foreground">{filtered.length} event{filtered.length !== 1 ? 's' : ''}</span>
+        <div className="flex items-center gap-2">
+          {!viewAll && (
+            <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-1 rounded-lg">
+              {format(selectedDate, 'EEE, MMM d')}
+            </span>
+          )}
+          <span className="text-xs text-muted-foreground">{filtered.length} event{filtered.length !== 1 ? 's' : ''}</span>
+        </div>
       </div>
+
+      {/* Selected Date Header */}
+      {!viewAll && (
+        <div className="mb-4">
+          <div className="bg-card rounded-xl border border-border/50 p-3 flex items-center gap-3">
+            <CalendarDays className="w-5 h-5 text-primary" />
+            <div>
+              <p className="text-xs font-medium text-muted-foreground">Events on</p>
+              <p className="text-sm font-bold text-foreground">{format(selectedDate, 'EEEE, MMMM d, yyyy')}</p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Category Filter */}
       <div className="flex gap-2 overflow-x-auto pb-2 mb-5 scrollbar-hide">
