@@ -233,15 +233,15 @@ export default function AppLayout() {
           </div>
         </div>
 
-        {/* Slide-down hamburger menu */}
+        {/* Slide-in right side menu */}
         <AnimatePresence>
           {menuOpen && (
             <motion.div
-              initial={{ opacity: 0, y: -8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.15 }}
-              className="border-t border-border/50 bg-card/95 backdrop-blur-xl p-3"
+              initial={{ opacity: 0, x: 40 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: 40 }}
+              transition={{ duration: 0.18 }}
+              className="absolute top-full right-0 w-72 border border-border/50 rounded-bl-2xl bg-card/95 backdrop-blur-xl shadow-xl p-3 z-50"
             >
               {/* Mobile only: full primary nav tree. Desktop: only Emergency (others are in the top nav) */}
               <div className="space-y-0.5">
