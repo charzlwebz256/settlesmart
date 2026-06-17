@@ -1,5 +1,5 @@
 import { useState, lazy, Suspense } from 'react';
-import { Phone, Globe, MapPin, Mail, ExternalLink, Navigation, List, Map } from 'lucide-react';
+import { Phone, Globe, MapPin, Mail, ExternalLink, Navigation, List, Map, ChevronDown, Search } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getOrgLogo } from '@/lib/orgLogos';
 import { PROVINCE_DATA } from '@/lib/provinceServicesData';
@@ -89,13 +89,36 @@ function OrgCard({ item }) {
 // ── SECTIONED GRID ────────────────────────────────────────────────────────────
 function SectionedGrid({ items }) {
   const [view, setView] = useState('list');
+  const [search, setSearch] = useState('');
+  const [openSections, setOpenSections] = useState({});
 
-  const sections = [...new Set(items.map(i => i.section || i.city || 'General').filter(Boolean))];
+  const filtered = search.trim()
+    ? items.filter(i =>
+        [i.name, i.organization, i.section, i.city, ...(i.services || [])]
+          .filter(Boolean).join(' ').toLowerCase().includes(search.toLowerCase())
+      )
+    : items;
+
+  const sections = [...new Set(filtered.map(i => i.section || i.city || 'General').filter(Boolean))];
+
+  const toggle = (sec) => setOpenSections(prev => ({ ...prev, [sec]: !prev[sec] }));
+  const isOpen = (sec) => openSections[sec] !== false; // default open
 
   return (
     <div>
-      <div className="flex justify-end mb-4">
-        <div className="flex gap-1 bg-muted rounded-xl p-1">
+      {/* Toolbar */}
+      <div className="flex flex-col sm:flex-row gap-3 mb-5">
+        <div className="relative flex-1">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Search services, organizations…"
+            className="w-full pl-9 pr-4 py-2 rounded-xl border border-border/60 bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
+          />
+        </div>
+        <div className="flex gap-1 bg-muted rounded-xl p-1 self-start sm:self-auto">
           <button onClick={() => setView('list')}
             className={cn("flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all",
               view === 'list' ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}>
@@ -111,18 +134,42 @@ function SectionedGrid({ items }) {
 
       {view === 'map' ? (
         <Suspense fallback={<div className="h-96 flex items-center justify-center text-muted-foreground text-sm">Loading map...</div>}>
-          <MapView items={items.map(i => ({ ...i, logo: getOrgLogo(i.name) }))} cityFilter="all" />
+          <MapView items={filtered.map(i => ({ ...i, logo: getOrgLogo(i.name) }))} cityFilter="all" />
         </Suspense>
+      ) : filtered.length === 0 ? (
+        <div className="text-center py-12 text-muted-foreground">
+          <p className="text-2xl mb-2">🔍</p>
+          <p className="text-sm font-semibold">No results for "{search}"</p>
+        </div>
       ) : (
-        <div className="space-y-6">
+        <div className="space-y-3">
           {sections.map(sec => {
-            const sectionItems = items.filter(i => (i.section || i.city || 'General') === sec);
+            const sectionItems = filtered.filter(i => (i.section || i.city || 'General') === sec);
+            const open = isOpen(sec);
             return (
-              <div key={sec}>
-                <h2 className="font-heading font-bold text-xs text-muted-foreground uppercase tracking-wider mb-3 px-1">{sec}</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {sectionItems.map((item, idx) => <OrgCard key={idx} item={item} />)}
-                </div>
+              <div key={sec} className="rounded-2xl border border-border/50 overflow-hidden bg-card">
+                {/* Section header — clickable accordion */}
+                <button
+                  onClick={() => toggle(sec)}
+                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors"
+                >
+                  <div className="flex items-center gap-2">
+                    <span className="font-heading font-bold text-sm text-foreground">{sec}</span>
+                    <span className="text-[10px] font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full">
+                      {sectionItems.length} {sectionItems.length === 1 ? 'resource' : 'resources'}
+                    </span>
+                  </div>
+                  <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform", open && "rotate-180")} />
+                </button>
+
+                {/* Section body */}
+                {open && (
+                  <div className="px-4 pb-4 border-t border-border/30">
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-3">
+                      {sectionItems.map((item, idx) => <OrgCard key={idx} item={item} />)}
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
