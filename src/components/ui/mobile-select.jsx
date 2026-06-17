@@ -3,9 +3,6 @@
 /**
  * MobileSelect — drop-in replacement for Select that renders a vaul bottom sheet
  * on small screens and the standard Radix popover on md+.
- *
- * Usage: identical to the normal Select / SelectTrigger / SelectContent / SelectItem.
- * Just import from this file instead of @/components/ui/select.
  */
 
 import * as React from "react"
@@ -14,7 +11,6 @@ import { Drawer } from "vaul"
 import { Check, ChevronDown } from "lucide-react"
 import { cn } from "@/lib/utils"
 
-// Hook: is the viewport below the md breakpoint (768px)?
 function useIsMobile() {
   const [isMobile, setIsMobile] = React.useState(
     () => typeof window !== "undefined" && window.innerWidth < 768
@@ -28,37 +24,37 @@ function useIsMobile() {
   return isMobile
 }
 
-// Context to share open state between trigger and content
 const MobileSelectCtx = React.createContext(null)
 
-export function MobileSelect({ children, value, onValueChange, defaultValue, ...props }) {
+export function MobileSelect({ children, value, onValueChange, defaultValue, disabled, ...props }) {
   const isMobile = useIsMobile()
   const [open, setOpen] = React.useState(false)
-  // Registry: value -> label string, populated by MobileSelectItem on render
+  // label registry: maps value -> display label, filled by MobileSelectItem at render
   const labelRegistry = React.useRef({})
 
-  // All hooks called above — now safe to branch
-  const registerLabel = (v, label) => { labelRegistry.current[v] = label }
-  const handleValueChange = (v) => { onValueChange?.(v); setOpen(false) }
-  const displayLabel = value ? (labelRegistry.current[value] || value) : null
+  const registerLabel = React.useCallback((v, label) => {
+    labelRegistry.current[v] = label
+  }, [])
+
+  const handleValueChange = React.useCallback((v) => {
+    onValueChange?.(v)
+    setOpen(false)
+  }, [onValueChange])
 
   if (!isMobile) {
     return (
-      <SelectPrimitive.Root value={value} onValueChange={onValueChange} defaultValue={defaultValue} {...props}>
+      <SelectPrimitive.Root value={value} onValueChange={onValueChange} defaultValue={defaultValue} disabled={disabled} {...props}>
         {children}
       </SelectPrimitive.Root>
     )
   }
 
+  const displayLabel = value ? (labelRegistry.current[value] ?? value) : null
+
   return (
-    <MobileSelectCtx.Provider value={{ open, setOpen, value, displayLabel, onValueChange: handleValueChange, registerLabel }}>
-      <SelectPrimitive.Root
-        value={value}
-        onValueChange={(v) => { onValueChange?.(v); setOpen(false) }}
-        defaultValue={defaultValue}
-        open={false}
-        {...props}
-      >
+    <MobileSelectCtx.Provider value={{ open, setOpen, value, displayLabel, onValueChange: handleValueChange, registerLabel, disabled }}>
+      {/* Radix root with open=false so it never opens its own popover on mobile */}
+      <SelectPrimitive.Root value={value} onValueChange={onValueChange} defaultValue={defaultValue} disabled={disabled} open={false} {...props}>
         {children}
       </SelectPrimitive.Root>
     </MobileSelectCtx.Provider>
@@ -69,7 +65,7 @@ export const MobileSelectTrigger = React.forwardRef(({ className, children, ...p
   const ctx = React.useContext(MobileSelectCtx)
 
   if (!ctx) {
-    // Desktop path — normal Radix trigger
+    // Desktop — standard Radix trigger
     return (
       <SelectPrimitive.Trigger
         ref={ref}
@@ -87,8 +83,8 @@ export const MobileSelectTrigger = React.forwardRef(({ className, children, ...p
     )
   }
 
-  // Mobile path — button that opens the vaul drawer
-  // Extract placeholder from SelectValue child if present
+  // Mobile — plain button that opens the drawer
+  // Extract placeholder text from SelectValue child
   const placeholder = React.Children.toArray(children).find(
     (child) => React.isValidElement(child) && child.type === SelectPrimitive.Value
   )?.props?.placeholder
@@ -97,15 +93,15 @@ export const MobileSelectTrigger = React.forwardRef(({ className, children, ...p
     <button
       ref={ref}
       type="button"
-      disabled={props.disabled}
+      disabled={ctx.disabled || props.disabled}
       className={cn(
         "flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
         className
       )}
-      onClick={() => ctx.setOpen(true)}
+      onClick={() => !(ctx.disabled || props.disabled) && ctx.setOpen(true)}
     >
-      <span className={cn("line-clamp-1", !ctx.value && "text-muted-foreground")}>
-        {ctx.value ? (ctx.displayLabel || ctx.value) : (placeholder || "Select…")}
+      <span className={cn("line-clamp-1 text-left", !ctx.displayLabel && "text-muted-foreground")}>
+        {ctx.displayLabel || placeholder || "Select…"}
       </span>
       <ChevronDown className="h-4 w-4 opacity-50 flex-shrink-0" />
     </button>
@@ -117,7 +113,6 @@ export function MobileSelectContent({ children, label, ...props }) {
   const ctx = React.useContext(MobileSelectCtx)
 
   if (!ctx) {
-    // Desktop path — normal Radix content
     return (
       <SelectPrimitive.Portal>
         <SelectPrimitive.Content
@@ -135,13 +130,11 @@ export function MobileSelectContent({ children, label, ...props }) {
     )
   }
 
-  // Mobile path — vaul Drawer bottom sheet
   return (
     <Drawer.Root open={ctx.open} onOpenChange={ctx.setOpen}>
       <Drawer.Portal>
         <Drawer.Overlay className="fixed inset-0 bg-black/40 z-50" />
         <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-2xl border-t border-border/50 outline-none pb-[env(safe-area-inset-bottom)]">
-          {/* Drag handle */}
           <div className="flex justify-center pt-3 pb-1">
             <div className="w-10 h-1 rounded-full bg-border" />
           </div>
@@ -160,8 +153,15 @@ export function MobileSelectContent({ children, label, ...props }) {
 export function MobileSelectItem({ className, children, value, ...props }) {
   const ctx = React.useContext(MobileSelectCtx)
 
+  // Always register label so trigger can display it (works on both mobile and desktop)
+  React.useEffect(() => {
+    if (ctx?.registerLabel) {
+      const labelText = typeof children === 'string' ? children : value
+      ctx.registerLabel(value, labelText)
+    }
+  }, [value, children, ctx])
+
   if (!ctx) {
-    // Desktop
     return (
       <SelectPrimitive.Item
         value={value}
@@ -181,19 +181,16 @@ export function MobileSelectItem({ className, children, value, ...props }) {
     )
   }
 
-  // Mobile — tappable row in the bottom sheet
   const isSelected = ctx.value === value
-  const labelText = typeof children === 'string' ? children : value
-  // Register this item's label so the trigger can display it
-  if (ctx.registerLabel) ctx.registerLabel(value, labelText)
   return (
     <button
+      type="button"
       className={cn(
         "w-full flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-medium transition-colors",
         isSelected ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted",
         className
       )}
-      onClick={() => ctx.onValueChange?.(value)}
+      onClick={() => ctx.onValueChange(value)}
     >
       <span>{children}</span>
       {isSelected && <Check className="h-4 w-4 text-primary flex-shrink-0" />}
@@ -206,7 +203,7 @@ export const MobileSelectGroup = SelectPrimitive.Group
 export const MobileSelectLabel = SelectPrimitive.Label
 export const MobileSelectSeparator = SelectPrimitive.Separator
 
-// Aliases for drop-in compatibility with @/components/ui/select import names
+// Aliases for drop-in compatibility
 export const Select = MobileSelect
 export const SelectTrigger = MobileSelectTrigger
 export const SelectContent = MobileSelectContent
