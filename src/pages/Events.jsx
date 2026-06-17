@@ -2,7 +2,9 @@ import { useState, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { isSameDay, parseISO, startOfDay } from 'date-fns';
-import { Loader2, CalendarDays, MapPin } from 'lucide-react';
+import { Loader2, CalendarDays, MapPin, Plus } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import AddEventModal from '@/components/events/AddEventModal';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import CalendarStrip from '@/components/events/CalendarStrip';
@@ -30,8 +32,14 @@ export default function Events() {
   const [category, setCategory] = useState('all');
   const [viewAll, setViewAll] = useState(false);
   const [calView, setCalView] = useState('strip'); // 'strip' | 'month'
+  const [showAddModal, setShowAddModal] = useState(false);
   const { city, province, isDetecting: cityLoading } = useLocation_();
   const source = city ? 'gps' : null;
+
+  const { data: user } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => base44.auth.me(),
+  });
 
   const { data: events, isLoading } = useQuery({
     queryKey: ['events'],
@@ -88,10 +96,18 @@ export default function Events() {
     <div className="max-w-5xl mx-auto px-4 py-6 pb-8">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="font-heading font-bold text-2xl md:text-3xl mb-1 flex items-center gap-2">
-          <CalendarDays className="w-6 h-6 text-primary" />
-          Community Events
-        </h1>
+        <div className="flex items-center justify-between">
+          <h1 className="font-heading font-bold text-2xl md:text-3xl mb-1 flex items-center gap-2">
+            <CalendarDays className="w-6 h-6 text-primary" />
+            Community Events
+          </h1>
+          {user?.role === 'admin' && (
+            <Button size="sm" onClick={() => setShowAddModal(true)} className="gap-1.5 rounded-xl">
+              <Plus className="w-4 h-4" />
+              Add Event
+            </Button>
+          )}
+        </div>
         <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
           {cityLoading ? (
             <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Detecting your location...</>
@@ -228,6 +244,11 @@ export default function Events() {
           </AnimatePresence>
         </div>
       )}
+      <AddEventModal
+        open={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onCreated={() => queryClient.invalidateQueries({ queryKey: ['events'] })}
+      />
     </div>
   );
 }
