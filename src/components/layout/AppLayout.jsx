@@ -16,6 +16,7 @@ import LanguageTranslator from '@/components/layout/LanguageTranslator';
 const TAB_CHILDREN = {
   '/explore': [
     { path: '/services', icon: Search, label: 'Settlement Services' },
+    { path: '/events', icon: CalendarDays, label: 'Community Events' },
     { path: '/near-me', icon: MapPin, label: 'Near Me' },
     { path: '/transit-map', icon: Navigation, label: 'Transit Map' },
   ],
@@ -42,6 +43,7 @@ const primaryNav = [
 const secondaryNav = [
   { path: '/assistant', icon: MessageCircle, label: 'AI Assistant' },
   { path: '/checklist', icon: BookOpen, label: 'Checklist' },
+  { path: '/events', icon: CalendarDays, label: 'Community Events' },
   { path: '/profile', icon: User, label: 'My Profile' },
   { path: '/support-us', icon: Heart, label: 'Support Us' },
   { path: '/meet-the-developer', icon: Info, label: 'Meet the Developer' },
