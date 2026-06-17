@@ -25,6 +25,11 @@
     "reviewer_name": {
       "type": "string",
       "description": "Display name of reviewer"
+    },
+    "description": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Optional longer description"
     }
   },
   "required": [
