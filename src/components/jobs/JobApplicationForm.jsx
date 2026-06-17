@@ -69,6 +69,9 @@ export default function JobApplicationForm({ application, onClose, onSaved }) {
         await base44.entities.JobApplication.create(form);
       }
       onSaved();
+    } catch (error) {
+      console.error('Failed to save application:', error);
+      alert('Failed to save application. Please try again.');
     } finally {
       setSaving(false);
     }
