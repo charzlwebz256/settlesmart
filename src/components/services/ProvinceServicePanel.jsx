@@ -3,14 +3,13 @@ import { Phone, Globe, MapPin, Mail, ExternalLink, Navigation, List, Map, Chevro
 import { cn } from '@/lib/utils';
 import { getOrgLogo } from '@/lib/orgLogos';
 import { PROVINCE_DATA } from '@/lib/provinceServicesData';
-import ServiceReviews from './ServiceReviews';
+
 
 const MapView = lazy(() => import('./MapView'));
 
 // ── SHARED ORG CARD ──────────────────────────────────────────────────────────
 function OrgCard({ item, province }) {
   const logo = item.logo || getOrgLogo(item.name);
-  const serviceKey = `${province}__${item.name}`.toLowerCase().replace(/\s+/g, '_');
   const mapQuery = item.address && item.address.length > 10 && !['Province-wide', 'Multiple', 'Online'].some(x => item.address.startsWith(x))
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(item.address)}`
     : null;
@@ -98,8 +97,6 @@ function OrgCard({ item, province }) {
           )}
         </div>
 
-        {/* Reviews */}
-        <ServiceReviews serviceKey={serviceKey} serviceName={item.name} province={province} />
       </div>
     </div>
   );
