@@ -3,11 +3,10 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
-import { Loader2, MapPin, ArrowUpDown } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { MapPin, ChevronDown } from 'lucide-react';
 import ProvinceServicePanel from '../components/services/ProvinceServicePanel';
 import { useLocation_ } from '@/lib/LocationContext';
-import { PROVINCES, PROVINCE_EMOJIS } from '@/lib/provinceServicesData';
+import { PROVINCES, PROVINCE_EMOJIS, PROVINCE_DATA } from '@/lib/provinceServicesData';
 
 const categories = [
   { value: 'settlement', label: '🧭 Settlement' },
@@ -21,21 +20,45 @@ const categories = [
   { value: 'volunteering', label: '🤝 Volunteering' },
 ];
 
+function SelectField({ label, icon, value, onChange, options, placeholder }) {
+  return (
+    <div className="flex-1 min-w-[180px]">
+      <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
+        {icon} {label}
+      </label>
+      <div className="relative">
+        <select
+          value={value}
+          onChange={e => onChange(e.target.value)}
+          className="w-full appearance-none bg-card border border-border/70 rounded-xl px-4 py-2.5 pr-9 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 cursor-pointer"
+        >
+          <option value="">{placeholder}</option>
+          {options.map(opt => (
+            <option key={opt.value ?? opt} value={opt.value ?? opt}>
+              {opt.label ?? opt}
+            </option>
+          ))}
+        </select>
+        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
+      </div>
+    </div>
+  );
+}
+
 export default function Services() {
   const queryClient = useQueryClient();
-
   const handleRefresh = useCallback(async () => {
     await queryClient.invalidateQueries({ queryKey: ['savedResources'] });
   }, [queryClient]);
 
   const { containerRef, pullDistance, isRefreshing, touchHandlers } = usePullToRefresh({ onRefresh: handleRefresh });
-  const { city: locationCity, province: locationProvince } = useLocation_();
+  const { province: locationProvince } = useLocation_();
   const urlParams = new URLSearchParams(window.location.search);
-  const initialCategory = urlParams.get('category') || 'settlement';
+  const initialCategory = urlParams.get('category') || '';
 
-  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedProvince, setSelectedProvince] = useState('');
-  const [sortBy, setSortBy] = useState('section'); // 'section' | 'city' | 'name'
+  const [selectedCity, setSelectedCity] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState(initialCategory);
 
   const { data: profile } = useQuery({
     queryKey: ['myProfile'],
@@ -46,142 +69,118 @@ export default function Services() {
     },
   });
 
-  // Auto-apply province from profile or GPS detection
+  // Auto-set province from profile or GPS
   useEffect(() => {
     if (selectedProvince) return;
     const province = profile?.province || locationProvince;
     if (province) setSelectedProvince(province);
-    else setSelectedProvince('Ontario'); // default fallback
   }, [profile, locationProvince, selectedProvince]);
 
-  const { data: savedResources } = useQuery({
-    queryKey: ['savedResources'],
-    queryFn: async () => {
-      const user = await base44.auth.me();
-      return base44.entities.SavedResource.filter({ created_by: user.email });
-    },
-    initialData: [],
-  });
+  // Reset city when province changes
+  useEffect(() => {
+    setSelectedCity('');
+  }, [selectedProvince]);
 
-  const categoryKey = selectedCategory;
+  // Derive available cities from the selected province's data
+  const provinceData = selectedProvince ? PROVINCE_DATA[selectedProvince] : null;
+  const availableCities = (() => {
+    if (!provinceData) return [];
+    const allItems = Object.values(provinceData).flat();
+    const cities = [...new Set(allItems.map(i => i.city).filter(c => c && c !== 'Province-Wide'))].sort();
+    return cities;
+  })();
 
-  const sortOptions = [
-    { value: 'section', label: 'By Category Group' },
-    { value: 'city', label: 'By City' },
-    { value: 'name', label: 'By Name (A–Z)' },
-  ];
+  const canSearch = selectedProvince && selectedCategory;
 
   return (
-    <div ref={containerRef} {...touchHandlers} className="max-w-7xl mx-auto px-4 py-6 pb-8">
+    <div ref={containerRef} {...touchHandlers} className="max-w-4xl mx-auto px-4 py-6 pb-8">
       <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
 
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-8">
         <h1 className="font-heading font-bold text-2xl md:text-3xl mb-1">Settlement Services</h1>
-        <p className="text-muted-foreground text-sm">Find services for newcomers across all Canadian provinces</p>
+        <p className="text-muted-foreground text-sm">Select your location and the type of service you need</p>
       </div>
 
-      {/* Province Selector */}
-      <div className="mb-5">
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-1.5">
-          <MapPin className="w-3.5 h-3.5 text-primary" />
-          Select Province / Territory
-          {(profile?.province || locationProvince) && (
-            <span className="text-[10px] font-normal normal-case text-primary/70 bg-primary/8 px-2 py-0.5 rounded-md ml-1">
-              {profile?.province ? 'from your profile' : 'detected location'}
-            </span>
-          )}
-        </p>
-        <div className="flex flex-wrap gap-2">
-          {PROVINCES.map(p => (
-            <button
-              key={p}
-              onClick={() => setSelectedProvince(p)}
-              className={cn(
-                "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all border",
-                selectedProvince === p
-                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                  : "bg-card border-border/50 text-muted-foreground hover:border-primary/30 hover:text-foreground"
-              )}
-            >
-              <span>{PROVINCE_EMOJIS[p] || '🍁'}</span>
-              <span className="hidden sm:inline">{p}</span>
-              <span className="sm:hidden">{p.split(' ')[0]}</span>
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* Filter card */}
+      <div className="bg-card border border-border/60 rounded-2xl p-5 shadow-sm mb-6">
+        <div className="flex flex-wrap gap-4">
+          {/* Province */}
+          <SelectField
+            label="Province / Territory"
+            icon={<MapPin className="w-3.5 h-3.5 text-primary" />}
+            value={selectedProvince}
+            onChange={setSelectedProvince}
+            placeholder="Select a province…"
+            options={PROVINCES.map(p => ({ value: p, label: `${PROVINCE_EMOJIS[p] || '🍁'} ${p}` }))}
+          />
 
-      {/* Category Tabs + Sort Row */}
-      <div className="flex flex-col gap-3 mb-6">
-        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
-          {categories.map(cat => (
-            <button
-              key={cat.value}
-              onClick={() => setSelectedCategory(cat.value)}
-              className={cn(
-                "flex-shrink-0 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap",
-                selectedCategory === cat.value
-                  ? "bg-primary text-primary-foreground"
-                  : "bg-card border border-border/50 text-muted-foreground hover:border-primary/30"
-              )}
-            >
-              {cat.label}
-            </button>
-          ))}
+          {/* City */}
+          <SelectField
+            label="City (optional)"
+            icon="📍"
+            value={selectedCity}
+            onChange={setSelectedCity}
+            placeholder={selectedProvince ? 'All cities' : 'Select province first'}
+            options={availableCities.map(c => ({ value: c, label: c }))}
+          />
+
+          {/* Service type */}
+          <SelectField
+            label="Service Type"
+            icon="🗂️"
+            value={selectedCategory}
+            onChange={setSelectedCategory}
+            placeholder="Select a service…"
+            options={categories.map(c => ({ value: c.value, label: c.label }))}
+          />
         </div>
 
-        {/* Sort Control */}
-        <div className="flex items-center gap-2">
-          <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
-          <span className="text-xs text-muted-foreground font-medium">Sort by:</span>
-          <div className="flex gap-1.5 flex-wrap">
-            {sortOptions.map(opt => (
+        {/* Selection summary */}
+        {(selectedProvince || selectedCategory) && (
+          <div className="mt-4 pt-4 border-t border-border/30 flex items-center justify-between flex-wrap gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
+              {selectedProvince && (
+                <span className="text-xs font-semibold bg-primary/10 text-primary px-3 py-1 rounded-full">
+                  {PROVINCE_EMOJIS[selectedProvince] || '🍁'} {selectedProvince}
+                </span>
+              )}
+              {selectedCity && (
+                <span className="text-xs font-semibold bg-muted text-muted-foreground px-3 py-1 rounded-full">
+                  📍 {selectedCity}
+                </span>
+              )}
+              {selectedCategory && (
+                <span className="text-xs font-semibold bg-accent/10 text-accent px-3 py-1 rounded-full">
+                  {categories.find(c => c.value === selectedCategory)?.label}
+                </span>
+              )}
+            </div>
+            {(selectedProvince || selectedCategory || selectedCity) && (
               <button
-                key={opt.value}
-                onClick={() => setSortBy(opt.value)}
-                className={cn(
-                  "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border",
-                  sortBy === opt.value
-                    ? "bg-primary/10 text-primary border-primary/30"
-                    : "bg-card border-border/50 text-muted-foreground hover:border-primary/20 hover:text-foreground"
-                )}
+                onClick={() => { setSelectedProvince(''); setSelectedCity(''); setSelectedCategory(''); }}
+                className="text-xs text-muted-foreground hover:text-destructive transition-colors font-medium"
               >
-                {opt.label}
+                Clear all
               </button>
-            ))}
+            )}
           </div>
-        </div>
+        )}
       </div>
 
-      {/* Selected Province + Category Banner */}
-      {selectedProvince && (
-        <div className="flex items-center gap-2 mb-5 bg-primary/5 border border-primary/20 rounded-xl px-4 py-3">
-          <span className="text-xl">{PROVINCE_EMOJIS[selectedProvince] || '🍁'}</span>
-          <div>
-            <p className="font-heading font-bold text-sm text-foreground">{selectedProvince}</p>
-            <p className="text-xs text-muted-foreground">
-              Showing {categories.find(c => c.value === selectedCategory)?.label?.replace(/^\S+\s/, '')} services
-            </p>
-          </div>
-          <a
-            href="https://ircc.canada.ca/english/newcomers/services/index.asp"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="ml-auto text-xs text-primary font-semibold hover:underline"
-          >
-            IRCC Directory →
-          </a>
+      {/* Results */}
+      {!canSearch ? (
+        <div className="text-center py-20 text-muted-foreground">
+          <p className="text-5xl mb-4">🗂️</p>
+          <p className="font-heading font-bold text-base mb-1">Choose your location &amp; service</p>
+          <p className="text-sm">Select a province and service type above to browse resources</p>
         </div>
-      )}
-
-      {/* Province Service Panel */}
-      {selectedProvince ? (
-        <ProvinceServicePanel category={categoryKey} province={selectedProvince} sortBy={sortBy} />
       ) : (
-        <div className="flex items-center justify-center py-20">
-          <Loader2 className="w-6 h-6 animate-spin text-primary" />
-        </div>
+        <ProvinceServicePanel
+          category={selectedCategory}
+          province={selectedProvince}
+          cityFilter={selectedCity}
+        />
       )}
     </div>
   );

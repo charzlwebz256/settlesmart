@@ -101,7 +101,7 @@ function OrgCard({ item }) {
 }
 
 // ── SECTIONED GRID ────────────────────────────────────────────────────────────
-function SectionedGrid({ items, sortBy = 'section' }) {
+function SectionedGrid({ items }) {
   const [view, setView] = useState('list');
   const [search, setSearch] = useState('');
   const [openSections, setOpenSections] = useState({});
@@ -113,23 +113,11 @@ function SectionedGrid({ items, sortBy = 'section' }) {
       )
     : items;
 
-  // Sort + group depending on sortBy
-  const groupKey = (i) => {
-    if (sortBy === 'city') return i.city || i.section || 'Province-Wide';
-    if (sortBy === 'name') return null; // flat A–Z, no groups
-    return i.section || i.city || 'General';
-  };
-
-  const sortedItems = sortBy === 'name'
-    ? [...filtered].sort((a, b) => a.name.localeCompare(b.name))
-    : filtered;
-
-  const sections = sortBy === 'name'
-    ? ['A–Z']
-    : [...new Set(sortedItems.map(i => groupKey(i)).filter(Boolean))];
+  const groupKey = (i) => i.section || i.city || 'General';
+  const sections = [...new Set(filtered.map(groupKey).filter(Boolean))];
 
   const toggle = (sec) => setOpenSections(prev => ({ ...prev, [sec]: !prev[sec] }));
-  const isOpen = (sec) => openSections[sec] !== false; // default open
+  const isOpen = (sec) => openSections[sec] !== false;
 
   return (
     <div>
@@ -171,9 +159,7 @@ function SectionedGrid({ items, sortBy = 'section' }) {
       ) : (
         <div className="space-y-3">
           {sections.map(sec => {
-            const sectionItems = sortBy === 'name'
-              ? sortedItems
-              : sortedItems.filter(i => groupKey(i) === sec);
+            const sectionItems = filtered.filter(i => groupKey(i) === sec);
             const open = isOpen(sec);
             return (
               <div key={sec} className="rounded-2xl border border-border/40 overflow-hidden shadow-sm">
@@ -280,7 +266,7 @@ function EducationGrid({ items }) {
 }
 
 // ── MAIN EXPORT ───────────────────────────────────────────────────────────────
-export default function ProvinceServicePanel({ category, province, sortBy = 'section' }) {
+export default function ProvinceServicePanel({ category, province, cityFilter = '' }) {
   const provinceData = PROVINCE_DATA[province];
 
   if (!provinceData) {
@@ -293,13 +279,18 @@ export default function ProvinceServicePanel({ category, province, sortBy = 'sec
     );
   }
 
-  const items = provinceData[category];
+  let items = provinceData[category] || [];
 
-  if (!items || items.length === 0) {
+  // Apply city filter if selected
+  if (cityFilter) {
+    items = items.filter(i => i.city === cityFilter || i.city === 'Province-Wide' || !i.city);
+  }
+
+  if (items.length === 0) {
     return (
       <div className="text-center py-12 text-muted-foreground">
         <p className="text-3xl mb-3">🔍</p>
-        <p className="font-semibold text-sm">No {category} services listed for {province} yet.</p>
+        <p className="font-semibold text-sm">No {category} services found{cityFilter ? ` in ${cityFilter}` : ` for ${province}`}.</p>
         <a href="https://ircc.canada.ca/english/newcomers/services/index.asp" target="_blank" rel="noopener noreferrer"
           className="text-xs text-primary underline mt-1 block">Find services via IRCC →</a>
       </div>
@@ -308,5 +299,5 @@ export default function ProvinceServicePanel({ category, province, sortBy = 'sec
 
   if (category === 'education') return <EducationGrid items={items} />;
 
-  return <SectionedGrid items={items} sortBy={sortBy} />;
+  return <SectionedGrid items={items} />;
 }
