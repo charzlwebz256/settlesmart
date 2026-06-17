@@ -62,13 +62,16 @@ export default function JobApplicationForm({ application, onClose, onSaved }) {
   const handleSave = async () => {
     if (!form.job_title || !form.company) return;
     setSaving(true);
-    if (isEdit) {
-      await base44.entities.JobApplication.update(application.id, form);
-    } else {
-      await base44.entities.JobApplication.create(form);
+    try {
+      if (isEdit) {
+        await base44.entities.JobApplication.update(application.id, form);
+      } else {
+        await base44.entities.JobApplication.create(form);
+      }
+      onSaved();
+    } finally {
+      setSaving(false);
     }
-    setSaving(false);
-    onSaved();
   };
 
   return (
