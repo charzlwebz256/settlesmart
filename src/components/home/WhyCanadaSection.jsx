@@ -87,15 +87,20 @@ export default function WhyCanadaSection() {
         {reasons.map((item, i) => (
           <motion.div
             key={item.title}
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: i * 0.07 }}
-            className="bg-card border border-border/50 rounded-2xl p-5 flex flex-col gap-3 hover:shadow-md transition-shadow"
+            transition={{ duration: 0.45, delay: i * 0.07, ease: 'easeOut' }}
+            whileHover={{ y: -6, boxShadow: '0 12px 32px rgba(0,0,0,0.10)' }}
+            className="bg-card border border-border/50 rounded-2xl p-5 flex flex-col gap-3 cursor-default"
           >
-            <div className={`w-10 h-10 rounded-xl ${item.bg} flex items-center justify-center flex-shrink-0`}>
+            <motion.div
+              whileHover={{ scale: 1.18, rotate: 6 }}
+              transition={{ type: 'spring', stiffness: 300, damping: 15 }}
+              className={`w-10 h-10 rounded-xl ${item.bg} flex items-center justify-center flex-shrink-0`}
+            >
               <item.icon className={`w-5 h-5 ${item.color}`} />
-            </div>
+            </motion.div>
             <div>
               <h3 className="font-heading font-semibold text-sm text-foreground mb-1">{item.title}</h3>
               <p className="text-xs text-muted-foreground leading-relaxed">{item.description}</p>
