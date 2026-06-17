@@ -5,6 +5,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Search, RefreshCw, Briefcase, MapPin, Clock, ExternalLink, Building2, DollarSign, SlidersHorizontal, FileText, ArrowRight, MessageSquare, BotMessageSquare } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 import { cn } from '@/lib/utils';
 import { Link } from 'react-router-dom';
 import { useLocation_ } from '@/lib/LocationContext';
@@ -24,6 +25,7 @@ const SOURCE_TABS = [
 
 export default function Jobs() {
   const { city, province, isDetecting: cityLoading } = useLocation_();
+  const { toast } = useToast();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeSource, setActiveSource] = useState('all');
   const [jobs, setJobs] = useState([]);
@@ -574,7 +576,13 @@ export default function Jobs() {
         <JobApplicationForm
           application={trackerJob}
           onClose={() => setTrackerJob(null)}
-          onSaved={() => setTrackerJob(null)}
+          onSaved={() => {
+            toast({
+              title: 'Application saved',
+              description: 'Your job application has been added to the tracker.',
+            });
+            setTrackerJob(null);
+          }}
         />
       )}
     </div>
