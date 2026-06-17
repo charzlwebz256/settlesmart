@@ -38,6 +38,7 @@ export default function ServiceReviews({ serviceKey, serviceName, province }) {
   const [review, setReview] = useState('');
   const [reviewerName, setReviewerName] = useState('');
   const [submitted, setSubmitted] = useState(false);
+  const [reviewerEmail, setReviewerEmail] = useState('');
 
   const { data: reviews = [], isLoading } = useQuery({
     queryKey: ['serviceReviews', serviceKey],
@@ -56,7 +57,30 @@ export default function ServiceReviews({ serviceKey, serviceName, province }) {
   });
 
   const mutation = useMutation({
-    mutationFn: (data) => base44.entities.ServiceReview.create(data),
+    mutationFn: async (data) => {
+      const created = await base44.entities.ServiceReview.create(data);
+      // Send email notification
+      const stars = '⭐'.repeat(data.rating);
+      const replySubject = encodeURIComponent(`Re: Review for ${data.service_name}`);
+      const replyBody = encodeURIComponent(`Hi ${data.reviewer_name},\n\nThank you for your review of ${data.service_name}!\n\n`);
+      const gmailReplyLink = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(data.reviewer_email || '')}&su=${replySubject}&body=${replyBody}`;
+      await base44.integrations.Core.SendEmail({
+        to: 'charzlwebz256@gmail.com',
+        subject: `New Review: ${data.service_name} — ${stars}`,
+        body: `
+<h2>New Service Review Submitted</h2>
+<table style="border-collapse:collapse;font-family:sans-serif;font-size:14px;">
+  <tr><td style="padding:6px 12px;color:#666;">Service</td><td style="padding:6px 12px;font-weight:bold;">${data.service_name}</td></tr>
+  <tr><td style="padding:6px 12px;color:#666;">Province</td><td style="padding:6px 12px;">${data.province}</td></tr>
+  <tr><td style="padding:6px 12px;color:#666;">Reviewer</td><td style="padding:6px 12px;">${data.reviewer_name}</td></tr>
+  <tr><td style="padding:6px 12px;color:#666;">Rating</td><td style="padding:6px 12px;">${stars} (${data.rating}/5)</td></tr>
+  <tr><td style="padding:6px 12px;color:#666;">Review</td><td style="padding:6px 12px;">${data.review || '(no text)'}</td></tr>
+</table>
+${data.reviewer_email ? `<p><a href="${gmailReplyLink}" style="background:#1a73e8;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;font-weight:bold;">Reply via Gmail</a></p>` : ''}
+        `.trim(),
+      });
+      return created;
+    },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['serviceReviews', serviceKey] });
       queryClient.invalidateQueries({ queryKey: ['myServiceReview', serviceKey] });
@@ -81,6 +105,7 @@ export default function ServiceReviews({ serviceKey, serviceName, province }) {
       rating,
       review: review.trim(),
       reviewer_name: reviewerName.trim() || 'Anonymous',
+      reviewer_email: reviewerEmail.trim(),
     });
   };
 
@@ -142,12 +167,19 @@ export default function ServiceReviews({ serviceKey, serviceName, province }) {
                     <StarRating value={rating} onChange={setRating} />
                   </div>
                   <input
-                    type="text"
-                    placeholder="Your name (optional)"
-                    value={reviewerName}
-                    onChange={e => setReviewerName(e.target.value)}
-                    maxLength={50}
-                    className="w-full text-xs bg-card border border-border/60 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary/30"
+                   type="text"
+                   placeholder="Your name (optional)"
+                   value={reviewerName}
+                   onChange={e => setReviewerName(e.target.value)}
+                   maxLength={50}
+                   className="w-full text-xs bg-card border border-border/60 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary/30"
+                  />
+                  <input
+                   type="email"
+                   placeholder="Your email (optional — for a reply)"
+                   value={reviewerEmail}
+                   onChange={e => setReviewerEmail(e.target.value)}
+                   className="w-full text-xs bg-card border border-border/60 rounded-lg px-3 py-2 focus:outline-none focus:ring-1 focus:ring-primary/30"
                   />
                   <textarea
                     placeholder="Share your experience… (optional)"
