@@ -56,18 +56,21 @@ export default function ServiceReviews({ serviceKey, serviceName, province }) {
     enabled: open,
   });
 
+  const [submitError, setSubmitError] = useState(null);
+
   const mutation = useMutation({
     mutationFn: async (data) => {
       const created = await base44.entities.ServiceReview.create(data);
-      // Send email notification
-      const stars = '⭐'.repeat(data.rating);
-      const replySubject = encodeURIComponent(`Re: Review for ${data.service_name}`);
-      const replyBody = encodeURIComponent(`Hi ${data.reviewer_name},\n\nThank you for your review of ${data.service_name}!\n\n`);
-      const gmailReplyLink = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(data.reviewer_email || '')}&su=${replySubject}&body=${replyBody}`;
-      await base44.integrations.Core.SendEmail({
-        to: 'charzlwebz256@gmail.com',
-        subject: `New Review: ${data.service_name} — ${stars}`,
-        body: `
+      // Fire-and-forget email — never block the review save
+      try {
+        const stars = '⭐'.repeat(data.rating);
+        const replySubject = encodeURIComponent(`Re: Review for ${data.service_name}`);
+        const replyBody = encodeURIComponent(`Hi ${data.reviewer_name},\n\nThank you for your review of ${data.service_name}!\n\n`);
+        const gmailReplyLink = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(data.reviewer_email || '')}&su=${replySubject}&body=${replyBody}`;
+        await base44.integrations.Core.SendEmail({
+          to: 'charzlwebz256@gmail.com',
+          subject: `New Review: ${data.service_name} — ${stars}`,
+          body: `
 <h2>New Service Review Submitted</h2>
 <table style="border-collapse:collapse;font-family:sans-serif;font-size:14px;">
   <tr><td style="padding:6px 12px;color:#666;">Service</td><td style="padding:6px 12px;font-weight:bold;">${data.service_name}</td></tr>
@@ -77,8 +80,9 @@ export default function ServiceReviews({ serviceKey, serviceName, province }) {
   <tr><td style="padding:6px 12px;color:#666;">Review</td><td style="padding:6px 12px;">${data.review || '(no text)'}</td></tr>
 </table>
 ${data.reviewer_email ? `<p><a href="${gmailReplyLink}" style="background:#1a73e8;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;font-weight:bold;">Reply via Gmail</a></p>` : ''}
-        `.trim(),
-      });
+          `.trim(),
+        });
+      } catch (_) {}
       return created;
     },
     onSuccess: () => {
@@ -88,7 +92,9 @@ ${data.reviewer_email ? `<p><a href="${gmailReplyLink}" style="background:#1a73e
       setShowForm(false);
       setRating(0);
       setReview('');
+      setSubmitError(null);
     },
+    onError: () => setSubmitError('Failed to submit. Please try again.'),
   });
 
   const avgRating = reviews.length > 0
@@ -189,6 +195,7 @@ ${data.reviewer_email ? `<p><a href="${gmailReplyLink}" style="background:#1a73e
                     rows={3}
                     className="w-full text-xs bg-card border border-border/60 rounded-lg px-3 py-2 resize-none focus:outline-none focus:ring-1 focus:ring-primary/30"
                   />
+                  {submitError && <p className="text-xs text-destructive">{submitError}</p>}
                   <div className="flex gap-2 justify-end">
                     <button type="button" onClick={() => setShowForm(false)}
                       className="text-xs text-muted-foreground hover:text-foreground px-3 py-1.5">
