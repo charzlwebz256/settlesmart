@@ -16,6 +16,7 @@ import DashboardCalendar from '@/components/dashboard/DashboardCalendar';
 import AIRecommendations from '@/components/dashboard/AIRecommendations';
 import WeatherWidget from '@/components/news/WeatherWidget';
 import DailySettlementTip from '@/components/dashboard/DailySettlementTip';
+import ServiceRecommendations from '@/components/dashboard/ServiceRecommendations';
 
 const interestConfig = {
   education: { icon: BookOpen, color: 'text-blue-600 bg-blue-500/10', label: 'Education & Language' },
@@ -140,6 +141,9 @@ export default function Dashboard() {
               )}
             </div>
           </div>
+
+          {/* Service Recommendations */}
+          <ServiceRecommendations profile={profile} />
 
           {/* AI Recommendations */}
           <AIRecommendations profile={profile} />
