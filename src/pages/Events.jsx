@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { isSameDay, parseISO, startOfDay, format } from 'date-fns';
-import { Loader2, CalendarDays, MapPin, Plus } from 'lucide-react';
+import { Loader2, CalendarDays, MapPin, Plus, RefreshCw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AddEventModal from '@/components/events/AddEventModal';
 import { cn } from '@/lib/utils';
@@ -33,6 +33,8 @@ export default function Events() {
   const [viewAll, setViewAll] = useState(false);
   const [calView, setCalView] = useState('strip'); // 'strip' | 'month'
   const [showAddModal, setShowAddModal] = useState(false);
+  const [syncing, setSyncing] = useState(false);
+  const [syncStatus, setSyncStatus] = useState(null);
   const { city, province, isDetecting: cityLoading } = useLocation_();
   const source = city ? 'gps' : null;
 
@@ -90,6 +92,21 @@ export default function Events() {
     queryClient.invalidateQueries({ queryKey: ['savedEvents'] });
   };
 
+  const handleSyncCalendar = async () => {
+    setSyncing(true);
+    try {
+      const res = await base44.functions.invoke('syncGoogleCalendarHolidays', {});
+      setSyncStatus({ success: true, count: res.data.imported, holidays: res.data.holidays });
+      queryClient.invalidateQueries({ queryKey: ['events'] });
+      setTimeout(() => setSyncStatus(null), 5000);
+    } catch (error) {
+      setSyncStatus({ success: false, error: error.message });
+      setTimeout(() => setSyncStatus(null), 5000);
+    } finally {
+      setSyncing(false);
+    }
+  };
+
   const eventDates = events.map(e => e.date).filter(Boolean);
 
   const filtered = useMemo(() => {
@@ -114,10 +131,22 @@ export default function Events() {
             Community Events
           </h1>
           {user?.role === 'admin' && (
-            <Button size="sm" onClick={() => setShowAddModal(true)} className="gap-1.5 rounded-xl">
-              <Plus className="w-4 h-4" />
-              Add Event
-            </Button>
+            <div className="flex gap-2">
+              <Button 
+                size="sm" 
+                onClick={handleSyncCalendar} 
+                disabled={syncing}
+                className="gap-1.5 rounded-xl"
+                variant="outline"
+              >
+                <RefreshCw className={cn("w-4 h-4", syncing && "animate-spin")} />
+                {syncing ? 'Syncing...' : 'Sync Holidays'}
+              </Button>
+              <Button size="sm" onClick={() => setShowAddModal(true)} className="gap-1.5 rounded-xl">
+                <Plus className="w-4 h-4" />
+                Add Event
+              </Button>
+            </div>
           )}
         </div>
         <div className="flex items-center gap-1.5 text-muted-foreground text-sm">
@@ -132,6 +161,21 @@ export default function Events() {
           )}
         </div>
       </div>
+
+      {/* Sync status message */}
+      {syncStatus && (
+        <div className={cn(
+          "mb-6 p-3 rounded-xl text-sm font-medium",
+          syncStatus.success 
+            ? "bg-green-500/10 text-green-700 dark:text-green-400 border border-green-500/20"
+            : "bg-red-500/10 text-red-700 dark:text-red-400 border border-red-500/20"
+        )}>
+          {syncStatus.success 
+            ? `✅ Successfully imported ${syncStatus.count} holiday${syncStatus.count !== 1 ? 's' : ''} from Google Calendar: ${syncStatus.holidays.join(', ')}`
+            : `❌ Sync failed: ${syncStatus.error}`
+          }
+        </div>
+      )}
 
       {/* Reminders panel */}
       {savedEvents.length > 0 && (
