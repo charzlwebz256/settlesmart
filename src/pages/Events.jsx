@@ -68,6 +68,18 @@ export default function Events() {
     queryClient.invalidateQueries({ queryKey: ['savedEvents'] });
   };
 
+  const handleSetReminder = async (event) => {
+    if (savedIds.has(event.id)) {
+      const existing = savedEvents.find(s => s.event_id === event.id);
+      if (existing && !existing.notify) {
+        await base44.entities.SavedEvent.update(existing.id, { notify: true });
+      }
+    } else {
+      await base44.entities.SavedEvent.create({ event_id: event.id, notify: true });
+    }
+    queryClient.invalidateQueries({ queryKey: ['savedEvents'] });
+  };
+
   const handleToggleNotify = async (saved) => {
     await base44.entities.SavedEvent.update(saved.id, { notify: !saved.notify });
     queryClient.invalidateQueries({ queryKey: ['savedEvents'] });
@@ -238,6 +250,7 @@ export default function Events() {
                   event={event}
                   saved={savedIds.has(event.id)}
                   onSave={handleSave}
+                  onSetReminder={handleSetReminder}
                 />
               </motion.div>
             ))}

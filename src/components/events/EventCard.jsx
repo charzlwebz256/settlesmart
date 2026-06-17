@@ -1,4 +1,4 @@
-import { Calendar, Clock, MapPin, Globe, Bookmark, BookmarkCheck, ExternalLink, Users } from 'lucide-react';
+import { Calendar, Clock, MapPin, Globe, Bookmark, BookmarkCheck, ExternalLink, Users, Bell, BellRing } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -16,7 +16,7 @@ const categoryConfig = {
   orientation: { color: 'bg-teal-500/10 text-teal-600', label: 'Orientation' },
 };
 
-export default function EventCard({ event, saved, onSave }) {
+export default function EventCard({ event, saved, onSave, onSetReminder }) {
   const config = categoryConfig[event.category] || categoryConfig.community;
 
   let dateDisplay = '';
@@ -39,14 +39,32 @@ export default function EventCard({ event, saved, onSave }) {
           <h3 className="font-heading font-bold text-sm leading-snug">{event.title}</h3>
           {event.organizer && <p className="text-[11px] text-muted-foreground mt-0.5">{event.organizer}</p>}
         </div>
-        <button
-          onClick={() => onSave(event)}
-          className="flex-shrink-0 p-1.5 rounded-lg hover:bg-muted transition-colors"
-        >
-          {saved
-            ? <BookmarkCheck className="w-5 h-5 text-primary" />
-            : <Bookmark className="w-5 h-5 text-muted-foreground" />}
-        </button>
+        <div className="flex items-center gap-1">
+          <button
+            onClick={() => onSetReminder && onSetReminder(event)}
+            className={cn(
+              "p-1.5 rounded-lg transition-colors",
+              saved ? "bg-primary/10 hover:bg-primary/20" : "hover:bg-muted"
+            )}
+            title={saved ? 'Reminder is active' : 'Set reminder for this event'}
+          >
+            {saved
+              ? <BellRing className="w-5 h-5 text-primary" />
+              : <Bell className="w-5 h-5 text-muted-foreground" />}
+          </button>
+          <button
+            onClick={() => onSave(event)}
+            className={cn(
+              "p-1.5 rounded-lg transition-colors",
+              saved ? "bg-primary/10 hover:bg-primary/20" : "hover:bg-muted"
+            )}
+            title={saved ? 'Saved to your events' : 'Save this event'}
+          >
+            {saved
+              ? <BookmarkCheck className="w-5 h-5 text-primary" />
+              : <Bookmark className="w-5 h-5 text-muted-foreground" />}
+          </button>
+        </div>
       </div>
 
       {/* Details */}
@@ -73,13 +91,27 @@ export default function EventCard({ event, saved, onSave }) {
         <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{event.description}</p>
       )}
 
-      {event.registration_url && (
-        <a href={event.registration_url} target="_blank" rel="noopener noreferrer" className="mt-auto">
-          <Button size="sm" variant="outline" className="w-full rounded-xl text-xs gap-1.5 h-8">
-            Register <ExternalLink className="w-3 h-3" />
+      {/* Actions */}
+      <div className="flex gap-2 mt-auto">
+        {event.registration_url && (
+          <a href={event.registration_url} target="_blank" rel="noopener noreferrer" className="flex-1">
+            <Button size="sm" className="w-full rounded-xl text-xs gap-1.5 h-8">
+              Register <ExternalLink className="w-3 h-3" />
+            </Button>
+          </a>
+        )}
+        {!saved && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onSetReminder && onSetReminder(event)}
+            className={cn("rounded-xl text-xs gap-1.5 h-8", event.registration_url ? "" : "flex-1")}
+          >
+            <Bell className="w-3.5 h-3.5" />
+            Set Reminder
           </Button>
-        </a>
-      )}
+        )}
+      </div>
     </div>
   );
 }

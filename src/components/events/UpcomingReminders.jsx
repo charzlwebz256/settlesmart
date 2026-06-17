@@ -23,12 +23,14 @@ export default function UpcomingReminders({ savedEvents, allEvents, onToggleNoti
 
   if (upcoming.length === 0) return null;
 
+  const remindersEnabled = upcoming.filter(({ saved }) => saved.notify).length;
+
   return (
     <div className="bg-card rounded-2xl border border-border/50 p-4">
       <div className="flex items-center gap-2 mb-3">
         <Bell className="w-4 h-4 text-primary" />
-        <h3 className="font-heading font-bold text-sm">Saved Events & Reminders</h3>
-        <span className="ml-auto text-xs text-muted-foreground">{upcoming.length} saved</span>
+        <h3 className="font-heading font-bold text-sm">My Event Reminders</h3>
+        <span className="ml-auto text-xs text-muted-foreground">{remindersEnabled} active</span>
       </div>
       <div className="space-y-2">
         {upcoming.slice(0, 5).map(({ saved, event }) => {
@@ -55,6 +57,9 @@ export default function UpcomingReminders({ savedEvents, allEvents, onToggleNoti
           );
         })}
       </div>
+      {upcoming.length > 5 && (
+        <p className="text-xs text-muted-foreground mt-2 text-center">+{upcoming.length - 5} more saved</p>
+      )}
     </div>
   );
 }
