@@ -74,7 +74,7 @@ export default function Dashboard() {
     );
   }
 
-  if (!profile) {
+  if (!isLoading && !profile) {
     navigate('/onboarding');
     return null;
   }
