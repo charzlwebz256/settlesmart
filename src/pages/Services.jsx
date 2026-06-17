@@ -3,16 +3,15 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
-import { Search, Filter, X, Loader2, MapPin } from 'lucide-react';
+import { Search, Filter, X, Loader2, MapPin, ChevronDown } from 'lucide-react';
 import { Input } from '@/components/ui/input';
-import { MobileSelect as Select, MobileSelectContent as SelectContent, MobileSelectItem as SelectItem, MobileSelectTrigger as SelectTrigger, MobileSelectValue as SelectValue } from '@/components/ui/mobile-select';
 import { cn } from '@/lib/utils';
 import ServiceCard from '../components/services/ServiceCard';
-import StaticCategoryPanel from '../components/services/StaticCategoryPanel';
+import ProvinceServicePanel from '../components/services/ProvinceServicePanel';
 import { useLocation_ } from '@/lib/LocationContext';
+import { PROVINCES, PROVINCE_EMOJIS } from '@/lib/provinceServicesData';
 
 const categories = [
-  { value: 'all', label: 'All Services' },
   { value: 'settlement', label: '🧭 Settlement' },
   { value: 'education', label: '🎓 Education' },
   { value: 'language', label: '💬 Language' },
@@ -20,31 +19,27 @@ const categories = [
   { value: 'housing', label: '🏠 Housing' },
   { value: 'legal', label: '⚖️ Legal' },
   { value: 'health', label: '🧠 Health' },
-  { value: 'transportation', label: '🚌 Transport' },
+  { value: 'transport', label: '🚌 Transport' },
   { value: 'volunteering', label: '🤝 Volunteering' },
-  { value: 'family_support', label: '👨‍👩‍👧‍👦 Family' },
 ];
 
 export default function Services() {
   const queryClient = useQueryClient();
 
   const handleRefresh = useCallback(async () => {
-    await queryClient.invalidateQueries({ queryKey: ['services'] });
     await queryClient.invalidateQueries({ queryKey: ['savedResources'] });
   }, [queryClient]);
 
   const { containerRef, pullDistance, isRefreshing, touchHandlers } = usePullToRefresh({ onRefresh: handleRefresh });
   const { city: locationCity, province: locationProvince } = useLocation_();
   const urlParams = new URLSearchParams(window.location.search);
-  const initialCategory = urlParams.get('category') || 'all';
+  const initialCategory = urlParams.get('category') || 'settlement';
 
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
-  const [selectedProvince, setSelectedProvince] = useState('all');
-  const [locationScope, setLocationScope] = useState('all'); // 'all' | 'province' | 'city'
-  const [autoFiltered, setAutoFiltered] = useState(false);
+  const [selectedProvince, setSelectedProvince] = useState('');
+  const [provinceDropdownOpen, setProvinceDropdownOpen] = useState(false);
 
-  // Fetch user profile to get their saved province
   const { data: profile } = useQuery({
     queryKey: ['myProfile'],
     queryFn: async () => {
@@ -54,22 +49,13 @@ export default function Services() {
     },
   });
 
-  // Auto-apply province filter: profile province takes priority, then GPS/IP detected province
+  // Auto-apply province from profile or GPS detection
   useEffect(() => {
-    if (autoFiltered) return;
+    if (selectedProvince) return;
     const province = profile?.province || locationProvince;
-    if (province) {
-      setSelectedProvince(province);
-      setLocationScope('province');
-      setAutoFiltered(true);
-    }
-  }, [profile, locationProvince, autoFiltered]);
-
-  const { data: services, isLoading } = useQuery({
-    queryKey: ['services'],
-    queryFn: () => base44.entities.Service.list('-created_date', 200),
-    initialData: [],
-  });
+    if (province) setSelectedProvince(province);
+    else setSelectedProvince('Ontario'); // default fallback
+  }, [profile, locationProvince, selectedProvince]);
 
   const { data: savedResources } = useQuery({
     queryKey: ['savedResources'],
@@ -80,133 +66,52 @@ export default function Services() {
     initialData: [],
   });
 
-  const savedIds = new Set(savedResources.map(r => r.service_id));
-
-  const saveMutation = useMutation({
-    mutationFn: async (service) => {
-      if (savedIds.has(service.id)) {
-        const existing = savedResources.find(r => r.service_id === service.id);
-        if (existing) await base44.entities.SavedResource.delete(existing.id);
-      } else {
-        await base44.entities.SavedResource.create({ service_id: service.id });
-      }
-    },
-    onMutate: async (service) => {
-      await queryClient.cancelQueries({ queryKey: ['savedResources'] });
-      const previous = queryClient.getQueryData(['savedResources']);
-      if (savedIds.has(service.id)) {
-        queryClient.setQueryData(['savedResources'], old =>
-          (old || []).filter(r => r.service_id !== service.id)
-        );
-      } else {
-        queryClient.setQueryData(['savedResources'], old =>
-          [...(old || []), { service_id: service.id, id: `optimistic-${service.id}` }]
-        );
-      }
-      return { previous };
-    },
-    onError: (_err, _vars, ctx) => {
-      queryClient.setQueryData(['savedResources'], ctx.previous);
-    },
-    onSettled: () => queryClient.invalidateQueries({ queryKey: ['savedResources'] }),
-  });
-
-  const handleSave = (service) => saveMutation.mutate(service);
-
-  const provinces = useMemo(() => {
-    const set = new Set(services.map(s => s.province).filter(Boolean));
-    return ['all', ...Array.from(set).sort()];
-  }, [services]);
-
-  // The effective province for display (profile > GPS)
-  const effectiveProvince = profile?.province || locationProvince;
-  const effectiveCity = profile?.city || locationCity;
-
-  const filtered = useMemo(() => {
-    return services.filter(s => {
-      const catMatch = selectedCategory === 'all' || s.category === selectedCategory;
-      const provMatch = selectedProvince === 'all' || s.province === selectedProvince;
-      const locationMatch = locationScope === 'all' ? true
-        : locationScope === 'province' ? (effectiveProvince ? s.province === effectiveProvince : true)
-        : locationScope === 'city' ? (effectiveCity ? s.city?.toLowerCase() === effectiveCity.toLowerCase() : true)
-        : true;
-      const searchMatch = !searchQuery ||
-        s.name?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        s.organization?.toLowerCase().includes(searchQuery.toLowerCase());
-      return catMatch && provMatch && locationMatch && searchMatch;
-    });
-  }, [services, selectedCategory, selectedProvince, locationScope, effectiveCity, effectiveProvince, searchQuery]);
+  // Map category to data key
+  const categoryKey = selectedCategory === 'transport' ? 'transport' : selectedCategory;
 
   return (
     <div ref={containerRef} {...touchHandlers} className="max-w-7xl mx-auto px-4 py-6 pb-8">
       <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
+
+      {/* Header */}
       <div className="mb-6">
         <h1 className="font-heading font-bold text-2xl md:text-3xl mb-1">Settlement Services</h1>
-        {effectiveCity || effectiveProvince ? (
-          <div className="flex items-center gap-1.5 text-sm text-muted-foreground mt-1">
-            <MapPin className="w-3.5 h-3.5 text-primary" />
-            <span>Showing services near <span className="font-semibold text-primary">{effectiveCity ? `${effectiveCity}, ` : ''}{effectiveProvince}</span></span>
-            {profile?.province && <span className="text-[10px] text-muted-foreground">(from your profile)</span>}
-          </div>
-        ) : (
-          <p className="text-muted-foreground text-sm">Browse free services for newcomers across Canada</p>
-        )}
+        <p className="text-muted-foreground text-sm">Find services for newcomers across all Canadian provinces</p>
       </div>
 
-      {/* Location scope toggle — only show if we have location data */}
-      {(effectiveCity || effectiveProvince) && (
-        <div className="flex items-center gap-2 mb-4 flex-wrap">
-          <MapPin className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
-          <span className="text-xs text-muted-foreground font-medium">Show:</span>
-          {[
-            { value: 'all', label: 'All Canada' },
-            ...(effectiveProvince ? [{ value: 'province', label: effectiveProvince }] : []),
-            ...(effectiveCity ? [{ value: 'city', label: effectiveCity }] : []),
-          ].map(opt => (
-            <button
-              key={opt.value}
-              onClick={() => {
-                setLocationScope(opt.value);
-                if (opt.value === 'province' && effectiveProvince) setSelectedProvince(effectiveProvince);
-                if (opt.value === 'all') setSelectedProvince('all');
-              }}
-              className={cn(
-                "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border",
-                locationScope === opt.value
-                  ? "bg-primary text-primary-foreground border-primary"
-                  : "bg-card border-border/50 text-muted-foreground hover:border-primary/30"
-              )}
-            >
-              {opt.label}
-            </button>
-          ))}
-          {profile?.province && (
-            <span className="text-[10px] text-muted-foreground bg-muted px-2 py-1 rounded-lg">
-              from your profile
+      {/* Province Selector */}
+      <div className="mb-5">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 flex items-center gap-1.5">
+          <MapPin className="w-3.5 h-3.5 text-primary" />
+          Select Province / Territory
+          {(profile?.province || locationProvince) && (
+            <span className="text-[10px] font-normal normal-case text-primary/70 bg-primary/8 px-2 py-0.5 rounded-md ml-1">
+              {profile?.province ? 'from your profile' : 'detected location'}
             </span>
           )}
+        </p>
+        <div className="flex flex-wrap gap-2">
+          {PROVINCES.map(p => (
+            <button
+              key={p}
+              onClick={() => setSelectedProvince(p)}
+              className={cn(
+                "flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-semibold transition-all border",
+                selectedProvince === p
+                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                  : "bg-card border-border/50 text-muted-foreground hover:border-primary/30 hover:text-foreground"
+              )}
+            >
+              <span>{PROVINCE_EMOJIS[p] || '🍁'}</span>
+              <span className="hidden sm:inline">{p}</span>
+              <span className="sm:hidden">{p.split(' ')[0]}</span>
+            </button>
+          ))}
         </div>
-      )}
-
-      {/* Search */}
-      <div className="relative mb-6">
-        <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <Input
-          placeholder="Search services, organizations, or keywords..."
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          className="pl-11 h-12 rounded-xl border-border/50 bg-card"
-        />
-        {searchQuery && (
-          <button onClick={() => setSearchQuery('')} className="absolute right-4 top-1/2 -translate-y-1/2">
-            <X className="w-4 h-4 text-muted-foreground" />
-          </button>
-        )}
       </div>
 
-      {/* Category Filters */}
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-4 scrollbar-hide">
+      {/* Category Tabs */}
+      <div className="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-hide">
         {categories.map(cat => (
           <button
             key={cat.value}
@@ -223,45 +128,33 @@ export default function Services() {
         ))}
       </div>
 
-      {/* Province Filter */}
-      <div className="flex items-center gap-2 mb-6">
-        <Filter className="w-4 h-4 text-muted-foreground" />
-        <Select value={selectedProvince} onValueChange={setSelectedProvince}>
-          <SelectTrigger className="w-44 min-h-[44px] rounded-xl text-sm">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent label="Filter by Province">
-            {provinces.map(p => (
-              <SelectItem key={p} value={p}>{p === 'all' ? 'All Provinces' : p}</SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
-        <span className="text-xs text-muted-foreground ml-auto">{filtered.length} results</span>
-      </div>
+      {/* Selected Province + Category Banner */}
+      {selectedProvince && (
+        <div className="flex items-center gap-2 mb-5 bg-primary/5 border border-primary/20 rounded-xl px-4 py-3">
+          <span className="text-xl">{PROVINCE_EMOJIS[selectedProvince] || '🍁'}</span>
+          <div>
+            <p className="font-heading font-bold text-sm text-foreground">{selectedProvince}</p>
+            <p className="text-xs text-muted-foreground">
+              Showing {categories.find(c => c.value === selectedCategory)?.label?.replace(/^\S+\s/, '')} services
+            </p>
+          </div>
+          <a
+            href="https://ircc.canada.ca/english/newcomers/services/index.asp"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="ml-auto text-xs text-primary font-semibold hover:underline"
+          >
+            IRCC Directory →
+          </a>
+        </div>
+      )}
 
-      {/* Static category panels for rich data tabs */}
-      {['language', 'education', 'legal', 'health', 'transportation', 'housing', 'volunteering', 'family_support'].includes(selectedCategory) && !searchQuery ? (
-        <StaticCategoryPanel category={selectedCategory} />
-      ) : isLoading ? (
+      {/* Province Service Panel */}
+      {selectedProvince ? (
+        <ProvinceServicePanel category={categoryKey} province={selectedProvince} />
+      ) : (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-6 h-6 animate-spin text-primary" />
-        </div>
-      ) : filtered.length === 0 ? (
-        <div className="text-center py-20">
-          <p className="text-4xl mb-4">🔍</p>
-          <h3 className="font-heading font-bold text-lg mb-2">No services found</h3>
-          <p className="text-muted-foreground text-sm">Try adjusting your filters or search terms</p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filtered.map(service => (
-            <ServiceCard
-              key={service.id}
-              service={service}
-              onSave={handleSave}
-              saved={savedIds.has(service.id)}
-            />
-          ))}
         </div>
       )}
     </div>
