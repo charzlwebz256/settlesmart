@@ -2,6 +2,7 @@ import { format, addDays, startOfDay, isSameDay, parseISO } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { useState } from 'react';
+import { isHoliday, getHolidayFlag, getHolidayBadgeColor } from '@/lib/holidays';
 
 export default function CalendarStrip({ selectedDate, onSelectDate, eventDates = [] }) {
   const [weekStart, setWeekStart] = useState(startOfDay(new Date()));
@@ -22,18 +23,25 @@ export default function CalendarStrip({ selectedDate, onSelectDate, eventDates =
         {days.map(day => {
           const active = isSameDay(day, selectedDate);
           const dot = hasEvent(day);
+          const holiday = isHoliday(day, 'Both');
           return (
             <button
               key={day.toISOString()}
               onClick={() => onSelectDate(day)}
               className={cn(
-                "flex flex-col items-center gap-0.5 px-2 py-2 rounded-xl min-w-[44px] transition-all",
-                active ? "bg-primary text-primary-foreground" : "hover:bg-muted text-muted-foreground"
+                "flex flex-col items-center gap-0.5 px-2 py-2 rounded-xl min-w-[44px] transition-all relative",
+                active ? "bg-primary text-primary-foreground" : "hover:bg-muted text-muted-foreground",
+                holiday && !active && "ring-1 ring-amber-500/40"
               )}
             >
               <span className="text-[9px] font-medium uppercase">{format(day, 'EEE')}</span>
               <span className={cn("text-sm font-bold", active && "text-primary-foreground")}>{format(day, 'd')}</span>
-              <div className={cn("w-1.5 h-1.5 rounded-full", dot ? (active ? "bg-white/80" : "bg-primary") : "bg-transparent")} />
+              <div className="flex items-center gap-0.5">
+                {holiday && (
+                  <span className="text-[10px]">{getHolidayFlag(holiday.country)}</span>
+                )}
+                <div className={cn("w-1.5 h-1.5 rounded-full", dot ? (active ? "bg-white/80" : "bg-primary") : "bg-transparent")} />
+              </div>
             </button>
           );
         })}

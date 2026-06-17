@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { startOfMonth, endOfMonth, eachDayOfInterval, startOfWeek, endOfWeek, isSameDay, isSameMonth, parseISO, format, addMonths, subMonths } from 'date-fns';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { isHoliday, getHolidayFlag, getHolidayBadgeColor } from '@/lib/holidays';
 
 const CATEGORY_COLORS = {
   orientation: 'bg-blue-500',
@@ -64,22 +65,34 @@ export default function MonthCalendarView({ events, selectedDate, onSelectDate }
           const isToday = isSameDay(day, new Date());
           const inMonth = isSameMonth(day, viewMonth);
 
+          const holiday = isHoliday(day, 'Both');
           return (
             <button
               key={i}
               onClick={() => onSelectDate(day)}
               className={cn(
-                "min-h-[56px] p-1.5 text-left border-b border-r border-border/20 transition-colors hover:bg-muted/50 flex flex-col gap-0.5",
+                "min-h-[56px] p-1.5 text-left border-b border-r border-border/20 transition-colors hover:bg-muted/50 flex flex-col gap-0.5 relative",
                 !inMonth && "opacity-35",
-                isSelected && "bg-primary/10"
+                isSelected && "bg-primary/10",
+                holiday && !isSelected && "ring-1 ring-amber-500/30"
               )}
             >
-              <span className={cn(
-                "text-xs font-semibold w-6 h-6 flex items-center justify-center rounded-full",
-                isSelected ? "bg-primary text-primary-foreground" : isToday ? "bg-accent text-accent-foreground" : "text-foreground"
-              )}>
-                {format(day, 'd')}
-              </span>
+              <div className="flex items-center gap-0.5">
+                <span className={cn(
+                  "text-xs font-semibold w-6 h-6 flex items-center justify-center rounded-full",
+                  isSelected ? "bg-primary text-primary-foreground" : isToday ? "bg-accent text-accent-foreground" : "text-foreground"
+                )}>
+                  {format(day, 'd')}
+                </span>
+                {holiday && (
+                  <span className="text-[10px]">{getHolidayFlag(holiday.country)}</span>
+                )}
+              </div>
+              {holiday && (
+                <span className="text-[8px] font-medium text-amber-600 dark:text-amber-400 truncate">
+                  {holiday.name}
+                </span>
+              )}
               <div className="flex flex-col gap-0.5 w-full overflow-hidden">
                 {dayEvents.slice(0, 2).map((e, j) => (
                   <div key={j} className={cn(
