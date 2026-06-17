@@ -17,10 +17,10 @@ const CATEGORY_COLORS = {
 };
 
 export default function YearCalendarView({ events, selectedDate, onSelectDate }) {
-  const [viewYear, setViewYear] = useState(selectedDate?.getFullYear() || new Date().getFullYear());
+  const [viewYear, setViewYear] = useState(selectedDate ? new Date(selectedDate) : new Date());
 
-  const yearStart = new Date(viewYear, 0, 1);
-  const yearEnd = new Date(viewYear, 11, 31);
+  const yearStart = new Date(viewYear.getFullYear(), 0, 1);
+  const yearEnd = new Date(viewYear.getFullYear(), 11, 31);
   const months = eachMonthOfInterval({ start: yearStart, end: yearEnd });
 
   const eventsByDay = {};
@@ -41,7 +41,7 @@ export default function YearCalendarView({ events, selectedDate, onSelectDate })
           className="p-1.5 rounded-lg hover:bg-muted transition-colors">
           <ChevronLeft className="w-4 h-4" />
         </button>
-        <span className="font-heading font-bold text-lg">{viewYear}</span>
+        <span className="font-heading font-bold text-lg">{viewYear.getFullYear()}</span>
         <button onClick={() => setViewYear(y => addYears(y, 1))}
           className="p-1.5 rounded-lg hover:bg-muted transition-colors">
           <ChevronRight className="w-4 h-4" />
