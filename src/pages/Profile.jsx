@@ -110,12 +110,12 @@ export default function Profile() {
 
   const [form, setForm] = useState(null);
 
-  // Sync form whenever profile data changes (initial load + after save)
+  // Sync form whenever profile data changes (initial load + after save refetch)
   useEffect(() => {
     if (profile) {
       setForm({ ...profile });
     }
-  }, [profile]);
+  }, [profile?.id, profile?.updated_date]);
 
   const cities = useMemo(() => PROVINCE_CITIES[form?.province] || [], [form?.province]);
 
@@ -135,9 +135,9 @@ export default function Profile() {
     setSaving(true);
     const { id, created_date, updated_date, created_by_id, ...payload } = form;
     try {
-      await base44.entities.UserProfile.update(id, payload);
-      // Update the query cache directly so the form re-syncs with saved data
-      queryClient.setQueryData(['myProfile'], { ...form });
+      const updated = await base44.entities.UserProfile.update(id, payload);
+      // Refetch from server to confirm persisted data, then sync form
+      await queryClient.invalidateQueries({ queryKey: ['myProfile'] });
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } finally {
