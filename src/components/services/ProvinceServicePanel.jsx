@@ -14,80 +14,94 @@ function OrgCard({ item }) {
     : null;
 
   return (
-    <div className="bg-card rounded-2xl border border-border/50 p-4 flex flex-col gap-3 hover:border-primary/20 hover:shadow-sm transition-all">
-      <div className="flex items-start gap-3">
-        {logo && (
-          <img src={logo} alt={item.name} className="h-8 w-auto object-contain flex-shrink-0 mt-0.5"
-            onError={e => { e.target.style.display = 'none'; }} />
-        )}
-        <div className="flex-1 min-w-0">
-          <h3 className="font-heading font-bold text-sm leading-snug">{item.name}</h3>
-          {item.organization && item.organization !== item.name && (
-            <p className="text-xs text-muted-foreground mt-0.5">{item.organization}</p>
+    <div className="bg-card rounded-2xl border border-border/50 overflow-hidden hover:border-primary/30 hover:shadow-md transition-all flex flex-col">
+      {/* Card top accent bar */}
+      <div className="h-1 w-full bg-gradient-to-r from-primary/60 to-primary/20" />
+
+      <div className="p-4 flex flex-col gap-3 flex-1">
+        {/* Name + logo row */}
+        <div className="flex items-start gap-3">
+          {logo && (
+            <img src={logo} alt={item.name} className="h-8 w-auto object-contain flex-shrink-0 mt-0.5"
+              onError={e => { e.target.style.display = 'none'; }} />
           )}
-          {item.city && item.city !== 'Province-Wide' && (
-            <span className="text-[10px] font-semibold text-primary/70 bg-primary/8 px-2 py-0.5 rounded-md mt-1 inline-block">{item.city}</span>
+          <div className="flex-1 min-w-0">
+            <h3 className="font-heading font-bold text-sm leading-snug">{item.name}</h3>
+            {item.organization && item.organization !== item.name && (
+              <p className="text-xs text-muted-foreground mt-0.5">{item.organization}</p>
+            )}
+            {item.city && item.city !== 'Province-Wide' && (
+              <span className="text-[10px] font-semibold text-primary/80 bg-primary/8 border border-primary/15 px-2 py-0.5 rounded-full mt-1 inline-block">
+                📍 {item.city}
+              </span>
+            )}
+          </div>
+        </div>
+
+        {/* Services list */}
+        {item.services && item.services.length > 0 && (
+          <div className="bg-muted/40 rounded-xl p-3">
+            <ul className="space-y-1">
+              {item.services.map((s, i) => (
+                <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
+                  <span className="text-primary font-bold mt-0.5 flex-shrink-0">✓</span>
+                  <span>{s}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* Contact info */}
+        <div className="space-y-1.5 text-xs text-muted-foreground">
+          {item.address && (
+            <div className="flex items-start gap-2">
+              <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-primary/50 mt-0.5" />
+              <span className="leading-snug">{item.address}</span>
+            </div>
+          )}
+          {item.phone && (
+            <div className="flex items-center gap-2">
+              <Phone className="w-3.5 h-3.5 flex-shrink-0 text-primary/50" />
+              <a href={`tel:${item.phone}`} className="hover:text-primary font-medium transition-colors">{item.phone}</a>
+            </div>
+          )}
+          {item.email && (
+            <div className="flex items-center gap-2">
+              <Mail className="w-3.5 h-3.5 flex-shrink-0 text-primary/50" />
+              <a href={`mailto:${item.email}`} className="hover:text-primary transition-colors truncate">{item.email}</a>
+            </div>
           )}
         </div>
-      </div>
 
-      {item.services && item.services.length > 0 && (
-        <ul className="space-y-0.5">
-          {item.services.map((s, i) => (
-            <li key={i} className="text-xs text-muted-foreground flex items-start gap-1.5">
-              <span className="text-primary mt-0.5">•</span> {s}
-            </li>
-          ))}
-        </ul>
-      )}
-
-      <div className="space-y-1 text-xs text-muted-foreground">
-        {item.address && (
-          <div className="flex items-start gap-2">
-            <MapPin className="w-3.5 h-3.5 flex-shrink-0 text-primary/50 mt-0.5" />
-            <span>{item.address}</span>
-          </div>
-        )}
-        {item.phone && (
-          <div className="flex items-center gap-2">
-            <Phone className="w-3.5 h-3.5 flex-shrink-0 text-primary/50" />
-            <a href={`tel:${item.phone}`} className="hover:text-primary transition-colors">{item.phone}</a>
-          </div>
-        )}
-        {item.email && (
-          <div className="flex items-center gap-2">
-            <Mail className="w-3.5 h-3.5 flex-shrink-0 text-primary/50" />
-            <a href={`mailto:${item.email}`} className="hover:text-primary transition-colors truncate">{item.email}</a>
-          </div>
-        )}
-      </div>
-
-      <div className="flex gap-2 flex-wrap mt-auto pt-1">
-        {item.website && (
-          <a href={item.website} target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary/10 text-primary text-xs font-semibold hover:bg-primary/15 transition-colors">
-            <Globe className="w-3 h-3" /> Website <ExternalLink className="w-2.5 h-2.5 opacity-60" />
-          </a>
-        )}
-        {mapQuery && (
-          <a href={mapQuery} target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-xs font-semibold hover:bg-muted/70 transition-colors">
-            <MapPin className="w-3 h-3" /> Map
-          </a>
-        )}
-        {item.liveMap && (
-          <a href={item.liveMap} target="_blank" rel="noopener noreferrer"
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-500/10 text-teal-700 text-xs font-semibold hover:bg-teal-500/15 transition-colors">
-            <Navigation className="w-3 h-3" /> Live Map
-          </a>
-        )}
+        {/* Action buttons */}
+        <div className="flex gap-2 flex-wrap mt-auto pt-1 border-t border-border/30">
+          {item.website && (
+            <a href={item.website} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors">
+              <Globe className="w-3 h-3" /> Visit Website <ExternalLink className="w-2.5 h-2.5 opacity-70" />
+            </a>
+          )}
+          {mapQuery && (
+            <a href={mapQuery} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-xs font-semibold hover:bg-muted/70 hover:text-foreground transition-colors">
+              <MapPin className="w-3 h-3" /> Map
+            </a>
+          )}
+          {item.liveMap && (
+            <a href={item.liveMap} target="_blank" rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-500/10 text-teal-700 text-xs font-semibold hover:bg-teal-500/20 transition-colors">
+              <Navigation className="w-3 h-3" /> Live Map
+            </a>
+          )}
+        </div>
       </div>
     </div>
   );
 }
 
 // ── SECTIONED GRID ────────────────────────────────────────────────────────────
-function SectionedGrid({ items }) {
+function SectionedGrid({ items, sortBy = 'section' }) {
   const [view, setView] = useState('list');
   const [search, setSearch] = useState('');
   const [openSections, setOpenSections] = useState({});
@@ -99,14 +113,27 @@ function SectionedGrid({ items }) {
       )
     : items;
 
-  const sections = [...new Set(filtered.map(i => i.section || i.city || 'General').filter(Boolean))];
+  // Sort + group depending on sortBy
+  const groupKey = (i) => {
+    if (sortBy === 'city') return i.city || i.section || 'Province-Wide';
+    if (sortBy === 'name') return null; // flat A–Z, no groups
+    return i.section || i.city || 'General';
+  };
+
+  const sortedItems = sortBy === 'name'
+    ? [...filtered].sort((a, b) => a.name.localeCompare(b.name))
+    : filtered;
+
+  const sections = sortBy === 'name'
+    ? ['A–Z']
+    : [...new Set(sortedItems.map(i => groupKey(i)).filter(Boolean))];
 
   const toggle = (sec) => setOpenSections(prev => ({ ...prev, [sec]: !prev[sec] }));
   const isOpen = (sec) => openSections[sec] !== false; // default open
 
   return (
     <div>
-      {/* Toolbar */}
+      {/* Search + View toggle */}
       <div className="flex flex-col sm:flex-row gap-3 mb-5">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
@@ -114,7 +141,7 @@ function SectionedGrid({ items }) {
             type="text"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Search services, organizations…"
+            placeholder="Search organizations, services, city…"
             className="w-full pl-9 pr-4 py-2 rounded-xl border border-border/60 bg-card text-sm focus:outline-none focus:ring-2 focus:ring-primary/30"
           />
         </div>
@@ -144,28 +171,30 @@ function SectionedGrid({ items }) {
       ) : (
         <div className="space-y-3">
           {sections.map(sec => {
-            const sectionItems = filtered.filter(i => (i.section || i.city || 'General') === sec);
+            const sectionItems = sortBy === 'name'
+              ? sortedItems
+              : sortedItems.filter(i => groupKey(i) === sec);
             const open = isOpen(sec);
             return (
-              <div key={sec} className="rounded-2xl border border-border/50 overflow-hidden bg-card">
-                {/* Section header — clickable accordion */}
+              <div key={sec} className="rounded-2xl border border-border/40 overflow-hidden shadow-sm">
+                {/* Section header */}
                 <button
                   onClick={() => toggle(sec)}
-                  className="w-full flex items-center justify-between px-4 py-3 hover:bg-muted/50 transition-colors"
+                  className="w-full flex items-center justify-between px-5 py-3.5 bg-gradient-to-r from-primary/5 to-transparent hover:from-primary/10 transition-colors"
                 >
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2.5">
                     <span className="font-heading font-bold text-sm text-foreground">{sec}</span>
-                    <span className="text-[10px] font-semibold bg-primary/10 text-primary px-2 py-0.5 rounded-full">
-                      {sectionItems.length} {sectionItems.length === 1 ? 'resource' : 'resources'}
+                    <span className="text-[10px] font-bold bg-primary text-primary-foreground px-2 py-0.5 rounded-full">
+                      {sectionItems.length}
                     </span>
                   </div>
-                  <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform", open && "rotate-180")} />
+                  <ChevronDown className={cn("w-4 h-4 text-muted-foreground transition-transform duration-200", open && "rotate-180")} />
                 </button>
 
-                {/* Section body */}
+                {/* Cards grid */}
                 {open && (
-                  <div className="px-4 pb-4 border-t border-border/30">
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 pt-3">
+                  <div className="bg-muted/20 px-4 pb-4 border-t border-border/30">
+                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 pt-4">
                       {sectionItems.map((item, idx) => <OrgCard key={idx} item={item} />)}
                     </div>
                   </div>
@@ -251,7 +280,7 @@ function EducationGrid({ items }) {
 }
 
 // ── MAIN EXPORT ───────────────────────────────────────────────────────────────
-export default function ProvinceServicePanel({ category, province }) {
+export default function ProvinceServicePanel({ category, province, sortBy = 'section' }) {
   const provinceData = PROVINCE_DATA[province];
 
   if (!provinceData) {
@@ -279,5 +308,5 @@ export default function ProvinceServicePanel({ category, province }) {
 
   if (category === 'education') return <EducationGrid items={items} />;
 
-  return <SectionedGrid items={items} />;
+  return <SectionedGrid items={items} sortBy={sortBy} />;
 }

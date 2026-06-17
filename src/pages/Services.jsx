@@ -1,12 +1,10 @@
-import { useState, useMemo, useEffect, useCallback } from 'react';
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { useState, useEffect, useCallback } from 'react';
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
-import { Search, Filter, X, Loader2, MapPin, ChevronDown } from 'lucide-react';
-import { Input } from '@/components/ui/input';
+import { Loader2, MapPin, ArrowUpDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import ServiceCard from '../components/services/ServiceCard';
 import ProvinceServicePanel from '../components/services/ProvinceServicePanel';
 import { useLocation_ } from '@/lib/LocationContext';
 import { PROVINCES, PROVINCE_EMOJIS } from '@/lib/provinceServicesData';
@@ -35,10 +33,9 @@ export default function Services() {
   const urlParams = new URLSearchParams(window.location.search);
   const initialCategory = urlParams.get('category') || 'settlement';
 
-  const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
   const [selectedProvince, setSelectedProvince] = useState('');
-  const [provinceDropdownOpen, setProvinceDropdownOpen] = useState(false);
+  const [sortBy, setSortBy] = useState('section'); // 'section' | 'city' | 'name'
 
   const { data: profile } = useQuery({
     queryKey: ['myProfile'],
@@ -66,8 +63,13 @@ export default function Services() {
     initialData: [],
   });
 
-  // Map category to data key
-  const categoryKey = selectedCategory === 'transport' ? 'transport' : selectedCategory;
+  const categoryKey = selectedCategory;
+
+  const sortOptions = [
+    { value: 'section', label: 'By Category Group' },
+    { value: 'city', label: 'By City' },
+    { value: 'name', label: 'By Name (A–Z)' },
+  ];
 
   return (
     <div ref={containerRef} {...touchHandlers} className="max-w-7xl mx-auto px-4 py-6 pb-8">
@@ -110,22 +112,46 @@ export default function Services() {
         </div>
       </div>
 
-      {/* Category Tabs */}
-      <div className="flex gap-2 overflow-x-auto pb-2 mb-6 scrollbar-hide">
-        {categories.map(cat => (
-          <button
-            key={cat.value}
-            onClick={() => setSelectedCategory(cat.value)}
-            className={cn(
-              "flex-shrink-0 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap",
-              selectedCategory === cat.value
-                ? "bg-primary text-primary-foreground"
-                : "bg-card border border-border/50 text-muted-foreground hover:border-primary/30"
-            )}
-          >
-            {cat.label}
-          </button>
-        ))}
+      {/* Category Tabs + Sort Row */}
+      <div className="flex flex-col gap-3 mb-6">
+        <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-hide">
+          {categories.map(cat => (
+            <button
+              key={cat.value}
+              onClick={() => setSelectedCategory(cat.value)}
+              className={cn(
+                "flex-shrink-0 px-4 py-2 rounded-xl text-xs font-semibold transition-all whitespace-nowrap",
+                selectedCategory === cat.value
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-card border border-border/50 text-muted-foreground hover:border-primary/30"
+              )}
+            >
+              {cat.label}
+            </button>
+          ))}
+        </div>
+
+        {/* Sort Control */}
+        <div className="flex items-center gap-2">
+          <ArrowUpDown className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0" />
+          <span className="text-xs text-muted-foreground font-medium">Sort by:</span>
+          <div className="flex gap-1.5 flex-wrap">
+            {sortOptions.map(opt => (
+              <button
+                key={opt.value}
+                onClick={() => setSortBy(opt.value)}
+                className={cn(
+                  "px-3 py-1.5 rounded-lg text-xs font-semibold transition-all border",
+                  sortBy === opt.value
+                    ? "bg-primary/10 text-primary border-primary/30"
+                    : "bg-card border-border/50 text-muted-foreground hover:border-primary/20 hover:text-foreground"
+                )}
+              >
+                {opt.label}
+              </button>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Selected Province + Category Banner */}
@@ -151,7 +177,7 @@ export default function Services() {
 
       {/* Province Service Panel */}
       {selectedProvince ? (
-        <ProvinceServicePanel category={categoryKey} province={selectedProvince} />
+        <ProvinceServicePanel category={categoryKey} province={selectedProvince} sortBy={sortBy} />
       ) : (
         <div className="flex items-center justify-center py-20">
           <Loader2 className="w-6 h-6 animate-spin text-primary" />
