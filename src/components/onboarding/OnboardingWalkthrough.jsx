@@ -60,14 +60,18 @@ const STORAGE_KEY = 'settlesmart_walkthrough_done';
 export default function OnboardingWalkthrough() {
   const [visible, setVisible] = useState(false);
   const [step, setStep] = useState(0);
+  const [isDismissed, setIsDismissed] = useState(false);
 
   useEffect(() => {
     const done = localStorage.getItem(STORAGE_KEY);
-    if (!done) setVisible(true);
-  }, []);
+    if (!done && !isDismissed) {
+      setVisible(true);
+    }
+  }, [isDismissed]);
 
   const dismiss = () => {
     localStorage.setItem(STORAGE_KEY, 'true');
+    setIsDismissed(true);
     setVisible(false);
   };
 

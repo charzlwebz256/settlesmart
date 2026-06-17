@@ -59,6 +59,7 @@ export default function Services() {
   const [selectedProvince, setSelectedProvince] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
+  const [hasManuallySelectedProvince, setHasManuallySelectedProvince] = useState(false);
 
   const { data: profile } = useQuery({
     queryKey: ['myProfile'],
@@ -71,10 +72,12 @@ export default function Services() {
 
   // Auto-set province from profile or GPS (only if user hasn't manually selected)
   useEffect(() => {
-    if (selectedProvince) return;
+    if (hasManuallySelectedProvince) return;
     const province = profile?.province || locationProvince;
-    if (province) setSelectedProvince(province);
-  }, [profile, locationProvince, selectedProvince]);
+    if (province && !selectedProvince) {
+      setSelectedProvince(province);
+    }
+  }, [profile, locationProvince, selectedProvince, hasManuallySelectedProvince]);
 
   // Reset city when province changes (preserve category)
   useEffect(() => {
@@ -110,7 +113,10 @@ export default function Services() {
             label="Province / Territory"
             icon={<MapPin className="w-3.5 h-3.5 text-primary" />}
             value={selectedProvince}
-            onChange={setSelectedProvince}
+            onChange={(value) => {
+              setSelectedProvince(value);
+              setHasManuallySelectedProvince(true);
+            }}
             placeholder="Select a province…"
             options={PROVINCES.map(p => ({ value: p, label: `${PROVINCE_EMOJIS[p] || '🍁'} ${p}` }))}
           />
@@ -121,7 +127,7 @@ export default function Services() {
             icon="📍"
             value={selectedCity}
             onChange={setSelectedCity}
-            placeholder={selectedProvince ? 'All cities' : 'Select province first'}
+            placeholder={selectedProvince && availableCities.length > 0 ? 'Select a city (optional)' : 'Select province first'}
             options={availableCities.map(c => ({ value: c, label: c }))}
           />
 
