@@ -94,10 +94,11 @@ export default function Profile() {
   };
 
   const handleSave = async () => {
-    if (!form || !profile) return;
+    if (!form || !form.id) return;
     setSaving(true);
+    const { id, created_date, updated_date, created_by_id, ...payload } = form;
     try {
-      await base44.entities.UserProfile.update(profile.id, form);
+      await base44.entities.UserProfile.update(id, payload);
       queryClient.invalidateQueries({ queryKey: ['myProfile'] });
       setSaved(true);
       setTimeout(() => setSaved(false), 2000);
