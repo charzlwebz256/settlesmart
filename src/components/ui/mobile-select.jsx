@@ -37,6 +37,11 @@ export function MobileSelect({ children, value, onValueChange, defaultValue, ...
   // Registry: value -> label string, populated by MobileSelectItem on render
   const labelRegistry = React.useRef({})
 
+  // All hooks called above — now safe to branch
+  const registerLabel = (v, label) => { labelRegistry.current[v] = label }
+  const handleValueChange = (v) => { onValueChange?.(v); setOpen(false) }
+  const displayLabel = value ? (labelRegistry.current[value] || value) : null
+
   if (!isMobile) {
     return (
       <SelectPrimitive.Root value={value} onValueChange={onValueChange} defaultValue={defaultValue} {...props}>
@@ -44,15 +49,6 @@ export function MobileSelect({ children, value, onValueChange, defaultValue, ...
       </SelectPrimitive.Root>
     )
   }
-
-  const registerLabel = (v, label) => { labelRegistry.current[v] = label }
-
-  const handleValueChange = (v) => {
-    onValueChange?.(v)
-    setOpen(false)
-  }
-
-  const displayLabel = value ? (labelRegistry.current[value] || value) : null
 
   return (
     <MobileSelectCtx.Provider value={{ open, setOpen, value, displayLabel, onValueChange: handleValueChange, registerLabel }}>
