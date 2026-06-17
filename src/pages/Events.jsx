@@ -6,6 +6,7 @@ import { Loader2, CalendarDays, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
 import CalendarStrip from '@/components/events/CalendarStrip';
+import MonthCalendarView from '@/components/events/MonthCalendarView';
 import EventCard from '@/components/events/EventCard';
 import UpcomingReminders from '@/components/events/UpcomingReminders';
 import EventbriteFeed from '@/components/events/EventbriteFeed';
@@ -28,6 +29,7 @@ export default function Events() {
   const [selectedDate, setSelectedDate] = useState(startOfDay(new Date()));
   const [category, setCategory] = useState('all');
   const [viewAll, setViewAll] = useState(false);
+  const [calView, setCalView] = useState('strip'); // 'strip' | 'month'
   const { city, province, isDetecting: cityLoading } = useLocation_();
   const source = city ? 'gps' : null;
 
@@ -115,13 +117,37 @@ export default function Events() {
         </div>
       )}
 
-      {/* Calendar Strip */}
-      <div className="bg-card rounded-2xl border border-border/50 p-4 mb-4">
-        <CalendarStrip
-          selectedDate={selectedDate}
-          onSelectDate={(d) => { setSelectedDate(d); setViewAll(false); }}
-          eventDates={eventDates}
-        />
+      {/* Calendar view toggle */}
+      <div className="flex gap-1 bg-muted rounded-xl p-1 self-start mb-3 w-fit">
+        <button onClick={() => setCalView('strip')}
+          className={cn("text-xs px-3 py-1.5 rounded-lg font-semibold transition-all",
+            calView === 'strip' ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}>
+          Week Strip
+        </button>
+        <button onClick={() => setCalView('month')}
+          className={cn("text-xs px-3 py-1.5 rounded-lg font-semibold transition-all",
+            calView === 'month' ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}>
+          Month View
+        </button>
+      </div>
+
+      {/* Calendar */}
+      <div className="mb-4">
+        {calView === 'strip' ? (
+          <div className="bg-card rounded-2xl border border-border/50 p-4">
+            <CalendarStrip
+              selectedDate={selectedDate}
+              onSelectDate={(d) => { setSelectedDate(d); setViewAll(false); }}
+              eventDates={eventDates}
+            />
+          </div>
+        ) : (
+          <MonthCalendarView
+            events={events}
+            selectedDate={selectedDate}
+            onSelectDate={(d) => { setSelectedDate(d); setViewAll(false); }}
+          />
+        )}
       </div>
 
       {/* View toggle */}
