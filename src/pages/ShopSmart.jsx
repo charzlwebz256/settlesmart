@@ -1,4 +1,5 @@
 import { ExternalLink, ShoppingBag } from 'lucide-react';
+import PriceComparison from '@/components/shop/PriceComparison';
 
 const CATEGORIES = [
   {
@@ -126,6 +127,8 @@ export default function ShopSmart() {
         </h1>
         <p className="text-muted-foreground text-sm">Popular Canadian online shopping platforms across every category — all in one place.</p>
       </div>
+
+      <PriceComparison />
 
       <div className="space-y-8">
         {CATEGORIES.map((cat) => (
