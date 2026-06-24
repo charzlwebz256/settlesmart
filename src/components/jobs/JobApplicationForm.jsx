@@ -78,8 +78,8 @@ export default function JobApplicationForm({ application, onClose, onSaved }) {
   };
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm p-4 safe-area-bottom">
-      <div className="bg-card rounded-2xl shadow-2xl border border-border/50 w-full max-w-lg max-h-[90vh] overflow-y-auto safe-area-bottom">
+    <div className="fixed inset-0 z-[200] flex items-end sm:items-center justify-center bg-black/40 backdrop-blur-sm p-4">
+      <div className="bg-card rounded-2xl shadow-2xl border border-border/50 w-full max-w-lg max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="sticky top-0 bg-card border-b border-border/50 px-5 py-4 flex items-center justify-between rounded-t-2xl z-10">
           <h2 className="font-heading font-bold text-base">{isEdit ? 'Edit Application' : 'Add Job Application'}</h2>
@@ -197,7 +197,7 @@ export default function JobApplicationForm({ application, onClose, onSaved }) {
         {/* Footer */}
         <div className="sticky bottom-0 bg-card border-t border-border/50 px-5 py-4 flex gap-2 rounded-b-2xl">
           <Button variant="outline" onClick={onClose} className="flex-1 rounded-xl">Cancel</Button>
-          <Button onClick={handleSave} disabled={!form.job_title || !form.company || saving} className="flex-1 rounded-xl gap-2">
+          <Button type="button" onClick={handleSave} disabled={!form.job_title || !form.company || saving} className="flex-1 rounded-xl gap-2">
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
             {isEdit ? 'Save Changes' : 'Add Application'}
           </Button>
