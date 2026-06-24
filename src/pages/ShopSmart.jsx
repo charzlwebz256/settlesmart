@@ -1,5 +1,6 @@
 import { ExternalLink, ShoppingBag } from 'lucide-react';
 import PriceComparison from '@/components/shop/PriceComparison';
+import PriceAlertSignup from '@/components/shop/PriceAlertSignup';
 
 const CATEGORIES = [
   {
@@ -129,6 +130,7 @@ export default function ShopSmart() {
       </div>
 
       <PriceComparison />
+      <PriceAlertSignup />
 
       <div className="space-y-8">
         {CATEGORIES.map((cat) => (

@@ -111,10 +111,7 @@ export default function JobTracker() {
 
   const { data: applications = [], isLoading } = useQuery({
     queryKey: ['jobApplications'],
-    queryFn: async () => {
-      const user = await base44.auth.me();
-      return base44.entities.JobApplication.filter({ created_by: user.email }, '-created_date', 200);
-    },
+    queryFn: () => base44.entities.JobApplication.list('-created_date', 200),
   });
 
   const deleteMutation = useMutation({
