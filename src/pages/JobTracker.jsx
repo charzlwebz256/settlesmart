@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { Plus, Briefcase, Loader2, ExternalLink, Calendar, Trash2, Edit3, ChevronDown, ChevronUp, Link as LinkIcon } from 'lucide-react';
+import { Plus, Briefcase, Loader2, ExternalLink, Calendar, Trash2, Edit3, ChevronDown, ChevronUp, Link as LinkIcon, CheckSquare, Square, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format, parseISO, isPast, isToday } from 'date-fns';
 import JobApplicationForm from '@/components/jobs/JobApplicationForm';
@@ -25,14 +25,17 @@ function StatusBadge({ status }) {
   );
 }
 
-function ApplicationCard({ app, onEdit, onDelete, onStatusChange }) {
+function ApplicationCard({ app, onEdit, onDelete, onStatusChange, selected, onToggleSelect }) {
   const [expanded, setExpanded] = useState(false);
   const followUp = app.follow_up_date ? parseISO(app.follow_up_date) : null;
   const followUpUrgent = followUp && (isToday(followUp) || isPast(followUp));
 
   return (
-    <div className="bg-card border border-border/50 rounded-2xl p-4 hover:border-primary/20 transition-all">
+    <div className={cn("bg-card border rounded-2xl p-4 transition-all", selected ? "border-primary bg-primary/5" : "border-border/50 hover:border-primary/20")}>
       <div className="flex items-start justify-between gap-3">
+        <button onClick={() => onToggleSelect(app.id)} className="mt-0.5 flex-shrink-0 text-muted-foreground hover:text-primary transition-colors">
+          {selected ? <CheckSquare className="w-4 h-4 text-primary" /> : <Square className="w-4 h-4" />}
+        </button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap mb-1">
             <StatusBadge status={app.status} />
@@ -45,7 +48,7 @@ function ApplicationCard({ app, onEdit, onDelete, onStatusChange }) {
           <button onClick={() => onEdit(app)} className="p-1.5 rounded-lg hover:bg-muted transition-colors">
             <Edit3 className="w-3.5 h-3.5 text-muted-foreground" />
           </button>
-          <button onClick={() => onDelete(app.id)} className="p-1.5 rounded-lg hover:bg-red-50 transition-colors">
+          <button onClick={() => onDelete(app.id)} className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
             <Trash2 className="w-3.5 h-3.5 text-red-400" />
           </button>
         </div>
@@ -108,6 +111,9 @@ export default function JobTracker() {
   const [editingApp, setEditingApp] = useState(null);
   const [showForm, setShowForm] = useState(false);
   const [activeColumn, setActiveColumn] = useState('all');
+  const [selected, setSelected] = useState(new Set());
+  const [bulkStatus, setBulkStatus] = useState('');
+  const [bulkWorking, setBulkWorking] = useState(false);
 
   const { data: applications = [], isLoading } = useQuery({
     queryKey: ['jobApplications'],
@@ -144,6 +150,27 @@ export default function JobTracker() {
 
   const handleEdit = (app) => { setEditingApp(app); setShowForm(true); };
   const handleClose = () => { setEditingApp(null); setShowForm(false); };
+
+  const toggleSelect = (id) => setSelected(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
+  const toggleSelectAll = () => setSelected(prev => prev.size === filtered.length ? new Set() : new Set(filtered.map(a => a.id)));
+  const clearSelection = () => { setSelected(new Set()); setBulkStatus(''); };
+
+  const handleBulkDelete = async () => {
+    setBulkWorking(true);
+    await Promise.all([...selected].map(id => base44.entities.JobApplication.delete(id)));
+    await queryClient.invalidateQueries({ queryKey: ['jobApplications'] });
+    clearSelection();
+    setBulkWorking(false);
+  };
+
+  const handleBulkStatus = async () => {
+    if (!bulkStatus) return;
+    setBulkWorking(true);
+    await Promise.all([...selected].map(id => base44.entities.JobApplication.update(id, { status: bulkStatus })));
+    await queryClient.invalidateQueries({ queryKey: ['jobApplications'] });
+    clearSelection();
+    setBulkWorking(false);
+  };
 
   // Upcoming follow-ups
   const upcomingFollowUps = applications
@@ -206,8 +233,8 @@ export default function JobTracker() {
         </div>
       )}
 
-      {/* All filter */}
-      <div className="flex items-center gap-2 mb-4">
+      {/* All filter + select-all */}
+      <div className="flex items-center gap-2 mb-4 flex-wrap">
         <button
           onClick={() => setActiveColumn('all')}
           className={cn('px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all',
@@ -215,8 +242,40 @@ export default function JobTracker() {
         >
           All ({applications.length})
         </button>
+        {filtered.length > 0 && (
+          <button onClick={toggleSelectAll} className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors border border-border/50 rounded-xl px-3 py-1.5">
+            {selected.size === filtered.length ? <CheckSquare className="w-3.5 h-3.5 text-primary" /> : <Square className="w-3.5 h-3.5" />}
+            {selected.size === filtered.length ? 'Deselect all' : 'Select all'}
+          </button>
+        )}
         <span className="text-xs text-muted-foreground ml-auto">{filtered.length} application{filtered.length !== 1 ? 's' : ''}</span>
       </div>
+
+      {/* Bulk action toolbar */}
+      {selected.size > 0 && (
+        <div className="flex items-center gap-2 mb-4 bg-primary/5 border border-primary/20 rounded-2xl px-4 py-3 flex-wrap">
+          <span className="text-xs font-semibold text-primary">{selected.size} selected</span>
+          <div className="flex items-center gap-2 ml-auto flex-wrap">
+            <select
+              value={bulkStatus}
+              onChange={e => setBulkStatus(e.target.value)}
+              className="text-xs border border-border/60 rounded-lg px-2 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30"
+            >
+              <option value="">Change status to…</option>
+              {STATUSES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+            </select>
+            <Button size="sm" onClick={handleBulkStatus} disabled={!bulkStatus || bulkWorking} className="rounded-lg text-xs h-7 px-3">
+              {bulkWorking ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Apply'}
+            </Button>
+            <Button size="sm" variant="destructive" onClick={handleBulkDelete} disabled={bulkWorking} className="rounded-lg text-xs h-7 px-3 gap-1">
+              {bulkWorking ? <Loader2 className="w-3 h-3 animate-spin" /> : <><Trash2 className="w-3 h-3" /> Delete</>}
+            </Button>
+            <button onClick={clearSelection} className="p-1 rounded-lg hover:bg-muted transition-colors">
+              <X className="w-3.5 h-3.5 text-muted-foreground" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {isLoading && (
         <div className="flex items-center justify-center py-16">
@@ -249,6 +308,8 @@ export default function JobTracker() {
             onEdit={handleEdit}
             onDelete={(id) => deleteMutation.mutate(id)}
             onStatusChange={(id, status) => statusMutation.mutate({ id, status })}
+            selected={selected.has(app.id)}
+            onToggleSelect={toggleSelect}
           />
         ))}
       </div>

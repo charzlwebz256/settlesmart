@@ -110,12 +110,12 @@ export default function Profile() {
 
   const [form, setForm] = useState(null);
 
-  // Sync form whenever profile data changes (initial load + after save refetch)
+  // Sync form on initial load only (when form is null); don't overwrite in-progress edits on refetch
   useEffect(() => {
-    if (profile) {
+    if (profile && form === null) {
       setForm({ ...profile });
     }
-  }, [profile?.id, profile?.updated_date]);
+  }, [profile]);
 
   const cities = useMemo(() => PROVINCE_CITIES[form?.province] || [], [form?.province]);
 
