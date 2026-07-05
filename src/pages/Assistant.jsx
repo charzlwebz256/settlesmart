@@ -26,7 +26,7 @@ export default function Assistant() {
     queryKey: ['myProfile'],
     queryFn: async () => {
       const user = await base44.auth.me();
-      const results = await base44.entities.UserProfile.filter({ created_by: user.email });
+      const results = await base44.entities.UserProfile.filter({ created_by_id: user.id });
       return results[0] || null;
     },
   });

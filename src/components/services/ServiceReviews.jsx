@@ -10,6 +10,11 @@ function escapeHtml(str) {
   }[ch]));
 }
 
+function sanitizeUrl(url) {
+  const u = String(url ?? '');
+  return /^https?:\/\//i.test(u) ? u : '#';
+}
+
 function StarRating({ value, onChange, readonly = false, size = 'md' }) {
   const [hovered, setHovered] = useState(0);
   const sz = size === 'sm' ? 'w-3.5 h-3.5' : 'w-5 h-5';
@@ -88,7 +93,7 @@ export default function ServiceReviews({ serviceKey, serviceName, province }) {
   <tr><td style="padding:6px 12px;color:#666;">Rating</td><td style="padding:6px 12px;">${stars} (${payload.rating}/5)</td></tr>
   <tr><td style="padding:6px 12px;color:#666;">Review</td><td style="padding:6px 12px;">${escapeHtml(payload.review || '(no text)')}</td></tr>
 </table>
-${reviewerEmail ? `<p><a href="${escapeHtml(gmailReplyLink)}" style="background:#1a73e8;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;font-weight:bold;">Reply via Gmail</a></p>` : ''}
+${reviewerEmail ? `<p><a href="${escapeHtml(sanitizeUrl(gmailReplyLink))}" style="background:#1a73e8;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;font-weight:bold;">Reply via Gmail</a></p>` : ''}
           `.trim(),
         });
       } catch (_) {}
