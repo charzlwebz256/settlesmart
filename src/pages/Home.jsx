@@ -13,10 +13,12 @@ import WhyCanadaSection from '../components/home/WhyCanadaSection';
 import ChecklistWizard from '../components/home/ChecklistWizard';
 import { useLocation_ } from '@/lib/LocationContext';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/lib/AuthContext';
 
 export default function Home() {
   const { city, province, isDetecting } = useLocation_();
   const navigate = useNavigate();
+  const { isAuthenticated, navigateToLogin } = useAuth();
   const queryClient = useQueryClient();
   const [showWizard, setShowWizard] = useState(false);
 
@@ -52,7 +54,13 @@ export default function Home() {
         </div>
       ) : (
         <>
-          <HeroSection hasProfile={hasProfile} onStartWizard={() => setShowWizard(true)} />
+          <HeroSection
+            hasProfile={hasProfile}
+            onStartWizard={() => {
+              if (!isAuthenticated) { navigateToLogin(); return; }
+              setShowWizard(true);
+            }}
+          />
           {hasProfile && (
             <>
               <NotificationCenter />
