@@ -39,6 +39,10 @@ import SupportUs from './pages/SupportUs';
 import MeetTheDeveloper from './pages/MeetTheDeveloper';
 import JobCoach from './pages/JobCoach';
 import Scholarships from './pages/Scholarships';
+import Login from './pages/Login';
+import Register from './pages/Register';
+import ForgotPassword from './pages/ForgotPassword';
+import ResetPassword from './pages/ResetPassword';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError, navigateToLogin } = useAuth();
@@ -66,10 +70,13 @@ const AuthenticatedApp = () => {
   // Render the main app
   return (
     <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
       <Route element={<AppLayout />}>
         {/* Publicly browseable without sign-in */}
         <Route path="/" element={<Home />} />
-        <Route path="/services" element={<Services />} />
         <Route path="/explore" element={<Explore />} />
         <Route path="/work" element={<Work />} />
         <Route path="/resources" element={<Resources />} />
@@ -93,6 +100,7 @@ const AuthenticatedApp = () => {
 
         {/* Sign in required — personal data & tracked actions */}
         <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+          <Route path="/services" element={<Services />} />
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/checklist" element={<Checklist />} />
           <Route path="/profile" element={<Profile />} />
