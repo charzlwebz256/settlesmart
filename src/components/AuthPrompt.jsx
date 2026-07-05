@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -10,15 +9,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { LogIn } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
-import { playBeep } from '@/lib/beep';
 
 export default function AuthPrompt() {
   const { authPromptOpen, dismissAuthPrompt, navigateToLogin } = useAuth();
-
-  // Play a short beep the moment a sign-in is requested
-  useEffect(() => {
-    if (authPromptOpen) playBeep();
-  }, [authPromptOpen]);
 
   return (
     <Dialog open={authPromptOpen} onOpenChange={(open) => { if (!open) dismissAuthPrompt(); }}>

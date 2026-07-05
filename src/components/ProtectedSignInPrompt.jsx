@@ -1,16 +1,11 @@
-import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { LogIn, ArrowLeft, Lock } from 'lucide-react';
-import { playBeep } from '@/lib/beep';
 
 export default function ProtectedSignInPrompt() {
   const navigate = useNavigate();
   const { navigateToLogin } = useAuth();
-
-  // Play a short beep once this sign-in prompt mounts
-  useEffect(() => { playBeep(); }, []);
 
   const goBack = () => {
     if (window.history.length > 1) navigate(-1);
