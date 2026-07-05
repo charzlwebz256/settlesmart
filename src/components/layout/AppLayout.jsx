@@ -162,7 +162,7 @@ export default function AppLayout() {
     queryFn: async () => {
       try {
         const user = await base44.auth.me();
-        const results = await base44.entities.UserProfile.filter({ created_by: user.email });
+        const results = await base44.entities.UserProfile.filter({ created_by_id: user.id });
         return results[0] || null;
       } catch {
         return null;
@@ -318,7 +318,7 @@ export default function AppLayout() {
                     className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium text-primary hover:bg-primary/10 transition-all"
                   >
                     <LogIn className="w-4 h-4" />
-                    Sign In
+                    Log In
                   </button>
                 )}
               </div>

@@ -23,7 +23,7 @@ export default function Login() {
       await base44.auth.loginViaEmailPassword(email, password);
       window.location.href = fromUrl;
     } catch (err) {
-      setError(err.message || 'Unable to sign in. Please check your credentials.');
+      setError(err.message || 'Unable to log in. Please check your credentials.');
       setLoading(false);
     }
   };
@@ -47,7 +47,7 @@ export default function Login() {
             <span className="text-primary-foreground font-bold text-lg">S</span>
           </div>
           <h1 className="font-heading font-bold text-2xl">Welcome back</h1>
-          <p className="text-muted-foreground text-sm mt-1">Sign in to your SettleSmart account</p>
+          <p className="text-muted-foreground text-sm mt-1">Log in to your SettleSmart account</p>
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-6 shadow-sm">
@@ -94,7 +94,7 @@ export default function Login() {
               </div>
             </div>
             <Button type="submit" className="w-full" disabled={loading}>
-              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Sign In'}
+              {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Log In'}
             </Button>
           </form>
 
