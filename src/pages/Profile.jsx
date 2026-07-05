@@ -300,7 +300,7 @@ export default function Profile() {
           </Button>
           <Button variant="outline" onClick={handleLogout} className="rounded-xl gap-2">
             <LogOut className="w-4 h-4" />
-            Sign Out
+            Log Out
           </Button>
         </div>
         {saveError && (
