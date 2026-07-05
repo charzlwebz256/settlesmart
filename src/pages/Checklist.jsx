@@ -10,6 +10,7 @@ import { CheckCircle2, Circle, Sparkles, Loader2, ChevronDown, ExternalLink } fr
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import ExportRoadmapPDF from '@/components/checklist/ExportRoadmapPDF';
+import { buildChecklist } from '@/data/checklistTemplate';
 
 const dayRangeLabels = {
   week1: 'Week 1: First Steps',
@@ -79,44 +80,16 @@ export default function Checklist() {
 
   const generateChecklist = async () => {
     setGenerating(true);
-    const context = profile
-      ? `for a ${profile.immigration_status?.replace(/_/g, ' ')} settling in ${profile.city}, ${profile.province}. English level: ${profile.english_level}. Interests: ${profile.interests?.join(', ')}.`
-      : 'for a newcomer settling in Canada.';
-
-    const result = await base44.integrations.Core.InvokeLLM({
-      model: 'gemini_3_flash',
-      prompt: `First 90 days Canada settlement checklist ${context} Return JSON "items" array, exactly 12 items. Each: title (5 words max), description (1 sentence), category (documents|housing|banking|health|education|employment|transportation|social|legal), day_range (week1|week2|week3|week4|month2|month3), order (1-12), link (URL or "").`,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          items: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                title: { type: 'string' },
-                description: { type: 'string' },
-                category: { type: 'string' },
-                day_range: { type: 'string' },
-                order: { type: 'number' },
-                link: { type: 'string' },
-              },
-            },
-          },
-        },
-      },
-    });
-
-    if (result?.items) {
+    try {
+      // Instant profile-personalized template (no LLM round-trip) — generates in <1s
+      const items = buildChecklist(profile);
       await base44.entities.ChecklistItem.bulkCreate(
-        result.items.map(item => ({
-          ...item,
-          is_completed: false,
-        }))
+        items.map(item => ({ ...item, is_completed: false }))
       );
       queryClient.invalidateQueries({ queryKey: ['myChecklist'] });
+    } finally {
+      setGenerating(false);
     }
-    setGenerating(false);
   };
 
   const completed = checklist.filter(c => c.is_completed).length;

@@ -30,9 +30,9 @@ const sourceConfig = {
 };
 
 function buildJobUrl(job) {
-  // Prefer the direct posting URL returned by the job platform (live feed)
-  if (job.url && /^https?:\/\//i.test(job.url)) return job.url;
-  // Fallback to a search on the relevant platform
+  // LLM-returned direct URLs are often invalid (404 "page not found").
+  // Always use the platform's live search URL with the exact title + company
+  // so the user lands on a real, working page where they can find and apply.
   const q = encodeURIComponent(`${job.title} ${job.company}`.trim());
   const loc = encodeURIComponent(job.location || 'Canada');
   const src = (job.source || '').toLowerCase();

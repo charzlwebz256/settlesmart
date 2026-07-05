@@ -5,13 +5,28 @@ import { cn } from '@/lib/utils';
 
 const ICONS = { Landmark, GraduationCap, Award, Heart, BookOpen };
 
-function NativeSelect({ value, onChange, options, placeholder }) {
+// Major cities per province (for city-level drill-down)
+const PROVINCE_CITIES = {
+  'Ontario': ['Toronto', 'Ottawa', 'Hamilton', 'London', 'Waterloo', 'Kingston', 'Mississauga', 'Windsor'],
+  'Alberta': ['Calgary', 'Edmonton', 'Lethbridge', 'Red Deer'],
+  'Saskatchewan': ['Saskatoon', 'Regina', 'Moose Jaw', 'Prince Albert'],
+  'Nova Scotia': ['Halifax', 'Sydney', 'Truro', 'Wolfville'],
+  'Quebec': ['Montreal', 'Quebec City', 'Sherbrooke', 'Laval', 'Gatineau'],
+  'Manitoba': ['Winnipeg', 'Brandon', 'Steinbach'],
+  'British Columbia': ['Vancouver', 'Victoria', 'Kelowna', 'Surrey', 'Burnaby', 'Kamloops'],
+  'Newfoundland & Labrador': ["St. John's", 'Corner Brook', 'Gander'],
+  'New Brunswick': ['Fredericton', 'Moncton', 'Saint John', 'Sackville'],
+  'Prince Edward Island': ['Charlottetown', 'Summerside'],
+};
+
+function NativeSelect({ value, onChange, options, placeholder, disabled }) {
   return (
     <div className="relative">
       <select
         value={value}
         onChange={e => onChange(e.target.value)}
-        className="w-full h-10 appearance-none rounded-xl border border-border/60 bg-card pl-3 pr-9 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
+        disabled={disabled}
+        className="w-full h-10 appearance-none rounded-xl border border-border/60 bg-card pl-3 pr-9 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       >
         <option value="all">{placeholder}</option>
         {options.map(opt => (
@@ -45,7 +60,7 @@ function ScholarshipCard({ item }) {
   );
 }
 
-function ProvinceSection({ province, search, categoryFilter }) {
+function ProvinceSection({ province, search, categoryFilter, city }) {
   const [openSections, setOpenSections] = useState(() =>
     Object.fromEntries(province.sections.map(s => [s.type, true]))
   );
@@ -54,15 +69,20 @@ function ProvinceSection({ province, search, categoryFilter }) {
     province.sections
       .map(section => ({
         ...section,
-        items: section.items.filter(item =>
-          (!search ||
-          item.name.toLowerCase().includes(search.toLowerCase()) ||
-          (item.desc || '').toLowerCase().includes(search.toLowerCase())) &&
-          (categoryFilter === 'all' || section.type === categoryFilter)
-        ),
+        items: section.items.filter(item => {
+          const matchesSearch = !search ||
+            item.name.toLowerCase().includes(search.toLowerCase()) ||
+            (item.desc || '').toLowerCase().includes(search.toLowerCase());
+          const matchesCategory = categoryFilter === 'all' || section.type === categoryFilter;
+          // City filter: university scholarships are city-specific; others are province-wide
+          const matchesCity = !city || section.type !== 'university' ||
+            item.name.toLowerCase().includes(city.toLowerCase()) ||
+            (item.desc || '').toLowerCase().includes(city.toLowerCase());
+          return matchesSearch && matchesCategory && matchesCity;
+        }),
       }))
       .filter(s => s.items.length > 0),
-    [province, search, categoryFilter]
+    [province, search, categoryFilter, city]
   );
 
   if (filteredSections.length === 0) return null;
@@ -72,7 +92,7 @@ function ProvinceSection({ province, search, categoryFilter }) {
       <div className="flex items-center gap-2 px-4 py-3 bg-card/60 backdrop-blur-sm border-b border-border/30">
         <MapPin className="w-4 h-4 text-primary" />
         <h2 className="font-heading font-bold text-base text-foreground">{province.province}</h2>
-        <span className="text-xs text-muted-foreground">· {province.city}</span>
+        <span className="text-xs text-muted-foreground">· {city && city !== 'all' ? city : province.city}</span>
         <span className="ml-auto text-xs text-muted-foreground">
           {filteredSections.reduce((s, sec) => s + sec.items.length, 0)} opportunities
         </span>
@@ -112,6 +132,7 @@ function ProvinceSection({ province, search, categoryFilter }) {
 
 export default function Scholarships() {
   const [activeProvince, setActiveProvince] = useState('all');
+  const [activeCity, setActiveCity] = useState('all');
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
 
@@ -124,11 +145,27 @@ export default function Scholarships() {
 
   const categoryOptions = Object.entries(SECTION_META).map(([key, meta]) => ({ value: key, label: meta.label }));
   const provinceOptions = provinces.map(p => ({ value: p.province, label: p.province }));
+  const cityOptions = (activeProvince !== 'all' ? (PROVINCE_CITIES[activeProvince] || []) : []).map(c => ({ value: c, label: c }));
 
-  // Count opportunities for the selected province/category
+  const handleProvinceChange = (val) => {
+    setActiveProvince(val);
+    setActiveCity('all');
+  };
+
+  // Count opportunities for the selected province/city/category
   const visibleCount = visible.reduce(
     (sum, p) => sum + p.sections
-      .filter(s => categoryFilter === 'all' || s.type === categoryFilter)
+      .map(section => ({
+        ...section,
+        items: section.items.filter(item => {
+          const matchesCategory = categoryFilter === 'all' || section.type === categoryFilter;
+          const matchesCity = !activeCity || activeCity === 'all' || section.type !== 'university' ||
+            item.name.toLowerCase().includes(activeCity.toLowerCase()) ||
+            (item.desc || '').toLowerCase().includes(activeCity.toLowerCase());
+          return matchesCategory && matchesCity;
+        }),
+      }))
+      .filter(s => s.items.length > 0)
       .reduce((s, sec) => s + sec.items.length, 0),
     0
   );
@@ -142,7 +179,7 @@ export default function Scholarships() {
           Scholarships in Canada
         </h1>
         <p className="text-muted-foreground text-sm">
-          Government-funded grants, university awards, private scholarships, and refugee/newcomer funding — organized by province and city. {totalCount}+ opportunities listed.
+          Government-funded grants, university awards, private scholarships, and refugee/newcomer funding — classified by province, city, and type. {totalCount}+ opportunities listed.
         </p>
       </div>
 
@@ -158,36 +195,47 @@ export default function Scholarships() {
         />
       </div>
 
-      {/* Dropdowns: Province + Category */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+      {/* Dropdowns: Province + City + Category */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
         <div>
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Province / Region</label>
           <NativeSelect
             value={activeProvince}
-            onChange={setActiveProvince}
+            onChange={handleProvinceChange}
             options={provinceOptions}
             placeholder="All Provinces"
           />
         </div>
         <div>
-          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Funding Category</label>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">City</label>
+          <NativeSelect
+            value={activeCity}
+            onChange={setActiveCity}
+            options={cityOptions}
+            placeholder={activeProvince === 'all' ? 'Select province first' : 'All Cities'}
+            disabled={activeProvince === 'all'}
+          />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Funding Type</label>
           <NativeSelect
             value={categoryFilter}
             onChange={setCategoryFilter}
             options={categoryOptions}
-            placeholder="All Categories"
+            placeholder="All Types"
           />
         </div>
       </div>
 
       {/* Result summary */}
-      <div className="flex items-center gap-2 mb-4 text-xs text-muted-foreground">
+      <div className="flex items-center gap-2 mb-4 text-xs text-muted-foreground flex-wrap">
         <span className="font-semibold text-foreground">{visibleCount}</span> opportunit{visibleCount !== 1 ? 'ies' : 'y'} found
         {activeProvince !== 'all' && <> in <span className="font-medium text-foreground">{activeProvince}</span></>}
+        {activeCity !== 'all' && activeCity && <> · <span className="font-medium text-foreground">{activeCity}</span></>}
         {categoryFilter !== 'all' && <> · <span className="font-medium text-foreground">{SECTION_META[categoryFilter].label}</span></>}
-        {(activeProvince !== 'all' || categoryFilter !== 'all') && (
+        {(activeProvince !== 'all' || categoryFilter !== 'all' || activeCity !== 'all') && (
           <button
-            onClick={() => { setActiveProvince('all'); setCategoryFilter('all'); }}
+            onClick={() => { setActiveProvince('all'); setActiveCity('all'); setCategoryFilter('all'); }}
             className="ml-auto text-primary hover:underline font-medium"
           >
             Clear filters
@@ -204,6 +252,7 @@ export default function Scholarships() {
               province={province}
               search={search}
               categoryFilter={categoryFilter}
+              city={activeCity}
             />
           ))}
         </div>
@@ -211,7 +260,7 @@ export default function Scholarships() {
         <div className="text-center py-16">
           <div className="text-5xl mb-4">🎓</div>
           <h3 className="font-heading font-bold text-lg mb-2">No scholarships match</h3>
-          <p className="text-muted-foreground text-sm">Try a different province, category, or search term.</p>
+          <p className="text-muted-foreground text-sm">Try a different province, city, type, or search term.</p>
         </div>
       )}
 
