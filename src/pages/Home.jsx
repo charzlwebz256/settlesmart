@@ -18,7 +18,7 @@ import { useAuth } from '@/lib/AuthContext';
 export default function Home() {
   const { city, province, isDetecting } = useLocation_();
   const navigate = useNavigate();
-  const { isAuthenticated, navigateToLogin } = useAuth();
+  const { requireAuth } = useAuth();
   const queryClient = useQueryClient();
   const [showWizard, setShowWizard] = useState(false);
 
@@ -56,10 +56,7 @@ export default function Home() {
         <>
           <HeroSection
             hasProfile={hasProfile}
-            onStartWizard={() => {
-              if (!isAuthenticated) { navigateToLogin(); return; }
-              setShowWizard(true);
-            }}
+            onStartWizard={() => requireAuth(() => setShowWizard(true))}
           />
           {hasProfile && (
             <>
