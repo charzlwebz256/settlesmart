@@ -93,6 +93,7 @@ export default function Profile() {
   const queryClient = useQueryClient();
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
@@ -131,13 +132,20 @@ export default function Profile() {
   };
 
   const handleSave = async () => {
-    if (!form?.id) return;
+    if (!form) return;
     setSaving(true);
     setSaved(false);
+    setSaveError(null);
     const { id, created_date, updated_date, created_by_id, ...payload } = form;
     try {
-      await base44.entities.UserProfile.update(id, payload);
-      // Refetch from server to confirm persisted data, then sync form to it
+      // Update existing profile, or create one if none exists yet (blank profile on first sign-in)
+      if (id) {
+        await base44.entities.UserProfile.update(id, payload);
+      } else {
+        await base44.entities.UserProfile.create(payload);
+      }
+      // Bust cache so every screen (Dashboard, Home, etc.) reflects the saved data
+      await queryClient.invalidateQueries({ queryKey: ['myProfile'] });
       const fresh = await queryClient.fetchQuery({
         queryKey: ['myProfile'],
         queryFn: async () => {
@@ -149,6 +157,8 @@ export default function Profile() {
       if (fresh) setForm({ ...fresh });
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
+    } catch (err) {
+      setSaveError(err?.message || 'Could not save. Please try again.');
     } finally {
       setSaving(false);
     }
@@ -293,6 +303,9 @@ export default function Profile() {
             Sign Out
           </Button>
         </div>
+        {saveError && (
+          <p className="text-xs text-destructive -mt-2 px-1">{saveError}</p>
+        )}
 
         {/* Information */}
         <div className="bg-card rounded-2xl border border-border/50 p-6">
