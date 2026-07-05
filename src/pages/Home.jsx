@@ -22,21 +22,21 @@ export default function Home() {
   const queryClient = useQueryClient();
   const [showWizard, setShowWizard] = useState(false);
 
-  const { data: profiles } = useQuery({
+  const { data: profile } = useQuery({
     queryKey: ['myProfile'],
     queryFn: async () => {
       try {
         const user = await base44.auth.me();
         const results = await base44.entities.UserProfile.filter({ created_by_id: user.id }, '-updated_date');
-        return results;
+        if (!results || results.length === 0) return null;
+        return results.find(p => p.onboarding_completed) || results[0];
       } catch {
-        return [];
+        return null;
       }
     },
-    initialData: [],
   });
 
-  const hasProfile = profiles.length > 0 && profiles[0].onboarding_completed;
+  const hasProfile = !!profile?.onboarding_completed;
 
   const handleWizardComplete = () => {
     queryClient.invalidateQueries({ queryKey: ['myProfile'] });

@@ -162,8 +162,11 @@ export default function AppLayout() {
     queryFn: async () => {
       try {
         const user = await base44.auth.me();
-        const results = await base44.entities.UserProfile.filter({ created_by_id: user.id });
-        return results[0] || null;
+        const results = await base44.entities.UserProfile.filter({ created_by_id: user.id }, '-updated_date');
+        if (!results || results.length === 0) return null;
+        // Prefer the completed onboarding profile (your original saved info);
+        // fall back to the most recently updated record.
+        return results.find(p => p.onboarding_completed) || results[0];
       } catch {
         return null;
       }
