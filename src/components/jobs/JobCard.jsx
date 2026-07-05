@@ -30,6 +30,9 @@ const sourceConfig = {
 };
 
 function buildJobUrl(job) {
+  // Prefer the direct posting URL returned by the job platform (live feed)
+  if (job.url && /^https?:\/\//i.test(job.url)) return job.url;
+  // Fallback to a search on the relevant platform
   const q = encodeURIComponent(`${job.title} ${job.company}`.trim());
   const loc = encodeURIComponent(job.location || 'Canada');
   const src = (job.source || '').toLowerCase();
@@ -47,8 +50,13 @@ export default function JobCard({ job, onAddToTracker }) {
   const expStyle = expLabels[job.experience_level] || expLabels.any;
   const jobUrl = buildJobUrl(job);
 
+  const openJob = () => window.open(jobUrl, '_blank', 'noopener,noreferrer');
+
   return (
-    <div className="flex flex-col gap-3 p-4 rounded-2xl border border-border/50 bg-card hover:border-primary/20 hover:shadow-md transition-all">
+    <div
+      onClick={openJob}
+      className="flex flex-col gap-3 p-4 rounded-2xl border border-border/50 bg-card hover:border-primary/30 hover:shadow-md transition-all cursor-pointer group"
+    >
       {/* Header */}
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
@@ -63,18 +71,9 @@ export default function JobCard({ job, onAddToTracker }) {
               <Badge className="text-[10px] border-0 px-2 py-0 bg-primary/10 text-primary">🍁 Newcomer Friendly</Badge>
             )}
           </div>
-          <h3 className="font-heading font-bold text-sm leading-snug">{job.title}</h3>
+          <h3 className="font-heading font-bold text-sm leading-snug group-hover:text-primary transition-colors">{job.title}</h3>
         </div>
-        <a
-          href={jobUrl}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={e => e.stopPropagation()}
-          className="p-1.5 rounded-lg hover:bg-muted transition-colors flex-shrink-0"
-          title="View on job site"
-        >
-          <ExternalLink className="w-4 h-4 text-muted-foreground/60 hover:text-primary transition-colors" />
-        </a>
+        <ExternalLink className="w-4 h-4 text-muted-foreground/60 group-hover:text-primary transition-colors flex-shrink-0 mt-1" />
       </div>
 
       {/* Company & Meta */}
@@ -108,16 +107,25 @@ export default function JobCard({ job, onAddToTracker }) {
         <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{job.description}</p>
       )}
 
-      {/* Add to Tracker */}
-      {onAddToTracker && (
+      {/* Actions */}
+      <div className="mt-auto flex items-center gap-2">
         <button
-          onClick={() => onAddToTracker(job)}
-          className="mt-auto flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 transition-colors self-start"
+          onClick={e => { e.stopPropagation(); openJob(); }}
+          className="flex items-center gap-1.5 text-xs font-semibold text-primary-foreground bg-primary px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-colors"
         >
-          <PlusCircle className="w-3.5 h-3.5" />
-          Add to Tracker
+          <ExternalLink className="w-3.5 h-3.5" />
+          Apply Now
         </button>
-      )}
+        {onAddToTracker && (
+          <button
+            onClick={e => { e.stopPropagation(); onAddToTracker(job); }}
+            className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 border border-primary/30 px-3 py-1.5 rounded-lg hover:bg-primary/5 transition-colors"
+          >
+            <PlusCircle className="w-3.5 h-3.5" />
+            Add to Tracker
+          </button>
+        )}
+      </div>
     </div>
   );
 }

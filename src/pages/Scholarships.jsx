@@ -5,6 +5,26 @@ import { cn } from '@/lib/utils';
 
 const ICONS = { Landmark, GraduationCap, Award, Heart, BookOpen };
 
+function NativeSelect({ value, onChange, options, placeholder }) {
+  return (
+    <div className="relative">
+      <select
+        value={value}
+        onChange={e => onChange(e.target.value)}
+        className="w-full h-10 appearance-none rounded-xl border border-border/60 bg-card pl-3 pr-9 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer"
+      >
+        <option value="all">{placeholder}</option>
+        {options.map(opt => (
+          <option key={opt.value ?? opt} value={opt.value ?? opt}>
+            {opt.label ?? opt}
+          </option>
+        ))}
+      </select>
+      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50 pointer-events-none" />
+    </div>
+  );
+}
+
 function ScholarshipCard({ item }) {
   return (
     <a
@@ -25,7 +45,7 @@ function ScholarshipCard({ item }) {
   );
 }
 
-function ProvinceSection({ province, search }) {
+function ProvinceSection({ province, search, categoryFilter }) {
   const [openSections, setOpenSections] = useState(() =>
     Object.fromEntries(province.sections.map(s => [s.type, true]))
   );
@@ -35,13 +55,14 @@ function ProvinceSection({ province, search }) {
       .map(section => ({
         ...section,
         items: section.items.filter(item =>
-          !search ||
+          (!search ||
           item.name.toLowerCase().includes(search.toLowerCase()) ||
-          (item.desc || '').toLowerCase().includes(search.toLowerCase())
+          (item.desc || '').toLowerCase().includes(search.toLowerCase())) &&
+          (categoryFilter === 'all' || section.type === categoryFilter)
         ),
       }))
       .filter(s => s.items.length > 0),
-    [province, search]
+    [province, search, categoryFilter]
   );
 
   if (filteredSections.length === 0) return null;
@@ -52,6 +73,9 @@ function ProvinceSection({ province, search }) {
         <MapPin className="w-4 h-4 text-primary" />
         <h2 className="font-heading font-bold text-base text-foreground">{province.province}</h2>
         <span className="text-xs text-muted-foreground">· {province.city}</span>
+        <span className="ml-auto text-xs text-muted-foreground">
+          {filteredSections.reduce((s, sec) => s + sec.items.length, 0)} opportunities
+        </span>
       </div>
       <div className="p-4 space-y-4">
         {filteredSections.map(section => {
@@ -98,6 +122,17 @@ export default function Scholarships() {
     (sum, p) => sum + p.sections.reduce((s, sec) => s + sec.items.length, 0), 0
   );
 
+  const categoryOptions = Object.entries(SECTION_META).map(([key, meta]) => ({ value: key, label: meta.label }));
+  const provinceOptions = provinces.map(p => ({ value: p.province, label: p.province }));
+
+  // Count opportunities for the selected province/category
+  const visibleCount = visible.reduce(
+    (sum, p) => sum + p.sections
+      .filter(s => categoryFilter === 'all' || s.type === categoryFilter)
+      .reduce((s, sec) => s + sec.items.length, 0),
+    0
+  );
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-10">
       {/* Header */}
@@ -123,71 +158,62 @@ export default function Scholarships() {
         />
       </div>
 
-      {/* Province chips */}
-      <div className="flex items-center gap-2 mb-4 overflow-x-auto pb-2 -mx-1 px-1">
-        <button
-          onClick={() => setActiveProvince('all')}
-          className={cn(
-            'px-3 py-1.5 rounded-xl text-xs font-semibold border whitespace-nowrap transition-all',
-            activeProvince === 'all' ? 'bg-primary text-primary-foreground border-primary' : 'bg-card border-border/50 text-muted-foreground hover:border-primary/30'
-          )}
-        >
-          All Provinces
-        </button>
-        {provinces.map(p => (
-          <button
-            key={p.province}
-            onClick={() => setActiveProvince(p.province)}
-            className={cn(
-              'px-3 py-1.5 rounded-xl text-xs font-semibold border whitespace-nowrap transition-all',
-              activeProvince === p.province ? 'bg-primary text-primary-foreground border-primary' : 'bg-card border-border/50 text-muted-foreground hover:border-primary/30'
-            )}
-          >
-            {p.province}
-          </button>
-        ))}
+      {/* Dropdowns: Province + Category */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Province / Region</label>
+          <NativeSelect
+            value={activeProvince}
+            onChange={setActiveProvince}
+            options={provinceOptions}
+            placeholder="All Provinces"
+          />
+        </div>
+        <div>
+          <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Funding Category</label>
+          <NativeSelect
+            value={categoryFilter}
+            onChange={setCategoryFilter}
+            options={categoryOptions}
+            placeholder="All Categories"
+          />
+        </div>
       </div>
 
-      {/* Category filter */}
-      <div className="flex items-center gap-2 mb-6 overflow-x-auto pb-2 -mx-1 px-1">
-        <button
-          onClick={() => setCategoryFilter('all')}
-          className={cn(
-            'px-3 py-1.5 rounded-xl text-xs font-medium border whitespace-nowrap transition-all',
-            categoryFilter === 'all' ? 'bg-foreground text-background border-foreground' : 'bg-card border-border/50 text-muted-foreground hover:border-foreground/30'
-          )}
-        >
-          All Categories
-        </button>
-        {Object.entries(SECTION_META).map(([key, meta]) => {
-          const Icon = ICONS[meta.icon];
-          return (
-            <button
-              key={key}
-              onClick={() => setCategoryFilter(key)}
-              className={cn(
-                'flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-medium border whitespace-nowrap transition-all',
-                categoryFilter === key ? 'bg-foreground text-background border-foreground' : 'bg-card border-border/50 text-muted-foreground hover:border-foreground/30'
-              )}
-            >
-              {Icon && <Icon className="w-3 h-3" />}
-              {meta.label}
-            </button>
-          );
-        })}
+      {/* Result summary */}
+      <div className="flex items-center gap-2 mb-4 text-xs text-muted-foreground">
+        <span className="font-semibold text-foreground">{visibleCount}</span> opportunit{visibleCount !== 1 ? 'ies' : 'y'} found
+        {activeProvince !== 'all' && <> in <span className="font-medium text-foreground">{activeProvince}</span></>}
+        {categoryFilter !== 'all' && <> · <span className="font-medium text-foreground">{SECTION_META[categoryFilter].label}</span></>}
+        {(activeProvince !== 'all' || categoryFilter !== 'all') && (
+          <button
+            onClick={() => { setActiveProvince('all'); setCategoryFilter('all'); }}
+            className="ml-auto text-primary hover:underline font-medium"
+          >
+            Clear filters
+          </button>
+        )}
       </div>
 
       {/* Province sections */}
-      <div className="space-y-4">
-        {visible.map(province => {
-          const filteredProvince = categoryFilter === 'all'
-            ? province
-            : { ...province, sections: province.sections.filter(s => s.type === categoryFilter) };
-          return (
-            <ProvinceSection key={province.province} province={filteredProvince} search={search} />
-          );
-        })}
-      </div>
+      {visible.length > 0 ? (
+        <div className="space-y-4">
+          {visible.map(province => (
+            <ProvinceSection
+              key={province.province}
+              province={province}
+              search={search}
+              categoryFilter={categoryFilter}
+            />
+          ))}
+        </div>
+      ) : (
+        <div className="text-center py-16">
+          <div className="text-5xl mb-4">🎓</div>
+          <h3 className="font-heading font-bold text-lg mb-2">No scholarships match</h3>
+          <p className="text-muted-foreground text-sm">Try a different province, category, or search term.</p>
+        </div>
+      )}
 
       {/* Footer note */}
       <div className="mt-8 bg-card rounded-2xl border border-border/50 p-4">
