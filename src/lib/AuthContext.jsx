@@ -1,7 +1,8 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
+import React, { createContext, useState, useContext, useEffect, useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
 import { appParams } from '@/lib/app-params';
 import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client';
+import AuthPrompt from '@/components/AuthPrompt';
 
 const AuthContext = createContext();
 
@@ -132,6 +133,19 @@ export const AuthProvider = ({ children }) => {
     base44.auth.redirectToLogin(window.location.href);
   };
 
+  // Auth prompt: shown when a logged-out user tries a protected action (save, apply, etc.)
+  const [authPromptOpen, setAuthPromptOpen] = useState(false);
+  const showAuthPrompt = useCallback(() => setAuthPromptOpen(true), []);
+  const dismissAuthPrompt = useCallback(() => setAuthPromptOpen(false), []);
+  const requireAuth = useCallback((action) => {
+    if (isAuthenticated) {
+      action && action();
+      return true;
+    }
+    setAuthPromptOpen(true);
+    return false;
+  }, [isAuthenticated]);
+
   return (
     <AuthContext.Provider value={{ 
       user, 
@@ -144,9 +158,14 @@ export const AuthProvider = ({ children }) => {
       logout,
       navigateToLogin,
       checkUserAuth,
-      checkAppState
+      checkAppState,
+      requireAuth,
+      showAuthPrompt,
+      dismissAuthPrompt,
+      authPromptOpen
     }}>
       {children}
+      <AuthPrompt />
     </AuthContext.Provider>
   );
 };

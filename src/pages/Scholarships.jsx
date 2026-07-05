@@ -1,5 +1,8 @@
 import { useState, useMemo } from 'react';
-import { Search, ExternalLink, MapPin, Landmark, GraduationCap, Award, Heart, BookOpen, ChevronDown } from 'lucide-react';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
+import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { Search, ExternalLink, MapPin, Landmark, GraduationCap, Award, Heart, BookOpen, ChevronDown, Bookmark, BookmarkCheck } from 'lucide-react';
 import { SCHOLARSHIPS_BY_PROVINCE, SECTION_META } from '@/data/scholarshipsData';
 import { cn } from '@/lib/utils';
 
@@ -40,27 +43,41 @@ function NativeSelect({ value, onChange, options, placeholder, disabled }) {
   );
 }
 
-function ScholarshipCard({ item }) {
+function ScholarshipCard({ item, saved, saving, onSave }) {
   return (
-    <a
-      href={item.link}
-      target={item.link ? '_blank' : undefined}
-      rel={item.link ? 'noopener noreferrer' : undefined}
-      className={cn(
-        'block bg-card border border-border/50 rounded-xl p-3 transition-all',
-        item.link ? 'hover:border-primary/30 hover:shadow-md hover:-translate-y-0.5 cursor-pointer' : 'cursor-default'
-      )}
-    >
-      <div className="flex items-start justify-between gap-2">
-        <h4 className="text-sm font-semibold text-foreground leading-snug flex-1">{item.name}</h4>
-        {item.link && <ExternalLink className="w-3.5 h-3.5 text-muted-foreground flex-shrink-0 mt-0.5" />}
+    <div className="bg-card border border-border/50 rounded-xl p-3 transition-all hover:border-primary/30 hover:shadow-md">
+      <div className="flex items-start gap-2">
+        <a
+          href={item.link || '#'}
+          target={item.link ? '_blank' : undefined}
+          rel={item.link ? 'noopener noreferrer' : undefined}
+          className="flex-1 min-w-0"
+        >
+          <h4 className="text-sm font-semibold text-foreground leading-snug flex items-center gap-1">
+            <span className="flex-1">{item.name}</span>
+            {item.link && <ExternalLink className="w-3 h-3 text-muted-foreground flex-shrink-0" />}
+          </h4>
+          {item.desc && <p className="text-xs text-muted-foreground mt-1 leading-snug">{item.desc}</p>}
+        </a>
+        <button
+          onClick={e => { e.preventDefault(); e.stopPropagation(); if (!saving) onSave(); }}
+          disabled={saving}
+          className={cn(
+            'p-1.5 rounded-lg flex-shrink-0 transition-colors flex items-center justify-center',
+            saved ? 'text-primary bg-primary/10' : 'text-muted-foreground hover:text-primary hover:bg-muted',
+            saving && 'opacity-50'
+          )}
+          aria-label={saved ? 'Remove from saved' : 'Save scholarship'}
+          title={saved ? 'Saved — click to remove' : 'Save to My Scholarships'}
+        >
+          {saved ? <BookmarkCheck className="w-4 h-4 fill-primary" /> : <Bookmark className="w-4 h-4" />}
+        </button>
       </div>
-      {item.desc && <p className="text-xs text-muted-foreground mt-1 leading-snug">{item.desc}</p>}
-    </a>
+    </div>
   );
 }
 
-function ProvinceSection({ province, search, categoryFilter, city }) {
+function ProvinceSection({ province, search, categoryFilter, city, savedNames, savingName, onSave }) {
   const [openSections, setOpenSections] = useState(() =>
     Object.fromEntries(province.sections.map(s => [s.type, true]))
   );
@@ -75,7 +92,7 @@ function ProvinceSection({ province, search, categoryFilter, city }) {
             (item.desc || '').toLowerCase().includes(search.toLowerCase());
           const matchesCategory = categoryFilter === 'all' || section.type === categoryFilter;
           // City filter: university scholarships are city-specific; others are province-wide
-          const matchesCity = !city || section.type !== 'university' ||
+          const matchesCity = !city || city === 'all' || section.type !== 'university' ||
             item.name.toLowerCase().includes(city.toLowerCase()) ||
             (item.desc || '').toLowerCase().includes(city.toLowerCase());
           return matchesSearch && matchesCategory && matchesCity;
@@ -118,7 +135,13 @@ function ProvinceSection({ province, search, categoryFilter, city }) {
               {isOpen && (
                 <div className="px-3 pb-3 pt-1 grid grid-cols-1 sm:grid-cols-2 gap-2">
                   {section.items.map((item, i) => (
-                    <ScholarshipCard key={i} item={item} />
+                    <ScholarshipCard
+                      key={i}
+                      item={item}
+                      saved={savedNames.has(item.name)}
+                      saving={savingName === item.name}
+                      onSave={() => onSave(item, province.province, province.city, section.type)}
+                    />
                   ))}
                 </div>
               )}
@@ -131,13 +154,77 @@ function ProvinceSection({ province, search, categoryFilter, city }) {
 }
 
 export default function Scholarships() {
+  const { isAuthenticated, requireAuth } = useAuth();
+  const queryClient = useQueryClient();
   const [activeProvince, setActiveProvince] = useState('all');
   const [activeCity, setActiveCity] = useState('all');
   const [search, setSearch] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('all');
+  const [savingName, setSavingName] = useState(null);
 
   const provinces = SCHOLARSHIPS_BY_PROVINCE;
   const visible = activeProvince === 'all' ? provinces : provinces.filter(p => p.province === activeProvince);
+
+  // Saved scholarships (only when authenticated)
+  const { data: savedScholarships = [] } = useQuery({
+    queryKey: ['savedScholarships'],
+    queryFn: async () => {
+      try {
+        const user = await base44.auth.me();
+        return base44.entities.SavedScholarship.filter({ created_by: user.email });
+      } catch {
+        return [];
+      }
+    },
+    enabled: isAuthenticated,
+  });
+
+  const savedNames = useMemo(
+    () => new Set(savedScholarships.map(s => s.scholarship_name)),
+    [savedScholarships]
+  );
+
+  const saveMutation = useMutation({
+    mutationFn: async (data) => {
+      setSavingName(data.scholarship_name);
+      return base44.entities.SavedScholarship.create(data);
+    },
+    onSettled: () => {
+      setSavingName(null);
+      queryClient.invalidateQueries({ queryKey: ['savedScholarships'] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (data) => {
+      setSavingName(data.scholarship_name);
+      const existing = savedScholarships.find(s => s.scholarship_name === data.scholarship_name);
+      if (existing) return base44.entities.SavedScholarship.delete(existing.id);
+    },
+    onSettled: () => {
+      setSavingName(null);
+      queryClient.invalidateQueries({ queryKey: ['savedScholarships'] });
+    },
+  });
+
+  const handleSave = (item, provinceName, city, fundingType) => {
+    requireAuth(() => {
+      const payload = {
+        scholarship_name: item.name,
+        province: provinceName,
+        city: city,
+        funding_type: fundingType,
+        link: item.link || '',
+        desc: item.desc || '',
+        status: 'saved',
+      };
+      if (savedNames.has(item.name)) {
+        deleteMutation.mutate(payload);
+      } else {
+        saveMutation.mutate(payload);
+      }
+    }, 'Sign in to save scholarships and track your applications');
+  };
 
   const totalCount = provinces.reduce(
     (sum, p) => sum + p.sections.reduce((s, sec) => s + sec.items.length, 0), 0
@@ -180,6 +267,7 @@ export default function Scholarships() {
         </h1>
         <p className="text-muted-foreground text-sm">
           Government-funded grants, university awards, private scholarships, and refugee/newcomer funding — classified by province, city, and type. {totalCount}+ opportunities listed.
+          {!isAuthenticated && <> Tap the bookmark icon on any scholarship to save it (free sign-in required).</>}
         </p>
       </div>
 
@@ -233,6 +321,7 @@ export default function Scholarships() {
         {activeProvince !== 'all' && <> in <span className="font-medium text-foreground">{activeProvince}</span></>}
         {activeCity !== 'all' && activeCity && <> · <span className="font-medium text-foreground">{activeCity}</span></>}
         {categoryFilter !== 'all' && <> · <span className="font-medium text-foreground">{SECTION_META[categoryFilter].label}</span></>}
+        {isAuthenticated && savedScholarships.length > 0 && <> · <span className="font-medium text-primary">{savedScholarships.length} saved</span></>}
         {(activeProvince !== 'all' || categoryFilter !== 'all' || activeCity !== 'all') && (
           <button
             onClick={() => { setActiveProvince('all'); setActiveCity('all'); setCategoryFilter('all'); }}
@@ -253,6 +342,9 @@ export default function Scholarships() {
               search={search}
               categoryFilter={categoryFilter}
               city={activeCity}
+              savedNames={savedNames}
+              savingName={savingName}
+              onSave={handleSave}
             />
           ))}
         </div>

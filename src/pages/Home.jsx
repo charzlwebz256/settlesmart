@@ -23,9 +23,13 @@ export default function Home() {
   const { data: profiles } = useQuery({
     queryKey: ['myProfile'],
     queryFn: async () => {
-      const user = await base44.auth.me();
-      const results = await base44.entities.UserProfile.filter({ created_by: user.email });
-      return results;
+      try {
+        const user = await base44.auth.me();
+        const results = await base44.entities.UserProfile.filter({ created_by: user.email });
+        return results;
+      } catch {
+        return [];
+      }
     },
     initialData: [],
   });

@@ -1,6 +1,7 @@
 import { Badge } from '@/components/ui/badge';
 import { ExternalLink, MapPin, Clock, Building2, DollarSign, PlusCircle } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useAuth } from '@/lib/AuthContext';
 
 const typeLabels = {
   full_time: { label: 'Full-time', color: 'bg-green-500/10 text-green-700' },
@@ -45,12 +46,17 @@ function buildJobUrl(job) {
 }
 
 export default function JobCard({ job, onAddToTracker }) {
+  const { requireAuth } = useAuth();
   const src = sourceConfig[job.source] || sourceConfig.indeed;
   const typeStyle = typeLabels[job.job_type] || { label: job.job_type, color: 'bg-muted text-muted-foreground' };
   const expStyle = expLabels[job.experience_level] || expLabels.any;
   const jobUrl = buildJobUrl(job);
 
   const openJob = () => window.open(jobUrl, '_blank', 'noopener,noreferrer');
+
+  const handleAddToTracker = () => {
+    requireAuth(() => onAddToTracker(job), 'Sign in to track your job applications');
+  };
 
   return (
     <div
@@ -118,7 +124,7 @@ export default function JobCard({ job, onAddToTracker }) {
         </button>
         {onAddToTracker && (
           <button
-            onClick={e => { e.stopPropagation(); onAddToTracker(job); }}
+            onClick={e => { e.stopPropagation(); handleAddToTracker(); }}
             className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 border border-primary/30 px-3 py-1.5 rounded-lg hover:bg-primary/5 transition-colors"
           >
             <PlusCircle className="w-3.5 h-3.5" />

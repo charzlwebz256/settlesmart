@@ -17,6 +17,7 @@ import AIRecommendations from '@/components/dashboard/AIRecommendations';
 import WeatherWidget from '@/components/news/WeatherWidget';
 import DailySettlementTip from '@/components/dashboard/DailySettlementTip';
 import ServiceRecommendations from '@/components/dashboard/ServiceRecommendations';
+import MyScholarships from '@/components/dashboard/MyScholarships';
 
 const interestConfig = {
   education: { icon: BookOpen, color: 'text-blue-600 bg-blue-500/10', label: 'Education & Language' },
@@ -147,6 +148,9 @@ export default function Dashboard() {
 
           {/* AI Recommendations */}
           <AIRecommendations profile={profile} />
+
+          {/* My Scholarships */}
+          <MyScholarships />
 
           {/* Interest-based quick links */}
           {(profile.interests || []).length > 0 && (

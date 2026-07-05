@@ -1,0 +1,81 @@
+{
+  "name": "SavedScholarship",
+  "type": "object",
+  "properties": {
+    "scholarship_name": {
+      "type": "string",
+      "description": "Name of the saved scholarship opportunity"
+    },
+    "province": {
+      "type": "string",
+      "description": "Province the scholarship belongs to"
+    },
+    "city": {
+      "type": "string",
+      "description": "City the scholarship applies to (if applicable)"
+    },
+    "funding_type": {
+      "type": "string",
+      "enum": [
+        "government",
+        "university",
+        "private",
+        "refugee"
+      ],
+      "description": "Funding category"
+    },
+    "link": {
+      "type": "string",
+      "description": "URL to the scholarship details/application"
+    },
+    "desc": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Short description of the scholarship"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "saved",
+        "applied",
+        "in_progress",
+        "awarded",
+        "rejected"
+      ],
+      "default": "saved",
+      "description": "Application progress status"
+    },
+    "applied_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the application was submitted"
+    },
+    "deadline": {
+      "type": "string",
+      "format": "date",
+      "description": "Scholarship application deadline"
+    },
+    "notes": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Personal notes about this scholarship"
+    }
+  },
+  "required": [
+    "scholarship_name"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

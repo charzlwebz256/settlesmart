@@ -1,6 +1,7 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, CalendarDays, ChevronDown, Moon, Sun, Heart, Info, GraduationCap } from 'lucide-react';
+import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, CalendarDays, ChevronDown, Moon, Sun, Heart, Info, GraduationCap, LogIn, LogOut } from 'lucide-react';
+import { useAuth } from '@/lib/AuthContext';
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -124,6 +125,7 @@ export default function AppLayout() {
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
   const menuRef = useRef(null);
   const { city: detectedCity, province: detectedProvince } = useLocation_();
+  const { isAuthenticated, logout, navigateToLogin } = useAuth();
   const activeTab = getActiveTab(location.pathname);
   const ROOT_TABS = ['/', '/explore', '/work', '/resources', '/emergency'];
   const isRootTab = ROOT_TABS.includes(location.pathname);
@@ -158,9 +160,13 @@ export default function AppLayout() {
   const { data: profile } = useQuery({
     queryKey: ['myProfile'],
     queryFn: async () => {
-      const user = await base44.auth.me();
-      const results = await base44.entities.UserProfile.filter({ created_by: user.email });
-      return results[0] || null;
+      try {
+        const user = await base44.auth.me();
+        const results = await base44.entities.UserProfile.filter({ created_by: user.email });
+        return results[0] || null;
+      } catch {
+        return null;
+      }
     },
   });
 
@@ -294,6 +300,27 @@ export default function AppLayout() {
                     {item.label}
                   </Link>
                 ))}
+              </div>
+
+              {/* Sign in / Sign out */}
+              <div className="border-t border-border/40 pt-1.5 mt-1">
+                {isAuthenticated ? (
+                  <button
+                    onClick={() => { setMenuOpen(false); logout(false); navigate('/'); }}
+                    className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 transition-all"
+                  >
+                    <LogOut className="w-4 h-4" />
+                    Sign Out
+                  </button>
+                ) : (
+                  <button
+                    onClick={() => { setMenuOpen(false); navigateToLogin(); }}
+                    className="w-full flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium text-primary hover:bg-primary/10 transition-all"
+                  >
+                    <LogIn className="w-4 h-4" />
+                    Sign In
+                  </button>
+                )}
               </div>
             </motion.div>
           )}

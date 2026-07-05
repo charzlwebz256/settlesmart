@@ -1,12 +1,13 @@
 import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
-import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
 import { useEffect } from 'react';
 import PageNotFound from './lib/PageNotFound';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import { LocationProvider } from '@/lib/LocationContext';
 import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import ProtectedRoute from '@/components/ProtectedRoute';
 import AppLayout from './components/layout/AppLayout';
 import Home from './pages/Home';
 import Onboarding from './pages/Onboarding';
@@ -66,15 +67,13 @@ const AuthenticatedApp = () => {
   return (
     <Routes>
       <Route element={<AppLayout />}>
+        {/* Publicly browseable without sign-in */}
         <Route path="/" element={<Home />} />
-        <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/services" element={<Services />} />
         <Route path="/explore" element={<Explore />} />
         <Route path="/work" element={<Work />} />
         <Route path="/resources" element={<Resources />} />
         <Route path="/assistant" element={<Assistant />} />
-        <Route path="/checklist" element={<Checklist />} />
-        <Route path="/profile" element={<Profile />} />
         <Route path="/transit-map" element={<TransitMap />} />
         <Route path="/events" element={<Events />} />
         <Route path="/jobs" element={<Jobs />} />
@@ -87,14 +86,21 @@ const AuthenticatedApp = () => {
         <Route path="/education" element={<Education />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
         <Route path="/volunteer" element={<Volunteer />} />
-        <Route path="/resume-builder" element={<ResumeBuilder />} />
-        <Route path="/job-tracker" element={<JobTracker />} />
-        <Route path="/interview-prep" element={<InterviewPrep />} />
         <Route path="/shop-smart" element={<ShopSmart />} />
         <Route path="/support-us" element={<SupportUs />} />
         <Route path="/meet-the-developer" element={<MeetTheDeveloper />} />
-        <Route path="/job-coach" element={<JobCoach />} />
         <Route path="/scholarships" element={<Scholarships />} />
+
+        {/* Sign in required — personal data & tracked actions */}
+        <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/checklist" element={<Checklist />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/resume-builder" element={<ResumeBuilder />} />
+          <Route path="/job-tracker" element={<JobTracker />} />
+          <Route path="/interview-prep" element={<InterviewPrep />} />
+          <Route path="/job-coach" element={<JobCoach />} />
+        </Route>
       </Route>
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="*" element={<PageNotFound />} />
