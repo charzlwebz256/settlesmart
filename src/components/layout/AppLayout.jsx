@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, CalendarDays, ChevronDown, Moon, Sun, Heart, Info } from 'lucide-react';
+import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, CalendarDays, ChevronDown, Moon, Sun, Heart, Info, GraduationCap } from 'lucide-react';
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -17,6 +17,7 @@ const TAB_CHILDREN = {
   '/explore': [
     { path: '/services', icon: Search, label: 'Settlement Services' },
     { path: '/near-me', icon: MapPin, label: 'Near Me' },
+    { path: '/scholarships', icon: GraduationCap, label: 'Scholarships' },
     { path: '/shop-smart', icon: ShoppingBag, label: 'ShopSmart' },
   ],
   '/work': [
