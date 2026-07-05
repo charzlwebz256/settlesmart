@@ -90,7 +90,7 @@ export default function ServiceReviews({ serviceKey, serviceName, province }) {
   <tr><td style="padding:6px 12px;color:#666;">Service</td><td style="padding:6px 12px;font-weight:bold;">${escapeHtml(payload.service_name)}</td></tr>
   <tr><td style="padding:6px 12px;color:#666;">Province</td><td style="padding:6px 12px;">${escapeHtml(payload.province)}</td></tr>
   <tr><td style="padding:6px 12px;color:#666;">Reviewer</td><td style="padding:6px 12px;">${escapeHtml(reviewerName)}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666;">Rating</td><td style="padding:6px 12px;">${stars} (${payload.rating}/5)</td></tr>
+  <tr><td style="padding:6px 12px;color:#666;">Rating</td><td style="padding:6px 12px;">${stars} (${escapeHtml(payload.rating)}/5)</td></tr>
   <tr><td style="padding:6px 12px;color:#666;">Review</td><td style="padding:6px 12px;">${escapeHtml(payload.review || '(no text)')}</td></tr>
 </table>
 ${reviewerEmail ? `<p><a href="${escapeHtml(sanitizeUrl(gmailReplyLink))}" style="background:#1a73e8;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;font-weight:bold;">Reply via Gmail</a></p>` : ''}
