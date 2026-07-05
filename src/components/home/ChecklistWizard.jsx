@@ -105,8 +105,8 @@ Return JSON "items" array, exactly 12 items. Each: title (5 words max), descript
 
     const userPromise = base44.auth.me().then(user =>
       Promise.all([
-        base44.entities.UserProfile.filter({ created_by: user.email }),
-        base44.entities.ChecklistItem.filter({ created_by: user.email }),
+        base44.entities.UserProfile.filter({ created_by_id: user.id }),
+        base44.entities.ChecklistItem.filter({ created_by_id: user.id }),
       ])
     );
 

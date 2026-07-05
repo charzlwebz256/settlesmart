@@ -103,7 +103,7 @@ export default function Profile() {
     queryKey: ['myProfile'],
     queryFn: async () => {
       const u = await base44.auth.me();
-      const results = await base44.entities.UserProfile.filter({ created_by_id: u.id });
+      const results = await base44.entities.UserProfile.filter({ created_by_id: u.id }, '-updated_date');
       return results[0] || null;
     },
   });

@@ -67,12 +67,23 @@ export default function Onboarding() {
 
   const handleFinish = async () => {
     setSaving(true);
-    await base44.entities.UserProfile.create({
-      ...data,
-      onboarding_completed: true,
-      arrival_date: new Date().toISOString().split('T')[0],
-    });
-    navigate('/dashboard');
+    try {
+      const user = await base44.auth.me();
+      const existing = await base44.entities.UserProfile.filter({ created_by_id: user.id });
+      const payload = {
+        ...data,
+        onboarding_completed: true,
+        arrival_date: new Date().toISOString().split('T')[0],
+      };
+      if (existing.length > 0) {
+        await base44.entities.UserProfile.update(existing[0].id, payload);
+      } else {
+        await base44.entities.UserProfile.create(payload);
+      }
+      navigate('/dashboard');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const steps = [

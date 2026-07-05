@@ -27,7 +27,7 @@ export default function Home() {
     queryFn: async () => {
       try {
         const user = await base44.auth.me();
-        const results = await base44.entities.UserProfile.filter({ created_by: user.email });
+        const results = await base44.entities.UserProfile.filter({ created_by_id: user.id }, '-updated_date');
         return results;
       } catch {
         return [];

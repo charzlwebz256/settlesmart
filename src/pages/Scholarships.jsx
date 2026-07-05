@@ -171,7 +171,7 @@ export default function Scholarships() {
     queryFn: async () => {
       try {
         const user = await base44.auth.me();
-        return base44.entities.SavedScholarship.filter({ created_by: user.email });
+        return base44.entities.SavedScholarship.filter({ created_by_id: user.id });
       } catch {
         return [];
       }

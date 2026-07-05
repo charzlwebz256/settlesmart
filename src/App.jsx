@@ -83,7 +83,6 @@ const AuthenticatedApp = () => {
         <Route path="/assistant" element={<Assistant />} />
         <Route path="/transit-map" element={<TransitMap />} />
         <Route path="/events" element={<Events />} />
-        <Route path="/jobs" element={<Jobs />} />
         <Route path="/legal" element={<Legal />} />
         <Route path="/emergency" element={<Emergency />} />
         <Route path="/near-me" element={<NearMe />} />
@@ -96,7 +95,6 @@ const AuthenticatedApp = () => {
         <Route path="/shop-smart" element={<ShopSmart />} />
         <Route path="/support-us" element={<SupportUs />} />
         <Route path="/meet-the-developer" element={<MeetTheDeveloper />} />
-        <Route path="/scholarships" element={<Scholarships />} />
 
         {/* Sign in required — personal data & tracked actions */}
         <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
@@ -104,6 +102,8 @@ const AuthenticatedApp = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/checklist" element={<Checklist />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/scholarships" element={<Scholarships />} />
+          <Route path="/jobs" element={<Jobs />} />
           <Route path="/resume-builder" element={<ResumeBuilder />} />
           <Route path="/job-tracker" element={<JobTracker />} />
           <Route path="/interview-prep" element={<InterviewPrep />} />

@@ -44,7 +44,7 @@ export default function Dashboard() {
     queryKey: ['myProfile'],
     queryFn: async () => {
       const user = await base44.auth.me();
-      const results = await base44.entities.UserProfile.filter({ created_by: user.email });
+      const results = await base44.entities.UserProfile.filter({ created_by_id: user.id }, '-updated_date');
       return results[0] || null;
     },
   });
@@ -53,7 +53,7 @@ export default function Dashboard() {
     queryKey: ['myChecklist'],
     queryFn: async () => {
       const user = await base44.auth.me();
-      return base44.entities.ChecklistItem.filter({ created_by: user.email }, 'order');
+      return base44.entities.ChecklistItem.filter({ created_by_id: user.id }, 'order');
     },
     initialData: [],
   });
@@ -62,7 +62,7 @@ export default function Dashboard() {
     queryKey: ['savedResources'],
     queryFn: async () => {
       const user = await base44.auth.me();
-      return base44.entities.SavedResource.filter({ created_by: user.email });
+      return base44.entities.SavedResource.filter({ created_by_id: user.id });
     },
     initialData: [],
   });
