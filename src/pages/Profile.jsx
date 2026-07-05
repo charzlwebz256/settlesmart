@@ -133,11 +133,20 @@ export default function Profile() {
   const handleSave = async () => {
     if (!form?.id) return;
     setSaving(true);
+    setSaved(false);
     const { id, created_date, updated_date, created_by_id, ...payload } = form;
     try {
-      const updated = await base44.entities.UserProfile.update(id, payload);
-      // Refetch from server to confirm persisted data, then sync form
-      await queryClient.invalidateQueries({ queryKey: ['myProfile'] });
+      await base44.entities.UserProfile.update(id, payload);
+      // Refetch from server to confirm persisted data, then sync form to it
+      const fresh = await queryClient.fetchQuery({
+        queryKey: ['myProfile'],
+        queryFn: async () => {
+          const u = await base44.auth.me();
+          const results = await base44.entities.UserProfile.filter({ created_by_id: u.id }, '-updated_date');
+          return results[0] || null;
+        },
+      });
+      if (fresh) setForm({ ...fresh });
       setSaved(true);
       setTimeout(() => setSaved(false), 2500);
     } finally {
@@ -271,9 +280,12 @@ export default function Profile() {
           <Button
             onClick={handleSave}
             disabled={saving}
-            className="flex-1 rounded-xl gap-2 bg-primary hover:bg-primary/90"
+            className={cn(
+              "flex-1 rounded-xl gap-2 bg-primary hover:bg-primary/90 relative overflow-hidden transition-all duration-300",
+              saving ? "saving-shimmer scale-[0.97]" : saved ? "bg-emerald-600 hover:bg-emerald-600" : ""
+            )}
           >
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle2 className="w-4 h-4" /> : <Save className="w-4 h-4" />}
+            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle2 className="w-4 h-4 success-pop" /> : <Save className="w-4 h-4" />}
             {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Changes'}
           </Button>
           <Button variant="outline" onClick={handleLogout} className="rounded-xl gap-2">
