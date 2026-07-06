@@ -102,7 +102,8 @@ export default function Events() {
       queryClient.invalidateQueries({ queryKey: ['events'] });
       setTimeout(() => setSyncStatus(null), 5000);
     } catch (error) {
-      setSyncStatus({ success: false, error: error.message });
+      const msg = error?.response?.data?.error || error?.response?.data?.details || error?.message || 'Unknown error';
+      setSyncStatus({ success: false, error: msg });
       setTimeout(() => setSyncStatus(null), 5000);
     } finally {
       setSyncing(false);
