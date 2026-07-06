@@ -6,10 +6,11 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
-import { CheckCircle2, Circle, Sparkles, Loader2, ChevronDown, ExternalLink } from 'lucide-react';
+import { CheckCircle2, Circle, Sparkles, Loader2, ChevronDown, ExternalLink, Plus, Pencil, Trash2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
 import ExportRoadmapPDF from '@/components/checklist/ExportRoadmapPDF';
+import ChecklistTaskModal from '@/components/checklist/ChecklistTaskModal';
 import { buildChecklist } from '@/data/checklistTemplate';
 
 const dayRangeLabels = {
@@ -37,6 +38,8 @@ export default function Checklist() {
   const queryClient = useQueryClient();
   const [generating, setGenerating] = useState(false);
   const [expandedPeriod, setExpandedPeriod] = useState('week1');
+  const [modalOpen, setModalOpen] = useState(false);
+  const [editingTask, setEditingTask] = useState(null);
 
   const handleRefresh = useCallback(async () => {
     await queryClient.invalidateQueries({ queryKey: ['myChecklist'] });
@@ -77,6 +80,35 @@ export default function Checklist() {
     },
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['myChecklist'] }),
   });
+
+  const upsertMutation = useMutation({
+    mutationFn: async (payload) => {
+      if (payload.id) {
+        const { id, ...rest } = payload;
+        return base44.entities.ChecklistItem.update(id, rest);
+      }
+      const existing = checklist.filter(i => i.day_range === payload.day_range);
+      const order = existing.length > 0 ? Math.max(...existing.map(i => i.order || 0)) + 1 : 1;
+      return base44.entities.ChecklistItem.create({ ...payload, is_completed: false, order });
+    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['myChecklist'] }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (id) => base44.entities.ChecklistItem.delete(id),
+    onMutate: async (id) => {
+      await queryClient.cancelQueries({ queryKey: ['myChecklist'] });
+      const previous = queryClient.getQueryData(['myChecklist']);
+      queryClient.setQueryData(['myChecklist'], old => (old || []).filter(i => i.id !== id));
+      return { previous };
+    },
+    onError: (_e, _v, ctx) => queryClient.setQueryData(['myChecklist'], ctx.previous),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['myChecklist'] }),
+  });
+
+  const handleSaveTask = async (payload) => { await upsertMutation.mutateAsync(payload); };
+  const openAdd = (period) => { setEditingTask({ day_range: period }); setModalOpen(true); };
+  const openEdit = (item) => { setEditingTask(item); setModalOpen(true); };
 
   const generateChecklist = async () => {
     setGenerating(true);
@@ -123,7 +155,18 @@ export default function Checklist() {
           </p>
         </div>
         {checklist.length > 0 && (
-          <ExportRoadmapPDF checklist={checklist} profile={profile} />
+          <div className="flex items-center gap-2">
+            <Button
+              onClick={() => openAdd('week1')}
+              variant="outline"
+              size="sm"
+              className="rounded-xl gap-2"
+            >
+              <Plus className="w-4 h-4" />
+              Add Task
+            </Button>
+            <ExportRoadmapPDF checklist={checklist} profile={profile} />
+          </div>
         )}
       </div>
 
@@ -223,7 +266,7 @@ export default function Checklist() {
                           initial={{ opacity: 0 }}
                           animate={{ opacity: 1 }}
                           className={cn(
-                            "flex items-start gap-3 p-3 rounded-xl transition-all",
+                            "group flex items-start gap-3 p-3 rounded-xl transition-all",
                             item.is_completed ? "bg-muted/30" : "bg-muted/50 hover:bg-muted/70"
                           )}
                         >
@@ -240,9 +283,11 @@ export default function Checklist() {
                             <p className={cn("text-sm font-medium", item.is_completed && "line-through text-muted-foreground")}>
                               {item.title}
                             </p>
-                            <p className="text-xs text-muted-foreground mt-0.5">{item.description}</p>
+                            {item.description && (
+                              <p className="text-xs text-muted-foreground mt-0.5">{item.description}</p>
+                            )}
                             <div className="flex items-center gap-2 mt-2">
-                              <Badge className={cn("text-[10px] border-0", categoryColors[item.category] || 'bg-muted text-muted-foreground')}>
+                              <Badge className={cn("text-[10px] border-0 capitalize", categoryColors[item.category] || 'bg-muted text-muted-foreground')}>
                                 {item.category}
                               </Badge>
                               {item.link && (
@@ -250,10 +295,33 @@ export default function Checklist() {
                                   <ExternalLink className="w-3 h-3" /> Resource
                                 </a>
                               )}
+                              <div className="flex items-center gap-1 ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                                <button
+                                  onClick={() => openEdit(item)}
+                                  className="p-1 rounded-md hover:bg-background text-muted-foreground hover:text-primary"
+                                  aria-label="Edit task"
+                                >
+                                  <Pencil className="w-3.5 h-3.5" />
+                                </button>
+                                <button
+                                  onClick={() => deleteMutation.mutate(item.id)}
+                                  className="p-1 rounded-md hover:bg-background text-muted-foreground hover:text-destructive"
+                                  aria-label="Delete task"
+                                >
+                                  <Trash2 className="w-3.5 h-3.5" />
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </motion.div>
                       ))}
+                      <button
+                        onClick={() => openAdd(period)}
+                        className="w-full flex items-center justify-center gap-2 py-2.5 rounded-xl border border-dashed border-border text-xs text-muted-foreground hover:text-primary hover:border-primary/40 transition-colors"
+                      >
+                        <Plus className="w-3.5 h-3.5" />
+                        Add task to this section
+                      </button>
                     </div>
                   )}
                 </div>
@@ -262,6 +330,13 @@ export default function Checklist() {
           </div>
         </>
       )}
+
+      <ChecklistTaskModal
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        task={editingTask}
+        onSave={handleSaveTask}
+      />
     </div>
   );
 }
