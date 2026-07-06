@@ -13,7 +13,7 @@ import {
   AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
-import { MobileSelect as Select, MobileSelectContent as SelectContent, MobileSelectItem as SelectItem, MobileSelectTrigger as SelectTrigger, MobileSelectValue as SelectValue } from '@/components/ui/mobile-select';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useNavigate, Link } from 'react-router-dom';
 
 const PROVINCE_CITIES = {
@@ -206,7 +206,7 @@ export default function Profile() {
                 <SelectTrigger className="w-full h-9 rounded-lg border border-input bg-transparent px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring">
                   <SelectValue placeholder="Select province" />
                 </SelectTrigger>
-                <SelectContent label="Province">
+                <SelectContent>
                   {PROVINCES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
                 </SelectContent>
               </Select>
@@ -217,7 +217,7 @@ export default function Profile() {
                 <SelectTrigger className="w-full h-9 rounded-lg border border-input bg-transparent px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50">
                   <SelectValue placeholder={form.province ? 'Select city' : 'Select province first'} />
                 </SelectTrigger>
-                <SelectContent label="City">
+                <SelectContent>
                   {cities.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                 </SelectContent>
               </Select>
@@ -238,7 +238,7 @@ export default function Profile() {
                 <SelectTrigger className="w-full h-9 rounded-lg border border-input bg-transparent px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
-                <SelectContent label="Immigration Status">
+                <SelectContent>
                   {IMMIGRATION_STATUSES.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
                 </SelectContent>
               </Select>
@@ -249,7 +249,7 @@ export default function Profile() {
                 <SelectTrigger className="w-full h-9 rounded-lg border border-input bg-transparent px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring">
                   <SelectValue placeholder="Select level" />
                 </SelectTrigger>
-                <SelectContent label="English Level">
+                <SelectContent>
                   {ENGLISH_LEVELS.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
                 </SelectContent>
               </Select>
