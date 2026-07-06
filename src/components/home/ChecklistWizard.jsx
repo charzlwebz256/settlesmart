@@ -81,7 +81,7 @@ export default function ChecklistWizard({ onComplete }) {
     const llmPromise = base44.integrations.Core.InvokeLLM({
       model: 'gpt_5_mini',
       prompt: `Settlement checklist for a ${statusLabel} in ${location}, Canada. Arrival: ${arrivalOpt?.label}.
-Return JSON "items" array, exactly 12 items. Each: title (5 words max), description (1 short sentence), category (documents|housing|banking|health|education|employment|transportation|social|legal), day_range (week1|week2|week3|week4|month2|month3), order (1-12), link (relevant gov/org URL or "").`,
+Return JSON "items" array, exactly 8 items. Each: title (5 words max), description (1 short sentence), category (documents|housing|banking|health|education|employment|transportation|social|legal), day_range (week1|week2|week3|week4|month2|month3), order (1-8), link (relevant gov/org URL or ""). Be concise and fast.`,
       response_json_schema: {
         type: 'object',
         properties: {
@@ -121,20 +121,19 @@ Return JSON "items" array, exactly 12 items. Each: title (5 words max), descript
       onboarding_completed: true,
     };
 
-    // Save profile + clear old items in parallel
+    // Save profile, clear old items, and create new items all in parallel
+    const newItems = result?.items?.length
+      ? base44.entities.ChecklistItem.bulkCreate(
+          result.items.map(item => ({ ...item, is_completed: false }))
+        )
+      : Promise.resolve();
     await Promise.all([
       existingProfiles.length > 0
         ? base44.entities.UserProfile.update(existingProfiles[0].id, profileData)
         : base44.entities.UserProfile.create(profileData),
       ...existingItems.map(i => base44.entities.ChecklistItem.delete(i.id)),
+      newItems,
     ]);
-
-    // Bulk create new checklist items
-    if (result?.items?.length) {
-      await base44.entities.ChecklistItem.bulkCreate(
-        result.items.map(item => ({ ...item, is_completed: false }))
-      );
-    }
 
     queryClient.invalidateQueries({ queryKey: ['myProfile'] });
     queryClient.invalidateQueries({ queryKey: ['myChecklist'] });

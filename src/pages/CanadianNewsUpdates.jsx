@@ -23,11 +23,11 @@ Location context: ${loc}, ${prov || 'Canada'}
 
 Sources to search: BBC News (bbc.com), CNN (cnn.com), Reuters (reuters.com), Al Jazeera (aljazeera.com), CBC News (cbc.ca), CTV News, AP News, The Guardian, Globe and Mail, National Post.
 
-Return 10 breaking news stories published TODAY — prioritize stories from the last 1-6 hours. Include: major world events, Canadian emergencies, political crises, natural disasters, major policy changes, major crimes, wars/conflicts, economic shocks.
+Return 5 breaking news stories published TODAY — prioritize stories from the last 1-6 hours. Include: major world events, Canadian emergencies, political crises, natural disasters, major policy changes, major crimes, wars/conflicts, economic shocks.
 
 For each: exact real headline, 2-sentence factual summary, source name, realistic time_ago (e.g. "12 min ago", "2 hrs ago", "4 hrs ago"), real or likely URL, is_local flag.
 
-Also return 3 newcomer_insights: what these breaking stories mean for newcomers in Canada specifically.`,
+Also return 2 newcomer_insights: what these breaking stories mean for newcomers in Canada specifically.`,
   },
   {
     id: 'immigration',
@@ -39,7 +39,7 @@ Also return 3 newcomer_insights: what these breaking stories mean for newcomers 
 
 Sources: IRCC Canada (canada.ca/ircc), CIC News (cicnews.com), Immigration.ca, CBC News, Reuters, BBC, Al Jazeera, Globe and Mail.
 
-Return 10 immigration stories — must include:
+Return 5 immigration stories — must include:
 - IRCC Express Entry draws, PNP updates, work permit changes
 - International student policy changes
 - Refugee and asylum updates globally
@@ -49,7 +49,7 @@ Return 10 immigration stories — must include:
 
 Each article: exact headline, 2-sentence factual summary, source name, realistic time_ago (hours/days ago), URL, is_local (Canada-specific = true).
 
-Also return 3 newcomer_insights specific to immigration impacts.`,
+Also return 2 newcomer_insights specific to immigration impacts.`,
   },
   {
     id: 'jobs',
@@ -63,7 +63,7 @@ Location: ${loc}, ${prov || 'Canada'}
 
 Sources: Statistics Canada, CBC News, BNN Bloomberg, Globe and Mail, Financial Post, Reuters, BBC Business, CNN Business, Indeed Canada, LinkedIn News.
 
-Return 10 economy/jobs stories — must include:
+Return 5 economy/jobs stories — must include:
 - Canadian employment data, job numbers, unemployment stats
 - Minimum wage changes by province
 - Major layoffs or hiring announcements
@@ -74,7 +74,7 @@ Return 10 economy/jobs stories — must include:
 
 Each article: exact headline, 2-sentence factual summary, source, realistic time_ago, URL, is_local.
 
-Return 3 newcomer_insights about what these economic stories mean for newcomers job-hunting in Canada.`,
+Return 2 newcomer_insights about what these economic stories mean for newcomers job-hunting in Canada.`,
   },
   {
     id: 'housing',
@@ -88,7 +88,7 @@ Location focus: ${loc}, ${prov || 'Canada'} — but include national news.
 
 Sources: CBC News, CTV News, Globe and Mail, Toronto Star, CMHC Canada, Canada Mortgage Housing, Bloomberg, Reuters, local real estate boards.
 
-Return 10 housing stories — must include:
+Return 5 housing stories — must include:
 - Rent price changes and rental market updates
 - Home buying/selling market data
 - Eviction protection news
@@ -99,7 +99,7 @@ Return 10 housing stories — must include:
 
 Each article: exact headline, 2-sentence factual summary, source, realistic time_ago, URL, is_local.
 
-Return 3 newcomer_insights about housing tips and what these stories mean for newly arrived immigrants renting or buying.`,
+Return 2 newcomer_insights about housing tips and what these stories mean for newly arrived immigrants renting or buying.`,
   },
   {
     id: 'health',
@@ -113,7 +113,7 @@ Location: ${loc}, ${prov || 'Canada'}
 
 Sources: Health Canada, CBC News, WHO (who.int), Reuters Health, BBC Health, CNN Health, Al Jazeera, Canadian Press, provincial health authorities.
 
-Return 10 health & safety stories — must include:
+Return 5 health & safety stories — must include:
 - Disease outbreaks, pandemics, new health alerts
 - Drug recalls or food safety warnings in Canada
 - Mental health resources and announcements
@@ -124,7 +124,7 @@ Return 10 health & safety stories — must include:
 
 Each article: exact headline, 2-sentence factual summary, source, realistic time_ago, URL, is_local.
 
-Return 3 newcomer_insights about health/safety topics newcomers should know.`,
+Return 2 newcomer_insights about health/safety topics newcomers should know.`,
   },
 ];
 
