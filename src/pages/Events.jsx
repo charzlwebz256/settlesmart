@@ -13,7 +13,6 @@ import YearCalendarView from '@/components/events/YearCalendarView';
 import EventCard from '@/components/events/EventCard';
 import UpcomingReminders from '@/components/events/UpcomingReminders';
 import EventbriteFeed from '@/components/events/EventbriteFeed';
-import MyGoogleCalendar from '@/components/events/MyGoogleCalendar';
 import { useLocation_ } from '@/lib/LocationContext';
 
 const CATEGORIES = [
@@ -179,9 +178,6 @@ export default function Events() {
           }
         </div>
       )}
-
-      {/* Per-user Google Calendar */}
-      <MyGoogleCalendar />
 
       {/* Reminders panel */}
       {savedEvents.length > 0 && (
