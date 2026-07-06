@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect, useRef } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
@@ -114,18 +114,16 @@ export default function Profile() {
   });
 
   const [form, setForm] = useState(null);
-  const formInitialized = useRef(false);
 
-  // Populate the form from the profile exactly once per mount. We never
-  // re-sync from a refetch (which may return a new reference or even a
-  // different record), so in-progress edits are never overwritten. After a
-  // save, handleSave sets the form explicitly from the fresh data.
+  // Populate the form from the profile exactly once — only while form is
+  // still null. We never re-sync from a refetch (which may return a new
+  // reference or even a different record), so in-progress edits are never
+  // overwritten. After a save, handleSave sets the form explicitly.
   useEffect(() => {
-    if (profile && !formInitialized.current) {
-      formInitialized.current = true;
+    if (profile && !form) {
       setForm({ ...profile });
     }
-  }, [profile]);
+  }, [profile, form]);
 
   const cities = useMemo(() => PROVINCE_CITIES[form?.province] || [], [form?.province]);
 
@@ -181,7 +179,8 @@ export default function Profile() {
     base44.auth.logout('/');
   };
 
-  if (isLoading) {
+  // Show the loading spinner only on the very first load (no form data yet)
+  if (isLoading && !form) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="w-6 h-6 animate-spin text-primary" />
@@ -189,7 +188,8 @@ export default function Profile() {
     );
   }
 
-  if (!profile) {
+  // Genuinely no profile and no form data → prompt onboarding
+  if (!profile && !form) {
     return (
       <div className="max-w-lg mx-auto px-4 py-16 text-center">
         <User className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
