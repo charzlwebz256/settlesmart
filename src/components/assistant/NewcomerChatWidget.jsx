@@ -224,6 +224,7 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
                 <Button
                   type="submit"
                   size="icon"
+                  aria-label="Send message"
                   className="rounded-xl h-9 w-9 bg-primary hover:bg-primary/90 flex-shrink-0"
                   disabled={!input.trim() || loading}
                 >

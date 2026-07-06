@@ -185,7 +185,7 @@ User question: "${question}"`,
       onClick={toggleListening}
       disabled={loading}
       className={cn(
-        'fixed bottom-6 left-4 md:left-6 z-40 w-10 h-10 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 flex items-center justify-center',
+        'fixed bottom-24 left-4 md:bottom-6 md:left-6 z-40 w-10 h-10 rounded-full shadow-lg hover:shadow-xl hover:scale-110 transition-all duration-300 flex items-center justify-center',
         isListening || loading
           ? 'bg-red-500 hover:bg-red-600 text-white'
           : 'bg-primary hover:bg-primary/90 text-primary-foreground'

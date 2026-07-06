@@ -34,7 +34,7 @@ function ApplicationCard({ app, onEdit, onDelete, onStatusChange, selected, onTo
   return (
     <div className={cn("bg-card border rounded-2xl p-4 transition-all", selected ? "border-primary bg-primary/5" : "border-border/50 hover:border-primary/20")}>
       <div className="flex items-start justify-between gap-3">
-        <button onClick={() => onToggleSelect(app.id)} className="mt-0.5 flex-shrink-0 text-muted-foreground hover:text-primary transition-colors">
+        <button onClick={() => onToggleSelect(app.id)} aria-label={selected ? 'Deselect application' : 'Select application'} className="mt-0.5 flex-shrink-0 min-w-[44px] min-h-[44px] flex items-center justify-center text-muted-foreground hover:text-primary transition-colors">
           {selected ? <CheckSquare className="w-4 h-4 text-primary" /> : <Square className="w-4 h-4" />}
         </button>
         <div className="flex-1 min-w-0">
@@ -46,10 +46,10 @@ function ApplicationCard({ app, onEdit, onDelete, onStatusChange, selected, onTo
           <p className="text-xs text-muted-foreground mt-0.5">{app.company}{app.location ? `, ${app.location}` : ''}</p>
         </div>
         <div className="flex items-center gap-1 flex-shrink-0">
-          <button onClick={() => onEdit(app)} className="p-1.5 rounded-lg hover:bg-muted transition-colors">
+          <button onClick={() => onEdit(app)} aria-label="Edit application" className="p-2.5 min-w-[44px] min-h-[44px] rounded-lg hover:bg-muted transition-colors flex items-center justify-center">
             <Edit3 className="w-3.5 h-3.5 text-muted-foreground" />
           </button>
-          <button onClick={() => onDelete(app.id)} className="p-1.5 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors">
+          <button onClick={() => onDelete(app.id)} aria-label="Delete application" className="p-2.5 min-w-[44px] min-h-[44px] rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors flex items-center justify-center">
             <Trash2 className="w-3.5 h-3.5 text-red-400" />
           </button>
         </div>
@@ -272,7 +272,7 @@ export default function JobTracker() {
             <Button size="sm" variant="destructive" onClick={handleBulkDelete} disabled={bulkWorking} className="rounded-lg text-xs h-7 px-3 gap-1">
               {bulkWorking ? <Loader2 className="w-3 h-3 animate-spin" /> : <><Trash2 className="w-3 h-3" /> Delete</>}
             </Button>
-            <button onClick={clearSelection} className="p-1 rounded-lg hover:bg-muted transition-colors">
+            <button onClick={clearSelection} aria-label="Clear selection" className="p-2.5 min-w-[44px] min-h-[44px] rounded-lg hover:bg-muted transition-colors flex items-center justify-center">
               <X className="w-3.5 h-3.5 text-muted-foreground" />
             </button>
           </div>

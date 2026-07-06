@@ -117,7 +117,7 @@ export default function JobCard({ job, onAddToTracker }) {
       <div className="mt-auto flex items-center gap-2">
         <button
           onClick={e => { e.stopPropagation(); openJob(); }}
-          className="flex items-center gap-1.5 text-xs font-semibold text-primary-foreground bg-primary px-3 py-1.5 rounded-lg hover:bg-primary/90 transition-colors"
+          className="flex items-center gap-1.5 text-xs font-semibold text-primary-foreground bg-primary px-3 py-1.5 min-h-[44px] rounded-lg hover:bg-primary/90 transition-colors"
         >
           <ExternalLink className="w-3.5 h-3.5" />
           Apply Now
@@ -125,7 +125,7 @@ export default function JobCard({ job, onAddToTracker }) {
         {onAddToTracker && (
           <button
             onClick={e => { e.stopPropagation(); handleAddToTracker(); }}
-            className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 border border-primary/30 px-3 py-1.5 rounded-lg hover:bg-primary/5 transition-colors"
+            className="flex items-center gap-1.5 text-xs font-semibold text-primary hover:text-primary/80 border border-primary/30 px-3 py-1.5 min-h-[44px] rounded-lg hover:bg-primary/5 transition-colors"
           >
             <PlusCircle className="w-3.5 h-3.5" />
             Add to Tracker

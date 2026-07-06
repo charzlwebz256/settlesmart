@@ -62,11 +62,23 @@ export default function Events() {
   const savedIds = new Set(savedEvents.map(s => s.event_id));
 
   const handleSave = async (event) => {
-    if (savedIds.has(event.id)) {
+    const wasSaved = savedIds.has(event.id);
+    const previous = queryClient.getQueryData(['savedEvents']);
+    if (wasSaved) {
       const existing = savedEvents.find(s => s.event_id === event.id);
-      if (existing) await base44.entities.SavedEvent.delete(existing.id);
+      queryClient.setQueryData(['savedEvents'], old => (old || []).filter(s => s.event_id !== event.id));
+      try {
+        if (existing) await base44.entities.SavedEvent.delete(existing.id);
+      } catch {
+        queryClient.setQueryData(['savedEvents'], previous);
+      }
     } else {
-      await base44.entities.SavedEvent.create({ event_id: event.id, notify: true });
+      queryClient.setQueryData(['savedEvents'], old => [...(old || []), { id: 'optimistic-' + event.id, event_id: event.id, notify: true }]);
+      try {
+        await base44.entities.SavedEvent.create({ event_id: event.id, notify: true });
+      } catch {
+        queryClient.setQueryData(['savedEvents'], previous);
+      }
     }
     queryClient.invalidateQueries({ queryKey: ['savedEvents'] });
   };
@@ -89,7 +101,13 @@ export default function Events() {
   };
 
   const handleRemove = async (saved) => {
-    await base44.entities.SavedEvent.delete(saved.id);
+    const previous = queryClient.getQueryData(['savedEvents']);
+    queryClient.setQueryData(['savedEvents'], old => (old || []).filter(s => s.id !== saved.id));
+    try {
+      await base44.entities.SavedEvent.delete(saved.id);
+    } catch {
+      queryClient.setQueryData(['savedEvents'], previous);
+    }
     queryClient.invalidateQueries({ queryKey: ['savedEvents'] });
   };
 

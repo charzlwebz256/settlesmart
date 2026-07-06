@@ -44,7 +44,7 @@ export default function EventCard({ event, saved, onSave, onSetReminder }) {
             onClick={() => onSetReminder && onSetReminder(event)}
             aria-label="Set event reminder"
             className={cn(
-              "p-1.5 rounded-lg transition-colors",
+              "p-2 min-w-[44px] min-h-[44px] rounded-lg transition-colors flex items-center justify-center",
               saved ? "bg-primary/10 hover:bg-primary/20" : "hover:bg-muted"
             )}
             title={saved ? 'Reminder is active' : 'Set reminder for this event'}
@@ -57,7 +57,7 @@ export default function EventCard({ event, saved, onSave, onSetReminder }) {
             onClick={() => onSave(event)}
             aria-label={saved ? 'Remove saved event' : 'Save event'}
             className={cn(
-              "p-1.5 rounded-lg transition-colors",
+              "p-2 min-w-[44px] min-h-[44px] rounded-lg transition-colors flex items-center justify-center",
               saved ? "bg-primary/10 hover:bg-primary/20" : "hover:bg-muted"
             )}
             title={saved ? 'Saved to your events' : 'Save this event'}

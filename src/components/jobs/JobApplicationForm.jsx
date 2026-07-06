@@ -83,7 +83,7 @@ export default function JobApplicationForm({ application, onClose, onSaved }) {
         {/* Header */}
         <div className="sticky top-0 bg-card border-b border-border/50 px-5 py-4 flex items-center justify-between rounded-t-2xl z-10">
           <h2 className="font-heading font-bold text-base">{isEdit ? 'Edit Application' : 'Add Job Application'}</h2>
-          <button type="button" onClick={onClose} className="p-1.5 rounded-lg hover:bg-muted transition-colors">
+          <button type="button" onClick={onClose} aria-label="Close form" className="p-2.5 min-w-[44px] min-h-[44px] rounded-lg hover:bg-muted transition-colors flex items-center justify-center">
             <X className="w-4 h-4" />
           </button>
         </div>

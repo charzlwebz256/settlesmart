@@ -91,6 +91,24 @@ export default function Checklist() {
       const order = existing.length > 0 ? Math.max(...existing.map(i => i.order || 0)) + 1 : 1;
       return base44.entities.ChecklistItem.create({ ...payload, is_completed: false, order });
     },
+    onMutate: async (payload) => {
+      await queryClient.cancelQueries({ queryKey: ['myChecklist'] });
+      const previous = queryClient.getQueryData(['myChecklist']);
+      if (payload.id) {
+        queryClient.setQueryData(['myChecklist'], old =>
+          (old || []).map(i => i.id === payload.id ? { ...i, ...payload, id: i.id } : i)
+        );
+      } else {
+        const existing = (previous || []).filter(i => i.day_range === payload.day_range);
+        const order = existing.length > 0 ? Math.max(...existing.map(i => i.order || 0)) + 1 : 1;
+        queryClient.setQueryData(['myChecklist'], old => [
+          ...(old || []),
+          { ...payload, id: 'optimistic-' + Date.now(), is_completed: false, order },
+        ]);
+      }
+      return { previous };
+    },
+    onError: (_e, _v, ctx) => queryClient.setQueryData(['myChecklist'], ctx.previous),
     onSuccess: () => queryClient.invalidateQueries({ queryKey: ['myChecklist'] }),
   });
 
@@ -296,17 +314,17 @@ export default function Checklist() {
                                   <ExternalLink className="w-3 h-3" /> Resource
                                 </a>
                               )}
-                              <div className="flex items-center gap-1 ml-auto opacity-0 group-hover:opacity-100 transition-opacity">
+                              <div className="flex items-center gap-1 ml-auto sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
                                 <button
                                   onClick={() => openEdit(item)}
-                                  className="p-1 rounded-md hover:bg-background text-muted-foreground hover:text-primary"
+                                  className="p-2 min-w-[44px] min-h-[44px] rounded-md hover:bg-background text-muted-foreground hover:text-primary flex items-center justify-center"
                                   aria-label="Edit task"
                                 >
                                   <Pencil className="w-3.5 h-3.5" />
                                 </button>
                                 <button
                                   onClick={() => deleteMutation.mutate(item.id)}
-                                  className="p-1 rounded-md hover:bg-background text-muted-foreground hover:text-destructive"
+                                  className="p-2 min-w-[44px] min-h-[44px] rounded-md hover:bg-background text-muted-foreground hover:text-destructive flex items-center justify-center"
                                   aria-label="Delete task"
                                 >
                                   <Trash2 className="w-3.5 h-3.5" />

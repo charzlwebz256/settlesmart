@@ -169,6 +169,18 @@ export default function Scholarships() {
       setSavingName(data.scholarship_name);
       return base44.entities.SavedScholarship.create(data);
     },
+    onMutate: async (data) => {
+      await queryClient.cancelQueries({ queryKey: ['savedScholarships'] });
+      const previous = queryClient.getQueryData(['savedScholarships']);
+      queryClient.setQueryData(['savedScholarships'], old => [
+        ...(old || []),
+        { ...data, id: 'optimistic-' + data.scholarship_name, created_date: new Date().toISOString() },
+      ]);
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      queryClient.setQueryData(['savedScholarships'], ctx.previous);
+    },
     onSettled: () => {
       setSavingName(null);
       queryClient.invalidateQueries({ queryKey: ['savedScholarships'] });
@@ -180,6 +192,17 @@ export default function Scholarships() {
       setSavingName(data.scholarship_name);
       const existing = savedScholarships.find(s => s.scholarship_name === data.scholarship_name);
       if (existing) return base44.entities.SavedScholarship.delete(existing.id);
+    },
+    onMutate: async (data) => {
+      await queryClient.cancelQueries({ queryKey: ['savedScholarships'] });
+      const previous = queryClient.getQueryData(['savedScholarships']);
+      queryClient.setQueryData(['savedScholarships'], old =>
+        (old || []).filter(s => s.scholarship_name !== data.scholarship_name)
+      );
+      return { previous };
+    },
+    onError: (_err, _vars, ctx) => {
+      queryClient.setQueryData(['savedScholarships'], ctx.previous);
     },
     onSettled: () => {
       setSavingName(null);
