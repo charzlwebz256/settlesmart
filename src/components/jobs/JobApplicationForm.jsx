@@ -15,7 +15,7 @@ const STATUSES = [
 const SOURCES = ['LinkedIn', 'Indeed', 'Job Bank', 'Jooble', 'ZipRecruiter', 'Glassdoor', 'Monster', 'Company Website', 'Referral', 'Other'];
 
 export default function JobApplicationForm({ application, onClose, onSaved }) {
-  const isEdit = !!application;
+  const isEdit = !!application?.id;
   const [saving, setSaving] = useState(false);
   const [form, setForm] = useState({
     job_title: '',
