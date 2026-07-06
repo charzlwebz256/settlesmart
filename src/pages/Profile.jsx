@@ -64,6 +64,18 @@ const interestOptions = [
   { value: 'volunteering', label: 'Community', icon: Sparkles },
 ];
 
+const BLANK_PROFILE = {
+  immigration_status: '',
+  province: '',
+  city: '',
+  language_preference: 'en',
+  interests: [],
+  english_level: '',
+  french_level: '',
+  education_level: '',
+  onboarding_completed: false,
+};
+
 export default function Profile() {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
@@ -96,8 +108,8 @@ export default function Profile() {
   // reference or even a different record), so in-progress edits are never
   // overwritten. After a save, handleSave sets the form explicitly.
   useEffect(() => {
-    if (profile && !form) {
-      setForm({ ...profile });
+    if (!form) {
+      setForm(profile ? { ...profile } : { ...BLANK_PROFILE });
     }
   }, [profile, form]);
 
@@ -116,10 +128,17 @@ export default function Profile() {
 
   const handleSave = async () => {
     if (!form) return;
+    if (!form.immigration_status || !form.province || !form.city) {
+      setSaveError('Please select your immigration status, province, and city before saving.');
+      return;
+    }
     setSaving(true);
     setSaved(false);
     setSaveError(null);
-    const { id, created_date, updated_date, created_by_id, ...payload } = form;
+    const { id, created_date, updated_date, created_by_id, ...rawPayload } = form;
+    const payload = Object.fromEntries(
+      Object.entries(rawPayload).filter(([, v]) => v !== '' && v !== undefined)
+    );
     try {
       // Update existing profile, or create one if none exists yet (blank profile on first sign-in)
       if (id) {
@@ -160,21 +179,6 @@ export default function Profile() {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="w-6 h-6 animate-spin text-primary" />
-      </div>
-    );
-  }
-
-  // Genuinely no profile and no form data → prompt onboarding
-  if (!profile && !form) {
-    return (
-      <div className="max-w-lg mx-auto px-4 py-16 text-center">
-        <User className="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-        <h2 className="font-heading font-bold text-xl mb-3">Complete Your Profile</h2>
-        <p className="text-muted-foreground text-sm mb-6">Set up your profile to get personalized recommendations</p>
-        <Button onClick={() => navigate('/onboarding')} className="rounded-xl gap-2 bg-primary hover:bg-primary/90">
-          <Sparkles className="w-4 h-4" />
-          Start Onboarding
-        </Button>
       </div>
     );
   }
@@ -284,8 +288,8 @@ export default function Profile() {
             onClick={handleSave}
             disabled={saving}
             className={cn(
-              "flex-1 rounded-xl gap-2 bg-primary hover:bg-primary/90 relative overflow-hidden transition-all duration-300",
-              saving ? "saving-shimmer scale-[0.97]" : saved ? "bg-emerald-600 hover:bg-emerald-600" : ""
+              "flex-1 rounded-xl gap-2 bg-primary hover:bg-primary/90 relative overflow-hidden transition-all duration-300 active:scale-95",
+              saving ? "saving-shimmer saving-pulse scale-[0.97]" : saved ? "bg-emerald-600 hover:bg-emerald-600" : ""
             )}
           >
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle2 className="w-4 h-4 success-pop" /> : <Save className="w-4 h-4" />}
