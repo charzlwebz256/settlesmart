@@ -105,19 +105,24 @@ export default function Profile() {
     queryFn: async () => {
       const u = await base44.auth.me();
       const results = await base44.entities.UserProfile.filter({ created_by_id: u.id }, '-updated_date');
-      return results[0] || null;
+      if (!results || results.length === 0) return null;
+      // Match AppLayout: prefer the completed onboarding profile, fall back to
+      // the most recently updated record. Keeps a single source of truth when
+      // duplicate profile records exist.
+      return results.find(p => p.onboarding_completed) || results[0];
     },
   });
 
   const [form, setForm] = useState(null);
-  const initializedProfileId = useRef(null);
+  const formInitialized = useRef(false);
 
-  // Initialize the form exactly once per profile (keyed by id). Subsequent
-  // refetches return a new object reference but the same id, so in-progress
-  // edits are never overwritten by stale profile data.
+  // Populate the form from the profile exactly once per mount. We never
+  // re-sync from a refetch (which may return a new reference or even a
+  // different record), so in-progress edits are never overwritten. After a
+  // save, handleSave sets the form explicitly from the fresh data.
   useEffect(() => {
-    if (profile && initializedProfileId.current !== profile.id) {
-      initializedProfileId.current = profile.id;
+    if (profile && !formInitialized.current) {
+      formInitialized.current = true;
       setForm({ ...profile });
     }
   }, [profile]);
@@ -155,7 +160,8 @@ export default function Profile() {
         queryFn: async () => {
           const u = await base44.auth.me();
           const results = await base44.entities.UserProfile.filter({ created_by_id: u.id }, '-updated_date');
-          return results[0] || null;
+          if (!results || results.length === 0) return null;
+          return results.find(p => p.onboarding_completed) || results[0];
         },
       });
       if (fresh) setForm({ ...fresh });
