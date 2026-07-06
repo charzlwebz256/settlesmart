@@ -11,6 +11,7 @@ import NotificationCenter from '../components/home/NotificationCenter';
 import LocationBanner from '../components/home/LocationBanner';
 import WhyCanadaSection from '../components/home/WhyCanadaSection';
 import ChecklistWizard from '../components/home/ChecklistWizard';
+import OnboardingNudge from '../components/home/OnboardingNudge';
 import { useLocation_ } from '@/lib/LocationContext';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/lib/AuthContext';
@@ -47,6 +48,7 @@ export default function Home() {
     <div className="pb-8">
       <OnboardingWalkthrough />
       <LocationBanner city={city} province={province} isDetecting={isDetecting} />
+      {!hasProfile && <OnboardingNudge />}
 
       {showWizard ? (
         <div className="max-w-xl mx-auto px-4 py-8">

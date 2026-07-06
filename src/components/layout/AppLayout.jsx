@@ -12,6 +12,7 @@ import MobileBottomNav from '@/components/layout/MobileBottomNav';
 import { useLocation_ } from '@/lib/LocationContext';
 
 import LanguageTranslator from '@/components/layout/LanguageTranslator';
+import GlobalSearch from '@/components/search/GlobalSearch';
 
 // Sub-items for tabs with dropdowns
 const TAB_CHILDREN = {
@@ -122,6 +123,7 @@ export default function AppLayout() {
   const location = useLocation();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
   const menuRef = useRef(null);
   const { city: detectedCity, province: detectedProvince } = useLocation_();
@@ -134,6 +136,18 @@ export default function AppLayout() {
   useEffect(() => {
     window.scrollTo(0, 0);
   }, [location.pathname]);
+
+  // Open global search with Cmd/Ctrl + K
+  useEffect(() => {
+    const handler = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'k') {
+        e.preventDefault();
+        setSearchOpen(true);
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, []);
 
   // Close menu when clicking outside
   useEffect(() => {
@@ -223,8 +237,15 @@ export default function AppLayout() {
             })}
           </nav>
 
-          {/* Right side: theme + language + hamburger */}
+          {/* Right side: search + theme + language + hamburger */}
           <div className="flex items-center gap-1">
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="p-2 rounded-lg hover:bg-muted min-w-[44px] min-h-[44px] flex items-center justify-center"
+              aria-label="Search SettleSmart"
+            >
+              <Search className="w-5 h-5" />
+            </button>
             <button
               onClick={toggleTheme}
               className="p-2 rounded-lg hover:bg-muted min-w-[44px] min-h-[44px] flex items-center justify-center"
@@ -348,6 +369,9 @@ export default function AppLayout() {
 
       {/* Mobile Bottom Nav */}
       <MobileBottomNav activeTab={activeTab} location={location} />
+
+      {/* Global Search */}
+      <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
 
       {/* Global AI Chat Widget */}
       {location.pathname !== '/assistant' && (
