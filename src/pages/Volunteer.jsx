@@ -61,7 +61,7 @@ export default function Volunteer() {
       <div className="flex gap-1.5 flex-wrap mb-3">
         {CITIES.map(c => (
           <button key={c} onClick={() => setCityFilter(c)}
-            className={cn("px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border",
+            className={cn("px-3 py-1.5 min-h-[44px] rounded-xl text-xs font-semibold transition-all border",
               cityFilter === c ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border/50 text-muted-foreground hover:border-primary/30")}>
             {c === 'all' ? 'All Locations' : c}
           </button>
@@ -72,7 +72,7 @@ export default function Volunteer() {
       <div className="flex gap-1.5 flex-wrap mb-5">
         {CATEGORIES.map(c => (
           <button key={c} onClick={() => setCatFilter(c)}
-            className={cn("px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border",
+            className={cn("px-3 py-1.5 min-h-[44px] rounded-xl text-xs font-semibold transition-all border",
               catFilter === c ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border/50 text-muted-foreground hover:border-primary/30")}>
             {c === 'all' ? 'All Categories' : c}
           </button>

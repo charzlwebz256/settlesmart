@@ -289,7 +289,7 @@ export default function Jobs() {
               key={tab.id}
               onClick={() => handleSourceChange(tab.id)}
               className={cn(
-                "px-3 py-1.5 rounded-xl text-xs font-semibold transition-all",
+                "px-3 py-1.5 min-h-[44px] rounded-xl text-xs font-semibold transition-all",
                 activeSource === tab.id
                   ? "bg-primary text-primary-foreground"
                   : "bg-card border border-border/50 text-muted-foreground hover:border-primary/30"

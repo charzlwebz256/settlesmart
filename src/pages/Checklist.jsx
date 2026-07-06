@@ -273,7 +273,7 @@ export default function Checklist() {
                           <button
                             onClick={() => toggleMutation.mutate({ id: item.id, is_completed: !item.is_completed })}
                             aria-label={item.is_completed ? 'Mark incomplete' : 'Mark complete'}
-                            className="mt-0.5 flex-shrink-0"
+                            className="flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg"
                           >
                             {item.is_completed
                               ? <CheckCircle2 className="w-5 h-5 text-primary" />

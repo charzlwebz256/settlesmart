@@ -194,17 +194,17 @@ export default function Events() {
       {/* Calendar view toggle */}
       <div className="flex gap-1 bg-muted rounded-xl p-1 self-start mb-3 w-fit">
         <button onClick={() => setCalView('strip')}
-          className={cn("text-xs px-3 py-1.5 rounded-lg font-semibold transition-all",
+          className={cn("text-xs px-3 py-1.5 min-h-[44px] rounded-lg font-semibold transition-all",
             calView === 'strip' ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}>
           Week Strip
         </button>
         <button onClick={() => setCalView('month')}
-          className={cn("text-xs px-3 py-1.5 rounded-lg font-semibold transition-all",
+          className={cn("text-xs px-3 py-1.5 min-h-[44px] rounded-lg font-semibold transition-all",
             calView === 'month' ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}>
           Month View
         </button>
         <button onClick={() => setCalView('year')}
-          className={cn("text-xs px-3 py-1.5 rounded-lg font-semibold transition-all",
+          className={cn("text-xs px-3 py-1.5 min-h-[44px] rounded-lg font-semibold transition-all",
             calView === 'year' ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground")}>
           Year View
         </button>
@@ -283,7 +283,7 @@ export default function Events() {
             key={cat.value}
             onClick={() => setCategory(cat.value)}
             className={cn(
-              "flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap",
+              "flex-shrink-0 px-3 py-1.5 min-h-[44px] rounded-xl text-xs font-semibold transition-all whitespace-nowrap",
               category === cat.value
                 ? "bg-primary text-primary-foreground"
                 : "bg-card border border-border/50 text-muted-foreground hover:border-primary/30"

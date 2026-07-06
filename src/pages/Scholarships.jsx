@@ -5,6 +5,7 @@ import { useAuth } from '@/lib/AuthContext';
 import { Search, ExternalLink, MapPin, Landmark, GraduationCap, Award, Heart, BookOpen, ChevronDown, Bookmark, BookmarkCheck } from 'lucide-react';
 import { SCHOLARSHIPS_BY_PROVINCE, SECTION_META } from '@/data/scholarshipsData';
 import { cn } from '@/lib/utils';
+import { MobileSelect as Select, MobileSelectContent as SelectContent, MobileSelectItem as SelectItem, MobileSelectTrigger as SelectTrigger, MobileSelectValue as SelectValue } from '@/components/ui/mobile-select';
 
 const ICONS = { Landmark, GraduationCap, Award, Heart, BookOpen };
 
@@ -21,27 +22,6 @@ const PROVINCE_CITIES = {
   'New Brunswick': ['Fredericton', 'Moncton', 'Saint John', 'Sackville'],
   'Prince Edward Island': ['Charlottetown', 'Summerside'],
 };
-
-function NativeSelect({ value, onChange, options, placeholder, disabled }) {
-  return (
-    <div className="relative">
-      <select
-        value={value}
-        onChange={e => onChange(e.target.value)}
-        disabled={disabled}
-        className="w-full h-10 appearance-none rounded-xl border border-border/60 bg-card pl-3 pr-9 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-      >
-        <option value="all">{placeholder}</option>
-        {options.map(opt => (
-          <option key={opt.value ?? opt} value={opt.value ?? opt}>
-            {opt.label ?? opt}
-          </option>
-        ))}
-      </select>
-      <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 opacity-50 pointer-events-none" />
-    </div>
-  );
-}
 
 function ScholarshipCard({ item, saved, saving, onSave }) {
   return (
@@ -287,31 +267,39 @@ export default function Scholarships() {
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
         <div>
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Province / Region</label>
-          <NativeSelect
-            value={activeProvince}
-            onChange={handleProvinceChange}
-            options={provinceOptions}
-            placeholder="All Provinces"
-          />
+          <Select value={activeProvince} onValueChange={handleProvinceChange}>
+            <SelectTrigger className="w-full h-10 rounded-xl border border-border/60 bg-card px-3 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer">
+              <SelectValue placeholder="All Provinces" />
+            </SelectTrigger>
+            <SelectContent label="Province / Region">
+              <SelectItem value="all">All Provinces</SelectItem>
+              {provinceOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">City</label>
-          <NativeSelect
-            value={activeCity}
-            onChange={setActiveCity}
-            options={cityOptions}
-            placeholder={activeProvince === 'all' ? 'Select province first' : 'All Cities'}
-            disabled={activeProvince === 'all'}
-          />
+          <Select value={activeCity} onValueChange={setActiveCity} disabled={activeProvince === 'all'}>
+            <SelectTrigger className="w-full h-10 rounded-xl border border-border/60 bg-card px-3 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed">
+              <SelectValue placeholder={activeProvince === 'all' ? 'Select province first' : 'All Cities'} />
+            </SelectTrigger>
+            <SelectContent label="City">
+              <SelectItem value="all">{activeProvince === 'all' ? 'Select province first' : 'All Cities'}</SelectItem>
+              {cityOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
+            </SelectContent>
+          </Select>
         </div>
         <div>
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Funding Type</label>
-          <NativeSelect
-            value={categoryFilter}
-            onChange={setCategoryFilter}
-            options={categoryOptions}
-            placeholder="All Types"
-          />
+          <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+            <SelectTrigger className="w-full h-10 rounded-xl border border-border/60 bg-card px-3 text-sm font-medium shadow-sm focus:outline-none focus:ring-2 focus:ring-primary/30 cursor-pointer">
+              <SelectValue placeholder="All Types" />
+            </SelectTrigger>
+            <SelectContent label="Funding Type">
+              <SelectItem value="all">All Types</SelectItem>
+              {categoryOptions.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
+            </SelectContent>
+          </Select>
         </div>
       </div>
 

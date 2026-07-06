@@ -91,7 +91,7 @@ For each return: name, category (food_bank/clinic/settlement/community), address
             key={tab.value}
             onClick={() => setActiveTab(tab.value)}
             className={cn(
-              "flex-shrink-0 px-3 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap",
+              "flex-shrink-0 px-3 py-1.5 min-h-[44px] rounded-xl text-xs font-semibold transition-all whitespace-nowrap",
               activeTab === tab.value
                 ? "bg-primary text-primary-foreground"
                 : "bg-card border border-border/50 text-muted-foreground hover:border-primary/30"

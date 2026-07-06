@@ -26,7 +26,7 @@ export default function JobFilters({ filters, onChange }) {
               key={t.value}
               onClick={() => onChange({ ...filters, type: t.value })}
               className={cn(
-                "px-3 py-1 rounded-lg text-xs font-medium transition-all",
+                "px-3 py-1 min-h-[44px] rounded-lg text-xs font-medium transition-all",
                 filters.type === t.value
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted text-muted-foreground hover:bg-muted/70"
@@ -45,7 +45,7 @@ export default function JobFilters({ filters, onChange }) {
               key={e.value}
               onClick={() => onChange({ ...filters, experience: e.value })}
               className={cn(
-                "px-3 py-1 rounded-lg text-xs font-medium transition-all",
+                "px-3 py-1 min-h-[44px] rounded-lg text-xs font-medium transition-all",
                 filters.experience === e.value
                   ? "bg-primary text-primary-foreground"
                   : "bg-muted text-muted-foreground hover:bg-muted/70"

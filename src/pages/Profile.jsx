@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import {
   User, MapPin, Globe, BookOpen, Briefcase, Home as HomeIcon,
   Scale, Heart, Sparkles, Save, LogOut, Loader2, CheckCircle2, Trash2,
-  ChevronDown, ExternalLink
+  ExternalLink
 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -13,6 +13,7 @@ import {
   AlertDialogTitle, AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
+import { MobileSelect as Select, MobileSelectContent as SelectContent, MobileSelectItem as SelectItem, MobileSelectTrigger as SelectTrigger, MobileSelectValue as SelectValue } from '@/components/ui/mobile-select';
 import { useNavigate, Link } from 'react-router-dom';
 
 const PROVINCE_CITIES = {
@@ -62,31 +63,6 @@ const interestOptions = [
   { value: 'health', label: 'Health', icon: Heart },
   { value: 'volunteering', label: 'Community', icon: Sparkles },
 ];
-
-// Simple native select — works reliably on all devices, always shows selected value
-function NativeSelect({ value, onChange, options, placeholder, disabled }) {
-  return (
-    <div className="relative">
-      <select
-        value={value || ''}
-        onChange={e => onChange(e.target.value)}
-        disabled={disabled}
-        className={cn(
-          "w-full h-9 appearance-none rounded-lg border border-input bg-transparent px-3 pr-8 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
-          !value && "text-muted-foreground"
-        )}
-      >
-        <option value="" disabled>{placeholder || 'Select…'}</option>
-        {options.map(opt => (
-          <option key={opt.value ?? opt} value={opt.value ?? opt}>
-            {opt.label ?? opt}
-          </option>
-        ))}
-      </select>
-      <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 opacity-50 pointer-events-none" />
-    </div>
-  );
-}
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -222,22 +198,25 @@ export default function Profile() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Province</label>
-              <NativeSelect
-                value={form.province}
-                onChange={updateProvince}
-                options={PROVINCES.map(p => ({ value: p, label: p }))}
-                placeholder="Select province"
-              />
+              <Select value={form.province || ''} onValueChange={updateProvince}>
+                <SelectTrigger className="w-full h-9 rounded-lg border border-input bg-transparent px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring">
+                  <SelectValue placeholder="Select province" />
+                </SelectTrigger>
+                <SelectContent label="Province">
+                  {PROVINCES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">City</label>
-              <NativeSelect
-                value={form.city}
-                onChange={v => updateField('city', v)}
-                options={cities.map(c => ({ value: c, label: c }))}
-                placeholder={form.province ? 'Select city' : 'Select province first'}
-                disabled={!form.province}
-              />
+              <Select value={form.city || ''} onValueChange={v => updateField('city', v)} disabled={!form.province}>
+                <SelectTrigger className="w-full h-9 rounded-lg border border-input bg-transparent px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50">
+                  <SelectValue placeholder={form.province ? 'Select city' : 'Select province first'} />
+                </SelectTrigger>
+                <SelectContent label="City">
+                  {cities.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>
@@ -251,21 +230,25 @@ export default function Profile() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Immigration Status</label>
-              <NativeSelect
-                value={form.immigration_status}
-                onChange={v => updateField('immigration_status', v)}
-                options={IMMIGRATION_STATUSES}
-                placeholder="Select status"
-              />
+              <Select value={form.immigration_status || ''} onValueChange={v => updateField('immigration_status', v)}>
+                <SelectTrigger className="w-full h-9 rounded-lg border border-input bg-transparent px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring">
+                  <SelectValue placeholder="Select status" />
+                </SelectTrigger>
+                <SelectContent label="Immigration Status">
+                  {IMMIGRATION_STATUSES.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">English Level</label>
-              <NativeSelect
-                value={form.english_level}
-                onChange={v => updateField('english_level', v)}
-                options={ENGLISH_LEVELS}
-                placeholder="Select level"
-              />
+              <Select value={form.english_level || ''} onValueChange={v => updateField('english_level', v)}>
+                <SelectTrigger className="w-full h-9 rounded-lg border border-input bg-transparent px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring">
+                  <SelectValue placeholder="Select level" />
+                </SelectTrigger>
+                <SelectContent label="English Level">
+                  {ENGLISH_LEVELS.map(opt => <SelectItem key={opt.value} value={opt.value}>{opt.label}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
           </div>
         </div>

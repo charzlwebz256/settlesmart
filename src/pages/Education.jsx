@@ -54,7 +54,7 @@ export default function Education() {
         <div className="flex gap-1.5">
           {['all', 'Edmonton', 'Calgary'].map(c => (
             <button key={c} onClick={() => setCityFilter(c)}
-              className={cn("px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border",
+              className={cn("px-3 py-1.5 min-h-[44px] rounded-xl text-xs font-semibold transition-all border",
                 cityFilter === c ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border/50 text-muted-foreground hover:border-primary/30")}>
               {c === 'all' ? 'All Cities' : c}
             </button>
@@ -63,7 +63,7 @@ export default function Education() {
         <div className="flex gap-1.5">
           {['all', 'University', 'Polytechnic', 'College'].map(t => (
             <button key={t} onClick={() => setTypeFilter(t)}
-              className={cn("px-3 py-1.5 rounded-xl text-xs font-semibold transition-all border",
+              className={cn("px-3 py-1.5 min-h-[44px] rounded-xl text-xs font-semibold transition-all border",
                 typeFilter === t ? "bg-primary text-primary-foreground border-primary" : "bg-card border-border/50 text-muted-foreground hover:border-primary/30")}>
               {t === 'all' ? 'All Types' : t}
             </button>
