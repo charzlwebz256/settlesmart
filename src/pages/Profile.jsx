@@ -108,10 +108,10 @@ export default function Profile() {
   // reference or even a different record), so in-progress edits are never
   // overwritten. After a save, handleSave sets the form explicitly.
   useEffect(() => {
-    if (!form) {
+    if (!form && !isLoading) {
       setForm(profile ? { ...profile } : { ...BLANK_PROFILE });
     }
-  }, [profile, form]);
+  }, [profile, form, isLoading]);
 
   const cities = useMemo(() => PROVINCE_CITIES[form?.province] || [], [form?.province]);
 

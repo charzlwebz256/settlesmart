@@ -17,7 +17,7 @@ export default function ProtectedSignInPrompt() {
       <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
         <Lock className="w-8 h-8 text-primary" />
       </div>
-      <h2 className="font-heading font-bold text-2xl mb-2">Sign in required</h2>
+      <h2 className="font-heading font-bold text-2xl mb-2">Log in required</h2>
       <p className="text-muted-foreground text-sm mb-7 max-w-sm mx-auto leading-relaxed">
         You can browse SettleSmart freely, but this section needs a free account
         so we can save your personal progress and saved items.
@@ -27,7 +27,7 @@ export default function ProtectedSignInPrompt() {
           <ArrowLeft className="w-4 h-4" /> Go Back
         </Button>
         <Button onClick={navigateToLogin} className="gap-2 rounded-xl">
-          <LogIn className="w-4 h-4" /> Sign In
+          <LogIn className="w-4 h-4" /> Log In
         </Button>
       </div>
     </div>
