@@ -202,7 +202,7 @@ export default function Profile() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Province</label>
-              <Select value={form.province || ''} onValueChange={updateProvince}>
+              <Select value={form.province || undefined} onValueChange={updateProvince}>
                 <SelectTrigger className="w-full h-9 rounded-lg border border-input bg-transparent px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring">
                   <SelectValue placeholder="Select province" />
                 </SelectTrigger>
@@ -213,7 +213,7 @@ export default function Profile() {
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">City</label>
-              <Select value={form.city || ''} onValueChange={v => updateField('city', v)} disabled={!form.province}>
+              <Select value={form.city || undefined} onValueChange={v => updateField('city', v)} disabled={!form.province}>
                 <SelectTrigger className="w-full h-9 rounded-lg border border-input bg-transparent px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50">
                   <SelectValue placeholder={form.province ? 'Select city' : 'Select province first'} />
                 </SelectTrigger>
@@ -234,7 +234,7 @@ export default function Profile() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Immigration Status</label>
-              <Select value={form.immigration_status || ''} onValueChange={v => updateField('immigration_status', v)}>
+              <Select value={form.immigration_status || undefined} onValueChange={v => updateField('immigration_status', v)}>
                 <SelectTrigger className="w-full h-9 rounded-lg border border-input bg-transparent px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring">
                   <SelectValue placeholder="Select status" />
                 </SelectTrigger>
@@ -245,7 +245,7 @@ export default function Profile() {
             </div>
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1.5 block">English Level</label>
-              <Select value={form.english_level || ''} onValueChange={v => updateField('english_level', v)}>
+              <Select value={form.english_level || undefined} onValueChange={v => updateField('english_level', v)}>
                 <SelectTrigger className="w-full h-9 rounded-lg border border-input bg-transparent px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring">
                   <SelectValue placeholder="Select level" />
                 </SelectTrigger>
