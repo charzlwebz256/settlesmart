@@ -165,7 +165,7 @@ export default function NotificationCenter() {
                 </Link>
                 <button
                   onClick={() => setDismissed(prev => new Set([...prev, n.id]))}
-                  aria-label="Dismiss"
+                  aria-label="Dismiss notification"
                   className="p-1 rounded-lg hover:bg-muted transition-colors"
                 >
                   <X className="w-3 h-3 text-muted-foreground/50 hover:text-foreground" />

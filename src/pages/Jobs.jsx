@@ -57,91 +57,10 @@ export default function Jobs() {
     const searchTerm = query || 'newcomer immigrant jobs';
 
     try {
-      // Fetch 5 batches of 10 jobs each = 50 total
+      // Fetch 2 batches of 10 jobs each = 20 total
       const batches = await Promise.all([
         base44.integrations.Core.InvokeLLM({
           prompt: `Find 10 real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Sources: LinkedIn, Indeed Canada (ca.indeed.com), Job Bank Canada, ZipRecruiter. Newcomer-friendly roles. For each job return: title, company, location (city), job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (short or empty), posted (e.g. "2d"), url (must be a direct link to the actual job posting, e.g. https://ca.indeed.com/viewjob?jk=JOBID or https://www.linkedin.com/jobs/view/JOBID), source (linkedin/indeed/jobbank/ziprecruiter), is_newcomer_friendly (boolean).`,
-          add_context_from_internet: true,
-          response_json_schema: {
-            type: 'object',
-            properties: {
-              jobs: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    title: { type: 'string' },
-                    company: { type: 'string' },
-                    location: { type: 'string' },
-                    job_type: { type: 'string' },
-                    experience_level: { type: 'string' },
-                    salary: { type: 'string' },
-                    posted: { type: 'string' },
-                    url: { type: 'string' },
-                    source: { type: 'string' },
-                    is_newcomer_friendly: { type: 'boolean' },
-                  },
-                },
-              },
-            },
-          },
-        }),
-        base44.integrations.Core.InvokeLLM({
-          prompt: `Find 10 more real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Sources: LinkedIn, Indeed Canada (ca.indeed.com), Job Bank Canada, ZipRecruiter. Newcomer-friendly roles. For each job return: title, company, location (city), job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (short or empty), posted (e.g. "2d"), url (must be a direct link to the actual job posting, e.g. https://ca.indeed.com/viewjob?jk=JOBID or https://www.linkedin.com/jobs/view/JOBID), source (linkedin/indeed/jobbank/ziprecruiter), is_newcomer_friendly (boolean).`,
-          add_context_from_internet: true,
-          response_json_schema: {
-            type: 'object',
-            properties: {
-              jobs: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    title: { type: 'string' },
-                    company: { type: 'string' },
-                    location: { type: 'string' },
-                    job_type: { type: 'string' },
-                    experience_level: { type: 'string' },
-                    salary: { type: 'string' },
-                    posted: { type: 'string' },
-                    url: { type: 'string' },
-                    source: { type: 'string' },
-                    is_newcomer_friendly: { type: 'boolean' },
-                  },
-                },
-              },
-            },
-          },
-        }),
-        base44.integrations.Core.InvokeLLM({
-          prompt: `Find 10 more real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Sources: LinkedIn, Indeed Canada (ca.indeed.com), Job Bank Canada, ZipRecruiter. Newcomer-friendly roles. For each job return: title, company, location (city), job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (short or empty), posted (e.g. "2d"), url (must be a direct link to the actual job posting, e.g. https://ca.indeed.com/viewjob?jk=JOBID or https://www.linkedin.com/jobs/view/JOBID), source (linkedin/indeed/jobbank/ziprecruiter), is_newcomer_friendly (boolean).`,
-          add_context_from_internet: true,
-          response_json_schema: {
-            type: 'object',
-            properties: {
-              jobs: {
-                type: 'array',
-                items: {
-                  type: 'object',
-                  properties: {
-                    title: { type: 'string' },
-                    company: { type: 'string' },
-                    location: { type: 'string' },
-                    job_type: { type: 'string' },
-                    experience_level: { type: 'string' },
-                    salary: { type: 'string' },
-                    posted: { type: 'string' },
-                    url: { type: 'string' },
-                    source: { type: 'string' },
-                    is_newcomer_friendly: { type: 'boolean' },
-                  },
-                },
-              },
-            },
-          },
-        }),
-        base44.integrations.Core.InvokeLLM({
-          prompt: `Find 10 more real current job listings for "${searchTerm}" in ${searchLoc}, Canada. Sources: LinkedIn, Indeed Canada (ca.indeed.com), Job Bank Canada, ZipRecruiter. Newcomer-friendly roles. For each job return: title, company, location (city), job_type (full_time/part_time/contract/remote), experience_level (entry/mid/senior), salary (short or empty), posted (e.g. "2d"), url (must be a direct link to the actual job posting, e.g. https://ca.indeed.com/viewjob?jk=JOBID or https://www.linkedin.com/jobs/view/JOBID), source (linkedin/indeed/jobbank/ziprecruiter), is_newcomer_friendly (boolean).`,
           add_context_from_internet: true,
           response_json_schema: {
             type: 'object',
@@ -211,11 +130,11 @@ export default function Jobs() {
     }
   }, [city, cityLoading]); // eslint-disable-line
 
-  // Auto-refresh every 10 minutes (not 5 — reduces unnecessary LLM calls)
+  // Auto-refresh every 30 minutes (reduces unnecessary LLM calls on mobile)
   useEffect(() => {
     const timer = setInterval(() => {
       if (!loading && jobs.length > 0) fetchJobs();
-    }, 10 * 60 * 1000);
+    }, 30 * 60 * 1000);
     return () => clearInterval(timer);
   }, [fetchJobs, loading]);
 

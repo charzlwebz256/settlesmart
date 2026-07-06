@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import React, { useEffect } from 'react';
 import PageNotFound from './lib/PageNotFound';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
@@ -20,13 +20,13 @@ import Resources from './pages/Resources';
 import Assistant from './pages/Assistant';
 import Checklist from './pages/Checklist';
 import Profile from './pages/Profile';
-import TransitMap from './pages/TransitMap';
+const TransitMap = React.lazy(() => import('./pages/TransitMap'));
 import Events from './pages/Events';
-import Jobs from './pages/Jobs';
+const Jobs = React.lazy(() => import('./pages/Jobs'));
 import Legal from './pages/Legal';
 import Emergency from './pages/Emergency';
 import NearMe from './pages/NearMe';
-import CanadianNewsUpdates from './pages/CanadianNewsUpdates';
+const CanadianNewsUpdates = React.lazy(() => import('./pages/CanadianNewsUpdates'));
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Education from './pages/Education';
@@ -35,7 +35,7 @@ import Volunteer from './pages/Volunteer';
 import ResumeBuilder from './pages/ResumeBuilder';
 import JobTracker from './pages/JobTracker';
 import InterviewPrep from './pages/InterviewPrep';
-import ShopSmart from './pages/ShopSmart';
+const ShopSmart = React.lazy(() => import('./pages/ShopSmart'));
 import SupportUs from './pages/SupportUs';
 import MeetTheDeveloper from './pages/MeetTheDeveloper';
 import JobCoach from './pages/JobCoach';
@@ -67,6 +67,7 @@ const AuthenticatedApp = () => {
 
   // Render the main app
   return (
+    <React.Suspense fallback={<div className="fixed inset-0 flex items-center justify-center"><div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div></div>}>
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
@@ -111,6 +112,7 @@ const AuthenticatedApp = () => {
       <Route path="/onboarding" element={<Onboarding />} />
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    </React.Suspense>
   );
 };
 

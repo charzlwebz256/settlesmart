@@ -67,14 +67,14 @@ export default function JobCard({ job, onAddToTracker }) {
       <div className="flex items-start justify-between gap-2">
         <div className="flex-1 min-w-0">
           <div className="flex flex-wrap gap-1.5 mb-1.5">
-            <Badge className={cn("text-[10px] border px-2 py-0 font-semibold", src.badge)}>
+            <Badge className={cn("text-xs border px-2 py-0 font-semibold", src.badge)}>
               <img src={src.logo} alt={src.label} className="w-3 h-3 mr-1 inline object-contain" />
               {src.label}
             </Badge>
-            <Badge className={cn("text-[10px] border-0 px-2 py-0", typeStyle.color)}>{typeStyle.label}</Badge>
-            <Badge className={cn("text-[10px] border-0 px-2 py-0", expStyle.color)}>{expStyle.label}</Badge>
+            <Badge className={cn("text-xs border-0 px-2 py-0", typeStyle.color)}>{typeStyle.label}</Badge>
+            <Badge className={cn("text-xs border-0 px-2 py-0", expStyle.color)}>{expStyle.label}</Badge>
             {job.is_newcomer_friendly && (
-              <Badge className="text-[10px] border-0 px-2 py-0 bg-primary/10 text-primary">🍁 Newcomer Friendly</Badge>
+              <Badge className="text-xs border-0 px-2 py-0 bg-primary/10 text-primary">🍁 Newcomer Friendly</Badge>
             )}
           </div>
           <h3 className="font-heading font-bold text-sm leading-snug group-hover:text-primary transition-colors">{job.title}</h3>

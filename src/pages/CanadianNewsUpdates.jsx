@@ -200,14 +200,12 @@ export default function CanadianNewsUpdates() {
     loadedRef.current[tabId] = true;
   }, [city, province]);
 
-  // Pre-fetch ALL tabs in parallel on mount for instant tab switching
+  // Only fetch the initial active tab on mount; other tabs load on demand
   useEffect(() => {
     if (cityLoading) return;
-    TABS.forEach(tab => {
-      if (!loadedRef.current[tab.id]) {
-        fetchTab(tab.id);
-      }
-    });
+    if (!loadedRef.current['breaking']) {
+      fetchTab('breaking');
+    }
   }, [cityLoading]); // eslint-disable-line
 
   // Load tab when switching if not yet loaded

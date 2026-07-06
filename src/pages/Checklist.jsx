@@ -272,6 +272,7 @@ export default function Checklist() {
                         >
                           <button
                             onClick={() => toggleMutation.mutate({ id: item.id, is_completed: !item.is_completed })}
+                            aria-label={item.is_completed ? 'Mark incomplete' : 'Mark complete'}
                             className="mt-0.5 flex-shrink-0"
                           >
                             {item.is_completed

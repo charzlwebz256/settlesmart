@@ -3,10 +3,11 @@ import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
-import { MapPin, ChevronDown } from 'lucide-react';
+import { MapPin } from 'lucide-react';
 import ProvinceServicePanel from '../components/services/ProvinceServicePanel';
 import { useLocation_ } from '@/lib/LocationContext';
 import { PROVINCES, PROVINCE_EMOJIS, PROVINCE_DATA } from '@/lib/provinceServicesData';
+import { MobileSelect as Select, MobileSelectContent as SelectContent, MobileSelectItem as SelectItem, MobileSelectTrigger as SelectTrigger, MobileSelectValue as SelectValue } from '@/components/ui/mobile-select';
 
 const categories = [
   { value: 'settlement', label: '🧭 Settlement' },
@@ -20,27 +21,27 @@ const categories = [
   { value: 'volunteering', label: '🤝 Volunteering' },
 ];
 
+const NONE = '__none__';
+
 function SelectField({ label, icon, value, onChange, options, placeholder }) {
   return (
     <div className="flex-1 min-w-[180px]">
       <label className="block text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-1.5 flex items-center gap-1.5">
         {icon} {label}
       </label>
-      <div className="relative">
-        <select
-          value={value}
-          onChange={e => onChange(e.target.value)}
-          className="w-full appearance-none bg-card border border-border/70 rounded-xl px-4 py-2.5 pr-9 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 cursor-pointer"
-        >
-          <option value="">{placeholder}</option>
+      <Select value={value || NONE} onValueChange={(v) => onChange(v === NONE ? '' : v)}>
+        <SelectTrigger className="bg-card border border-border/70 rounded-xl px-4 py-2.5 text-sm font-medium text-foreground focus:ring-2 focus:ring-primary/30 focus:border-primary/50 cursor-pointer">
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value={NONE}>{placeholder}</SelectItem>
           {options.map(opt => (
-            <option key={opt.value ?? opt} value={opt.value ?? opt}>
+            <SelectItem key={opt.value ?? opt} value={opt.value ?? opt}>
               {opt.label ?? opt}
-            </option>
+            </SelectItem>
           ))}
-        </select>
-        <ChevronDown className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground pointer-events-none" />
-      </div>
+        </SelectContent>
+      </Select>
     </div>
   );
 }

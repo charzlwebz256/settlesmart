@@ -6,6 +6,7 @@ import { Plus, Briefcase, Loader2, ExternalLink, Calendar, Trash2, Edit3, Chevro
 import { cn } from '@/lib/utils';
 import { format, parseISO, isPast, isToday } from 'date-fns';
 import JobApplicationForm from '@/components/jobs/JobApplicationForm';
+import { MobileSelect as Select, MobileSelectContent as SelectContent, MobileSelectItem as SelectItem, MobileSelectTrigger as SelectTrigger, MobileSelectValue as SelectValue } from '@/components/ui/mobile-select';
 
 const STATUSES = [
   { id: 'saved',       label: 'Saved',        color: 'bg-slate-500/10 text-slate-600 border-slate-300',     dot: 'bg-slate-400' },
@@ -256,14 +257,15 @@ export default function JobTracker() {
         <div className="flex items-center gap-2 mb-4 bg-primary/5 border border-primary/20 rounded-2xl px-4 py-3 flex-wrap">
           <span className="text-xs font-semibold text-primary">{selected.size} selected</span>
           <div className="flex items-center gap-2 ml-auto flex-wrap">
-            <select
-              value={bulkStatus}
-              onChange={e => setBulkStatus(e.target.value)}
-              className="text-xs border border-border/60 rounded-lg px-2 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30"
-            >
-              <option value="">Change status to…</option>
-              {STATUSES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
-            </select>
+            <Select value={bulkStatus || '__none__'} onValueChange={(v) => setBulkStatus(v === '__none__' ? '' : v)}>
+              <SelectTrigger className="text-xs border border-border/60 rounded-lg px-2 py-1.5 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30 h-7 w-[160px]">
+                <SelectValue placeholder="Change status to…" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="__none__">Change status to…</SelectItem>
+                {STATUSES.map(s => <SelectItem key={s.id} value={s.id}>{s.label}</SelectItem>)}
+              </SelectContent>
+            </Select>
             <Button size="sm" onClick={handleBulkStatus} disabled={!bulkStatus || bulkWorking} className="rounded-lg text-xs h-7 px-3">
               {bulkWorking ? <Loader2 className="w-3 h-3 animate-spin" /> : 'Apply'}
             </Button>

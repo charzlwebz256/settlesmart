@@ -42,6 +42,7 @@ export default function EventCard({ event, saved, onSave, onSetReminder }) {
         <div className="flex items-center gap-1">
           <button
             onClick={() => onSetReminder && onSetReminder(event)}
+            aria-label="Set event reminder"
             className={cn(
               "p-1.5 rounded-lg transition-colors",
               saved ? "bg-primary/10 hover:bg-primary/20" : "hover:bg-muted"
@@ -54,6 +55,7 @@ export default function EventCard({ event, saved, onSave, onSetReminder }) {
           </button>
           <button
             onClick={() => onSave(event)}
+            aria-label={saved ? 'Remove saved event' : 'Save event'}
             className={cn(
               "p-1.5 rounded-lg transition-colors",
               saved ? "bg-primary/10 hover:bg-primary/20" : "hover:bg-muted"

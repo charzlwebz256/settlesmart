@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { cn } from '@/lib/utils';
+import { MobileSelect as Select, MobileSelectContent as SelectContent, MobileSelectItem as SelectItem, MobileSelectTrigger as SelectTrigger, MobileSelectValue as SelectValue } from '@/components/ui/mobile-select';
 
 const STATUSES = [
   { id: 'saved', label: 'Saved', color: 'bg-slate-500/10 text-slate-600 border-slate-300', dot: 'bg-slate-400' },
@@ -120,15 +121,16 @@ export default function MyScholarships() {
                   </div>
                 </div>
                 <div className="flex-shrink-0">
-                  <select
-                    value={s.status}
-                    onChange={e => statusMutation.mutate({ id: s.id, status: e.target.value })}
-                    className="text-[11px] border border-border/60 rounded-lg px-2 py-1 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30 cursor-pointer"
-                  >
-                    {STATUSES.map(st => (
-                      <option key={st.id} value={st.id}>{st.label}</option>
-                    ))}
-                  </select>
+                  <Select value={s.status} onValueChange={(v) => statusMutation.mutate({ id: s.id, status: v })}>
+                    <SelectTrigger className="text-[11px] border border-border/60 rounded-lg px-2 py-1 bg-background focus:outline-none focus:ring-1 focus:ring-primary/30 cursor-pointer h-7 w-[100px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {STATUSES.map(st => (
+                        <SelectItem key={st.id} value={st.id}>{st.label}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             ))}
