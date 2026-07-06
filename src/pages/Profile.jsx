@@ -1,4 +1,4 @@
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
@@ -110,10 +110,14 @@ export default function Profile() {
   });
 
   const [form, setForm] = useState(null);
+  const initializedProfileId = useRef(null);
 
-  // Sync form on initial load only (when form is null); don't overwrite in-progress edits on refetch
+  // Initialize the form exactly once per profile (keyed by id). Subsequent
+  // refetches return a new object reference but the same id, so in-progress
+  // edits are never overwritten by stale profile data.
   useEffect(() => {
-    if (profile && form === null) {
+    if (profile && initializedProfileId.current !== profile.id) {
+      initializedProfileId.current = profile.id;
       setForm({ ...profile });
     }
   }, [profile]);
