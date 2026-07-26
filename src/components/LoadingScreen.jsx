@@ -4,7 +4,7 @@ export default function LoadingScreen() {
       <div
         className="absolute inset-0 animate-fade-in"
         style={{
-          backgroundImage: 'url(https://manuleaf.com/wp-content/uploads/2021/08/manuleaf-presentation.jpg)',
+          backgroundImage: 'url(https://images4.alphacoders.com/722/72234.jpg)',
           backgroundSize: 'contain',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
