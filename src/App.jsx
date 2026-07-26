@@ -45,17 +45,14 @@ import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
 import ProtectedSignInPrompt from '@/components/ProtectedSignInPrompt';
+import LoadingScreen from '@/components/LoadingScreen';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
 
   // Show loading spinner while checking app public settings or auth
   if (isLoadingPublicSettings || isLoadingAuth) {
-    return (
-      <div className="fixed inset-0 flex items-center justify-center">
-        <div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   // Only block the whole app for unregistered users. An "auth_required" app
@@ -67,7 +64,7 @@ const AuthenticatedApp = () => {
 
   // Render the main app
   return (
-    <React.Suspense fallback={<div className="fixed inset-0 flex items-center justify-center"><div className="w-8 h-8 border-4 border-slate-200 border-t-slate-800 rounded-full animate-spin"></div></div>}>
+    <React.Suspense fallback={<LoadingScreen />}>
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />

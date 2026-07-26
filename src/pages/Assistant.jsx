@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query';
 import { Button } from '@/components/ui/button';
 import { Send, Sparkles, Loader2, MapPin, User } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import TypewriterContent from '@/components/assistant/TypewriterContent';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -60,7 +61,7 @@ Previous conversation: ${messages.slice(-6).map(m => `${m.role}: ${m.content}`).
       add_context_from_internet: true,
     });
 
-    setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+    setMessages(prev => [...prev, { role: 'assistant', content: response, typing: true }]);
     setLoading(false);
   };
 
@@ -125,6 +126,13 @@ Previous conversation: ${messages.slice(-6).map(m => `${m.role}: ${m.content}`).
               )}>
                 {msg.role === 'user' ? (
                   <p className="text-sm">{msg.content}</p>
+                ) : msg.typing ? (
+                  <TypewriterContent
+                    content={msg.content}
+                    className="text-sm prose prose-sm prose-slate dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0"
+                    onDone={() => setMessages(prev => prev.map((m, idx) => idx === i ? { ...m, typing: false } : m))}
+                    onTick={() => bottomRef.current?.scrollIntoView({ block: 'end' })}
+                  />
                 ) : (
                   <ReactMarkdown className="text-sm prose prose-sm prose-slate dark:prose-invert max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
                     {msg.content}

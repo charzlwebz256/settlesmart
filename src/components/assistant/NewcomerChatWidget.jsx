@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { MessageCircle, X, Send, Loader2, Sparkles, ChevronDown } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import TypewriterContent from '@/components/assistant/TypewriterContent';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -60,7 +61,7 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
   // Save messages to localStorage whenever they change
   useEffect(() => {
     if (messages.length > 0) {
-      localStorage.setItem('newcomerChatMessages', JSON.stringify(messages));
+      localStorage.setItem('newcomerChatMessages', JSON.stringify(messages.map(({ typing, ...rest }) => rest)));
     }
   }, [messages]);
 
@@ -105,7 +106,7 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
       prompt: `${SYSTEM_PROMPT}\n\n${locationCtx}\n\nConversation:\n${history}\n\nRespond as the Assistant:`,
     });
 
-    setMessages(prev => [...prev, { role: 'assistant', content: response }]);
+    setMessages(prev => [...prev, { role: 'assistant', content: response, typing: true }]);
     setLoading(false);
   };
 
@@ -173,6 +174,13 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
                   )}>
                     {msg.role === 'user' ? (
                       <p>{msg.content}</p>
+                    ) : msg.typing ? (
+                      <TypewriterContent
+                        content={msg.content}
+                        className="prose prose-sm max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_p]:my-1 [&_ul]:my-1 [&_li]:my-0.5 [&_strong]:font-semibold"
+                        onDone={() => setMessages(prev => prev.map((m, idx) => idx === i ? { ...m, typing: false } : m))}
+                        onTick={() => bottomRef.current?.scrollIntoView({ block: 'end' })}
+                      />
                     ) : (
                       <ReactMarkdown className="prose prose-sm max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_p]:my-1 [&_ul]:my-1 [&_li]:my-0.5 [&_strong]:font-semibold">
                         {msg.content}
