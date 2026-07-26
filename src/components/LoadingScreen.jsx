@@ -40,7 +40,6 @@ export default function LoadingScreen() {
             style={{ animation: 'loading-ring-spin 1.8s linear infinite reverse' }}
           />
         </div>
-        <h1 className="font-heading font-bold text-2xl text-foreground tracking-tight">SettleSmart</h1>
         <div className="relative w-48 h-1.5 rounded-full bg-muted overflow-hidden">
           <div
             className="absolute inset-y-0 left-0 rounded-full bg-primary"
@@ -51,7 +50,7 @@ export default function LoadingScreen() {
             style={{ animation: 'loading-shimmer 1.4s ease-in-out infinite' }}
           />
         </div>
-        <p className="text-xs text-muted-foreground font-medium tracking-wide">Getting everything ready…</p>
+        <h1 className="text-xs text-muted-foreground font-medium tracking-wide">Getting everything ready…</h1>
       </div>
     </div>
   );
