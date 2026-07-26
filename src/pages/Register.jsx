@@ -9,7 +9,9 @@ import { Mail, Lock, Loader2, AlertCircle, ArrowLeft } from 'lucide-react';
 export default function Register() {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
-  const fromUrl = searchParams.get('from') || '/';
+  const rawFrom = searchParams.get('from') || '/';
+  // Only allow same-origin relative paths to prevent open redirect / XSS via `javascript:` or external URLs
+  const fromUrl = rawFrom.startsWith('/') && !rawFrom.startsWith('//') && !rawFrom.startsWith('/\\') ? rawFrom : '/';
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirm, setConfirm] = useState('');
