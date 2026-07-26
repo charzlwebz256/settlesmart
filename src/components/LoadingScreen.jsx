@@ -61,7 +61,6 @@ export default function LoadingScreen() {
         <h1 className="text-xs text-muted-foreground font-medium tracking-wide">
           {progress < 100 ? 'Getting everything ready…' : 'Ready!'}
         </h1>
-        <span className="font-heading font-bold text-lg text-foreground tabular-nums">{progress}%</span>
       </div>
     </div>
   );
