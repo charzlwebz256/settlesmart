@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
 
-export default function TypewriterContent({ content, className = '', speed = 15, charsPerTick = 2, onDone, onTick }) {
+export default function TypewriterContent({ content, className = '', speed = 38, charsPerTick = 1, onDone, onTick }) {
   const [displayed, setDisplayed] = useState('');
   const doneRef = useRef(false);
   const lastTickRef = useRef(0);

@@ -10,12 +10,20 @@ export default function LoadingScreen() {
           backgroundRepeat: 'no-repeat',
         }}
       >
-        <div className="flex flex-col items-center gap-3 bg-card/80 backdrop-blur-sm rounded-3xl px-10 py-8 shadow-lg border border-border/40">
-          <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center overflow-hidden">
-            <img src="https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/34a7de8f6_generated_image.png" alt="SettleSmart" className="w-12 h-12 object-cover" />
+        <div className="relative flex flex-col items-center gap-4">
+          <div className="relative w-20 h-20 flex items-center justify-center">
+            <span className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
+            <span className="absolute inset-2 rounded-full bg-primary/30 animate-ping" style={{ animationDelay: '0.2s' }} />
+            <div className="relative w-14 h-14 rounded-2xl bg-primary flex items-center justify-center overflow-hidden shadow-lg">
+              <img src="https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/34a7de8f6_generated_image.png" alt="SettleSmart" className="w-14 h-14 object-cover" />
+            </div>
           </div>
-          <h1 className="font-heading font-bold text-lg text-foreground">SettleSmart</h1>
-          <div className="w-8 h-8 border-4 border-primary/20 border-t-primary rounded-full animate-spin" />
+          <h1 className="font-heading font-bold text-xl text-foreground tracking-tight">SettleSmart</h1>
+          <div className="flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
+            <span className="w-2 h-2 rounded-full bg-primary/70 animate-bounce" style={{ animationDelay: '150ms' }} />
+            <span className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: '300ms' }} />
+          </div>
         </div>
       </div>
     </div>
