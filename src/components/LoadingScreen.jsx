@@ -1,30 +1,60 @@
 export default function LoadingScreen() {
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center bg-background">
+    <div className="fixed inset-0 flex flex-col items-center justify-center bg-background overflow-hidden">
       <div
-        className="w-full h-full flex flex-col items-center justify-center animate-fade-in"
+        className="absolute inset-0 animate-fade-in"
         style={{
           backgroundImage: 'url(https://png.pngtree.com/png-vector/20220721/ourmid/pngtree-grunge-canada-flag-brush-stroke-transparent-png-png-image_6027240.png)',
           backgroundSize: 'contain',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
+          opacity: 0.85,
         }}
-      >
-        <div className="relative flex flex-col items-center gap-4">
-          <div className="relative w-20 h-20 flex items-center justify-center">
-            <span className="absolute inset-0 rounded-full bg-primary/20 animate-ping" />
-            <span className="absolute inset-2 rounded-full bg-primary/30 animate-ping" style={{ animationDelay: '0.2s' }} />
-            <div className="relative w-14 h-14 rounded-2xl bg-primary flex items-center justify-center overflow-hidden shadow-lg">
-              <img src="https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/34a7de8f6_generated_image.png" alt="SettleSmart" className="w-14 h-14 object-cover" />
-            </div>
-          </div>
-          <h1 className="font-heading font-bold text-xl text-foreground tracking-tight">SettleSmart</h1>
-          <div className="flex items-center gap-1.5">
-            <span className="w-2 h-2 rounded-full bg-primary animate-bounce" style={{ animationDelay: '0ms' }} />
-            <span className="w-2 h-2 rounded-full bg-primary/70 animate-bounce" style={{ animationDelay: '150ms' }} />
-            <span className="w-2 h-2 rounded-full bg-primary/40 animate-bounce" style={{ animationDelay: '300ms' }} />
+      />
+      <style>{`
+        @keyframes loading-float {
+          0%, 100% { transform: translateY(0) scale(1); }
+          50% { transform: translateY(-8px) scale(1.04); }
+        }
+        @keyframes loading-ring-spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+        @keyframes loading-bar-fill {
+          0% { width: 0%; }
+          100% { width: 100%; }
+        }
+        @keyframes loading-shimmer {
+          0% { transform: translateX(-100%); }
+          100% { transform: translateX(200%); }
+        }
+      `}</style>
+      <div className="relative z-10 flex flex-col items-center gap-6">
+        <div className="relative w-24 h-24 flex items-center justify-center" style={{ animation: 'loading-float 2.4s ease-in-out infinite' }}>
+          <span
+            className="absolute inset-0 rounded-full border-4 border-transparent border-t-primary border-r-primary/40"
+            style={{ animation: 'loading-ring-spin 1.2s linear infinite' }}
+          />
+          <span
+            className="absolute inset-2 rounded-full border-4 border-transparent border-b-primary/60 border-l-primary/20"
+            style={{ animation: 'loading-ring-spin 1.8s linear infinite reverse' }}
+          />
+          <div className="relative w-14 h-14 rounded-2xl bg-primary flex items-center justify-center overflow-hidden shadow-lg">
+            <img src="https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/34a7de8f6_generated_image.png" alt="SettleSmart" className="w-14 h-14 object-cover" />
           </div>
         </div>
+        <h1 className="font-heading font-bold text-2xl text-foreground tracking-tight">SettleSmart</h1>
+        <div className="relative w-48 h-1.5 rounded-full bg-muted overflow-hidden">
+          <div
+            className="absolute inset-y-0 left-0 rounded-full bg-primary"
+            style={{ animation: 'loading-bar-fill 2s ease-in-out infinite' }}
+          />
+          <div
+            className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/60 to-transparent"
+            style={{ animation: 'loading-shimmer 1.4s ease-in-out infinite' }}
+          />
+        </div>
+        <p className="text-xs text-muted-foreground font-medium tracking-wide">Getting everything ready…</p>
       </div>
     </div>
   );
