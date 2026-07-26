@@ -2,7 +2,7 @@ import { Toaster } from "@/components/ui/toaster"
 import { QueryClientProvider } from '@tanstack/react-query'
 import { queryClientInstance } from '@/lib/query-client'
 import { BrowserRouter as Router, Route, Routes, Navigate } from 'react-router-dom';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PageNotFound from './lib/PageNotFound';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
@@ -49,9 +49,16 @@ import LoadingScreen from '@/components/LoadingScreen';
 
 const AuthenticatedApp = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
+  const [minLoading, setMinLoading] = useState(true);
 
-  // Show loading spinner while checking app public settings or auth
-  if (isLoadingPublicSettings || isLoadingAuth) {
+  // Ensure the loading screen shows for at least 3 seconds on initial open
+  useEffect(() => {
+    const t = setTimeout(() => setMinLoading(false), 3000);
+    return () => clearTimeout(t);
+  }, []);
+
+  // Show loading spinner while checking app public settings or auth (min 3s)
+  if (isLoadingPublicSettings || isLoadingAuth || minLoading) {
     return <LoadingScreen />;
   }
 
