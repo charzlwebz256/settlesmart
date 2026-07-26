@@ -34,25 +34,28 @@ export default function ResumePreview({ resumeData, onEdit }) {
     const content = printRef.current?.innerHTML;
     if (!content) return;
     const w = window.open('', '_blank');
-    w.document.write(`
-      <html><head><title>${contact.fullName || 'Resume'} - Resume</title>
-      <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Arial', sans-serif; font-size: 11pt; line-height: 1.5; color: #1a1a1a; padding: 2cm; }
-        h1 { font-size: 20pt; font-weight: 700; margin-bottom: 2px; }
-        h2 { font-size: 11pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1.5px solid #2d9d78; padding-bottom: 3px; margin: 14px 0 6px; color: #1a1a1a; }
-        .contact { font-size: 10pt; color: #555; margin-bottom: 4px; }
-        .section-content { font-size: 10.5pt; }
-        .job-title { font-weight: 600; }
-        .job-meta { font-size: 10pt; color: #555; margin-bottom: 4px; }
-        ul { margin-left: 14px; margin-top: 3px; }
-        li { margin-bottom: 2px; }
-        .skills-row { margin-bottom: 4px; }
-        .skills-cat { font-weight: 600; }
-        @media print { body { padding: 1.5cm; } }
-      </style></head><body>${content}</body></html>
-    `);
-    w.document.close();
+    // Set the title safely (avoids interpolating user input into HTML markup)
+    w.document.title = `${contact.fullName || 'Resume'} - Resume`;
+    const style = w.document.createElement('style');
+    style.textContent = `
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      body { font-family: 'Arial', sans-serif; font-size: 11pt; line-height: 1.5; color: #1a1a1a; padding: 2cm; }
+      h1 { font-size: 20pt; font-weight: 700; margin-bottom: 2px; }
+      h2 { font-size: 11pt; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; border-bottom: 1.5px solid #2d9d78; padding-bottom: 3px; margin: 14px 0 6px; color: #1a1a1a; }
+      .contact { font-size: 10pt; color: #555; margin-bottom: 4px; }
+      .section-content { font-size: 10.5pt; }
+      .job-title { font-weight: 600; }
+      .job-meta { font-size: 10pt; color: #555; margin-bottom: 4px; }
+      ul { margin-left: 14px; margin-top: 3px; }
+      li { margin-bottom: 2px; }
+      .skills-row { margin-bottom: 4px; }
+      .skills-cat { font-weight: 600; }
+      @media print { body { padding: 1.5cm; } }
+    `;
+    w.document.head.appendChild(style);
+    // content comes from React-rendered DOM (text already escaped by React),
+    // so assigning it via innerHTML cannot inject script.
+    w.document.body.innerHTML = content;
     setTimeout(() => { w.print(); }, 300);
   };
 

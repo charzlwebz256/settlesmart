@@ -55,17 +55,21 @@ Tone: ${tone}. Language: Canadian English. Keep it to 3–4 paragraphs, under 35
   };
 
   const handlePrint = () => {
-    const w = window.open('', '_blank');
     const contact = resumeData?.contact || {};
-    w.document.write(`
-      <html><head><title>Cover Letter – ${contact.fullName || ''}</title>
-      <style>
-        body { font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.7; color: #1a1a1a; padding: 2.5cm; max-width: 750px; margin: 0 auto; }
-        pre { font-family: Arial, sans-serif; white-space: pre-wrap; word-wrap: break-word; }
-        @media print { body { padding: 1.5cm; } }
-      </style></head><body><pre>${letter}</pre></body></html>
-    `);
-    w.document.close();
+    const w = window.open('', '_blank');
+    // Set the title safely (avoids interpolating user input into HTML markup)
+    w.document.title = `Cover Letter – ${contact.fullName || ''}`;
+    const style = w.document.createElement('style');
+    style.textContent = `
+      body { font-family: Arial, sans-serif; font-size: 11pt; line-height: 1.7; color: #1a1a1a; padding: 2.5cm; max-width: 750px; margin: 0 auto; }
+      pre { font-family: Arial, sans-serif; white-space: pre-wrap; word-wrap: break-word; }
+      @media print { body { padding: 1.5cm; } }
+    `;
+    w.document.head.appendChild(style);
+    const pre = w.document.createElement('pre');
+    // textContent safely escapes the letter text (no script execution)
+    pre.textContent = letter;
+    w.document.body.appendChild(pre);
     setTimeout(() => w.print(), 300);
   };
 
