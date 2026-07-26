@@ -44,6 +44,11 @@ function getSourceStyle(source) {
   return key ? SOURCE_STYLES[key] : 'bg-slate-700 text-white';
 }
 
+function isSafeUrl(url) {
+  if (!url) return false;
+  return /^https?:\/\//i.test(url) || url.startsWith('/');
+}
+
 function isRecent(time_ago) {
   if (!time_ago) return false;
   const t = time_ago.toLowerCase();
@@ -66,7 +71,7 @@ export default function NewsSection({ articles, category }) {
         return (
           <a
             key={i}
-            href={article.url || '#'}
+            href={isSafeUrl(article.url) ? article.url : '#'}
             target="_blank"
             rel="noopener noreferrer"
             className={cn(
