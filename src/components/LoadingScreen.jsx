@@ -39,9 +39,6 @@ export default function LoadingScreen() {
             className="absolute inset-2 rounded-full border-4 border-transparent border-b-primary/60 border-l-primary/20"
             style={{ animation: 'loading-ring-spin 1.8s linear infinite reverse' }}
           />
-          <div className="relative w-14 h-14 rounded-2xl bg-primary flex items-center justify-center overflow-hidden shadow-lg">
-            <img src="https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/34a7de8f6_generated_image.png" alt="SettleSmart" className="w-14 h-14 object-cover" />
-          </div>
         </div>
         <h1 className="font-heading font-bold text-2xl text-foreground tracking-tight">SettleSmart</h1>
         <div className="relative w-48 h-1.5 rounded-full bg-muted overflow-hidden">
