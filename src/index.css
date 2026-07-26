@@ -151,17 +151,5 @@
   body {
     @apply bg-background text-foreground font-body;
     overscroll-behavior-y: none;
-    background-image: 
-      linear-gradient(rgba(255, 255, 255, 0.92), rgba(255, 255, 255, 0.92)),
-      url('https://png.pngtree.com/png-vector/20220721/ourmid/pngtree-grunge-canada-flag-brush-stroke-transparent-png-png-image_6027240.png');
-    background-size: cover;
-    background-attachment: scroll;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
-  .dark body {
-    background-image: 
-      linear-gradient(rgba(20, 20, 20, 0.92), rgba(20, 20, 20, 0.92)),
-      url('https://png.pngtree.com/png-vector/20220721/ourmid/pngtree-grunge-canada-flag-brush-stroke-transparent-png-png-image_6027240.png');
   }
 }
