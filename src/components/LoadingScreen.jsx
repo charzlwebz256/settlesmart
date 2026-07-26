@@ -4,7 +4,7 @@ export default function LoadingScreen() {
       <div
         className="absolute inset-0 animate-fade-in"
         style={{
-          backgroundImage: 'url(https://png.pngtree.com/png-vector/20220721/ourmid/pngtree-grunge-canada-flag-brush-stroke-transparent-png-png-image_6027240.png)',
+          backgroundImage: 'url(https://manuleaf.com/wp-content/uploads/2021/08/manuleaf-presentation.jpg)',
           backgroundSize: 'contain',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
