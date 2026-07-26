@@ -1,4 +1,16 @@
+import { useEffect, useState } from 'react';
+
 export default function LoadingScreen() {
+  const [progress, setProgress] = useState(0);
+
+  // Increment the percentage in steps of 10 until 100
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setProgress((prev) => (prev >= 100 ? 100 : prev + 10));
+    }, 300);
+    return () => clearInterval(interval);
+  }, []);
+
   return (
     <div className="fixed inset-0 flex flex-col items-center justify-center bg-background overflow-hidden">
       <div
@@ -20,10 +32,6 @@ export default function LoadingScreen() {
           from { transform: rotate(0deg); }
           to { transform: rotate(360deg); }
         }
-        @keyframes loading-bar-fill {
-          0% { width: 0%; }
-          100% { width: 100%; }
-        }
         @keyframes loading-shimmer {
           0% { transform: translateX(-100%); }
           100% { transform: translateX(200%); }
@@ -42,15 +50,18 @@ export default function LoadingScreen() {
         </div>
         <div className="relative w-48 h-1.5 rounded-full bg-muted overflow-hidden">
           <div
-            className="absolute inset-y-0 left-0 rounded-full bg-primary"
-            style={{ animation: 'loading-bar-fill 2s ease-in-out infinite' }}
+            className="absolute inset-y-0 left-0 rounded-full bg-primary transition-all duration-300 ease-out"
+            style={{ width: `${progress}%` }}
           />
           <div
             className="absolute inset-y-0 w-1/3 bg-gradient-to-r from-transparent via-white/60 to-transparent"
             style={{ animation: 'loading-shimmer 1.4s ease-in-out infinite' }}
           />
         </div>
-        <h1 className="text-xs text-muted-foreground font-medium tracking-wide">Getting everything ready…</h1>
+        <h1 className="text-xs text-muted-foreground font-medium tracking-wide">
+          {progress < 100 ? 'Getting everything ready…' : 'Ready!'}
+        </h1>
+        <span className="font-heading font-bold text-lg text-foreground tabular-nums">{progress}%</span>
       </div>
     </div>
   );
