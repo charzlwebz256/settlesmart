@@ -16,7 +16,7 @@ export default function LoadingScreen() {
       <div
         className="absolute inset-0 animate-fade-in"
         style={{
-          backgroundImage: 'url(https://cdn-res.keymedia.com/cdn-cgi/image/w=1000,h=600,f=auto/https://cdn-res.keymedia.com/cms/images/us/036/0363_639179796181705278.png)',
+          backgroundImage: 'url(https://bsmedia.business-standard.com/_media/bs/img/article/2024-05/23/full/1716440154-6699.jpg?im=FeatureCrop,size=(826,465))',
           backgroundSize: 'contain',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
