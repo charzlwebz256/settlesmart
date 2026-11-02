@@ -3,6 +3,7 @@ import { Scale, Newspaper, ArrowRight, ShoppingBag, ChevronDown, ExternalLink } 
 import { motion } from 'framer-motion';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import CanadaTimeZones from '@/components/resources/CanadaTimeZones';
 
 const staticSections = [
   {
@@ -123,6 +124,15 @@ export default function Resources() {
               ))}
             </motion.div>
           )}
+        </motion.div>
+
+        {/* Canada Time Zones */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: (staticSections.length + 1) * 0.07 }}
+        >
+          <CanadaTimeZones />
         </motion.div>
       </div>
     </div>
