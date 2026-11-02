@@ -49,6 +49,15 @@ export default function Resources() {
         <p className="text-muted-foreground text-sm">Legal information, news, and shopping guides to keep you informed.</p>
       </div>
       <div className="space-y-4">
+        {/* Canada Time Zones */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <CanadaTimeZones />
+        </motion.div>
+
         {staticSections.map((s, i) => (
           <motion.div
             key={s.path}
@@ -126,14 +135,6 @@ export default function Resources() {
           )}
         </motion.div>
 
-        {/* Canada Time Zones */}
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: (staticSections.length + 1) * 0.07 }}
-        >
-          <CanadaTimeZones />
-        </motion.div>
       </div>
     </div>
   );
