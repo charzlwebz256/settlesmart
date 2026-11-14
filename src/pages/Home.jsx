@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import HeroSection from '../components/home/HeroSection';
 import WelcomeBanner from '../components/home/WelcomeBanner';
+import GuestGreeting from '../components/home/GuestGreeting';
 import QuickAccessGrid from '../components/home/QuickAccessGrid';
 import InfoBanner from '../components/home/InfoBanner';
 import First30DaysBanner from '../components/home/First30DaysBanner';
@@ -60,8 +60,7 @@ export default function Home() {
           {isAuthenticated ? (
             <WelcomeBanner user={user} profile={profile} city={city} province={province} />
           ) : (
-            <HeroSection
-              hasProfile={hasProfile}
+            <GuestGreeting
               onStartWizard={() => requireAuth(() => setShowWizard(true))}
             />
           )}
