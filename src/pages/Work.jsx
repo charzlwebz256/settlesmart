@@ -78,8 +78,8 @@ export default function Work() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 pb-24 md:pb-12">
       <div className="mb-8">
-        <h1 className="font-heading font-bold text-2xl md:text-3xl mb-2">SmartLife</h1>
-        <p className="text-muted-foreground text-sm">Shopping, entertainment and work, the everyday essentials for life in Canada.</p>
+        <h1 className="font-heading font-bold text-2xl md:text-3xl mb-2">Career Tools</h1>
+        <p className="text-muted-foreground text-sm">Find work, prepare strong applications and know your rights at work in Canada.</p>
       </div>
 
       <div className="space-y-8">

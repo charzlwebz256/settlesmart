@@ -209,9 +209,9 @@ export default function CanadianNewsUpdates() {
         </div>
       </div>
 
-      {/* Weather stays on the visitor's own location, never on the news filter */}
+      {/* Weather follows the location chosen for the news */}
       <div className="mt-3">
-        <WeatherWidget city={city || 'Edmonton'} province={province} />
+        <WeatherWidget city={activeLoc.city || 'Edmonton'} province={activeLoc.province} />
       </div>
 
       {/* Tab Bar */}
