@@ -63,10 +63,9 @@ export function MapLayerTiles({ type }) {
   return (
     <TileLayer
       key="street"
-      url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
-      attribution='&copy; OpenStreetMap contributors &copy; CARTO'
-      subdomains="abcd"
-      maxZoom={20}
+      url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+      attribution='&copy; OpenStreetMap contributors'
+      maxZoom={19}
     />
   );
 }
