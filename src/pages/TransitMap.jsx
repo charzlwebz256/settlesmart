@@ -55,6 +55,14 @@ export default function TransitMap() {
   } = useDeviceLocation();
 
   const { stops, loading: stopsLoading, error: stopsError, load: loadStops, clear: clearStops } = useNearbyStops();
+  // Stops around the destination, so the closest alighting option is visible too.
+  const {
+    stops: destStops,
+    loading: destStopsLoading,
+    error: destStopsError,
+    load: loadDestStops,
+    clear: clearDestStops,
+  } = useNearbyStops();
 
   const reverseAddress = async (coords) => {
     if (!coords) return '';
@@ -98,10 +106,20 @@ export default function TransitMap() {
     loadStops([position.lat, position.lng]);
   }, [position?.lat, position?.lng, showStops, loadStops]);
 
+  // Stops around wherever the rider is heading, so the closest way off is clear.
+  useEffect(() => {
+    if (!endCoords || !showStops) {
+      clearDestStops();
+      return;
+    }
+    loadDestStops(endCoords);
+  }, [endCoords?.join(','), showStops, loadDestStops, clearDestStops]);
+
   const toggleStops = () => {
     if (showStops) {
       setShowStops(false);
       clearStops();
+      clearDestStops();
       stopsCenterRef.current = null;
     } else {
       setShowStops(true);
@@ -207,6 +225,12 @@ export default function TransitMap() {
   // Memoised so the map only redraws the route when a new one is calculated.
   const routePath = useMemo(() => routeData?.waypoints || [], [routeData]);
   const routeLegs = useMemo(() => routeData?.journey || [], [routeData]);
+  // Both ends' closest stops share the map; memoised so markers are not rebuilt.
+  const mapStops = useMemo(() => [...destStops, ...stops], [destStops, stops]);
+
+  const destinationPoint = endCoords ? { lat: endCoords[0], lng: endCoords[1] } : null;
+  // Only worth listing the destination's stops when it is not already next door.
+  const showDestStops = Boolean(destinationPoint) && (!position || distanceMeters(position, destinationPoint) > 700);
 
   return (
     <div className="pb-16 md:pb-0">
@@ -221,7 +245,7 @@ export default function TransitMap() {
             endCoords={endCoords}
             routePath={routePath}
             routeLegs={routeLegs}
-            nearbyStops={stops}
+            nearbyStops={mapStops}
             busStations={busStations}
             showStops={showStops}
             stopsLoading={stopsLoading}
@@ -284,9 +308,22 @@ export default function TransitMap() {
               stops={stops}
               loading={stopsLoading}
               error={stopsError}
-              userPosition={position}
+              center={position}
               onWalkTo={walkToStop}
+              title="Nearest bus stops"
             />
+
+            {showDestStops && (
+              <NearbyTransitPanel
+                stops={destStops}
+                loading={destStopsLoading}
+                error={destStopsError}
+                center={destinationPoint}
+                onWalkTo={walkToStop}
+                title="Stops near your destination"
+                idleText=""
+              />
+            )}
           </div>
         </aside>
       </div>

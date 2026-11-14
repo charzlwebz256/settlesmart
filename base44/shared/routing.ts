@@ -229,8 +229,20 @@ async function transitPlan(start, end) {
   }
 
   if (itineraries.length) {
-    const primary = describeItinerary(itineraries[0]);
-    const alternatives = itineraries.slice(1, 3).map((it) => ({
+    // Prefer the trip whose stops sit closest to both ends: every 80 m of walking
+    // costs the same as a minute on board, so a nearby stop beats a long walk.
+    const accessMeters = (itinerary) =>
+      (itinerary.legs || []).reduce((sum, leg) => {
+        const kind = LEG_KIND[leg.mode];
+        const onFoot = !kind || kind === 'walk' || kind === 'bike';
+        return onFoot ? sum + (Number(leg.distance) || 0) : sum;
+      }, 0);
+    const scored = itineraries
+      .map((it) => ({ it, score: (it.duration || 0) / 60 + accessMeters(it) / 80 }))
+      .sort((a, b) => a.score - b.score);
+
+    const primary = describeItinerary(scored[0].it);
+    const alternatives = scored.slice(1, 3).map(({ it }) => ({
       duration_minutes: Math.max(1, Math.round((it.duration || 0) / 60)),
       transfers: it.transfers || 0,
       routes: (it.legs || [])

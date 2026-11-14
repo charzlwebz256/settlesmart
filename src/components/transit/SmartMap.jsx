@@ -225,7 +225,7 @@ export default function SmartMap({
     if (showStops) {
       nearbyStops
         .filter((stop) => Number.isFinite(stop.lat) && Number.isFinite(stop.lng))
-        .slice(0, 40)
+        .slice(0, 80)
         .forEach((stop) => {
           const marker = new maps.Marker({ map, position: { lat: stop.lat, lng: stop.lng }, icon: stopIcon(maps), title: stop.name });
           marker.addListener('click', () => handlers.current.onStopSelect?.(stop));
