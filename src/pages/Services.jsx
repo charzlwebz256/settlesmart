@@ -66,7 +66,7 @@ export default function Services() {
     queryKey: ['myProfile'],
     queryFn: async () => {
       const user = await base44.auth.me();
-      const results = await base44.entities.UserProfile.filter({ created_by: user.email });
+      const results = await base44.entities.UserProfile.filter({ created_by_id: user.id });
       return results[0] || null;
     },
   });
@@ -165,7 +165,7 @@ export default function Services() {
             </div>
             {(selectedProvince || selectedCategory || selectedCity) && (
               <button
-                onClick={() => { setSelectedProvince(''); setSelectedCity(''); setSelectedCategory(''); }}
+                onClick={() => { setSelectedProvince(''); setSelectedCity(''); setSelectedCategory(''); setHasManuallySelectedProvince(false); }}
                 className="text-xs text-muted-foreground hover:text-destructive transition-colors font-medium"
               >
                 Clear all

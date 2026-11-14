@@ -13,6 +13,7 @@ function useIsMobile() {
   React.useEffect(() => {
     const mq = window.matchMedia("(max-width: 767px)")
     const handler = (e) => setIsMobile(e.matches)
+    setIsMobile(mq.matches)
     mq.addEventListener("change", handler)
     return () => mq.removeEventListener("change", handler)
   }, [])
@@ -24,21 +25,14 @@ const MobileSelectCtx = React.createContext(null)
 export function MobileSelect({ children, value, onValueChange, defaultValue, disabled, ...props }) {
   const isMobile = useIsMobile()
   const [open, setOpen] = React.useState(false)
-  const labelRegistry = React.useRef({})
-  const [, forceUpdate] = React.useReducer(x => x + 1, 0)
-
-  const registerLabel = React.useCallback((v, label) => {
-    if (labelRegistry.current[v] !== label) {
-      labelRegistry.current[v] = label
-      forceUpdate()
-    }
-  }, [])
+  const [selectedLabel, setSelectedLabel] = React.useState(null)
 
   const handleValueChange = React.useCallback((v) => {
     onValueChange?.(v)
     setOpen(false)
   }, [onValueChange])
 
+  // Desktop: hand everything to Radix Select, unchanged.
   if (!isMobile) {
     return (
       <SelectPrimitive.Root value={value} onValueChange={onValueChange} defaultValue={defaultValue} disabled={disabled} {...props}>
@@ -47,15 +41,12 @@ export function MobileSelect({ children, value, onValueChange, defaultValue, dis
     )
   }
 
-  // displayLabel: try registry first, fall back to raw value
-  const displayLabel = value ? (labelRegistry.current[value] ?? value) : null
-
+  // Mobile: plain provider (no Radix root) driving the custom bottom sheet.
   return (
-    <MobileSelectCtx.Provider value={{ open, setOpen, value, displayLabel, onValueChange: handleValueChange, registerLabel, disabled }}>
-      {/* Radix Root with open=false so it never renders its own popover */}
-      <SelectPrimitive.Root value={value} onValueChange={onValueChange} defaultValue={defaultValue} disabled={disabled} open={false} {...props}>
-        {children}
-      </SelectPrimitive.Root>
+    <MobileSelectCtx.Provider
+      value={{ open, setOpen, value, selectedLabel, setSelectedLabel, onValueChange: handleValueChange, disabled }}
+    >
+      {children}
     </MobileSelectCtx.Provider>
   )
 }
@@ -85,19 +76,22 @@ export const MobileSelectTrigger = React.forwardRef(({ className, children, ...p
     (child) => React.isValidElement(child) && child.type === SelectPrimitive.Value
   )?.props?.placeholder
 
+  const isPlaceholder = !ctx.selectedLabel || ctx.selectedLabel === placeholder
+  const text = isPlaceholder ? (placeholder || "Select…") : ctx.selectedLabel
+
   return (
     <button
       ref={ref}
       type="button"
       disabled={ctx.disabled || props.disabled}
+      onClick={() => ctx.setOpen(true)}
       className={cn(
-        "flex h-9 w-full items-center justify-between whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
+        "flex h-9 w-full items-center justify-between gap-2 whitespace-nowrap rounded-md border border-input bg-transparent px-3 py-2 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:cursor-not-allowed disabled:opacity-50",
         className
       )}
-      onClick={() => ctx.setOpen(true)}
     >
-      <span className={cn("line-clamp-1 text-left", !ctx.displayLabel && "text-muted-foreground")}>
-        {ctx.displayLabel || placeholder || "Select…"}
+      <span className={cn("line-clamp-1 text-left", isPlaceholder && "text-muted-foreground")}>
+        {text}
       </span>
       <ChevronDown className="h-4 w-4 opacity-50 flex-shrink-0" />
     </button>
@@ -107,6 +101,24 @@ MobileSelectTrigger.displayName = "MobileSelectTrigger"
 
 export function MobileSelectContent({ children, label, ...props }) {
   const ctx = React.useContext(MobileSelectCtx)
+
+  // Derive the selected option's label from the child elements themselves.
+  // Runs as an effect (never during render) and needs no hidden copies of the items.
+  React.useEffect(() => {
+    if (!ctx) return
+    if (ctx.value == null || ctx.value === "") {
+      ctx.setSelectedLabel(null)
+      return
+    }
+    let found = null
+    React.Children.forEach(children, (child) => {
+      if (React.isValidElement(child) && String(child.props?.value) === String(ctx.value)) {
+        const c = child.props.children
+        found = typeof c === "string" ? c : String(ctx.value)
+      }
+    })
+    ctx.setSelectedLabel(found)
+  }, [ctx?.value, children])
 
   if (!ctx) {
     return (
@@ -126,44 +138,28 @@ export function MobileSelectContent({ children, label, ...props }) {
     )
   }
 
-  // On mobile: always render children hidden so MobileSelectItem registers labels
-  // immediately on mount, before the drawer ever opens.
   return (
-    <>
-      {/* Hidden label scanner — renders items so they register labels synchronously */}
-      <div style={{ display: 'none' }} aria-hidden="true">
-        {children}
-      </div>
-
-      {/* Actual drawer */}
-      <Drawer.Root open={ctx.open} onOpenChange={ctx.setOpen}>
-        <Drawer.Portal>
-          <Drawer.Overlay className="fixed inset-0 bg-black/40 z-50" />
-          <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-2xl border-t border-border/50 outline-none pb-[env(safe-area-inset-bottom)]">
-            <div className="flex justify-center pt-3 pb-1">
-              <div className="w-10 h-1 rounded-full bg-border" />
-            </div>
-            {label && (
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-5 pb-2 pt-1">{label}</p>
-            )}
-            <div className="overflow-y-auto max-h-[60vh] px-3 pb-4">
-              {children}
-            </div>
-          </Drawer.Content>
-        </Drawer.Portal>
-      </Drawer.Root>
-    </>
+    <Drawer.Root open={ctx.open} onOpenChange={ctx.setOpen}>
+      <Drawer.Portal>
+        <Drawer.Overlay className="fixed inset-0 bg-black/40 z-50" />
+        <Drawer.Content className="fixed bottom-0 left-0 right-0 z-50 bg-card rounded-t-2xl border-t border-border/50 outline-none pb-[env(safe-area-inset-bottom)]">
+          <div className="flex justify-center pt-3 pb-1">
+            <div className="w-10 h-1 rounded-full bg-border" />
+          </div>
+          {label && (
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider px-5 pb-2 pt-1">{label}</p>
+          )}
+          <div className="overflow-y-auto max-h-[60vh] px-3 pb-4">
+            {children}
+          </div>
+        </Drawer.Content>
+      </Drawer.Portal>
+    </Drawer.Root>
   )
 }
 
 export function MobileSelectItem({ className, children, value, ...props }) {
   const ctx = React.useContext(MobileSelectCtx)
-
-  // Register label synchronously on every render
-  if (ctx?.registerLabel) {
-    const labelText = typeof children === 'string' ? children : String(value)
-    ctx.registerLabel(value, labelText)
-  }
 
   if (!ctx) {
     return (
@@ -185,18 +181,18 @@ export function MobileSelectItem({ className, children, value, ...props }) {
     )
   }
 
-  const isSelected = ctx.value === value
+  const isSelected = String(ctx.value) === String(value)
   return (
     <button
       type="button"
       className={cn(
-        "w-full flex items-center justify-between px-4 py-3.5 rounded-xl text-sm font-medium transition-colors",
+        "w-full flex items-center justify-between gap-3 px-4 py-3.5 rounded-xl text-sm font-medium transition-colors",
         isSelected ? "bg-primary/10 text-primary" : "text-foreground hover:bg-muted",
         className
       )}
       onClick={() => ctx.onValueChange(value)}
     >
-      <span>{children}</span>
+      <span className="text-left">{children}</span>
       {isSelected && <Check className="h-4 w-4 text-primary flex-shrink-0" />}
     </button>
   )
