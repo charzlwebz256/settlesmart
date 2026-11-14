@@ -28,7 +28,7 @@ function PickerSection({ label, hint, placeholder, options, selected, onAdd, onR
         {label} {hint && <span className="text-muted-foreground/70">{hint}</span>}
       </label>
       <Select value="" onValueChange={onAdd}>
-        <SelectTrigger className="h-10 w-1/2 rounded-xl border border-input bg-background px-3 text-sm">
+        <SelectTrigger className="h-10 w-1/4 rounded-xl border border-input bg-background px-3 text-sm">
           <SelectValue placeholder={placeholder} />
         </SelectTrigger>
         <SelectContent>
@@ -164,7 +164,7 @@ export default function PriceAlertSignup() {
 
       {error && <p className="text-xs text-destructive mb-3">{error}</p>}
 
-      <Button onClick={handleSubmit} disabled={sending} className="w-1/2 rounded-xl gap-2">
+      <Button onClick={handleSubmit} disabled={sending} className="w-1/4 rounded-xl gap-2">
         {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Bell className="w-4 h-4" />}
         {sending ? 'Subscribing...' : isAuthenticated ? 'Notify Me of Deals' : 'Sign in to get alerts'}
       </Button>
