@@ -114,7 +114,7 @@ export default function ServiceDirectory({ initialProvince = '', initialCategory
       <ResourceFilters
         filters={filters}
         onChange={setFilters}
-        cities={filters.province ? cities : cities}
+        cities={cities}
         languages={languages}
         onClear={clearFilters}
       />
