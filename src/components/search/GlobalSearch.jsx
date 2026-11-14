@@ -32,6 +32,7 @@ const CATALOG = [
   { path: '/events', label: 'Community Events', category: 'community', keywords: 'events community workshops calendar gatherings meetings sessions' },
   { path: '/volunteer', label: 'Volunteer', category: 'community', keywords: 'volunteer community service give back opportunities' },
   { path: '/shop-smart', label: 'ShopSmart', category: 'community', keywords: 'shopping prices deals compare groceries budget savings' },
+  { path: '/smart-play', label: 'SmartPlay', category: 'community', keywords: 'free movies tv shows streaming netflix tubi cbc gem music podcasts radio audiobooks ebooks documentaries kids entertainment' },
   { path: '/explore', label: 'Explore', category: 'info', keywords: 'explore browse discover find everything all' },
   { path: '/resources', label: 'Resources', category: 'info', keywords: 'resources guides information help articles' },
   { path: '/news', label: 'News & Updates', category: 'info', keywords: 'news updates announcements canada immigration news' },

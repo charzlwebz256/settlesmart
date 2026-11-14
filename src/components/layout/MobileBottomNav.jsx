@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Search, MapPin, ShoppingBag, CalendarDays, Scale, Newspaper, ChevronUp, GraduationCap, Bus, Clock } from 'lucide-react';
+import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Search, MapPin, ShoppingBag, CalendarDays, Scale, Newspaper, ChevronUp, GraduationCap, Bus, Clock, Clapperboard } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -28,6 +28,7 @@ const TAB_CHILDREN = {
   ],
   '/work': [
     { path: '/jobs', icon: Briefcase, label: 'Job Search' },
+    { path: '/smart-play', icon: Clapperboard, label: 'SmartPlay' },
   ],
   '/resources': [
     { path: '/transit-map', icon: Bus, label: 'Transit Map' },

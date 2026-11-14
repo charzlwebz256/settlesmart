@@ -1,0 +1,211 @@
+/**
+ * SmartPlay — free and paid entertainment in Canada.
+ * Logos come from the Google favicon service, which is reliable for every brand.
+ */
+
+const logo = (domain) => `https://www.google.com/s2/favicons?sz=128&domain=${domain}`;
+
+export const FILTERS = [
+  { id: 'all', label: 'All', tags: null },
+  { id: 'watch', label: 'Movies & TV', tags: ['movies', 'tv', 'anime'] },
+  { id: 'music', label: 'Music & Podcasts', tags: ['music', 'podcasts'] },
+  { id: 'live', label: 'Live TV & Radio', tags: ['live', 'radio'] },
+  { id: 'docs', label: 'Documentaries', tags: ['documentaries'] },
+  { id: 'books', label: 'Audiobooks & eBooks', tags: ['audiobooks', 'ebooks'] },
+  { id: 'kids', label: 'Kids & Family', tags: ['kids'] },
+];
+
+export const SECTIONS = [
+  {
+    id: 'free-tv',
+    label: '📺 Free movies & TV in Canada',
+    note: 'No subscription needed — most of these are free with ads.',
+    tint: 'rose',
+    services: [
+      {
+        name: 'Tubi',
+        url: 'https://tubitv.com',
+        logo: logo('tubitv.com'),
+        access: 'ads',
+        desc: 'Movies, TV shows, comedy, documentaries and anime. Free account available.',
+        tags: ['movies', 'tv', 'documentaries', 'anime', 'kids'],
+      },
+      {
+        name: 'CBC Gem',
+        url: 'https://gem.cbc.ca',
+        logo: logo('gem.cbc.ca'),
+        access: 'tier',
+        desc: 'Canadian movies and TV shows, documentaries, live CBC television and news.',
+        tags: ['movies', 'tv', 'live', 'documentaries', 'kids'],
+      },
+      {
+        name: 'Pluto TV',
+        url: 'https://pluto.tv',
+        logo: logo('pluto.tv'),
+        access: 'ads',
+        desc: 'Live streaming channels, movies and television, always on.',
+        tags: ['live', 'movies', 'tv'],
+      },
+      {
+        name: 'Plex',
+        url: 'https://watch.plex.tv',
+        logo: logo('plex.tv'),
+        access: 'tier',
+        desc: 'Movies and TV shows plus free live television channels.',
+        tags: ['movies', 'tv', 'live'],
+      },
+      {
+        name: 'CTV',
+        url: 'https://www.ctv.ca',
+        logo: logo('ctv.ca'),
+        access: 'tier',
+        desc: 'Selected television shows and movies. Some content requires a TV provider.',
+        tags: ['tv', 'movies', 'live'],
+      },
+    ],
+  },
+  {
+    id: 'documentaries',
+    label: '🍁 Documentaries & Canadian stories',
+    note: 'Homegrown film, animation and educational programming — free to watch.',
+    tint: 'amber',
+    services: [
+      {
+        name: 'National Film Board of Canada',
+        url: 'https://www.nfb.ca',
+        logo: logo('nfb.ca'),
+        access: 'free',
+        desc: 'Canadian films and documentaries, animation and Indigenous storytelling. No subscription or ads.',
+        tags: ['documentaries', 'movies', 'kids'],
+      },
+      {
+        name: 'Knowledge Network',
+        url: 'https://www.knowledge.ca',
+        logo: logo('knowledge.ca'),
+        access: 'free',
+        desc: 'Documentaries, independent films and educational programming from British Columbia.',
+        tags: ['documentaries', 'movies'],
+      },
+    ],
+  },
+  {
+    id: 'audio',
+    label: '🎵 Free music, podcasts & radio',
+    note: 'Millions of songs, Canadian radio and podcasts — all free to start.',
+    tint: 'violet',
+    services: [
+      {
+        name: 'Spotify Free',
+        url: 'https://www.spotify.com/ca-en/free/',
+        logo: logo('spotify.com'),
+        access: 'tier',
+        desc: 'Songs, playlists and podcasts with ads on the free plan.',
+        tags: ['music', 'podcasts'],
+      },
+      {
+        name: 'CBC Listen',
+        url: 'https://www.cbc.ca/listen',
+        logo: logo('cbc.ca'),
+        access: 'free',
+        desc: 'Canadian radio, podcasts and audio programs, including live stations.',
+        tags: ['radio', 'podcasts', 'music', 'live'],
+      },
+      {
+        name: 'SoundCloud',
+        url: 'https://soundcloud.com',
+        logo: logo('soundcloud.com'),
+        access: 'tier',
+        desc: 'Free music and independent artists from around the world.',
+        tags: ['music', 'podcasts'],
+      },
+      {
+        name: 'TuneIn',
+        url: 'https://tunein.com',
+        logo: logo('tunein.com'),
+        access: 'tier',
+        desc: 'Radio stations, news and podcasts, including stations from back home.',
+        tags: ['radio', 'podcasts', 'live'],
+      },
+    ],
+  },
+  {
+    id: 'library',
+    label: '📚 Free with your library card',
+    note: 'A Canadian library card unlocks these at no cost — ask at your local branch.',
+    tint: 'emerald',
+    services: [
+      {
+        name: 'Kanopy',
+        url: 'https://www.kanopy.com',
+        logo: logo('kanopy.com'),
+        access: 'library',
+        desc: 'Independent films, documentaries and world cinema, free through participating libraries.',
+        tags: ['movies', 'documentaries', 'kids'],
+      },
+      {
+        name: 'Hoopla',
+        url: 'https://www.hoopladigital.com',
+        logo: logo('hoopladigital.com'),
+        access: 'library',
+        desc: 'Movies, music, audiobooks, comics and eBooks. Requires a participating library membership.',
+        tags: ['movies', 'music', 'audiobooks', 'ebooks', 'kids'],
+      },
+      {
+        name: 'Libby',
+        url: 'https://www.libbyapp.com',
+        logo: logo('libbyapp.com'),
+        access: 'library',
+        desc: 'eBooks, audiobooks and magazines, free with participating library membership.',
+        tags: ['audiobooks', 'ebooks', 'kids'],
+      },
+    ],
+  },
+  {
+    id: 'paid',
+    label: '💳 Paid streaming services',
+    note: 'Subscription services with Canadian catalogues and free trial periods.',
+    tint: 'slate',
+    services: [
+      {
+        name: 'Netflix',
+        url: 'https://www.netflix.com/ca/',
+        logo: logo('netflix.com'),
+        access: 'paid',
+        desc: 'Movies, series, documentaries and Netflix originals.',
+        tags: ['movies', 'tv', 'documentaries', 'kids'],
+      },
+      {
+        name: 'Amazon Prime Video',
+        url: 'https://www.primevideo.com',
+        logo: logo('primevideo.com'),
+        access: 'paid',
+        desc: 'Movies, series and originals; included with a Prime membership.',
+        tags: ['movies', 'tv', 'kids'],
+      },
+      {
+        name: 'Disney+',
+        url: 'https://www.disneyplus.com/en-ca',
+        logo: logo('disneyplus.com'),
+        access: 'paid',
+        desc: 'Disney, Pixar, Marvel, Star Wars and National Geographic.',
+        tags: ['movies', 'tv', 'kids', 'documentaries'],
+      },
+      {
+        name: 'Apple TV+',
+        url: 'https://tv.apple.com/ca',
+        logo: logo('tv.apple.com'),
+        access: 'paid',
+        desc: 'Apple Original films and series, plus add-on channels.',
+        tags: ['movies', 'tv'],
+      },
+      {
+        name: 'Paramount+',
+        url: 'https://www.paramountplus.com/ca/',
+        logo: logo('paramountplus.com'),
+        access: 'paid',
+        desc: 'Movies, series, live sports and Paramount originals.',
+        tags: ['movies', 'tv', 'live', 'kids'],
+      },
+    ],
+  },
+];

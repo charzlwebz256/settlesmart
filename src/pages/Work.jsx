@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { Briefcase, CalendarDays, ArrowRight, FileText, MessagesSquare, BadgeCheck, Scale, Sparkles } from 'lucide-react';
+import { Briefcase, CalendarDays, ArrowRight, FileText, MessagesSquare, BadgeCheck, Scale, Sparkles, Clapperboard } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const groups = [
@@ -64,6 +64,18 @@ const groups = [
         label: 'Workplace Rights & Wages',
         desc: 'Your rights at work, minimum wages by province, and where to get help if something goes wrong.',
         path: '/workplace-rights',
+      },
+    ],
+  },
+  {
+    title: 'Entertainment & downtime',
+    items: [
+      {
+        icon: Clapperboard,
+        color: 'bg-sky-500/10 text-sky-600',
+        label: 'SmartPlay',
+        desc: 'Free movies, live TV, music, podcasts, documentaries, audiobooks and kids shows in Canada.',
+        path: '/smart-play',
       },
     ],
   },
