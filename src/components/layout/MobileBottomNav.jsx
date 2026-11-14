@@ -95,22 +95,15 @@ export default function MobileBottomNav({ activeTab, location }) {
   const handleTabPress = (item) => {
     const children = TAB_CHILDREN[item.path];
     if (children) {
-      if (activeTab === item.path && openMenu === item.path) {
-        // Second tap while submenu open: go to root
+      if (openMenu === item.path) {
+        // Second tap while the submenu is open: just close it
         setOpenMenu(null);
-        navigate(item.path);
-      } else if (activeTab !== item.path) {
-        // Switching to a new tab: restore last sub-page if available
-        const lastPath = tabHistory.get(item.path);
-        if (lastPath && lastPath !== item.path) {
-          setOpenMenu(null);
-          navigate(lastPath);
-        } else {
-          setOpenMenu(prev => prev === item.path ? null : item.path);
-        }
-      } else {
-        setOpenMenu(prev => prev === item.path ? null : item.path);
+        return;
       }
+      // Always land on the tab's own page first (Explore = Settlement Navigator,
+      // which holds the transit map), with its sub-pages offered above.
+      setOpenMenu(item.path);
+      if (activeTab !== item.path) navigate(item.path);
     } else {
       setOpenMenu(null);
       navigate(item.path);

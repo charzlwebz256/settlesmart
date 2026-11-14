@@ -2,7 +2,7 @@ export default function GreetingCard({ part, eyebrow, title, subtitle, children 
   return (
     <section className="max-w-7xl mx-auto px-4 pt-5">
       <div className={`relative overflow-hidden rounded-3xl border border-border/50 bg-gradient-to-br ${part.grad} p-6 md:p-8`}>
-        <div className="flex items-center gap-6">
+        <div className="flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
           <div className="flex-1 min-w-0">
             <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
               {eyebrow}
@@ -23,7 +23,7 @@ export default function GreetingCard({ part, eyebrow, title, subtitle, children 
             key={part.image}
             src={part.image}
             alt={part.alt}
-            className="hidden md:block w-96 lg:w-[40rem] xl:w-[44rem] h-80 lg:h-[25rem] object-cover object-center flex-shrink-0 saturate-[1.12] contrast-[1.06] brightness-[1.02] animate-fade-in [mask-image:radial-gradient(ellipse_at_center,black_58%,transparent_82%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black_58%,transparent_82%)]"
+            className="w-full h-40 rounded-2xl md:rounded-none md:w-96 lg:w-[40rem] xl:w-[44rem] md:h-80 lg:h-[25rem] object-cover object-center flex-shrink-0 saturate-[1.12] contrast-[1.06] brightness-[1.02] animate-fade-in [mask-image:radial-gradient(ellipse_at_center,black_58%,transparent_82%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black_58%,transparent_82%)]"
           />
         </div>
       </div>
