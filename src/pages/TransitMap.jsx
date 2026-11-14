@@ -1,13 +1,14 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { MapContainer, Marker, Popup, Polyline, ScaleControl, useMap } from 'react-leaflet';
 import { base44 } from '@/api/base44Client';
-import { Loader2, Navigation, Bus, MapPin, RotateCcw, ExternalLink, Info, Clock, Route, Fuel, Footprints, Bike, ArrowLeft, X } from 'lucide-react';
+import { Loader2, Navigation, Bus, MapPin, RotateCcw, ExternalLink, Info, Clock, Route, Fuel, Footprints, Bike, ArrowLeft, X, Crosshair } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useCityDetection } from '@/hooks/useCityDetection';
 import WeatherWidget from '@/components/transit/WeatherWidget';
-import { MapLayerTiles, MapTypeSwitcher, MapClickToPin } from '@/components/transit/MapLayers';
+import { MapLayerTiles, MapTypeSwitcher, MapClickToPin, MapResizer, MapCenterWatcher } from '@/components/transit/MapLayers';
+import { useNearbyStops } from '@/hooks/useNearbyStops';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -47,6 +48,13 @@ const busIcon = L.divIcon({
   iconAnchor: [10, 10],
 });
 
+const stopIcon = L.divIcon({
+  className: '',
+  html: `<div style="width:14px;height:14px;background:#0ea5e9;border:2px solid white;border-radius:50%;box-shadow:0 2px 6px rgba(0,0,0,0.25)"></div>`,
+  iconSize: [14, 14],
+  iconAnchor: [7, 7],
+});
+
 function RecenterMap({ position }) {
   const map = useMap();
   useEffect(() => {
@@ -76,7 +84,9 @@ export default function TransitMap() {
   const [endSuggestions, setEndSuggestions] = useState([]);
   const [showStartSuggestions, setShowStartSuggestions] = useState(false);
   const [showEndSuggestions, setShowEndSuggestions] = useState(false);
-  const watchId = useRef(null);
+  const [mapCenter, setMapCenter] = useState(null);
+  const [showStops, setShowStops] = useState(false);
+  const { stops, loading: stopsLoading, error: stopsError, load: loadStops, clear: clearStops } = useNearbyStops();
 
   const modes = [
     { id: 'driving', label: 'Car', icon: Fuel, color: 'text-blue-600' },
@@ -85,33 +95,31 @@ export default function TransitMap() {
     { id: 'bicycling', label: 'Bike', icon: Bike, color: 'text-purple-600' },
   ];
 
+  // Asks the browser for location access. Never blocks the map: if permission is
+  // denied the map stays fully usable and the visitor can search or tap instead.
   const getLocation = () => {
-    setLoading(true);
     setError(null);
     if (!navigator.geolocation) {
-      setError('Geolocation is not supported by your browser.');
-      setLoading(false);
+      setError('This browser does not support location access. Search an address or tap the map instead.');
       return;
     }
-    watchId.current = navigator.geolocation.watchPosition(
+    setLoading(true);
+    navigator.geolocation.getCurrentPosition(
       (pos) => {
         setPosition([pos.coords.latitude, pos.coords.longitude]);
         setAccuracy(Math.round(pos.coords.accuracy));
         setLoading(false);
       },
-      (err) => {
-        setError('Unable to determine your location. Please allow location access.');
+      () => {
         setLoading(false);
+        setError('Location access is blocked. Allow location for this site in your browser, or search an address / tap the map.');
       },
-      { enableHighAccuracy: true, timeout: 15000, maximumAge: 10000 }
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 60000 }
     );
   };
 
   useEffect(() => {
     getLocation();
-    return () => {
-      if (watchId.current) navigator.geolocation.clearWatch(watchId.current);
-    };
   }, []);
 
   const getPlaceSuggestions = async (query, setSuggestions, setShow) => {
@@ -157,6 +165,18 @@ export default function TransitMap() {
 
   // Use waypoints for route path
   const routePath = routeData?.waypoints || [];
+
+  const stopSearchCenter = mapCenter || position || displayCenter;
+
+  const toggleStops = () => {
+    if (showStops) {
+      setShowStops(false);
+      clearStops();
+      return;
+    }
+    setShowStops(true);
+    loadStops(stopSearchCenter);
+  };
 
   return (
     <div className="flex flex-col h-screen pb-16 md:pb-0">
@@ -441,9 +461,20 @@ export default function TransitMap() {
               </>
             )}
             {error && (
-              <span className="text-xs text-destructive flex items-center gap-1">
-                <Info className="w-3.5 h-3.5" /> {error}
-              </span>
+              <>
+                <span className="text-xs text-destructive flex items-center gap-1">
+                  <Info className="w-3.5 h-3.5" /> {error}
+                </span>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  onClick={getLocation}
+                  className="rounded-lg gap-1.5 ml-auto"
+                  disabled={loading}
+                >
+                  <Crosshair className="w-3.5 h-3.5" /> Enable location
+                </Button>
+              </>
             )}
           </div>
         </div>
@@ -453,11 +484,19 @@ export default function TransitMap() {
       <div className="flex-1 relative min-h-0">
         <MapContainer
           center={displayCenter}
-          zoom={14}
-          style={{ height: '100%', width: '100%' }}
-          zoomControl={true}
+          zoom={13}
+          minZoom={3}
+          maxZoom={19}
+          scrollWheelZoom
+          dragging
+          doubleClickZoom
+          touchZoom
+          zoomControl
+          style={{ height: '100%', width: '100%', zIndex: 0 }}
         >
           <MapLayerTiles type={mapType} />
+          <MapResizer />
+          <MapCenterWatcher onChange={setMapCenter} />
           <ScaleControl position="bottomleft" imperial={false} />
 
           {/* Tap the map to drop the destination pin */}
@@ -523,26 +562,83 @@ export default function TransitMap() {
               </Popup>
             </Marker>
           ))}
+
+          {/* Nearby transit stops */}
+          {showStops && stops.map((stop) => (
+            <Marker key={stop.id} position={[stop.lat, stop.lng]} icon={stopIcon}>
+              <Popup>
+                <div className="text-sm font-semibold">{stop.name}</div>
+                {stop.routes.length > 0 && (
+                  <div className="text-xs text-gray-600 mt-1">Routes: {stop.routes.join(', ')}</div>
+                )}
+              </Popup>
+            </Marker>
+          ))}
         </MapContainer>
 
         <MapTypeSwitcher value={mapType} onChange={setMapType} />
 
-        {routeLoading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/70 z-[1000]">
-            <div className="text-center">
-              <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-3" />
-              <p className="text-sm font-medium">Calculating route...</p>
+        {/* Map controls — never cover the map, it stays fully usable */}
+        <div className="absolute bottom-6 right-3 z-[1000] flex flex-col items-end gap-2">
+          <button
+            onClick={() => getLocation()}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-card/95 backdrop-blur border border-border/60 shadow-lg text-[11px] font-semibold text-foreground hover:bg-card transition-colors"
+          >
+            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Crosshair className="w-3.5 h-3.5 text-primary" />}
+            {loading ? 'Locating…' : position ? 'My location' : 'Allow location'}
+          </button>
+          <button
+            onClick={toggleStops}
+            className={cn(
+              'flex items-center gap-1.5 px-3 py-2 rounded-xl backdrop-blur border shadow-lg text-[11px] font-semibold transition-colors',
+              showStops
+                ? 'bg-primary text-primary-foreground border-primary'
+                : 'bg-card/95 text-foreground border-border/60 hover:bg-card'
+            )}
+          >
+            {stopsLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Bus className="w-3.5 h-3.5" />}
+            {showStops ? 'Hide stops' : 'Transit stops'}
+          </button>
+        </div>
+
+        {/* Transit stops list */}
+        {showStops && (stopsLoading || stops.length > 0 || stopsError) && (
+          <div className="absolute bottom-6 left-3 z-[1000] w-64 max-h-[45%] overflow-y-auto rounded-xl bg-card/95 backdrop-blur border border-border/60 shadow-lg p-2.5">
+            <div className="flex items-center justify-between mb-1.5">
+              <p className="text-[11px] font-bold text-foreground">
+                Nearby stops {stops.length > 0 && <span className="text-muted-foreground">({stops.length})</span>}
+              </p>
+              <button onClick={toggleStops} aria-label="Close transit stops" className="p-1 rounded-md hover:bg-muted">
+                <X className="w-3 h-3 text-muted-foreground" />
+              </button>
             </div>
+            {stopsLoading && (
+              <p className="text-[11px] text-muted-foreground flex items-center gap-1.5 py-1">
+                <Loader2 className="w-3 h-3 animate-spin" /> Finding stops here…
+              </p>
+            )}
+            {stopsError && <p className="text-[11px] text-destructive py-1">{stopsError}</p>}
+            {!stopsLoading && !stopsError && stops.length === 0 && (
+              <p className="text-[11px] text-muted-foreground py-1">No mapped stops in this view. Zoom out or pan.</p>
+            )}
+            <div className="space-y-1">
+              {stops.slice(0, 25).map((stop) => (
+                <div key={stop.id} className="text-[11px] p-1.5 rounded-lg bg-muted/40">
+                  <p className="font-medium text-foreground leading-tight">{stop.name}</p>
+                  {stop.routes.length > 0 && (
+                    <p className="text-muted-foreground">Routes: {stop.routes.join(', ')}</p>
+                  )}
+                </div>
+              ))}
+            </div>
+            <p className="text-[10px] text-muted-foreground mt-1.5">Stops from OpenStreetMap around the map view.</p>
           </div>
         )}
 
-        {loading && !position && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/70 z-[1000]">
-            <div className="text-center">
-              <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto mb-3" />
-              <p className="text-sm font-medium">Getting your location...</p>
-              <p className="text-xs text-muted-foreground mt-1">Please allow location access</p>
-            </div>
+        {routeLoading && (
+          <div className="absolute top-3 left-1/2 -translate-x-1/2 z-[1000] px-3 py-1.5 rounded-full bg-card/95 backdrop-blur border border-border/60 shadow-lg flex items-center gap-2">
+            <Loader2 className="w-3.5 h-3.5 animate-spin text-primary" />
+            <span className="text-[11px] font-semibold">Calculating route…</span>
           </div>
         )}
       </div>

@@ -1,4 +1,5 @@
-import { TileLayer, useMapEvents } from 'react-leaflet';
+import { useEffect } from 'react';
+import { TileLayer, useMap, useMapEvents } from 'react-leaflet';
 import { Map as MapIcon, Satellite, Layers, Mountain } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -62,11 +63,39 @@ export function MapLayerTiles({ type }) {
   return (
     <TileLayer
       key="street"
-      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-      attribution='&copy; OpenStreetMap contributors'
-      maxZoom={19}
+      url="https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png"
+      attribution='&copy; OpenStreetMap contributors &copy; CARTO'
+      subdomains="abcd"
+      maxZoom={20}
     />
   );
+}
+
+// Keeps the Leaflet canvas the right size when the page layout changes.
+export function MapResizer() {
+  const map = useMap();
+  useEffect(() => {
+    const t = setTimeout(() => map.invalidateSize(), 250);
+    const onResize = () => map.invalidateSize();
+    window.addEventListener('resize', onResize);
+    return () => {
+      clearTimeout(t);
+      window.removeEventListener('resize', onResize);
+    };
+  }, [map]);
+  return null;
+}
+
+// Reports the current map centre so nearby searches follow the view.
+export function MapCenterWatcher({ onChange }) {
+  const map = useMap();
+  useMapEvents({
+    moveend() {
+      const c = map.getCenter();
+      onChange([c.lat, c.lng]);
+    },
+  });
+  return null;
 }
 
 export function MapTypeSwitcher({ value, onChange }) {
