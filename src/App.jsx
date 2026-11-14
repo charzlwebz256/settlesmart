@@ -21,13 +21,13 @@ import TimeZones from './pages/TimeZones';
 import Assistant from './pages/Assistant';
 import Checklist from './pages/Checklist';
 import Profile from './pages/Profile';
-const TransitMap = React.lazy(() => import('./pages/TransitMap'));
+import TransitMap from './pages/TransitMap';
 import Events from './pages/Events';
-const Jobs = React.lazy(() => import('./pages/Jobs'));
+import Jobs from './pages/Jobs';
 import Legal from './pages/Legal';
 import Emergency from './pages/Emergency';
 import NearMe from './pages/NearMe';
-const CanadianNewsUpdates = React.lazy(() => import('./pages/CanadianNewsUpdates'));
+import CanadianNewsUpdates from './pages/CanadianNewsUpdates';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Education from './pages/Education';
@@ -38,7 +38,7 @@ import Volunteer from './pages/Volunteer';
 import ResumeBuilder from './pages/ResumeBuilder';
 import JobTracker from './pages/JobTracker';
 import InterviewPrep from './pages/InterviewPrep';
-const ShopSmart = React.lazy(() => import('./pages/ShopSmart'));
+import ShopSmart from './pages/ShopSmart';
 import SupportUs from './pages/SupportUs';
 import MeetTheDeveloper from './pages/MeetTheDeveloper';
 import Connect from './pages/Connect';
@@ -79,7 +79,7 @@ const AuthenticatedApp = () => {
 
   // Render the main app
   return (
-    <React.Suspense fallback={<LoadingScreen />}>
+    <React.Suspense fallback={null}>
     <Routes>
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />

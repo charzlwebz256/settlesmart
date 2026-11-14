@@ -1,4 +1,4 @@
-import { Check, Clock, Navigation, Play, Route as RouteIcon, X } from 'lucide-react';
+import { Check, Clock, Navigation, Play, Route as RouteIcon, Volume2, VolumeX, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatMinutes } from '@/lib/duration';
 import { formatDistance } from '@/lib/navigation';
@@ -9,8 +9,23 @@ const BOTTOM = { bottom: 'calc(4.75rem + env(safe-area-inset-bottom))' };
  * Sits on the map: starts navigation for the chosen route, then steers the rider
  * turn by turn until they arrive.
  */
-export default function NavigationBanner({ route, guidance, navigating, arrived, onStart, onEnd, canStart, heading }) {
+export default function NavigationBanner({ route, guidance, navigating, arrived, onStart, onEnd, canStart, heading, voiceOn, voiceSupported, onToggleVoice }) {
   if (!navigating && !route) return null;
+
+  const voiceButton = voiceSupported ? (
+    <button
+      onClick={onToggleVoice}
+      aria-label={voiceOn ? 'Turn spoken directions off' : 'Turn spoken directions on'}
+      className={cn(
+        'flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full border transition-colors',
+        voiceOn
+          ? 'border-primary/40 bg-primary/10 text-primary'
+          : 'border-border/60 text-muted-foreground hover:bg-muted'
+      )}
+    >
+      {voiceOn ? <Volume2 className="h-4 w-4" /> : <VolumeX className="h-4 w-4" />}
+    </button>
+  ) : null;
 
   if (navigating) {
     const rotation = Number.isFinite(guidance?.bearing)
@@ -55,6 +70,7 @@ export default function NavigationBanner({ route, guidance, navigating, arrived,
                   <p className="mt-0.5 truncate text-[11px] text-muted-foreground">{guidance.detail}</p>
                 )}
               </div>
+              {voiceButton}
               <button
                 onClick={onEnd}
                 aria-label="End navigation"
@@ -99,6 +115,7 @@ export default function NavigationBanner({ route, guidance, navigating, arrived,
             {canStart ? 'Start to follow the route live' : 'Turn on location to navigate'}
           </p>
         </div>
+        {voiceButton}
         <button
           onClick={onStart}
           disabled={!canStart}

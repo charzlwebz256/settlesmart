@@ -10,9 +10,11 @@ import NearbyTransitPanel from '@/components/transit/NearbyTransitPanel';
 import NavigationBanner from '@/components/transit/NavigationBanner';
 import { useDeviceLocation } from '@/hooks/useDeviceLocation';
 import { useDeviceOrientation } from '@/hooks/useDeviceOrientation';
+import useVoiceGuidance from '@/hooks/useVoiceGuidance';
 import { useNearbyStops } from '@/hooks/useNearbyStops';
 import { accuracyBand, distanceMeters } from '@/lib/geo';
 import { buildTrack, buildGuidance } from '@/lib/navigation';
+import { formatMinutes } from '@/lib/duration';
 
 const MODES = [
   { id: 'driving', label: 'Car', icon: Fuel },
@@ -65,6 +67,9 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
 
   // The compass is what makes the direction arrow point the right way while standing still.
   const compass = useDeviceOrientation();
+
+  // Spoken turn-by-turn directions, like a navigation app.
+  const { voiceOn, voiceSupported, toggleVoice, announce, resetVoice } = useVoiceGuidance();
 
   const { stops, loading: stopsLoading, error: stopsError, load: loadStops, clear: clearStops } = useNearbyStops();
   // Stops around the destination, so the closest alighting option is visible too.
@@ -257,11 +262,30 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
     return () => clearInterval(id);
   }, [navigating]);
 
+  // Read each new instruction aloud once, the way a navigation app does.
+  useEffect(() => {
+    if (!navigating) {
+      resetVoice();
+      return;
+    }
+    if (!guidance) return;
+    if (guidance.arrived) {
+      announce('You have arrived at your destination.', 'arrived');
+      return;
+    }
+    announce(
+      `${guidance.instruction}.${guidance.detail ? ` ${guidance.detail}.` : ''}`,
+      `${guidance.instruction}|${guidance.detail || ''}`
+    );
+  }, [navigating, guidance?.instruction, guidance?.detail, guidance?.arrived, announce, resetVoice]);
+
   const startNavigation = (index = selectedOption) => {
     if (!routeOptions[index]) return;
     setSelectedOption(index);
     setClock(Date.now());
     setNavigating(true);
+    // Speaking inside the tap also unlocks audio on mobile browsers.
+    announce(`Starting route guidance. ${formatMinutes(routeOptions[index].duration_minutes)} to your destination.`, `start-${Date.now()}`);
     if (!position) requestOnce();
   };
 
@@ -322,6 +346,9 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
           onEnd={endNavigation}
           canStart={Boolean(position)}
           heading={Number.isFinite(compass.heading) ? compass.heading : heading}
+          voiceOn={voiceOn}
+          voiceSupported={voiceSupported}
+          onToggleVoice={toggleVoice}
         />
       </div>
 

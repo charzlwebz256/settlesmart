@@ -1,5 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
-import { Globe, Clock } from 'lucide-react';
+import { Globe, Clock, MousePointerClick } from 'lucide-react';
+import ProvinceCard from '@/components/resources/ProvinceCard';
+import { PROVINCE_PROFILES } from '@/data/provinceProfiles';
 
 // Every province & territory with its main cities and IANA timezone.
 const PROVINCE_TIMEZONES = [
@@ -181,31 +183,25 @@ export default function CanadaTimeZones() {
         </span>
       </div>
 
-      <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-2 mb-4">
+      <div className="flex items-center gap-1.5 text-xs text-muted-foreground mt-2 mb-2">
         <Clock className="w-3.5 h-3.5 text-primary" />
         Your local time: <span className="font-mono font-semibold text-foreground tabular-nums">{localTime}</span>
       </div>
 
+      <p className="mb-4 flex items-center gap-1.5 rounded-lg bg-primary/5 px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground">
+        <MousePointerClick className="h-3.5 w-3.5 flex-shrink-0 text-primary" />
+        Hover over a province for its capital, population, leadership and geography — tap on a phone.
+      </p>
+
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {PROVINCE_TIMEZONES.map(prov => (
-          <div key={prov.province} className="rounded-xl border border-border/50 bg-background/60 p-3.5">
-            <p className="font-heading font-bold text-sm mb-2">{prov.province}</p>
-            <div className="space-y-2.5">
-              {groupByZone(prov.cities).map(([tz, names]) => (
-                <div key={tz}>
-                  <div className="flex items-baseline justify-between gap-2">
-                    <span className="font-mono text-[15px] font-semibold tabular-nums text-primary leading-none">
-                      {zoneInfo[tz]?.time}
-                    </span>
-                    <span className="text-[10px] font-semibold text-muted-foreground uppercase flex-shrink-0">
-                      {zoneInfo[tz]?.abbr}
-                    </span>
-                  </div>
-                  <p className="text-[11px] text-muted-foreground leading-snug mt-1">{names.join(' · ')}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ProvinceCard
+            key={prov.province}
+            name={prov.province}
+            profile={PROVINCE_PROFILES[prov.province]}
+            timeGroups={groupByZone(prov.cities)}
+            zoneInfo={zoneInfo}
+          />
         ))}
       </div>
     </div>
