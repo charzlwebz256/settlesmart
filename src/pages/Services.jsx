@@ -5,6 +5,8 @@ import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
 import { MapPin } from 'lucide-react';
 import ProvinceServicePanel from '../components/services/ProvinceServicePanel';
+import ServiceDirectory from '../components/services/ServiceDirectory';
+import { cn } from '@/lib/utils';
 import { useLocation_ } from '@/lib/LocationContext';
 import { PROVINCES, PROVINCE_EMOJIS, PROVINCE_DATA } from '@/lib/provinceServicesData';
 import { MobileSelect as Select, MobileSelectContent as SelectContent, MobileSelectItem as SelectItem, MobileSelectTrigger as SelectTrigger, MobileSelectValue as SelectValue } from '@/components/ui/mobile-select';
@@ -50,6 +52,7 @@ export default function Services() {
   const queryClient = useQueryClient();
   const handleRefresh = useCallback(async () => {
     await queryClient.invalidateQueries({ queryKey: ['savedResources'] });
+    await queryClient.invalidateQueries({ queryKey: ['serviceDirectory'] });
   }, [queryClient]);
 
   const { containerRef, pullDistance, isRefreshing, touchHandlers } = usePullToRefresh({ onRefresh: handleRefresh });
@@ -57,6 +60,7 @@ export default function Services() {
   const urlParams = new URLSearchParams(window.location.search);
   const initialCategory = urlParams.get('category') || '';
 
+  const [view, setView] = useState('directory');
   const [selectedProvince, setSelectedProvince] = useState('');
   const [selectedCity, setSelectedCity] = useState('');
   const [selectedCategory, setSelectedCategory] = useState(initialCategory);
@@ -97,97 +101,128 @@ export default function Services() {
   const canSearch = selectedProvince && selectedCategory;
 
   return (
-    <div ref={containerRef} {...touchHandlers} className="max-w-4xl mx-auto px-4 py-6 pb-8">
+    <div ref={containerRef} {...touchHandlers} className="max-w-5xl mx-auto px-4 py-6 pb-8">
       <PullToRefreshIndicator pullDistance={pullDistance} isRefreshing={isRefreshing} />
 
       {/* Header */}
-      <div className="mb-8">
+      <div className="mb-5">
         <h1 className="font-heading font-bold text-2xl md:text-3xl mb-1">Settlement Services</h1>
-        <p className="text-muted-foreground text-sm">Select your location and the type of service you need</p>
+        <p className="text-muted-foreground text-sm">Search the resource directory or browse curated guides by province</p>
       </div>
 
-      {/* Filter card */}
-      <div className="bg-card border border-border/60 rounded-2xl p-5 shadow-sm mb-6">
-        <div className="flex flex-wrap gap-4">
-          {/* Province */}
-          <SelectField
-            label="Province / Territory"
-            icon={<MapPin className="w-3.5 h-3.5 text-primary" />}
-            value={selectedProvince}
-            onChange={(value) => {
-              setSelectedProvince(value);
-              setHasManuallySelectedProvince(true);
-            }}
-            placeholder="Select a province…"
-            options={PROVINCES.map(p => ({ value: p, label: `${PROVINCE_EMOJIS[p] || '🍁'} ${p}` }))}
-          />
+      {/* View switch */}
+      <div className="flex gap-1 bg-muted rounded-xl p-1 mb-5 w-full sm:w-fit">
+        <button
+          onClick={() => setView('directory')}
+          className={cn(
+            "flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold transition-all",
+            view === 'directory' ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          Resource Directory
+        </button>
+        <button
+          onClick={() => setView('guides')}
+          className={cn(
+            "flex-1 sm:flex-none px-4 py-2 rounded-lg text-xs font-semibold transition-all",
+            view === 'guides' ? "bg-card shadow-sm text-foreground" : "text-muted-foreground hover:text-foreground"
+          )}
+        >
+          Provincial Guides
+        </button>
+      </div>
 
-          {/* City */}
-          <SelectField
-            label="City (optional)"
-            icon="📍"
-            value={selectedCity}
-            onChange={setSelectedCity}
-            placeholder={selectedProvince && availableCities.length > 0 ? 'Select a city (optional)' : 'Select province first'}
-            options={availableCities.map(c => ({ value: c, label: c }))}
-          />
+      {view === 'directory' ? (
+        <ServiceDirectory
+          initialProvince={selectedProvince || profile?.province || locationProvince || ''}
+          initialCategory={selectedCategory}
+        />
+      ) : (
+        <>
+          {/* Filter card */}
+          <div className="bg-card border border-border/60 rounded-2xl p-5 shadow-sm mb-6">
+            <div className="flex flex-wrap gap-4">
+              {/* Province */}
+              <SelectField
+                label="Province / Territory"
+                icon={<MapPin className="w-3.5 h-3.5 text-primary" />}
+                value={selectedProvince}
+                onChange={(value) => {
+                  setSelectedProvince(value);
+                  setHasManuallySelectedProvince(true);
+                }}
+                placeholder="Select a province…"
+                options={PROVINCES.map(p => ({ value: p, label: `${PROVINCE_EMOJIS[p] || '🍁'} ${p}` }))}
+              />
 
-          {/* Service type */}
-          <SelectField
-            label="Service Type"
-            icon="🗂️"
-            value={selectedCategory}
-            onChange={setSelectedCategory}
-            placeholder="Select a service…"
-            options={categories.map(c => ({ value: c.value, label: c.label }))}
-          />
-        </div>
+              {/* City */}
+              <SelectField
+                label="City (optional)"
+                icon="📍"
+                value={selectedCity}
+                onChange={setSelectedCity}
+                placeholder={selectedProvince && availableCities.length > 0 ? 'Select a city (optional)' : 'Select province first'}
+                options={availableCities.map(c => ({ value: c, label: c }))}
+              />
 
-        {/* Selection summary */}
-        {(selectedProvince || selectedCategory) && (
-          <div className="mt-4 pt-4 border-t border-border/30 flex items-center justify-between flex-wrap gap-2">
-            <div className="flex items-center gap-2 flex-wrap">
-              {selectedProvince && (
-                <span className="text-xs font-semibold bg-primary/10 text-primary px-3 py-1 rounded-full">
-                  {PROVINCE_EMOJIS[selectedProvince] || '🍁'} {selectedProvince}
-                </span>
-              )}
-              {selectedCity && (
-                <span className="text-xs font-semibold bg-muted text-muted-foreground px-3 py-1 rounded-full">
-                  📍 {selectedCity}
-                </span>
-              )}
-              {selectedCategory && (
-                <span className="text-xs font-semibold bg-accent/10 text-accent px-3 py-1 rounded-full">
-                  {categories.find(c => c.value === selectedCategory)?.label}
-                </span>
-              )}
+              {/* Service type */}
+              <SelectField
+                label="Service Type"
+                icon="🗂️"
+                value={selectedCategory}
+                onChange={setSelectedCategory}
+                placeholder="Select a service…"
+                options={categories.map(c => ({ value: c.value, label: c.label }))}
+              />
             </div>
-            {(selectedProvince || selectedCategory || selectedCity) && (
-              <button
-                onClick={() => { setSelectedProvince(''); setSelectedCity(''); setSelectedCategory(''); setHasManuallySelectedProvince(false); }}
-                className="text-xs text-muted-foreground hover:text-destructive transition-colors font-medium"
-              >
-                Clear all
-              </button>
+
+            {/* Selection summary */}
+            {(selectedProvince || selectedCategory) && (
+              <div className="mt-4 pt-4 border-t border-border/30 flex items-center justify-between flex-wrap gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
+                  {selectedProvince && (
+                    <span className="text-xs font-semibold bg-primary/10 text-primary px-3 py-1 rounded-full">
+                      {PROVINCE_EMOJIS[selectedProvince] || '🍁'} {selectedProvince}
+                    </span>
+                  )}
+                  {selectedCity && (
+                    <span className="text-xs font-semibold bg-muted text-muted-foreground px-3 py-1 rounded-full">
+                      📍 {selectedCity}
+                    </span>
+                  )}
+                  {selectedCategory && (
+                    <span className="text-xs font-semibold bg-accent/10 text-accent px-3 py-1 rounded-full">
+                      {categories.find(c => c.value === selectedCategory)?.label}
+                    </span>
+                  )}
+                </div>
+                {(selectedProvince || selectedCategory || selectedCity) && (
+                  <button
+                    onClick={() => { setSelectedProvince(''); setSelectedCity(''); setSelectedCategory(''); setHasManuallySelectedProvince(false); }}
+                    className="text-xs text-muted-foreground hover:text-destructive transition-colors font-medium"
+                  >
+                    Clear all
+                  </button>
+                )}
+              </div>
             )}
           </div>
-        )}
-      </div>
 
-      {/* Results */}
-      {!canSearch ? (
-        <div className="text-center py-20 text-muted-foreground">
-          <p className="text-5xl mb-4">🗂️</p>
-          <p className="font-heading font-bold text-base mb-1">Choose your location &amp; service</p>
-          <p className="text-sm">Select a province and service type above to browse resources</p>
-        </div>
-      ) : (
-        <ProvinceServicePanel
-          category={selectedCategory}
-          province={selectedProvince}
-          cityFilter={selectedCity}
-        />
+          {/* Results */}
+          {!canSearch ? (
+            <div className="text-center py-20 text-muted-foreground">
+              <p className="text-5xl mb-4">🗂️</p>
+              <p className="font-heading font-bold text-base mb-1">Choose your location &amp; service</p>
+              <p className="text-sm">Select a province and service type above to browse resources</p>
+            </div>
+          ) : (
+            <ProvinceServicePanel
+              category={selectedCategory}
+              province={selectedProvince}
+              cityFilter={selectedCity}
+            />
+          )}
+        </>
       )}
     </div>
   );

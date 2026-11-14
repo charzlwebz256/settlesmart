@@ -43,6 +43,64 @@ function buildHistory(history) {
     .join('\n');
 }
 
+const STATUS_RANK = { verified: 0, review_due: 1, pending: 2, needs_correction: 3, inactive: 4 };
+
+// Directory records, ranked for this person: local, eligible, verified first.
+// Only text the app already stores is included — Nexa may not add service facts.
+function buildServiceContext(services, profile) {
+  if (!Array.isArray(services) || services.length === 0) return '';
+
+  const province = profile && typeof profile === 'object' ? profile.province : '';
+  const city = profile && typeof profile === 'object' ? profile.city : '';
+  const immigrationStatus = profile && typeof profile === 'object' ? profile.immigration_status : '';
+
+  const ranked = services
+    .filter((s) => (s.verification_status || 'pending') !== 'inactive')
+    .map((s) => {
+      let score = 0;
+      if (province && s.province === province) score += 30;
+      if (city && String(s.city || '').toLowerCase() === String(city).toLowerCase()) score += 25;
+      if (immigrationStatus && Array.isArray(s.eligibility) && s.eligibility.includes(immigrationStatus)) score += 20;
+      const status = s.verification_status || 'pending';
+      if (status === 'verified') score += 15;
+      if (status === 'review_due') score += 5;
+      if (status === 'needs_correction') score -= 10;
+      if (s.is_free) score += 3;
+      return { service: s, score };
+    })
+    .sort((a, b) => b.score - a.score || (STATUS_RANK[a.service.verification_status || 'pending'] - STATUS_RANK[b.service.verification_status || 'pending']))
+    .slice(0, 8)
+    .map(({ service: s }) => {
+      const status = s.verification_status || 'pending';
+      const parts = [
+        `- ${cleanText(s.name, 140)}${s.organization ? ` (${cleanText(s.organization, 100)})` : ''}`,
+        `  Location: ${cleanText(s.city || 'Province-wide', 60)}, ${cleanText(s.province || '', 40)}`,
+        `  Category: ${cleanText(s.category, 40)}`,
+        Array.isArray(s.eligibility) && s.eligibility.length
+          ? `  Eligibility: ${s.eligibility.map((e) => cleanText(e, 40)).join(', ')}`
+          : '  Eligibility: not recorded',
+        `  Verification status: ${status}${status === 'verified' && s.verified_at ? ` (verified ${String(s.verified_at).slice(0, 10)})` : ''}`,
+        s.source_url ? `  Official source: ${cleanText(s.source_url, 250)}` : '',
+        s.website ? `  Website: ${cleanText(s.website, 250)}` : '',
+        s.phone ? `  Phone: ${cleanText(s.phone, 40)}` : '',
+        s.description ? `  Description: ${cleanText(s.description, 260)}` : '',
+      ].filter(Boolean);
+      return parts.join('\n');
+    });
+
+  if (ranked.length === 0) return '';
+
+  return `SERVICES IN THE SETTLESMART DIRECTORY (the app's own records, ranked for this person — local, eligible and verified first):
+${ranked.join('\n')}
+
+HOW TO USE THE DIRECTORY:
+- Recommend only services from this list, and only details written above. Never invent a service, phone number, address, website or eligibility rule.
+- Prefer "verified" records, and say when a record is "pending", "review_due" or "needs_correction": describe those as not yet verified and tell the person to confirm with the organization.
+- State eligibility restrictions exactly as listed, and mention when eligibility is not recorded instead of guessing.
+- Include the official source or website link (a full https:// URL) when you name a service.
+- If nothing in this list fits, say the directory has no match and suggest a general next step — do not imply an unlisted service exists.`;
+}
+
 // Answers a newcomer's settlement question with Nexa's grounding rules.
 // The prompt is always built here, never accepted from the browser.
 export default async function (req) {
@@ -88,9 +146,19 @@ User question: "${message}"`;
         : '';
       useWebSearch = mode === 'full';
 
+      let serviceContext = '';
+      try {
+        const servicePage = await base44.asServiceRole.entities.Service.filter({}, { limit: 300 });
+        serviceContext = buildServiceContext(servicePage.items || [], payload.profile);
+      } catch {
+        serviceContext = '';
+      }
+
       prompt = `${NEXA_SYSTEM_PROMPT}
 
 ${profileContext ? `About this person — tailor every answer to this location and situation instead of giving generic Canada-wide advice: ${profileContext}.` : locationContext}
+
+${serviceContext}
 
 ${history ? `Conversation so far:\n${history}\n` : ''}
 Newcomer's question: ${message}

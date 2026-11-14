@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { MapPin, ArrowRight, Loader2, BookOpen, Briefcase, Home, Scale, Heart, DollarSign, Bus, Users, Building2, GraduationCap } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { motion } from 'framer-motion';
+import VerificationBadge from '@/components/services/VerificationBadge';
 
 // Immigration status → most relevant service categories
 const STATUS_CATEGORY_WEIGHTS = {
@@ -34,7 +35,7 @@ const CATEGORY_META = {
 export default function ServiceRecommendations({ profile }) {
   const { data: services, isLoading } = useQuery({
     queryKey: ['services-for-recommendations', profile?.province],
-    queryFn: () => base44.entities.Service.filter({ province: profile.province }, 'name', 50),
+    queryFn: () => base44.entities.Service.filter({ province: profile.province, verification_status: { $ne: 'inactive' } }, 'name', 50),
     enabled: !!profile?.province,
     staleTime: 1000 * 60 * 15,
   });
@@ -59,6 +60,11 @@ export default function ServiceRecommendations({ profile }) {
 
       // Bonus: free services rank higher
       if (svc.is_free) score += 2;
+
+      // Verified listings rank above unverified ones
+      if (svc.verification_status === 'verified') score += 12;
+      if (svc.verification_status === 'review_due') score += 4;
+      if (svc.verification_status === 'needs_correction') score -= 12;
 
       return { ...svc, score };
     });
@@ -136,6 +142,7 @@ export default function ServiceRecommendations({ profile }) {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-1.5 flex-wrap">
                         <p className="font-semibold text-sm leading-snug truncate">{svc.name}</p>
+                        <VerificationBadge status={svc.verification_status} />
                         {svc.is_free && (
                           <Badge variant="secondary" className="text-[10px] px-1.5 py-0 h-4 bg-green-500/10 text-green-700 dark:text-green-400 border-0">
                             Free

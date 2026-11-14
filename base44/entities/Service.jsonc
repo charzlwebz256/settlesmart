@@ -80,6 +80,57 @@
     "source_url": {
       "type": "string",
       "description": "URL of the original data source"
+    },
+    "verification_status": {
+      "type": "string",
+      "enum": [
+        "pending",
+        "verified",
+        "review_due",
+        "needs_correction",
+        "inactive"
+      ],
+      "enumColors": [
+        "gray",
+        "green",
+        "yellow",
+        "red",
+        "red"
+      ],
+      "default": "pending",
+      "description": "Review state of this record"
+    },
+    "verified_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the record was last verified"
+    },
+    "next_review_at": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the record is due for review"
+    },
+    "verified_by": {
+      "type": "string",
+      "description": "Reviewer who verified this record"
+    },
+    "verification_source": {
+      "type": "string",
+      "description": "URL of the source used to verify this record"
+    },
+    "verification_notes": {
+      "type": "string",
+      "description": "Internal reviewer notes (shown only in the admin review screen)"
+    },
+    "last_contacted_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the organization was last contacted"
+    },
+    "reported_issue_count": {
+      "type": "number",
+      "default": 0,
+      "description": "Number of open correction reports"
     }
   },
   "required": [

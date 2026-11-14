@@ -1,7 +1,9 @@
-import { MapPin, Phone, Globe, ExternalLink, Bookmark, Users, CheckCircle2, Navigation } from 'lucide-react';
+import { MapPin, Phone, Globe, ExternalLink, Bookmark, Users, CheckCircle2, Navigation, ChevronRight } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { getOrgLogo } from '@/lib/orgLogos';
+import { safeHref } from '@/lib/safeUrl';
+import VerificationBadge from './VerificationBadge';
 
 const CATEGORY_META = {
   education:        { icon: '🎓', label: 'Education',      bar: 'from-blue-500 to-blue-400',        chip: 'bg-blue-500/10 text-blue-700 dark:text-blue-300' },
@@ -26,10 +28,12 @@ const ELIGIBILITY_LABELS = {
   citizen: 'Citizen',
 };
 
-export default function ServiceCard({ service, onSave, saved }) {
+export default function ServiceCard({ service, onSave, saved, onOpen }) {
   const meta = CATEGORY_META[service.category] || { icon: '📋', label: service.category || 'Service', bar: 'from-slate-400 to-slate-300', chip: 'bg-muted text-muted-foreground' };
   const logo = getOrgLogo(service.organization) || getOrgLogo(service.name);
   const eligibility = service.eligibility || [];
+  const languages = service.languages_offered || [];
+  const website = safeHref(service.website);
   const hasLocation = service.city || service.province || service.address;
   const mapQuery = service.address
     ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(`${service.address}, ${service.city || ''} ${service.province || ''}`)}`
@@ -43,10 +47,13 @@ export default function ServiceCard({ service, onSave, saved }) {
       <div className="p-5 flex flex-col gap-3.5 flex-1">
         {/* Header: category chip + bookmark */}
         <div className="flex items-start justify-between gap-2">
-          <span className={cn("inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide", meta.chip)}>
-            <span>{meta.icon}</span>
-            {meta.label}
-          </span>
+          <div className="flex flex-wrap items-center gap-1.5">
+            <span className={cn("inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold uppercase tracking-wide", meta.chip)}>
+              <span>{meta.icon}</span>
+              {meta.label}
+            </span>
+            <VerificationBadge status={service.verification_status} />
+          </div>
           {onSave && (
             <button
               onClick={() => onSave(service)}
@@ -126,10 +133,13 @@ export default function ServiceCard({ service, onSave, saved }) {
           {service.is_free && (
             <Badge className="bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-0 text-[10px] font-bold">FREE</Badge>
           )}
-          {service.languages_offered?.length > 0 && (
+          {languages.length > 0 && (
             <Badge variant="outline" className="text-[10px] font-medium">
-              🌐 {service.languages_offered.length} language{service.languages_offered.length > 1 ? 's' : ''}
+              🌐 {languages.slice(0, 3).join(', ')}{languages.length > 3 ? ` +${languages.length - 3}` : ''}
             </Badge>
+          )}
+          {service.is_free === false && (
+            <Badge variant="outline" className="text-[10px] font-bold text-muted-foreground">PAID</Badge>
           )}
         </div>
 
@@ -153,15 +163,24 @@ export default function ServiceCard({ service, onSave, saved }) {
 
         {/* Actions */}
         <div className="flex gap-2 mt-auto pt-1">
-          {service.website && (
-            <a
-              href={service.website}
-              target="_blank"
-              rel="noopener noreferrer"
+          {onOpen && (
+            <button
+              onClick={() => onOpen(service)}
               className="flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-colors"
             >
+              View details
+              <ChevronRight className="w-3.5 h-3.5" />
+            </button>
+          )}
+          {website && (
+            <a
+              href={website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-muted text-muted-foreground text-xs font-semibold hover:bg-muted/70 hover:text-foreground transition-colors"
+            >
               <Globe className="w-3.5 h-3.5" />
-              Visit Website
+              Website
               <ExternalLink className="w-3 h-3 opacity-70" />
             </a>
           )}
