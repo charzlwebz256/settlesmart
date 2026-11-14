@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import HeroSection from '../components/home/HeroSection';
+import WelcomeBanner from '../components/home/WelcomeBanner';
 import QuickAccessGrid from '../components/home/QuickAccessGrid';
 import InfoBanner from '../components/home/InfoBanner';
 import First30DaysBanner from '../components/home/First30DaysBanner';
@@ -19,7 +20,7 @@ import { useAuth } from '@/lib/AuthContext';
 export default function Home() {
   const { city, province, isDetecting } = useLocation_();
   const navigate = useNavigate();
-  const { requireAuth } = useAuth();
+  const { requireAuth, user, isAuthenticated } = useAuth();
   const queryClient = useQueryClient();
   const [showWizard, setShowWizard] = useState(false);
 
@@ -47,7 +48,7 @@ export default function Home() {
   return (
     <div className="pb-8">
       <OnboardingWalkthrough />
-      <LocationBanner city={city} province={province} isDetecting={isDetecting} />
+      {!isAuthenticated && <LocationBanner city={city} province={province} isDetecting={isDetecting} />}
       {!hasProfile && <OnboardingNudge />}
 
       {showWizard ? (
@@ -56,10 +57,14 @@ export default function Home() {
         </div>
       ) : (
         <>
-          <HeroSection
-            hasProfile={hasProfile}
-            onStartWizard={() => requireAuth(() => setShowWizard(true))}
-          />
+          {isAuthenticated ? (
+            <WelcomeBanner user={user} profile={profile} city={city} province={province} />
+          ) : (
+            <HeroSection
+              hasProfile={hasProfile}
+              onStartWizard={() => requireAuth(() => setShowWizard(true))}
+            />
+          )}
           {hasProfile && (
             <>
               <NotificationCenter />

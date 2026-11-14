@@ -47,7 +47,7 @@ const now = () => new Date().toISOString();
 export const NEWS_PROMPTS = {
   breaking: (loc, prov) => `You are a LIVE breaking news reporter. Today is ${now()}. Search for the MOST URGENT breaking news stories published in the LAST 6 HOURS globally and in Canada. CRITICAL: Only include stories published within the last 7 days. For each article, provide an EXACT time_ago in format like "12 minutes ago", "3 hours ago", "2 days ago". Do NOT include stories older than 7 days.
 
-Location context: ${loc}, ${prov || 'Canada'}
+Location context: ${loc}${prov ? `, ${prov}` : ''}
 
 Sources to search: BBC News (bbc.com), CNN (cnn.com), Reuters (reuters.com), Al Jazeera (aljazeera.com), CBC News (cbc.ca), CTV News, AP News, The Guardian, Globe and Mail, National Post.
 
@@ -75,7 +75,7 @@ Also return 2 newcomer_insights specific to immigration impacts.`,
 
   jobs: (loc, prov) => `You are a jobs and economy reporter. Today is ${now()}. Search for LATEST jobs and economic news published in last 48 hours. CRITICAL: Only include stories published within the last 7 days. For each article, provide an EXACT time_ago in format like "30 minutes ago", "4 hours ago", "3 days ago". Do NOT include stories older than 7 days.
 
-Location: ${loc}, ${prov || 'Canada'}
+Location: ${loc}${prov ? `, ${prov}` : ''}
 
 Sources: Statistics Canada, CBC News, BNN Bloomberg, Globe and Mail, Financial Post, Reuters, BBC Business, CNN Business, Indeed Canada, LinkedIn News.
 
@@ -94,7 +94,7 @@ Return 2 newcomer_insights about what these economic stories mean for newcomers 
 
   housing: (loc, prov) => `You are a housing and real estate reporter. Today is ${now()}. Search for the LATEST housing and real estate news from the last 48-72 hours. CRITICAL: Only include stories published within the last 7 days. For each article, provide an EXACT time_ago in format like "1 hour ago", "5 hours ago", "4 days ago". Do NOT include stories older than 7 days.
 
-Location focus: ${loc}, ${prov || 'Canada'} — but include national news.
+Location focus: ${loc}${prov ? `, ${prov}` : ''} — but include national news.
 
 Sources: CBC News, CTV News, Globe and Mail, Toronto Star, CMHC Canada, Canada Mortgage Housing, Bloomberg, Reuters, local real estate boards.
 
@@ -113,7 +113,7 @@ Return 2 newcomer_insights about housing tips and what these stories mean for ne
 
   health: (loc, prov) => `You are a health and safety reporter. Today is ${now()}. Search for LATEST health and safety news from the last 48 hours globally and in Canada. CRITICAL: Only include stories published within the last 7 days. For each article, provide an EXACT time_ago in format like "20 minutes ago", "2 hours ago", "6 days ago". Do NOT include stories older than 7 days.
 
-Location: ${loc}, ${prov || 'Canada'}
+Location: ${loc}${prov ? `, ${prov}` : ''}
 
 Sources: Health Canada, CBC News, WHO (who.int), Reuters Health, BBC Health, CNN Health, Al Jazeera, Canadian Press, provincial health authorities.
 

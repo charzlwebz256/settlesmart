@@ -3,8 +3,13 @@ import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { Loader2, RefreshCw, Newspaper, Zap, Briefcase, Home as HomeIcon, Heart, AlertTriangle, Globe } from 'lucide-react';
+import { Loader2, RefreshCw, Newspaper, Zap, Briefcase, Home as HomeIcon, Heart, AlertTriangle, Globe, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { PROVINCES, citiesFor } from '@/data/canadaLocations';
+import {
+  MobileSelect as Select, MobileSelectContent as SelectContent, MobileSelectItem as SelectItem,
+  MobileSelectTrigger as SelectTrigger, MobileSelectValue as SelectValue,
+} from '@/components/ui/mobile-select';
 import { useCityDetection } from '@/hooks/useCityDetection';
 import NewsSection from '@/components/news/NewsSection';
 import WeatherWidget from '@/components/news/WeatherWidget';
@@ -51,9 +56,14 @@ const TABS = [
 export default function CanadianNewsUpdates() {
   const { city, province, loading: cityLoading } = useCityDetection();
   const [activeTab, setActiveTab] = useState('breaking');
+  const [override, setOverride] = useState(null); // { province, city } chosen in the filter
   const [tabData, setTabData] = useState({}); // { [tabId]: { articles, newcomer_insights, loadedAt } }
   const [loadingTabs, setLoadingTabs] = useState({});
   const loadedRef = useRef({});
+
+  // Detected location until the visitor picks a province or city
+  const activeLoc = override || { province: province || '', city: city || '' };
+  const locKey = `${activeLoc.province}|${activeLoc.city}`;
 
   // Live clock tick for "X ago" freshness display
   const [, setTick] = useState(0);
@@ -66,12 +76,11 @@ export default function CanadianNewsUpdates() {
     const tab = TABS.find(t => t.id === tabId);
     if (!tab) return;
     setLoadingTabs(prev => ({ ...prev, [tabId]: true }));
-    const loc = city || 'Edmonton';
     const response = await base44.functions.invoke('communityFeeds', {
       action: 'news',
       topic: tabId,
-      city: loc,
-      province,
+      city: activeLoc.city,
+      province: activeLoc.province,
     });
     const result = response.data || {};
     // Filter out any articles older than 7 days by checking time_ago text
@@ -91,15 +100,15 @@ export default function CanadianNewsUpdates() {
     setTabData(prev => ({ ...prev, [tabId]: { ...result, articles: filtered, loadedAt: new Date() } }));
     setLoadingTabs(prev => ({ ...prev, [tabId]: false }));
     loadedRef.current[tabId] = true;
-  }, [city, province]);
+  }, [locKey]); // eslint-disable-line
 
-  // Only fetch the initial active tab on mount; other tabs load on demand
+  // Reload the visible topic whenever the province/city filter changes
   useEffect(() => {
-    if (cityLoading) return;
-    if (!loadedRef.current['breaking']) {
-      fetchTab('breaking');
-    }
-  }, [cityLoading]); // eslint-disable-line
+    if (cityLoading && !override) return;
+    loadedRef.current = {};
+    setTabData({});
+    fetchTab(activeTab);
+  }, [locKey, cityLoading]); // eslint-disable-line
 
   // Load tab when switching if not yet loaded
   const handleTabSwitch = (tabId) => {
@@ -116,6 +125,13 @@ export default function CanadianNewsUpdates() {
   const currentData = tabData[activeTab];
   const isLoading = loadingTabs[activeTab];
   const currentTab = TABS.find(t => t.id === activeTab);
+
+  // Keep a detected city that isn't in our list selectable
+  const cityOptions = activeLoc.province
+    ? (activeLoc.city && !citiesFor(activeLoc.province).includes(activeLoc.city)
+        ? [activeLoc.city, ...citiesFor(activeLoc.province)]
+        : citiesFor(activeLoc.province))
+    : [];
 
   return (
     <div ref={containerRef} className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-8 overflow-y-auto" {...touchHandlers}>
@@ -148,8 +164,55 @@ export default function CanadianNewsUpdates() {
         </Button>
       </div>
 
+      {/* Location filter — every province and territory in Canada */}
+      <div className="bg-card border border-border/50 rounded-2xl px-3 py-2.5">
+        <div className="flex flex-wrap items-center gap-2">
+          <span className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">
+            <MapPin className="w-3.5 h-3.5 text-primary" /> News for
+          </span>
+
+          <Select
+            value={activeLoc.province || 'all'}
+            onValueChange={(v) => setOverride({ province: v === 'all' ? '' : v, city: '' })}
+          >
+            <SelectTrigger className="h-9 min-w-[170px] rounded-xl border border-input bg-background px-3 text-xs font-medium">
+              <SelectValue placeholder="All Canada" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Canada</SelectItem>
+              {PROVINCES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
+          <Select
+            value={activeLoc.city || 'all'}
+            onValueChange={(v) => setOverride({ province: activeLoc.province, city: v === 'all' ? '' : v })}
+            disabled={!activeLoc.province}
+          >
+            <SelectTrigger className="h-9 min-w-[150px] rounded-xl border border-input bg-background px-3 text-xs font-medium disabled:opacity-50">
+              <SelectValue placeholder="All cities" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All cities</SelectItem>
+              {cityOptions.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+            </SelectContent>
+          </Select>
+
+          {override && (
+            <button
+              onClick={() => setOverride(null)}
+              className="text-[11px] font-semibold text-primary hover:underline ml-auto"
+            >
+              Use my location
+            </button>
+          )}
+        </div>
+      </div>
+
       {/* Weather */}
-      <WeatherWidget city={city || 'Edmonton'} province={province} />
+      <div className="mt-3">
+        <WeatherWidget city={activeLoc.city || 'Edmonton'} province={activeLoc.province} />
+      </div>
 
       {/* Tab Bar */}
       <div className="flex gap-2 overflow-x-auto pb-2 mt-5 mb-4 scrollbar-hide">

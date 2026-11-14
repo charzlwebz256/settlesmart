@@ -86,7 +86,8 @@ For each event return:
 
     if (action === 'news') {
       const topic = Object.prototype.hasOwnProperty.call(NEWS_PROMPTS, payload.topic) ? payload.topic : 'breaking';
-      const city = cleanText(payload.city, 60) || 'Edmonton';
+      // No province = Canada-wide news; a chosen province carries its city
+      const city = cleanText(payload.city, 60) || 'Canada';
       const province = cleanText(payload.province, 60);
 
       const result = await base44.asServiceRole.integrations.Core.InvokeLLM({

@@ -1,7 +1,9 @@
 import { useState, useRef, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { MessageCircle, X, Send, Loader2, Sparkles, ChevronDown } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2, Sparkles, ChevronDown, ChevronRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '@/lib/AuthContext';
 import ReactMarkdown from 'react-markdown';
 import TypewriterContent from '@/components/assistant/TypewriterContent';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -19,6 +21,8 @@ const QUICK_QUESTIONS = [
 
 
 export default function NewcomerChatWidget({ userCity, userProvince }) {
+  const { isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState('');
@@ -175,6 +179,23 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
               )}
               <div ref={bottomRef} />
             </div>
+
+            {/* Signed-out visitors: three questions instead of a blank chat */}
+            {!isAuthenticated && messages.length <= 1 && !loading && (
+              <div className="px-4 pb-2 flex-shrink-0">
+                <button
+                  onClick={() => { setOpen(false); navigate('/assistant'); }}
+                  className="w-full flex items-center gap-2.5 p-2.5 rounded-xl bg-primary/10 border border-primary/20 text-left hover:bg-primary/15 transition-colors"
+                >
+                  <Sparkles className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span className="min-w-0">
+                    <span className="block text-xs font-semibold text-primary">Not sure where to start?</span>
+                    <span className="block text-[10px] text-muted-foreground">Answer 3 quick questions for a personal plan</span>
+                  </span>
+                  <ChevronRight className="w-4 h-4 text-primary ml-auto flex-shrink-0" />
+                </button>
+              </div>
+            )}
 
             {/* Quick questions */}
             {messages.length <= 1 && !loading && (
