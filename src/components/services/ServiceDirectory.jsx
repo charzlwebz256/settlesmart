@@ -50,23 +50,28 @@ export default function ServiceDirectory({ initialProvince = '', initialCategory
     return map;
   }, [savedResources]);
 
-  const { data: cities = [] } = useQuery({
-    queryKey: ['serviceCities'],
+  // Service carries a field-level read rule, so distinct queries are rejected:
+  // read every page and collect the unique values in code instead.
+  const { data: filterOptions = { cities: [], languages: [] } } = useQuery({
+    queryKey: ['serviceFilterOptions'],
     queryFn: async () => {
-      const res = await base44.entities.Service.list({ distinct: 'city' });
-      return (res.items || []).filter(Boolean).sort();
+      const cities = new Set();
+      const languages = new Set();
+      let cursor;
+      for (let i = 0; i < 20; i++) {
+        const page = await base44.entities.Service.list({ limit: 500, cursor });
+        (page.items || []).forEach(s => {
+          if (s.city) cities.add(s.city);
+          (s.languages_offered || []).forEach(l => { if (l) languages.add(l); });
+        });
+        if (!page.has_more || !page.next_cursor) break;
+        cursor = page.next_cursor;
+      }
+      return { cities: [...cities].sort(), languages: [...languages].sort() };
     },
     staleTime: 1000 * 60 * 30,
   });
-
-  const { data: languages = [] } = useQuery({
-    queryKey: ['serviceLanguages'],
-    queryFn: async () => {
-      const res = await base44.entities.Service.list({ distinct: 'languages_offered' });
-      return (res.items || []).filter(Boolean).sort();
-    },
-    staleTime: 1000 * 60 * 30,
-  });
+  const { cities, languages } = filterOptions;
 
   const queryKey = ['serviceDirectory', debouncedSearch, filters.province, filters.city, filters.category, filters.eligibility, filters.language, filters.cost];
 
