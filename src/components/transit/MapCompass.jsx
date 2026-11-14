@@ -15,24 +15,40 @@ function cardinalName(heading) {
   return CARDINALS[Math.round((((heading % 360) + 360) % 360) / 45) % 8];
 }
 
+function clamp(value, min, max) {
+  return Math.max(min, Math.min(max, value));
+}
+
 /**
- * Compass rose over the map: the dial turns with the phone while the small
- * accent arrow keeps pointing at the destination, so the rider sees at a
- * glance which way they face and which way they need to go.
+ * Compass rose over the map: the dial turns with the phone's compass heading and
+ * leans with its tilt, while the small accent arrow keeps pointing at the
+ * destination, so the rider sees at a glance which way they face and which way
+ * they need to go.
  */
-export default function MapCompass({ heading, bearing, needsPermission, onEnableCompass }) {
+export default function MapCompass({ heading, bearing, tilt, needsPermission, onEnableCompass }) {
   const hasHeading = Number.isFinite(heading);
   const hasBearing = Number.isFinite(bearing);
   // The dial turns against the phone so north stays true to the ground.
   const dialRotation = hasHeading ? -heading : 0;
   const targetRotation = hasBearing ? bearing - (hasHeading ? heading : 0) : null;
 
+  // 45° is how the phone is normally held when reading a map: the rose sits flat
+  // there and tips forward, back or sideways as the handset moves.
+  const beta = Number.isFinite(tilt?.beta) ? tilt.beta : 45;
+  const gamma = Number.isFinite(tilt?.gamma) ? tilt.gamma : 0;
+  const tiltX = clamp((beta - 45) * 0.4, -28, 28);
+  const tiltY = clamp(gamma * 0.45, -28, 28);
+
   return (
     <div className="absolute left-3 top-3 z-10 flex flex-col items-center gap-1">
-      <div className="relative h-[74px] w-[74px] rounded-full border border-border/60 bg-card/95 shadow-lg backdrop-blur">
+      <div
+        className="relative h-[74px] w-[74px] rounded-full border border-border/60 bg-card/95 shadow-lg backdrop-blur"
+        style={{ perspective: '260px' }}
+      >
         <motion.div
           className="absolute inset-0"
-          animate={{ rotate: dialRotation }}
+          style={{ transformStyle: 'preserve-3d' }}
+          animate={{ rotate: dialRotation, rotateX: tiltX, rotateY: tiltY }}
           transition={{ type: 'spring', stiffness: 110, damping: 22 }}
         >
           {ROSE.map((point) => (
@@ -66,6 +82,7 @@ export default function MapCompass({ heading, bearing, needsPermission, onEnable
 
       {needsPermission ? (
         <button
+          type="button"
           onClick={onEnableCompass}
           className="flex min-h-[22px] items-center gap-1 rounded-full border border-primary/40 bg-card/95 px-2 py-0.5 text-[9px] font-bold text-primary shadow-md backdrop-blur"
         >

@@ -119,7 +119,7 @@ export default function NearMe() {
       {!loading && loaded && (
         <>
           <p className="text-xs text-muted-foreground mb-4">{filtered.length} place{filtered.length !== 1 ? 's' : ''} found</p>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="auto-grid gap-4">
             {filtered.map((place, i) => {
               const cat = CATEGORY_CONFIG[place.category] || CATEGORY_CONFIG.community;
               return (

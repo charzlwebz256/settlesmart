@@ -114,7 +114,7 @@ export default function Healthcare() {
       <h2 className="font-heading font-bold text-sm mb-3 flex items-center gap-2">
         <Phone className="w-4 h-4 text-primary" /> Helplines
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-6">
+      <div className="auto-grid gap-2 mb-6">
         {HELP_LINES.map(line => (
           <a
             key={line.number}
@@ -133,7 +133,7 @@ export default function Healthcare() {
       <h2 className="font-heading font-bold text-sm mb-3 flex items-center gap-2">
         <MapPin className="w-4 h-4 text-primary" /> Where to get care
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+      <div className="auto-grid gap-3 mb-6">
         {CARE.map(item => (
           <div key={item.title} className="p-4 rounded-2xl bg-card border border-border/50">
             <div className="flex items-center gap-2 mb-1.5">
@@ -146,7 +146,7 @@ export default function Healthcare() {
       </div>
 
       {/* Mental health & newcomer health */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
+      <div className="auto-grid gap-3 mb-6">
         <div className="p-4 rounded-2xl bg-card border border-border/50">
           <div className="flex items-center gap-2 mb-1.5">
             <Brain className="w-4 h-4 text-primary" />

@@ -105,7 +105,7 @@ export default function Work() {
         {groups.map((group, gi) => (
           <div key={group.title}>
             <h2 className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">{group.title}</h2>
-            <div className="space-y-3">
+            <div className="auto-grid gap-3 [--card-min:19rem]">
               {group.items.map((s, i) => (
                 <motion.div
                   key={s.path}
@@ -115,16 +115,18 @@ export default function Work() {
                 >
                   <Link
                     to={s.path}
-                    className="flex items-center gap-4 p-5 rounded-2xl bg-card border border-border/50 hover:border-primary/30 hover:shadow-md transition-all group"
+                    className="flex h-full flex-col gap-3 p-5 rounded-2xl bg-card border border-border/50 hover:border-primary/30 hover:shadow-lg hover:-translate-y-1 transition-all duration-200 group"
                   >
                     <div className={`w-12 h-12 rounded-xl flex items-center justify-center flex-shrink-0 ${s.color}`}>
                       <s.icon className="w-6 h-6" />
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-heading font-bold text-base mb-0.5 group-hover:text-primary transition-colors">{s.label}</h3>
+                      <div className="flex items-start justify-between gap-2 mb-1">
+                        <h3 className="font-heading font-bold text-base group-hover:text-primary transition-colors">{s.label}</h3>
+                        <ArrowRight className="w-4 h-4 mt-1 text-muted-foreground/40 group-hover:text-primary group-hover:translate-x-0.5 transition-all flex-shrink-0" />
+                      </div>
                       <p className="text-muted-foreground text-sm leading-snug">{s.desc}</p>
                     </div>
-                    <ArrowRight className="w-5 h-5 text-muted-foreground/40 group-hover:text-primary transition-colors flex-shrink-0" />
                   </Link>
                 </motion.div>
               ))}

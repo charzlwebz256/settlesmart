@@ -86,7 +86,7 @@ export default function Benefits() {
       </div>
 
       <div className="bg-card rounded-2xl border border-border/50 p-5 space-y-4 mb-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="auto-grid gap-4">
           <Field label="Province or territory">
             <Select value={answers.province || undefined} onValueChange={v => set('province', v)}>
               <SelectTrigger className="w-full h-10 rounded-xl border border-input bg-transparent px-3 text-sm">
@@ -121,7 +121,7 @@ export default function Benefits() {
           </Select>
         </Field>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="auto-grid gap-4">
           <Field label="Are you currently working?">
             <YesNo value={answers.working} onChange={v => set('working', v)} />
           </Field>

@@ -350,7 +350,7 @@ export default function Jobs() {
       {/* Jobs Grid */}
       {!loading && filtered.length > 0 && (
         <>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+          <div className="auto-grid gap-4 mb-6">
             {paginatedJobs.map((job, i) => (
               <JobCard key={i} job={job} onAddToTracker={handleAddToTracker} />
             ))}

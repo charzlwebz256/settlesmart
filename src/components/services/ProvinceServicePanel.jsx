@@ -182,7 +182,7 @@ function SectionedGrid({ items, province }) {
                 {/* Cards grid */}
                 {open && (
                   <div className="bg-muted/20 px-4 pb-4 border-t border-border/30">
-                    <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-3 pt-4">
+                    <div className="auto-grid gap-3 pt-4 [--card-min:19rem]">
                       {sectionItems.map((item, idx) => <OrgCard key={idx} item={item} province={province} />)}
                     </div>
                   </div>
@@ -231,7 +231,7 @@ function EducationGrid({ items }) {
           </button>
         ))}
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div className="auto-grid gap-4 [--card-min:19rem]">
         {filtered.map((inst, i) => (
           <div key={i} className="bg-card rounded-2xl border border-border/50 p-4 flex flex-col gap-3 hover:border-primary/20 hover:shadow-sm transition-all">
             <div className="flex items-start gap-3">

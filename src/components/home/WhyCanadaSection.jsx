@@ -75,7 +75,7 @@ export default function WhyCanadaSection() {
       </motion.div>
 
       {/* Cards Grid */}
-      <div className="flex flex-wrap justify-center gap-5">
+      <div className="auto-grid gap-5 [--card-min:20rem]">
         {reasons.map((item, i) => (
           <motion.div
             key={item.title}
@@ -84,7 +84,7 @@ export default function WhyCanadaSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.45, delay: i * 0.07, ease: 'easeOut' }}
             whileHover={{ y: -6 }}
-            className="group relative flex w-full min-h-[240px] flex-col overflow-hidden rounded-2xl border border-border/50 bg-black sm:w-[calc(50%-0.625rem)] lg:w-[calc(33.333%-0.834rem)] md:min-h-[290px]"
+            className="group relative flex h-full w-full min-h-[240px] flex-col overflow-hidden rounded-2xl border border-border/50 bg-black md:min-h-[290px]"
           >
             <img
               src={item.image}

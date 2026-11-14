@@ -91,7 +91,7 @@ export default function Explore() {
       <h2 className="font-heading font-bold text-sm uppercase tracking-wide text-muted-foreground mb-3">
         Available now
       </h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-8">
+      <div className="auto-grid gap-3 mb-8 [--card-min:20rem]">
         {liveModules.map((m, i) => <ModuleCard key={m.id} module={m} index={i} />)}
       </div>
 
@@ -100,7 +100,7 @@ export default function Explore() {
           <h2 className="font-heading font-bold text-sm uppercase tracking-wide text-muted-foreground mb-3">
             Coming next
           </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div className="auto-grid gap-3 [--card-min:20rem]">
             {plannedModules.map((m, i) => <ModuleCard key={m.id} module={m} index={i} />)}
           </div>
         </>
