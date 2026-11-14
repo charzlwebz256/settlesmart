@@ -404,7 +404,9 @@ export default function TransitMap() {
                   {busStations.map((bs, i) => (
                     <div key={i} className="text-[10px] p-2 bg-muted/30 rounded-lg">
                       <div className="font-medium text-foreground">{bs.name}</div>
-                      <div className="text-muted-foreground">Buses: {bs.buses.join(', ')}</div>
+                      {Array.isArray(bs.buses) && bs.buses.length > 0 && (
+                        <div className="text-muted-foreground">Buses: {bs.buses.join(', ')}</div>
+                      )}
                     </div>
                   ))}
                   <a
@@ -511,11 +513,13 @@ export default function TransitMap() {
           )}
 
           {/* Bus stations */}
-          {busStations.map((bs, i) => (
+          {busStations.filter((bs) => Number.isFinite(bs.lat) && Number.isFinite(bs.lng)).map((bs, i) => (
             <Marker key={i} position={[bs.lat, bs.lng]} icon={busIcon}>
               <Popup>
                 <div className="text-sm font-semibold">{bs.name}</div>
-                <div className="text-xs text-gray-600 mt-1">Buses: {bs.buses.join(', ')}</div>
+                {Array.isArray(bs.buses) && bs.buses.length > 0 && (
+                  <div className="text-xs text-gray-600 mt-1">Buses: {bs.buses.join(', ')}</div>
+                )}
               </Popup>
             </Marker>
           ))}
