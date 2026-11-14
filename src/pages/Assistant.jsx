@@ -7,6 +7,7 @@ import ReactMarkdown from 'react-markdown';
 import TypewriterContent from '@/components/assistant/TypewriterContent';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { NEXA_SYSTEM_PROMPT } from '@/lib/nexaPrompt';
 
 const suggestedQuestions = [
   "How do I get a SIN number?",
@@ -49,15 +50,16 @@ export default function Assistant() {
       : '';
 
     const response = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are SettleSmart AI, a helpful assistant for newcomers settling in Canada. You provide accurate, practical information about immigration, settlement services, housing, education, employment, healthcare, and legal rights in Canada.
+      prompt: `${NEXA_SYSTEM_PROMPT}
 
-${contextInfo}
+${contextInfo ? `About this person: ${contextInfo}` : ''}
 
-IMPORTANT: Be warm, supportive, and practical. Keep answers concise but thorough. Include specific resources, websites, or phone numbers when possible. If the user is in a specific city/province, tailor your response to their location.
+Conversation so far:
+${messages.slice(-6).map(m => `${m.role === 'user' ? 'Newcomer' : 'Nexa'}: ${m.content}`).join('\n')}
 
-User question: ${text}
+Newcomer's question: ${text}
 
-Previous conversation: ${messages.slice(-6).map(m => `${m.role}: ${m.content}`).join('\n')}`,
+Reply as Nexa.`,
       add_context_from_internet: true,
     });
 
@@ -74,8 +76,8 @@ Previous conversation: ${messages.slice(-6).map(m => `${m.role}: ${m.content}`).
             <Sparkles className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <h1 className="font-heading font-bold text-lg">Settlement Assistant</h1>
-            <p className="text-xs text-muted-foreground">Ask me anything about settling in Canada</p>
+            <h1 className="font-heading font-bold text-lg">Nexa</h1>
+            <p className="text-xs text-muted-foreground">Your AI settlement guide for Canada</p>
           </div>
         </div>
       </div>

@@ -1,0 +1,117 @@
+import {
+  Plane, Home, Briefcase, Heart, Wallet, GraduationCap,
+  Bus, Scale, Soup, Users, Baby, Smartphone,
+} from 'lucide-react';
+
+/**
+ * The twelve settlement modules. `status: 'live'` entries link to a working
+ * screen; `status: 'planned'` entries are shown as coming next so newcomers
+ * are never sent to an empty page.
+ */
+export const settlementModules = [
+  {
+    id: 'arrival',
+    title: 'Arrival in Canada',
+    icon: Plane,
+    description: 'Your first hours, days and weeks — documents, SIN, banking, a phone and a personalized checklist.',
+    path: '/checklist',
+    status: 'live',
+    accent: 'bg-sky-500/10 text-sky-600',
+  },
+  {
+    id: 'housing',
+    title: 'Housing & Accommodation',
+    icon: Home,
+    description: 'Safe, affordable housing guidance, tenant rights, rental scam protection and housing programs.',
+    status: 'planned',
+    accent: 'bg-amber-500/10 text-amber-600',
+  },
+  {
+    id: 'employment',
+    title: 'Employment & Careers',
+    icon: Briefcase,
+    description: 'Job search, Canadian resumes and cover letters, interview prep, credential recognition.',
+    path: '/work',
+    status: 'live',
+    accent: 'bg-indigo-500/10 text-indigo-600',
+  },
+  {
+    id: 'healthcare',
+    title: 'Healthcare & Wellness',
+    icon: Heart,
+    description: 'Health card registration, finding a doctor or clinic, mental health support and what is free.',
+    path: '/healthcare',
+    status: 'live',
+    accent: 'bg-rose-500/10 text-rose-600',
+  },
+  {
+    id: 'benefits',
+    title: 'Benefits & Financial Support',
+    icon: Wallet,
+    description: 'A guided checker for programs like the Canada Child Benefit, GST credit and provincial help.',
+    path: '/benefits',
+    status: 'live',
+    accent: 'bg-emerald-500/10 text-emerald-600',
+  },
+  {
+    id: 'education',
+    title: 'Education & Language',
+    icon: GraduationCap,
+    description: 'Free English and French classes, LINC, CLB levels, colleges, universities and scholarships.',
+    path: '/education',
+    status: 'live',
+    accent: 'bg-violet-500/10 text-violet-600',
+  },
+  {
+    id: 'transportation',
+    title: 'Transportation & Mobility',
+    icon: Bus,
+    description: 'Transit networks, fares and maps, driver licensing and getting around your city.',
+    path: '/transit-map',
+    status: 'live',
+    accent: 'bg-cyan-500/10 text-cyan-600',
+  },
+  {
+    id: 'legal',
+    title: 'Legal Rights & Protection',
+    icon: Scale,
+    description: 'Tenant and employment rights, legal aid, immigration help and how to report exploitation.',
+    path: '/legal',
+    status: 'live',
+    accent: 'bg-slate-500/10 text-slate-600',
+  },
+  {
+    id: 'food',
+    title: 'Food & Emergency Assistance',
+    icon: Soup,
+    description: 'Food banks, community meals, shelters, crisis lines and emergency contacts near you.',
+    path: '/emergency',
+    status: 'live',
+    accent: 'bg-orange-500/10 text-orange-600',
+  },
+  {
+    id: 'community',
+    title: 'Community & Social',
+    icon: Users,
+    description: 'Local events, volunteer opportunities, cultural groups and mentorship.',
+    path: '/events',
+    status: 'live',
+    accent: 'bg-teal-500/10 text-teal-600',
+  },
+  {
+    id: 'family',
+    title: 'Family & Children',
+    icon: Baby,
+    description: 'Childcare, school registration, family benefits, youth programs and parenting support.',
+    status: 'planned',
+    accent: 'bg-pink-500/10 text-pink-600',
+  },
+  {
+    id: 'digital',
+    title: 'Digital Services & Daily Life',
+    icon: Smartphone,
+    description: 'Banking, credit building, phone plans, taxes, online government accounts and scam protection.',
+    status: 'planned',
+    accent: 'bg-lime-500/10 text-lime-600',
+  },
+];

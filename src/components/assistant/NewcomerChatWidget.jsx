@@ -6,6 +6,7 @@ import ReactMarkdown from 'react-markdown';
 import TypewriterContent from '@/components/assistant/TypewriterContent';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { NEXA_SYSTEM_PROMPT } from '@/lib/nexaPrompt';
 
 const QUICK_QUESTIONS = [
   "What's the nearest emergency shelter?",
@@ -16,27 +17,7 @@ const QUICK_QUESTIONS = [
   "How do I call for emergency help?",
 ];
 
-const SYSTEM_PROMPT = `You are a Canadian Newcomer Settlement Assistant — a warm, knowledgeable helper specializing in services for immigrants, refugees, and newcomers to Canada.
 
-Your expertise covers:
-- **Emergency contacts**: 911 (police/fire/ambulance), 211 (social services helpline), 1-800-O-Canada (government info)
-- **Settlement services**: IRCC-funded agencies, newcomer centres, Catholic Social Services, ACCES Employment
-- **Housing**: shelters, transitional housing, tenant rights by province, affordable housing waitlists
-- **Food**: food banks, community meals, Ontario Works/Alberta Works/BC Employment Assistance
-- **Healthcare**: health card registration by province, walk-in clinics, Community Health Centres
-- **Transit**: Presto (Ontario), Compass (BC), Orca (Metro Vancouver), transit card setup by city
-- **Language**: LINC programs, ESL classes, language assessment (CLB), IELTS/CELPIP info
-- **Employment**: SIN application, job search, credential recognition (WES, ICAS), bridging programs
-- **Legal**: legal aid, tenant rights, immigration lawyers, refugee claim process
-- **Financial**: opening a bank account, credit building, GST/HST credits, Canada Child Benefit
-
-IMPORTANT RULES:
-- Always be warm, reassuring, and practical
-- Give specific phone numbers, websites, and names where possible
-- For emergencies, ALWAYS lead with 911 or 211
-- Tailor advice to the user's province/city if mentioned
-- Keep answers concise but actionable — use bullet points
-- If you don't know something specific, refer to 211.ca or canada.ca`;
 
 export default function NewcomerChatWidget({ userCity, userProvince }) {
   const [open, setOpen] = useState(false);
@@ -69,7 +50,7 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
     if (open && messages.length === 0) {
       const greeting = {
         role: 'assistant',
-        content: `Hi! I'm your Canadian Newcomer Assistant 🍁\n\nI can help you find **emergency contacts**, **nearby services**, **transit info**, and answers to common settlement questions${userCity ? ` for **${userCity}**` : ''}.\n\nWhat do you need help with?`,
+        content: `Hi! I'm Nexa, your settlement guide 🍁\n\nI can help you find **emergency contacts**, **nearby services**, **benefits you may qualify for**, and answers to common settlement questions${userCity ? ` for **${userCity}**` : ''}.\n\nWhat do you need help with?`,
       };
       setMessages([greeting]);
     }
@@ -103,7 +84,7 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
       .join('\n');
 
     const response = await base44.integrations.Core.InvokeLLM({
-      prompt: `${SYSTEM_PROMPT}\n\n${locationCtx}\n\nConversation:\n${history}\n\nRespond as the Assistant:`,
+      prompt: `${NEXA_SYSTEM_PROMPT}\n\n${locationCtx}\n\nConversation:\n${history}\n\nRespond as Nexa:`,
     });
 
     setMessages(prev => [...prev, { role: 'assistant', content: response, typing: true }]);
@@ -148,8 +129,8 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <p className="font-semibold text-sm leading-tight">Newcomer Assistant</p>
-                  <p className="text-[10px] text-white/70">Emergency • Services • Settlement</p>
+                  <p className="font-semibold text-sm leading-tight">Nexa</p>
+                  <p className="text-[10px] text-white/70">Settlement • Services • Emergency</p>
                 </div>
               </div>
               <button onClick={() => setOpen(false)} aria-label="Close chat" className="p-1.5 rounded-lg hover:bg-white/10 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">

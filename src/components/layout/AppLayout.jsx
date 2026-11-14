@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, CalendarDays, ChevronDown, Moon, Sun, Heart, Info, GraduationCap, LogIn, LogOut } from 'lucide-react';
+import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, CalendarDays, ChevronDown, Moon, Sun, Heart, Info, GraduationCap, Wallet, LogIn, LogOut } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -17,6 +17,9 @@ import GlobalSearch from '@/components/search/GlobalSearch';
 // Sub-items for tabs with dropdowns
 const TAB_CHILDREN = {
   '/explore': [
+    { path: '/settlement', icon: Compass, label: 'Settlement Navigator' },
+    { path: '/healthcare', icon: Heart, label: 'Healthcare' },
+    { path: '/benefits', icon: Wallet, label: 'Benefits' },
     { path: '/services', icon: Search, label: 'Settlement Services' },
     { path: '/near-me', icon: MapPin, label: 'Near Me' },
     { path: '/scholarships', icon: GraduationCap, label: 'Scholarships' },
@@ -43,7 +46,7 @@ const primaryNav = [
 
 // Secondary items in hamburger menu (no duplicates with primary nav)
 const secondaryNav = [
-  { path: '/assistant', icon: MessageCircle, label: 'AI Assistant' },
+  { path: '/assistant', icon: MessageCircle, label: 'Nexa AI' },
   { path: '/checklist', icon: BookOpen, label: 'Checklist' },
   { path: '/events', icon: CalendarDays, label: 'Community Events' },
   { path: '/profile', icon: User, label: 'My Profile' },
