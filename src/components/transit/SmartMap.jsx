@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { loadGoogleMaps } from '@/lib/googleMaps';
 import { bearingBetween, distanceMeters } from '@/lib/geo';
 import DirectionArrow from '@/components/transit/DirectionArrow';
+import MapCompass from '@/components/transit/MapCompass';
 
 const MAP_TYPES = [
   { id: 'roadmap', label: 'Map', icon: MapIcon },
@@ -377,13 +378,18 @@ export default function SmartMap({
 
       {ready && (
         <>
+          <MapCompass
+            heading={Number.isFinite(heading) ? heading : null}
+            bearing={destinationBearing}
+            needsPermission={needsCompass}
+            onEnableCompass={onEnableCompass}
+          />
+
           {!navigating && (
             <DirectionArrow
               bearing={destinationBearing}
               heading={heading}
               distance={destinationDistance}
-              needsCompass={needsCompass}
-              onEnableCompass={onEnableCompass}
             />
           )}
 

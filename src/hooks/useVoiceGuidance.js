@@ -48,6 +48,11 @@ export default function useVoiceGuidance() {
     utterance.lang = 'en-CA';
     utterance.rate = 1.02;
     utterance.pitch = 1;
+    // Browsers stay silent when no voice is picked, so choose a Canadian one.
+    const voices = synth.getVoices();
+    const voice =
+      voices.find((v) => /^en[-_]CA/i.test(v.lang)) || voices.find((v) => /^en/i.test(v.lang));
+    if (voice) utterance.voice = voice;
     synth.speak(utterance);
   }, []);
 

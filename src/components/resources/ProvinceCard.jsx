@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { CalendarDays, Landmark, Languages, MapPin, Ruler, Sparkles, Users } from 'lucide-react';
 import { formatPopulation } from '@/data/provinceProfiles';
@@ -23,22 +22,18 @@ function Stat({ icon: Icon, label, value }) {
  * One province on the time zone page: live local time, plus the province's
  * facts revealed on hover (or tap, on a touch screen).
  */
-export default function ProvinceCard({ name, profile, timeGroups, zoneInfo }) {
-  const [hovered, setHovered] = useState(false);
-  const [pinned, setPinned] = useState(false);
-  const open = hovered || pinned;
-
+export default function ProvinceCard({ name, profile, timeGroups, zoneInfo, open, onOpen, onClose, onToggle }) {
   return (
     <motion.div
       className={cn(
         'relative rounded-xl border bg-background/60 p-3.5 transition-colors duration-200',
         open ? 'border-primary/50 shadow-lg shadow-primary/10' : 'border-border/50'
       )}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      onFocus={() => setHovered(true)}
-      onBlur={() => setHovered(false)}
-      onClick={() => setPinned((p) => !p)}
+      onPointerEnter={(e) => e.pointerType === 'mouse' && onOpen?.()}
+      onPointerLeave={(e) => e.pointerType === 'mouse' && onClose?.()}
+      onFocus={onOpen}
+      onBlur={onClose}
+      onClick={() => window.matchMedia('(hover: none)').matches && onToggle?.()}
       tabIndex={0}
       whileHover={{ y: -3 }}
       transition={{ duration: 0.18, ease: 'easeOut' }}
@@ -62,7 +57,7 @@ export default function ProvinceCard({ name, profile, timeGroups, zoneInfo }) {
 
       <span className="mt-2.5 flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-muted-foreground/70">
         <Sparkles className="h-2.5 w-2.5" />
-        {pinned ? 'Tap to close facts' : 'Province facts'}
+        {open ? 'Hover away to close' : 'Province facts'}
       </span>
 
       <AnimatePresence>

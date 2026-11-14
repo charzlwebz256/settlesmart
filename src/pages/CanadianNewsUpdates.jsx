@@ -175,7 +175,7 @@ export default function CanadianNewsUpdates() {
             value={activeLoc.province || 'all'}
             onValueChange={(v) => setOverride({ province: v === 'all' ? '' : v, city: '' })}
           >
-            <SelectTrigger className="h-9 min-w-[170px] rounded-xl border border-input bg-background px-3 text-xs font-medium">
+            <SelectTrigger className="h-9 w-[85px] flex-shrink-0 rounded-xl border border-input bg-background px-2 text-xs font-medium [&>span]:truncate">
               <SelectValue placeholder="All Canada" />
             </SelectTrigger>
             <SelectContent>
@@ -189,7 +189,7 @@ export default function CanadianNewsUpdates() {
             onValueChange={(v) => setOverride({ province: activeLoc.province, city: v === 'all' ? '' : v })}
             disabled={!activeLoc.province}
           >
-            <SelectTrigger className="h-9 min-w-[150px] rounded-xl border border-input bg-background px-3 text-xs font-medium disabled:opacity-50">
+            <SelectTrigger className="h-9 w-[75px] flex-shrink-0 rounded-xl border border-input bg-background px-2 text-xs font-medium disabled:opacity-50 [&>span]:truncate">
               <SelectValue placeholder="All cities" />
             </SelectTrigger>
             <SelectContent>

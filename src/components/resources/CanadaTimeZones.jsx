@@ -166,6 +166,8 @@ export default function CanadaTimeZones() {
   }, [now, uniqueTzs]);
 
   const localTime = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', second: '2-digit' });
+  // Only one province's facts are open at a time, so the next one is always reachable.
+  const [openProvince, setOpenProvince] = useState(null);
 
   return (
     <div className="rounded-2xl bg-card border border-border/50 p-5">
@@ -201,6 +203,10 @@ export default function CanadaTimeZones() {
             profile={PROVINCE_PROFILES[prov.province]}
             timeGroups={groupByZone(prov.cities)}
             zoneInfo={zoneInfo}
+            open={openProvince === prov.province}
+            onOpen={() => setOpenProvince(prov.province)}
+            onClose={() => setOpenProvince(prev => (prev === prov.province ? null : prev))}
+            onToggle={() => setOpenProvince(prev => (prev === prov.province ? null : prov.province))}
           />
         ))}
       </div>

@@ -4,59 +4,51 @@ import { Heart, Globe, Mountain, Waves, Users, Shield, Smile, Star } from 'lucid
 const reasons = [
   {
     icon: Heart,
-    color: 'text-rose-500',
-    bg: 'bg-rose-50 dark:bg-rose-950/30',
     title: 'Peaceful & Welcoming',
     description: 'Canadians are internationally recognized for their peaceful, cooperative and generous nature — accepting of what makes each person unique.',
+    image: 'https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/38617e4af_generated_image.png',
   },
   {
     icon: Globe,
-    color: 'text-blue-500',
-    bg: 'bg-blue-50 dark:bg-blue-950/30',
     title: 'Vibrant Multiculturalism',
     description: 'A wide variety of ethnic foods, festivals, and cultural celebrations are held year-round to honour the diverse traditions of Canadian people.',
+    image: 'https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/c3d56753c_generated_image.png',
   },
   {
     icon: Mountain,
-    color: 'text-green-600',
-    bg: 'bg-green-50 dark:bg-green-950/30',
     title: 'World-Class Nature',
     description: 'Home to Whistler, Banff, Lake Louise and countless parks — Canada offers breathtaking landscapes for outdoor adventures in every season.',
+    image: 'https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/0fc3c9592_generated_image.png',
   },
   {
     icon: Waves,
-    color: 'text-cyan-500',
-    bg: 'bg-cyan-50 dark:bg-cyan-950/30',
     title: 'Abundant Water & Sports',
     description: 'Rivers, lakes and oceans make water sports like kayaking, fishing and sailing a way of life, alongside hockey, soccer, skiing and more.',
+    image: 'https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/98f1eef1b_generated_image.png',
   },
   {
     icon: Shield,
-    color: 'text-primary',
-    bg: 'bg-primary/10 dark:bg-primary/20',
     title: 'Strong Social Safety Net',
     description: 'Access to Employment Insurance, public pensions (CPP/OAS), the Canadian Dental Care Plan, and robust disability benefits for residents.',
+    image: 'https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/9c9acde1d_generated_image.png',
   },
   {
     icon: Users,
-    color: 'text-violet-500',
-    bg: 'bg-violet-50 dark:bg-violet-950/30',
     title: 'Pathways to Belong',
     description: 'Clear immigration and citizenship pathways — visit, work, study, or settle permanently with support from government settlement services.',
+    image: 'https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/6ca393e59_generated_image.png',
   },
   {
     icon: Smile,
-    color: 'text-amber-500',
-    bg: 'bg-amber-50 dark:bg-amber-950/30',
     title: 'Active, Healthy Lifestyles',
     description: 'Canadians enjoy active living year-round: hiking, cycling, camping, swimming, rock climbing, dance, basketball, and community sports leagues.',
+    image: 'https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/61cd4be90_generated_image.png',
   },
   {
     icon: Star,
-    color: 'text-orange-500',
-    bg: 'bg-orange-50 dark:bg-orange-950/30',
     title: 'World Events & Culture',
     description: 'Canada hosts world-class events like the FIFA World Cup 2026™ and celebrates Pride, Indigenous History Month, and cultural milestones nationally.',
+    image: 'https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/dd8f7374a_generated_image.png',
   },
 ];
 
@@ -91,19 +83,25 @@ export default function WhyCanadaSection() {
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.45, delay: i * 0.07, ease: 'easeOut' }}
-            whileHover={{ y: -6, boxShadow: '0 12px 32px rgba(0,0,0,0.10)' }}
-            className="bg-card border border-border/50 rounded-2xl p-5 flex flex-col gap-3 cursor-default"
+            whileHover={{ y: -6 }}
+            className="group relative flex min-h-[190px] flex-col overflow-hidden rounded-2xl border border-border/50 bg-black"
           >
-            <motion.div
-              whileHover={{ scale: 1.18, rotate: 6 }}
-              transition={{ type: 'spring', stiffness: 300, damping: 15 }}
-              className={`w-10 h-10 rounded-xl ${item.bg} flex items-center justify-center flex-shrink-0`}
-            >
-              <item.icon className={`w-5 h-5 ${item.color}`} />
-            </motion.div>
-            <div>
-              <h3 className="font-heading font-semibold text-sm text-foreground mb-1">{item.title}</h3>
-              <p className="text-xs text-muted-foreground leading-relaxed">{item.description}</p>
+            <img
+              src={item.image}
+              alt={item.title}
+              loading="lazy"
+              className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/55 to-black/25" />
+
+            <div className="relative z-10 flex flex-1 flex-col gap-3 p-5">
+              <span className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl border border-white/25 bg-white/15 backdrop-blur">
+                <item.icon className="h-5 w-5 text-white" />
+              </span>
+              <div>
+                <h3 className="font-heading font-semibold text-sm text-white mb-1">{item.title}</h3>
+                <p className="text-xs leading-relaxed text-white/80">{item.description}</p>
+              </div>
             </div>
           </motion.div>
         ))}
