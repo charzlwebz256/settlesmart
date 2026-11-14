@@ -124,7 +124,7 @@ export default function ServiceDirectory({ initialProvince = '', initialCategory
       </div>
 
       {isLoading ? (
-        <div className="auto-grid gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {[0, 1, 2, 3].map(i => (
             <div key={i} className="h-56 rounded-2xl border border-border/50 bg-card animate-pulse" />
           ))}
@@ -148,7 +148,7 @@ export default function ServiceDirectory({ initialProvince = '', initialCategory
           <Button variant="outline" onClick={clearFilters} className="rounded-xl">Clear filters</Button>
         </div>
       ) : (
-        <div className="auto-grid gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {services.map(service => (
             <ServiceCard
               key={service.id}

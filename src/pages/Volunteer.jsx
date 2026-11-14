@@ -81,7 +81,7 @@ export default function Volunteer() {
 
       <p className="text-xs text-muted-foreground mb-4">{filtered.length} organization{filtered.length !== 1 ? 's' : ''} found</p>
 
-      <div className="auto-grid gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filtered.map((org, i) => (
           <div key={i} className="bg-card rounded-2xl border border-border/50 p-5 flex flex-col gap-3 hover:border-primary/20 hover:shadow-sm transition-all">
             <div className="flex items-start gap-3">

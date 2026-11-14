@@ -153,7 +153,7 @@ export default function ShopSmart() {
         {CATEGORIES.map((cat) => (
           <div key={cat.label}>
             <h2 className="font-heading font-bold text-base mb-3 text-foreground">{cat.label}</h2>
-            <div className="auto-grid gap-3 [--card-min:8.5rem]">
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
               {cat.stores.map((store, i) => (
                 <StoreCard key={store.name} store={store} index={i} onOpen={openStore} />
               ))}
@@ -164,7 +164,7 @@ export default function ShopSmart() {
 
       <div className="mt-10 bg-card rounded-2xl border border-border/50 p-5">
         <h3 className="font-heading font-bold text-base mb-3">🛡️ Shopping Tips for Newcomers</h3>
-        <div className="auto-grid gap-3 text-sm text-muted-foreground [--card-min:18rem]">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-muted-foreground">
           <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Verify sellers</strong>, Check ratings and reviews before purchasing on marketplace sites.</span></div>
           <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Compare prices</strong>, Factor in shipping fees and delivery times across platforms.</span></div>
           <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Check return policies</strong>, Most stores have 30-day return windows; read before buying.</span></div>

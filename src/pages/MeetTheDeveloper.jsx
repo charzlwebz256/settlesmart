@@ -148,7 +148,7 @@ export default function MeetTheDeveloper() {
         {/* Highlights */}
         <div className="mb-8">
           <h3 className="font-heading font-bold text-xl text-foreground mb-4">Key Contributions & Projects</h3>
-          <div className="auto-grid gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {HIGHLIGHTS.map(h => (
               <div key={h.title} className={`rounded-2xl border p-5 ${h.color}`}>
                 <h4 className="font-semibold text-sm mb-1">{h.title}</h4>

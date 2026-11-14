@@ -8,9 +8,7 @@ import TransitAppPromo from '@/components/transit/TransitAppPromo';
 import LocationStatusBar from '@/components/transit/LocationStatusBar';
 import NearbyTransitPanel from '@/components/transit/NearbyTransitPanel';
 import NavigationBanner from '@/components/transit/NavigationBanner';
-import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { useDeviceLocation } from '@/hooks/useDeviceLocation';
-import { useSwipeToRefresh } from '@/hooks/useSwipeToRefresh';
 import { useDeviceOrientation } from '@/hooks/useDeviceOrientation';
 import useVoiceGuidance from '@/hooks/useVoiceGuidance';
 import { useNearbyStops } from '@/hooks/useNearbyStops';
@@ -228,25 +226,6 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
     }
   };
 
-  // Pull the map down to fetch everything again: position, address, stops and route.
-  const refreshAll = async () => {
-    geocodedAtRef.current = null;
-    stopsCenterRef.current = null;
-    requestOnce();
-    if (endCoords) {
-      await getRoute({ end: endCoords });
-    } else if (position) {
-      await loadStops([position.lat, position.lng]);
-    }
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  };
-
-  const {
-    ref: swipeRef,
-    pullDistance,
-    isRefreshing,
-  } = useSwipeToRefresh({ onRefresh: refreshAll, enabled: !embedded });
-
   const walkToStop = (stop) => {
     setEndInput(stop.name);
     setEndCoords([stop.lat, stop.lng]);
@@ -324,7 +303,6 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
 
   return (
     <div
-      ref={swipeRef}
       className={cn(
         'flex flex-col overflow-hidden md:flex-row',
         embedded
@@ -343,7 +321,6 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
           userPosition={position}
           accuracy={accuracy}
           heading={Number.isFinite(compass.heading) ? compass.heading : heading}
-          compassTilt={compass.tilt}
           needsCompass={compass.needsPermission}
           onEnableCompass={compass.requestPermission}
           startCoords={startCoords}
@@ -361,19 +338,6 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
           locating={locating}
           navigating={navigating}
         />
-
-        {!embedded && (
-          <div className="pointer-events-none absolute inset-x-0 top-0 z-20 flex justify-center">
-            <div className="rounded-b-2xl bg-card/95 shadow-lg backdrop-blur">
-              <PullToRefreshIndicator
-                pullDistance={pullDistance}
-                isRefreshing={isRefreshing}
-                threshold={72}
-              />
-            </div>
-          </div>
-        )}
-
         <TransitAppPromo />
         <NavigationBanner
           route={activeRoute}

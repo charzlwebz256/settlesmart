@@ -58,7 +58,7 @@ export default function SupportUs() {
         </div>
 
         {/* Ways to Support */}
-        <div className="auto-grid gap-4 mb-10">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-10">
           {WAYS_TO_SUPPORT.map((item) => (
             <motion.div
               key={item.title}

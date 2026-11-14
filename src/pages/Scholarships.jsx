@@ -287,7 +287,7 @@ export default function Scholarships() {
       </div>
 
       {/* Dropdowns: Province + City + Category */}
-      <div className="auto-grid gap-3 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-6">
         <div>
           <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Province / Region</label>
           <Select value={activeProvince} onValueChange={handleProvinceChange}>

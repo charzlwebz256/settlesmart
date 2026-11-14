@@ -270,7 +270,7 @@ function SectionedGrid({ items, sectionKey = 'section', cityField = 'city', show
           {sections.map(sec => (
             <div key={sec}>
               <h2 className="font-heading font-bold text-sm text-muted-foreground uppercase tracking-wider mb-3 px-1">{sec}</h2>
-              <div className="auto-grid gap-4 [--card-min:19rem]">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 {filtered.filter(i => i[sectionKey] === sec).map((item, idx) => (
                       <OrgCard key={idx} item={{ ...item, logo: getOrgLogo(item.name) }} />
                     ))}
@@ -342,7 +342,7 @@ function EducationPanel() {
           <MapView items={filtered.map(i => ({ ...i, logo: getOrgLogo(i.name) }))} cityFilter={cityFilter} />
         </Suspense>
       ) : (
-        <div className="auto-grid gap-4 [--card-min:19rem]">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           {filtered.map((inst, i) => {
             const logo = getOrgLogo(inst.name);
             return (
