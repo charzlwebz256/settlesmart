@@ -98,6 +98,20 @@ export default function GlobalSearch({ open, onClose }) {
     }
   }, [pathname, onClose]);
 
+  // Close as soon as the visitor clicks another tab or control in the header
+  useEffect(() => {
+    if (!open) return;
+    const onPointerDown = (e) => {
+      if (e.target instanceof Element && e.target.closest('header')) onClose();
+    };
+    document.addEventListener('mousedown', onPointerDown);
+    document.addEventListener('touchstart', onPointerDown);
+    return () => {
+      document.removeEventListener('mousedown', onPointerDown);
+      document.removeEventListener('touchstart', onPointerDown);
+    };
+  }, [open, onClose]);
+
   const goTo = (path) => { onClose(); navigate(path); };
 
   const onKeyDown = (e) => {
@@ -113,7 +127,7 @@ export default function GlobalSearch({ open, onClose }) {
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm flex items-start justify-center pt-[10vh] px-4"
+          className="fixed inset-0 z-40 bg-black/40 backdrop-blur-sm flex items-start justify-center pt-[10vh] px-4"
           onClick={onClose}
         >
           <motion.div

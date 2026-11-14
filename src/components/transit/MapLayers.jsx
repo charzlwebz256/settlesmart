@@ -53,9 +53,9 @@ export function MapLayerTiles({ type }) {
     return (
       <TileLayer
         key="terrain"
-        url="https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png"
-        attribution='Map data &copy; OpenStreetMap, elevation &copy; OpenTopoMap'
-        maxZoom={17}
+        url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
+        attribution='Tiles &copy; Esri, HERE, Garmin, USGS'
+        maxZoom={19}
       />
     );
   }
@@ -63,8 +63,8 @@ export function MapLayerTiles({ type }) {
   return (
     <TileLayer
       key="street"
-      url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
-      attribution='&copy; OpenStreetMap contributors'
+      url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
+      attribution='Tiles &copy; Esri, HERE, Garmin, OpenStreetMap contributors'
       maxZoom={19}
     />
   );
