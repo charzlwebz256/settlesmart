@@ -7,7 +7,7 @@ export default function GreetingCard({ part, eyebrow, title, subtitle, children 
           key={part.image}
           src={part.image}
           alt={part.alt}
-          className="absolute inset-0 h-full w-full object-cover object-center saturate-[1.12] contrast-[1.06] brightness-[1.02] animate-fade-in"
+          className="absolute inset-0 h-full w-full object-contain object-center saturate-[1.12] contrast-[1.06] brightness-[1.02] animate-fade-in"
         />
 
         {/* Time-of-day tint */}

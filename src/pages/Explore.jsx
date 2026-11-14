@@ -1,10 +1,8 @@
 import { Link } from 'react-router-dom';
-import { ArrowRight, Sparkles, CheckCircle2, Clock, Bus } from 'lucide-react';
+import { ArrowRight, Sparkles, CheckCircle2, Clock } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { settlementModules } from '@/data/settlementModules';
-import TransitPlanner from '@/components/transit/TransitPlanner';
-import LocalTimeChip from '@/components/transit/LocalTimeChip';
 
 const liveModules = settlementModules.filter(m => m.status === 'live');
 const plannedModules = settlementModules.filter(m => m.status === 'planned');
@@ -86,28 +84,6 @@ export default function Explore() {
         </div>
         <ArrowRight className="w-4 h-4 text-primary/60 group-hover:text-primary transition-colors flex-shrink-0" />
       </Link>
-
-      <section className="mb-8">
-        <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
-          <div className="flex items-center gap-2">
-            <h2 className="font-heading font-bold text-sm uppercase tracking-wide text-muted-foreground flex items-center gap-2">
-              <Bus className="w-4 h-4 text-primary" />
-              Transit map
-            </h2>
-            <LocalTimeChip />
-          </div>
-          <Link
-            to="/transit-map"
-            className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
-          >
-            Open full map <ArrowRight className="w-3 h-3" />
-          </Link>
-        </div>
-        <p className="text-xs text-muted-foreground mb-3">
-          Live transit around you. Times are shown in your local timezone, wherever you are.
-        </p>
-        <TransitPlanner embedded autoLocate />
-      </section>
 
       <h2 className="font-heading font-bold text-sm uppercase tracking-wide text-muted-foreground mb-3">
         Available now
