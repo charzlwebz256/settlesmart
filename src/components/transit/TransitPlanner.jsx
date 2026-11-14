@@ -25,7 +25,7 @@ const RELOAD_STOPS_AFTER_M = 400;
  * The live transit planner: map plus directions sidebar.
  * `embedded` shrinks it to fit inside a card (Explore) instead of a full page.
  */
-export default function TransitPlanner({ embedded = false }) {
+export default function TransitPlanner({ embedded = false, autoLocate = false }) {
   const [myAddress, setMyAddress] = useState('');
   const [resolvingAddress, setResolvingAddress] = useState(false);
   const startTouchedRef = useRef(false);
@@ -56,7 +56,7 @@ export default function TransitPlanner({ embedded = false }) {
     error: locationError,
     locating,
     requestOnce,
-  } = useDeviceLocation({ autoStart: !embedded });
+  } = useDeviceLocation({ autoStart: autoLocate || !embedded });
 
   const { stops, loading: stopsLoading, error: stopsError, load: loadStops, clear: clearStops } = useNearbyStops();
   // Stops around the destination, so the closest alighting option is visible too.

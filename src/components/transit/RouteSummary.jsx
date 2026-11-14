@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import { Footprints, Bus, Train, Ship, Bike, Car, Clock, Route, ArrowRight, Info, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ETS_LINKS } from '@/data/etsTransit';
@@ -34,6 +35,13 @@ function formatTime(iso) {
 }
 
 export default function RouteSummary({ route, startLabel, endLabel }) {
+  // Keeps the departure countdown honest as the rider stands at the stop.
+  const [now, setNow] = useState(() => Date.now());
+  useEffect(() => {
+    const id = setInterval(() => setNow(Date.now()), 20000);
+    return () => clearInterval(id);
+  }, []);
+
   if (!route) return null;
 
   const steps = Array.isArray(route.steps) ? route.steps : [];
@@ -42,6 +50,9 @@ export default function RouteSummary({ route, startLabel, endLabel }) {
   const alternatives = Array.isArray(route.alternatives) ? route.alternatives : [];
   const depart = formatTime(route.depart_at);
   const arrive = formatTime(route.arrive_at);
+  const leaveIn = route.depart_at
+    ? Math.round((new Date(route.depart_at).getTime() - now) / 60000)
+    : null;
 
   return (
     <div className="bg-card rounded-xl border border-border/50 p-3.5 space-y-3">
@@ -60,6 +71,24 @@ export default function RouteSummary({ route, startLabel, endLabel }) {
             {depart} → {arrive}
           </span>
         )}
+      </div>
+      <div className="flex items-center gap-2 flex-wrap text-[11px]">
+        {leaveIn !== null && (
+          <span
+            className={cn(
+              'inline-flex items-center gap-1 rounded-md px-2 py-0.5 font-bold',
+              leaveIn <= 0 ? 'bg-muted text-muted-foreground' : 'bg-primary/10 text-primary'
+            )}
+          >
+            <Clock className="w-3 h-3" />
+            {leaveIn > 0
+              ? `Leaves in ${leaveIn} min`
+              : leaveIn > -5
+                ? 'Leaving now'
+                : 'This departure has passed'}
+          </span>
+        )}
+        <span className="text-muted-foreground">Shown in your local time</span>
       </div>
 
       {/* Routes to take */}
