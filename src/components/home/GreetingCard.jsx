@@ -23,7 +23,7 @@ export default function GreetingCard({ part, eyebrow, title, subtitle, children 
             key={part.image}
             src={part.image}
             alt={part.alt}
-            className="hidden md:block w-96 lg:w-[40rem] xl:w-[44rem] h-72 lg:h-[22rem] object-cover object-center flex-shrink-0 saturate-[1.12] contrast-[1.06] brightness-[1.02] animate-fade-in [mask-image:radial-gradient(ellipse_at_center,black_58%,transparent_82%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black_58%,transparent_82%)]"
+            className="hidden md:block w-96 lg:w-[40rem] xl:w-[44rem] h-80 lg:h-[25rem] object-cover object-center flex-shrink-0 saturate-[1.12] contrast-[1.06] brightness-[1.02] animate-fade-in [mask-image:radial-gradient(ellipse_at_center,black_58%,transparent_82%)] [-webkit-mask-image:radial-gradient(ellipse_at_center,black_58%,transparent_82%)]"
           />
         </div>
       </div>

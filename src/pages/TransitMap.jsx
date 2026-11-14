@@ -7,7 +7,8 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useCityDetection } from '@/hooks/useCityDetection';
 import WeatherWidget from '@/components/transit/WeatherWidget';
-import { MapLayerTiles, MapTypeSwitcher, MapClickToPin, MapResizer, MapCenterWatcher } from '@/components/transit/MapLayers';
+import { MapLayerTiles, MapTypeSwitcher, MapClickToPin, MapResizer, MapCenterWatcher, FitRoute } from '@/components/transit/MapLayers';
+import RouteSummary from '@/components/transit/RouteSummary';
 import { useNearbyStops } from '@/hooks/useNearbyStops';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -135,29 +136,41 @@ export default function TransitMap() {
     setShow(true);
   };
 
-  const geocodeAddress = async (address, setCoords) => {
-    if (!address.trim()) return;
+  const geocodeAddress = async (address) => {
+    if (!address.trim()) return null;
     const { data } = await base44.functions.invoke('localAreaInfo', {
       action: 'geocode',
       address,
     });
-    if (data?.lat !== undefined && data?.lng !== undefined) setCoords([data.lat, data.lng]);
+    return data?.lat !== undefined && data?.lng !== undefined ? [data.lat, data.lng] : null;
   };
 
   const getRoute = async () => {
-    if (!startCoords || !endCoords) return;
+    const origin = startCoords || position;
+    if (!origin) {
+      setError('Set a starting point or allow location access first.');
+      return;
+    }
     setRouteLoading(true);
-
-    const { data: result } = await base44.functions.invoke('localAreaInfo', {
-      action: 'route',
-      start: startCoords,
-      end: endCoords,
-      mode: selectedMode,
-    });
-
-    setRouteData(result?.route || null);
-    setBusStations(result?.route?.nearby_bus_stations || []);
-    setRouteLoading(false);
+    setError(null);
+    try {
+      const destination = endCoords || (await geocodeAddress(endInput));
+      if (!destination) {
+        setError('We could not find that destination. Pick one from the suggestions.');
+        return;
+      }
+      setEndCoords(destination);
+      const { data: result } = await base44.functions.invoke('localAreaInfo', {
+        action: 'route',
+        start: origin,
+        end: destination,
+        mode: selectedMode === 'bicycling' ? 'cycling' : selectedMode,
+      });
+      setRouteData(result?.route || null);
+      setBusStations(result?.route?.nearby_bus_stations || []);
+    } finally {
+      setRouteLoading(false);
+    }
   };
 
   const defaultCenter = [43.6532, -79.3832]; // Toronto fallback
@@ -359,13 +372,8 @@ export default function TransitMap() {
 
               {/* Get route button */}
               <Button
-                onClick={() => {
-                  if (endInput && !endCoords) {
-                    geocodeAddress(endInput, setEndCoords);
-                  }
-                  getRoute();
-                }}
-                disabled={!startCoords || !endInput || routeLoading}
+                onClick={getRoute}
+                disabled={(!startCoords && !position) || !endInput || routeLoading}
                 className="w-full rounded-lg gap-2 bg-primary hover:bg-primary/90"
               >
                 {routeLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Route className="w-4 h-4" />}
@@ -373,49 +381,7 @@ export default function TransitMap() {
               </Button>
 
               {/* Route details */}
-              {routeData && (
-                <div className="bg-card rounded-lg border border-border/50 p-3 space-y-2">
-                  <div className="flex items-center gap-3 text-sm">
-                    <div className="flex items-center gap-1">
-                      <Route className="w-4 h-4 text-primary" />
-                      <span className="font-semibold">{routeData.distance_km} km</span>
-                    </div>
-                    <div className="flex items-center gap-1">
-                      <Clock className="w-4 h-4 text-primary" />
-                      <span className="font-semibold">{routeData.duration_minutes} min</span>
-                    </div>
-                  </div>
-
-                  {/* Bus info */}
-                  {routeData.bus_info && routeData.bus_info.length > 0 && (
-                    <div className="space-y-1">
-                      <p className="text-xs font-semibold text-muted-foreground">Buses:</p>
-                      <div className="flex flex-wrap gap-1">
-                        {routeData.bus_info.map((b, i) => (
-                          <Badge key={i} className="bg-orange-500/10 text-orange-700 border-0 text-[10px]">
-                            {b.name} → {b.route}
-                          </Badge>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* Steps */}
-                  {routeData.steps && routeData.steps.length > 0 && (
-                    <div className="space-y-1 max-h-32 overflow-y-auto">
-                      <p className="text-xs font-semibold text-muted-foreground">Directions:</p>
-                      {routeData.steps.slice(0, 5).map((s, i) => (
-                        <div key={i} className="text-[10px] text-muted-foreground">
-                          {i + 1}. {s.instruction} ({(s.distance_m / 1000).toFixed(1)} km)
-                        </div>
-                      ))}
-                      {routeData.steps.length > 5 && (
-                        <p className="text-[10px] text-muted-foreground italic">... and {routeData.steps.length - 5} more steps</p>
-                      )}
-                    </div>
-                  )}
-                </div>
-              )}
+              {routeData && <RouteSummary route={routeData} />}
 
               {/* Bus stations */}
               {busStations.length > 0 && (
@@ -537,6 +503,8 @@ export default function TransitMap() {
               </Popup>
             </Marker>
           )}
+
+          <FitRoute positions={routePath} />
 
           {/* Route polyline */}
           {routePath.length > 1 && (

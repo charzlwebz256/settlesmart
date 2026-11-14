@@ -85,6 +85,16 @@ export function MapResizer() {
   return null;
 }
 
+// Frames the whole route once it is calculated.
+export function FitRoute({ positions }) {
+  const map = useMap();
+  const key = positions.length > 1 ? `${positions.length}-${positions[0][0].toFixed(4)}` : '';
+  useEffect(() => {
+    if (positions.length > 1) map.fitBounds(positions, { padding: [40, 40] });
+  }, [key, map]);
+  return null;
+}
+
 // Reports the current map centre so nearby searches follow the view.
 export function MapCenterWatcher({ onChange }) {
   const map = useMap();

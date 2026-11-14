@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
 import { cleanText, safeUrl } from '../../shared/safeUrl.ts';
+import { planRoute } from '../../shared/routing.ts';
 
 const PLACES_SCHEMA = {
   type: 'object',
@@ -147,48 +148,9 @@ For each return: name, category (food_bank/clinic/settlement/community), address
       if (!valid(start) || !valid(end)) return Response.json({ error: 'Two valid coordinate pairs are required.' }, { status: 400 });
 
       const mode = ['walking', 'cycling', 'transit', 'driving'].includes(payload.mode) ? payload.mode : 'transit';
+      const route = await planRoute(start, end, mode);
 
-      const result = await llm({
-        prompt: `Calculate a detailed route in Canada from coordinates [${start[0].toFixed(5)}, ${start[1].toFixed(5)}] to [${end[0].toFixed(5)}, ${end[1].toFixed(5)}] using ${mode} mode. Return JSON with:
-- distance_km (number)
-- duration_minutes (number)
-- waypoints: array of [lat, lng] coordinates for the exact route path
-- steps: array of turn-by-turn navigation instructions with distance
-- bus_info: for transit, array of bus routes with numbers and names
-- nearby_bus_stations: for transit, array of nearby station coordinates and bus numbers`,
-        add_context_from_internet: true,
-        response_json_schema: {
-          type: 'object',
-          properties: {
-            distance_km: { type: 'number' },
-            duration_minutes: { type: 'number' },
-            waypoints: { type: 'array', items: { type: 'array', items: { type: 'number' } } },
-            steps: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: { instruction: { type: 'string' }, distance_m: { type: 'number' } },
-              },
-            },
-            bus_info: {
-              type: ['array', 'null'],
-              items: {
-                type: 'object',
-                properties: { route: { type: 'string' }, headsign: { type: 'string' } },
-              },
-            },
-            nearby_bus_stations: {
-              type: ['array', 'null'],
-              items: {
-                type: 'object',
-                properties: { name: { type: 'string' }, lat: { type: 'number' }, lng: { type: 'number' } },
-              },
-            },
-          },
-        },
-      });
-
-      return Response.json({ route: result || null });
+      return Response.json({ route });
     }
 
     if (action === 'reverse_geocode') {
