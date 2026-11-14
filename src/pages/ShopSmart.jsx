@@ -1,8 +1,7 @@
-import { useState } from 'react';
 import { ArrowRight, ShoppingBag } from 'lucide-react';
 import PriceComparison from '@/components/shop/PriceComparison';
 import PriceAlertSignup from '@/components/shop/PriceAlertSignup';
-import StoreViewer from '@/components/shop/StoreViewer';
+import { useToast } from '@/components/ui/use-toast';
 
 const CATEGORIES = [
   {
@@ -120,7 +119,22 @@ function StoreCard({ store, index, onOpen }) {
 }
 
 export default function ShopSmart() {
-  const [activeStore, setActiveStore] = useState(null);
+  const { toast } = useToast();
+
+  // Stores refuse to be framed by another site, so launch them for real.
+  const openStore = (store) => {
+    const link = document.createElement('a');
+    link.href = store.url;
+    link.target = '_blank';
+    link.rel = 'noopener noreferrer';
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    toast({
+      title: `Opening ${store.name}`,
+      description: 'Your store opens in a new tab — come back to ShopSmart when you are done.',
+    });
+  };
 
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-10">
@@ -129,7 +143,7 @@ export default function ShopSmart() {
           <ShoppingBag className="w-6 h-6 text-primary" />
           ShopSmart Canada
         </h1>
-        <p className="text-muted-foreground text-sm">Popular Canadian online shopping platforms across every category — tap a store to shop without leaving SettleSmart.</p>
+        <p className="text-muted-foreground text-sm">Popular Canadian online shopping platforms across every category — tap a store to open it in a new tab.</p>
       </div>
 
       <PriceComparison />
@@ -141,7 +155,7 @@ export default function ShopSmart() {
             <h2 className="font-heading font-bold text-base mb-3 text-foreground">{cat.label}</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
               {cat.stores.map((store, i) => (
-                <StoreCard key={store.name} store={store} index={i} onOpen={setActiveStore} />
+                <StoreCard key={store.name} store={store} index={i} onOpen={openStore} />
               ))}
             </div>
           </div>
@@ -158,7 +172,6 @@ export default function ShopSmart() {
         </div>
       </div>
 
-      <StoreViewer store={activeStore} onClose={() => setActiveStore(null)} />
     </div>
   );
 }
