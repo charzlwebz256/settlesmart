@@ -41,6 +41,7 @@ import InterviewPrep from './pages/InterviewPrep';
 const ShopSmart = React.lazy(() => import('./pages/ShopSmart'));
 import SupportUs from './pages/SupportUs';
 import MeetTheDeveloper from './pages/MeetTheDeveloper';
+import Connect from './pages/Connect';
 import JobCoach from './pages/JobCoach';
 import CareerSupport from './pages/CareerSupport';
 import WorkplaceRights from './pages/WorkplaceRights';
@@ -111,6 +112,7 @@ const AuthenticatedApp = () => {
         <Route path="/shop-smart" element={<ShopSmart />} />
         <Route path="/support-us" element={<SupportUs />} />
         <Route path="/meet-the-developer" element={<MeetTheDeveloper />} />
+        <Route path="/connect" element={<Connect />} />
 
         {/* Sign in required — personal data & tracked actions */}
         <Route element={<ProtectedRoute unauthenticatedElement={<ProtectedSignInPrompt />} />}>
