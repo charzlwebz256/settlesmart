@@ -7,21 +7,21 @@ const PROVINCE_HEALTH_LINKS = {
   'Manitoba': 'https://www.gov.mb.ca/health/mhsip/',
   'Quebec': 'https://www.ramq.gouv.qc.ca/en/citizens/health-insurance',
   'Nova Scotia': 'https://novascotia.ca/dhw/msi/',
-  'New Brunswick': 'https://www2.gnb.ca/content/gnb/en/departments/health/Medicare_Plan.html',
+  'New Brunswick': 'https://www.gnb.ca/en.html',
   'Newfoundland & Labrador': 'https://www.gov.nl.ca/hcs/mcp/',
   'Prince Edward Island': 'https://www.princeedwardisland.ca/en/topic/health-pei',
 };
 
 const PROVINCE_DRIVER_LINKS = {
-  'Ontario': 'https://www.ontario.ca/page/exchange-foreign-drivers-licence',
-  'Alberta': 'https://www.alberta.ca/exchange-non-alberta-licence',
+  'Ontario': 'https://www.ontario.ca/page/exchange-out-province-drivers-licence',
+  'Alberta': 'https://www.alberta.ca/',
   'British Columbia': 'https://www.icbc.com/driver-licensing/moving-bc',
-  'Saskatchewan': 'https://www.sgi.sk.ca/exchanging',
-  'Manitoba': 'https://www.mpi.mb.ca/Pages/exchange-foreign-licence.aspx',
+  'Saskatchewan': 'https://www.sgi.sk.ca/',
+  'Manitoba': 'https://www.mpi.mb.ca/',
   'Quebec': 'https://saaq.gouv.qc.ca/en/drivers-licence/exchanging-foreign-drivers-licence/',
-  'Nova Scotia': 'https://novascotia.ca/sns/rmv/handbook/DL-foreign.asp',
-  'New Brunswick': 'https://www2.gnb.ca/content/gnb/en/departments/psmv/driver_licensing.html',
-  'Newfoundland & Labrador': 'https://www.gov.nl.ca/motorregistration/exchanging-foreign-licence/',
+  'Nova Scotia': 'https://www.novascotia.ca/',
+  'New Brunswick': 'https://www.gnb.ca/en.html',
+  'Newfoundland & Labrador': 'https://www.gov.nl.ca/motorregistration/',
   'Prince Edward Island': 'https://www.princeedwardisland.ca/en/information/transportation/transfer-out-province-drivers-licence',
 };
 
@@ -57,7 +57,7 @@ export function buildChecklist(profile) {
       title: 'Secure temporary housing',
       description: `Find short-term accommodation in ${city} while you search for a permanent home.`,
       category: 'housing', day_range: 'week1', order: 4,
-      link: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants/settle-canada/housing.html',
+      link: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/settle-canada/housing.html',
     },
     {
       title: 'Get a local phone plan',
@@ -71,7 +71,7 @@ export function buildChecklist(profile) {
       title: 'Register with settlement services',
       description: `Connect with a local settlement agency in ${city} for free newcomer support and guidance.`,
       category: 'social', day_range: 'week2', order: 6,
-      link: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants/settle-canada/find-free-services.html',
+      link: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/settle-canada.html',
     },
     {
       title: 'Apply for a driver\'s licence',
@@ -83,7 +83,7 @@ export function buildChecklist(profile) {
       title: 'Enrol children in school',
       description: `Register school-age children at your local school board in ${city}. Education is free for residents.`,
       category: 'education', day_range: 'week2', order: 8,
-      link: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants/settle-canada/education.html',
+      link: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/settle-canada.html',
     },
     {
       title: 'Learn local public transit',
@@ -135,19 +135,19 @@ export function buildChecklist(profile) {
       title: 'Get credentials assessed',
       description: 'Have your foreign education and credentials evaluated for Canadian equivalency.',
       category: 'education', day_range: 'week4', order: 16,
-      link: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants/prepare-life-canada/credentials-assessment.html',
+      link: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/education-assessed.html',
     },
     {
       title: 'Set up a budget & savings',
       description: 'Track your expenses, open a TFSA, and start building a Canadian credit history.',
       category: 'banking', day_range: 'week4', order: 17,
-      link: 'https://www.canada.ca/en/financial-consumer-agency/services/savings.html',
+      link: 'https://www.canada.ca/en/financial-consumer-agency/services.html',
     },
     {
       title: 'Enrol in language classes',
       description: 'Join free English or French language classes if you want to improve your proficiency.',
       category: 'education', day_range: 'week4', order: 18,
-      link: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants/prepare-life-canada/improve-english-french.html',
+      link: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/settle-canada/language-skills.html',
     },
 
     // Month 2

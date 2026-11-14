@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
 import { MobileSelect as Select, MobileSelectContent as SelectContent, MobileSelectItem as SelectItem, MobileSelectTrigger as SelectTrigger, MobileSelectValue as SelectValue } from '@/components/ui/mobile-select';
+import { PROVINCES, citiesFor } from '@/data/canadaLocations';
 
 const CATEGORIES = [
   'orientation', 'workshop', 'language', 'employment',
@@ -76,12 +77,33 @@ export default function AddEventModal({ open, onClose, onCreated }) {
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">City</label>
-              <Input value={form.city} onChange={e => set('city', e.target.value)} placeholder="City" />
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">Province</label>
+              <Select
+                value={form.province || undefined}
+                onValueChange={(v) => setForm(prev => ({ ...prev, province: v, city: '' }))}
+              >
+                <SelectTrigger className="w-full h-9 rounded-lg border border-input bg-transparent px-3 text-sm focus:outline-none focus:ring-1 focus:ring-ring">
+                  <SelectValue placeholder="Select province" />
+                </SelectTrigger>
+                <SelectContent>
+                  {PROVINCES.map(p => <SelectItem key={p} value={p}>{p}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
             <div>
-              <label className="text-xs font-medium text-muted-foreground mb-1 block">Province</label>
-              <Input value={form.province} onChange={e => set('province', e.target.value)} placeholder="Province" />
+              <label className="text-xs font-medium text-muted-foreground mb-1 block">City</label>
+              <Select
+                value={form.city || undefined}
+                onValueChange={(v) => set('city', v)}
+                disabled={!form.province}
+              >
+                <SelectTrigger className="w-full h-9 rounded-lg border border-input bg-transparent px-3 text-sm focus:outline-none focus:ring-1 focus:ring-ring disabled:opacity-50 disabled:cursor-not-allowed">
+                  <SelectValue placeholder={form.province ? 'Select city' : 'Province first'} />
+                </SelectTrigger>
+                <SelectContent>
+                  {citiesFor(form.province).map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
+                </SelectContent>
+              </Select>
             </div>
           </div>
           <div>

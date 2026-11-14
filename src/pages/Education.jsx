@@ -46,7 +46,7 @@ const PROVINCES = [
 const PROVINCE_FINDERS = {
   'British Columbia': [
     { label: 'EducationPlannerBC', url: 'https://educationplannerbc.ca/', note: 'Official BC directory of universities, colleges and trades programs' },
-    { label: 'WorkBC — Training', url: 'https://www.workbc.ca/learn-and-train', note: 'Short-term and skills training across BC' },
+    { label: 'WorkBC — Training', url: 'https://www.workbc.ca/', note: 'Short-term and skills training across BC' },
   ],
   'Ontario': [
     { label: 'OUInfo — Ontario universities', url: 'https://www.ouinfo.ca/', note: 'Official directory of Ontario universities and programs' },
@@ -65,7 +65,7 @@ const PROVINCE_FINDERS = {
     { label: 'Nova Scotia — Education', url: 'https://novascotia.ca/education/', note: 'Provincial education and post-secondary information' },
   ],
   'New Brunswick': [
-    { label: 'New Brunswick — Education', url: 'https://www.gnb.ca/en/topic/education', note: 'Provincial education and post-secondary information' },
+    { label: 'New Brunswick — Education', url: 'https://www.gnb.ca/en.html', note: 'Provincial education and post-secondary information' },
   ],
   'Prince Edward Island': [
     { label: 'PEI — Education', url: 'https://www.princeedwardisland.ca/en/topic/education', note: 'Provincial education and post-secondary information' },
@@ -94,7 +94,7 @@ const LANGUAGE_PROGRAMS = [
 const CREDENTIAL_LINKS = [
   { label: 'CICIC — International credentials', url: 'https://www.cicic.ca/', note: 'How credential assessment works and which body to use' },
   { label: 'Canada.ca — Get your education assessed', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/education-assessed.html', note: 'Official federal guidance' },
-  { label: 'IQAS — Alberta', url: 'https://www.alberta.ca/international-qualifications-assessment-service', note: 'Alberta government assessment service' },
+  { label: 'IQAS — Alberta', url: 'https://www.alberta.ca/iqas', note: 'Alberta government assessment service' },
   { label: 'WES Canada', url: 'https://www.wes.org/ca/', note: 'Designated credential assessment provider' },
 ];
 

@@ -30,7 +30,7 @@ const SECTIONS = [
     title: 'Your Rights & Responsibilities',
     description: "Canada's Charter of Rights and Freedoms protects all people in Canada. Know your rights as a newcomer.",
     links: [
-      { label: 'Rights & Responsibilities in Canada — IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants/learn-about-canada/rights-responsibilities.html' },
+      { label: 'Rights & Responsibilities in Canada — IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants.html' },
       { label: 'Canadian Human Rights Commission', url: 'https://www.chrc-ccdp.gc.ca/en' },
       { label: 'Tenant Rights by Province (CMHC)', url: 'https://www.cmhc-schl.gc.ca/consumers/renting-a-home' },
       { label: 'Worker Rights — Employment Standards', url: 'https://www.canada.ca/en/employment-social-development/services/labour-standards.html' },
@@ -46,7 +46,7 @@ const SECTIONS = [
       { label: 'Contact IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/corporate/contact-ircc.html' },
       { label: 'IRCC Web Form (Questions)', url: 'https://ircc.canada.ca/english/contacts/web-form.asp' },
       { label: 'Settlement Services Finder — IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/settle-canada.html' },
-      { label: 'Citizenship Application — IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-citizenship/become-citizen.html' },
+      { label: 'Citizenship Application — IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-citizenship.html' },
     ],
   },
 ];

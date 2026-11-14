@@ -87,7 +87,7 @@ export const PROVINCE_DATA = {
       { name: 'First Nations Technical Institute (FNTI)', type: 'Indigenous Institute', website: 'https://www.fnti.net', address: 'Tyendinaga Mohawk Territory, ON', phone: '613-396-2122', city: 'Deseronto' },
     ],
     language: [
-      { name: 'LINC Ontario — IRCC (Free for Eligible Newcomers)', website: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants/improve-english-french.html', address: 'Multiple locations across Ontario', phone: '', services: ['Free English/French for permanent residents and protected persons', 'CLB levels 1–8', 'Childcare support available'], section: 'Government Programs' },
+      { name: 'LINC Ontario — IRCC (Free for Eligible Newcomers)', website: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/settle-canada/language-skills.html', address: 'Multiple locations across Ontario', phone: '', services: ['Free English/French for permanent residents and protected persons', 'CLB levels 1–8', 'Childcare support available'], section: 'Government Programs' },
       // School Boards
       { name: 'Toronto District School Board (TDSB) — LINC & ESL', website: 'https://www.tdsb.on.ca', address: 'Multiple locations, Toronto, ON', phone: '416-397-3000', services: ['LINC English classes', 'Adult ESL programs', 'Flexible scheduling'], section: 'Toronto / GTA School Boards' },
       { name: 'Toronto Catholic District School Board (TCDSB)', website: 'https://www.tcdsb.org', address: 'Toronto, ON', phone: '416-222-8282', services: ['LINC and ESL programs', 'Adult language training'], section: 'Toronto / GTA School Boards' },
@@ -135,7 +135,7 @@ export const PROVINCE_DATA = {
       { name: 'PTP Adult Learning & Employment Programs', website: 'https://www.ptp.ca', address: 'Toronto, ON', phone: '416-532-7010', services: ['Employment counselling', 'Training + certification programs', 'Job placement support'], section: 'Employment Ontario Service Providers' },
       { name: 'TNO — The Neighbourhood Organization Employment Services', website: 'https://tno-toronto.org', address: 'Toronto, ON', phone: '416-469-9916', services: ['Career counselling', 'Job readiness programs', 'Employer connections'], section: 'Employment Ontario Service Providers' },
       { name: 'Dixie Bloor Neighbourhood Centre (Employment Ontario)', website: 'https://dixiebloor.ca', address: 'Mississauga, ON', phone: '905-279-5544', services: ['Job placement services', 'Skills development', 'Newcomer employment support'], section: 'Employment Ontario Service Providers' },
-      { name: 'Youth Job Connection (YJC)', website: 'https://www.ontario.ca/page/find-job', address: 'Province-wide', phone: '1-800-387-5656', services: ['Paid job placements', 'Training support', 'Youth career counselling'], section: 'Youth Employment Programs' },
+      { name: 'Youth Job Connection (YJC)', website: 'https://www.ontario.ca/page/jobs-and-employment', address: 'Province-wide', phone: '1-800-387-5656', services: ['Paid job placements', 'Training support', 'Youth career counselling'], section: 'Youth Employment Programs' },
       { name: 'Youth Employment Services (YES)', website: 'https://www.yes.on.ca', address: 'Toronto, ON', phone: '416-504-5516', services: ['Youth job readiness', 'Resume + interview training', 'Employer matching'], section: 'Youth Employment Programs' },
       { name: 'Ontario Youth Apprenticeship Program (OYAP)', website: 'https://www.ontario.ca/page/ontario-youth-apprenticeship-program', address: 'Province-wide', phone: '', services: ['Skilled trades training', 'High school apprenticeship pathway'], section: 'Youth Employment Programs' },
       { name: 'March of Dimes Canada (Employment Services)', website: 'https://www.marchofdimes.ca', address: 'Toronto, ON', phone: '416-425-3463', services: ['Disability employment support', 'Skills training', 'Job placement'], section: 'Disability & Inclusive Employment' },
@@ -149,7 +149,7 @@ export const PROVINCE_DATA = {
       { name: 'Glassdoor Canada', website: 'https://www.glassdoor.ca', address: 'Online', phone: '', services: ['Job listings with salary and company reviews'], section: 'Online Job Platforms' },
     ],
     housing: [
-      { name: 'Ontario Ministry of Municipal Affairs and Housing', website: 'https://www.ontario.ca/page/ministry-municipal-affairs-and-housing', address: 'Province-wide', phone: '1-800-267-9438', services: ['Housing policy and programs', 'Affordable housing funding', 'Homelessness prevention'], section: 'Provincial Government' },
+      { name: 'Ontario Ministry of Municipal Affairs and Housing', website: 'https://www.ontario.ca/', address: 'Province-wide', phone: '1-800-267-9438', services: ['Housing policy and programs', 'Affordable housing funding', 'Homelessness prevention'], section: 'Provincial Government' },
       { name: 'Housing Services Corporation', website: 'https://www.hscorp.ca', address: 'Toronto, ON', phone: '416-594-9325', services: ['Supports social and affordable housing sector', 'Energy services and procurement'], section: 'Provincial Government' },
       { name: 'Toronto Community Housing Corporation', website: 'https://www.torontohousing.ca', address: '931 Yonge St, Toronto, ON M4W 2H2', phone: '416-981-5500', services: ['Largest social housing provider in Canada', 'Rent-geared-to-income units', 'Community support programs'], section: 'Social Housing Providers' },
       { name: 'Houselink & Mainstay Community Housing', website: 'https://www.houselink.on.ca', address: 'Toronto, ON', phone: '416-537-6624', services: ['Supportive housing for mental health challenges', 'Housing stabilization'], section: 'Social Housing Providers' },
@@ -206,13 +206,13 @@ export const PROVINCE_DATA = {
     ],
     transport: [
       { name: 'TTC (Toronto Transit Commission)', website: 'https://www.ttc.ca', address: '1900 Yonge St, Toronto, ON M4S 1Z2', phone: '416-393-4636', services: ['Subway (4 lines)', 'Bus and streetcar network', 'Presto card system', 'Wheel-Trans accessible service'], section: 'Toronto Transit', liveMap: 'https://www.ttc.ca/routes-and-schedules' },
-      { name: 'GO Transit (Regional Rail & Bus)', website: 'https://www.gotransit.com', address: '20 Bay St, Toronto, ON M5J 2W3', phone: '1-888-438-6646', services: ['Regional rail (7 GO train lines)', 'Regional bus service across GTA', 'Connects to TTC, MiWay, Brampton Transit'], section: 'Regional Transit', liveMap: 'https://www.gotransit.com/en/trip-planning/plan-a-trip' },
+      { name: 'GO Transit (Regional Rail & Bus)', website: 'https://www.gotransit.com', address: '20 Bay St, Toronto, ON M5J 2W3', phone: '1-888-438-6646', services: ['Regional rail (7 GO train lines)', 'Regional bus service across GTA', 'Connects to TTC, MiWay, Brampton Transit'], section: 'Regional Transit', liveMap: 'https://www.gotransit.com/en' },
       { name: 'MiWay (Mississauga Transit)', website: 'https://www.mississauga.ca/miway', address: 'Mississauga, ON', phone: '905-615-4636', services: ['City-wide bus service in Mississauga'], section: 'GTA Transit Systems', liveMap: 'https://www.mississauga.ca/miway' },
       { name: 'Brampton Transit', website: 'https://www.brampton.ca/transit', address: 'Brampton, ON', phone: '905-874-2750', services: ['City bus and Züm rapid transit'], section: 'GTA Transit Systems' },
       { name: 'York Region Transit (YRT)', website: 'https://www.yrt.ca', address: 'Newmarket, ON', phone: '1-866-668-3978', services: ['Bus service across York Region'], section: 'GTA Transit Systems' },
       { name: 'OC Transpo (Ottawa)', website: 'https://www.octranspo.com', address: 'Ottawa, ON', phone: '613-741-4390', services: ['O-Train LRT (Confederation Line)', 'Bus network', 'Para Transpo accessible service'], section: 'Ottawa Transit', liveMap: 'https://www.octranspo.com/en/plan-your-trip' },
       { name: 'Hamilton Street Railway (HSR)', website: 'https://www.hamilton.ca/hsr', address: 'Hamilton, ON', phone: '905-527-4441', services: ['City bus service in Hamilton'], section: 'Other Ontario Cities' },
-      { name: 'Grand River Transit (Kitchener-Waterloo)', website: 'https://www.grt.ca', address: 'Waterloo, ON', phone: '519-585-7555', services: ['Bus and ION LRT', 'Connecting Kitchener, Waterloo, Cambridge'], section: 'Other Ontario Cities', liveMap: 'https://www.grt.ca/en/routes-schedules' },
+      { name: 'Grand River Transit (Kitchener-Waterloo)', website: 'https://www.grt.ca', address: 'Waterloo, ON', phone: '519-585-7555', services: ['Bus and ION LRT', 'Connecting Kitchener, Waterloo, Cambridge'], section: 'Other Ontario Cities', liveMap: 'https://www.grt.ca/' },
       { name: 'London Transit Commission', website: 'https://www.londontransit.ca', address: 'London, ON', phone: '519-451-1347', services: ['City bus service in London'], section: 'Other Ontario Cities' },
     ],
     volunteering: [
@@ -262,7 +262,7 @@ export const PROVINCE_DATA = {
       { name: 'Okanagan College', type: 'College', website: 'https://www.okanagan.bc.ca', address: '1000 KLO Rd, Kelowna, BC V1Y 4X8', phone: '250-762-5445', city: 'Kelowna' },
     ],
     language: [
-      { name: 'LINC BC (IRCC-funded)', website: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants/improve-english-french.html', address: 'Multiple locations across BC', phone: '', services: ['Free English for permanent residents and protected persons', 'CLB levels 1–8', 'Childcare support at many sites'], section: 'Government Programs' },
+      { name: 'LINC BC (IRCC-funded)', website: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/settle-canada/language-skills.html', address: 'Multiple locations across BC', phone: '', services: ['Free English for permanent residents and protected persons', 'CLB levels 1–8', 'Childcare support at many sites'], section: 'Government Programs' },
       { name: 'ISSofBC Language Programs', website: 'https://issbc.org', address: '2610 Victoria Dr, Vancouver, BC', phone: '604-684-2561', services: ['LINC classes', 'EAL programs', 'Language assessment', 'Workplace English'], section: 'Vancouver Language Programs' },
       { name: 'MOSAIC Language Services', website: 'https://mosaicbc.org', address: '1720 Grant St, Vancouver, BC', phone: '604-254-9626', services: ['LINC English classes', 'Language for employment', 'Advanced language skills'], section: 'Vancouver Language Programs' },
       { name: 'S.U.C.C.E.S.S. Language Programs', website: 'https://www.successbc.ca', address: '28 W Pender St, Vancouver, BC', phone: '604-684-1628', services: ['LINC classes', 'ESL programs in multiple languages'], section: 'Vancouver Language Programs' },
@@ -311,7 +311,7 @@ export const PROVINCE_DATA = {
       { name: 'Centre for Addiction and Mental Health BC (BCMHSUS)', website: 'https://www.bcmhsus.ca', address: 'Province-wide', phone: '310-6789', services: ['Mental health and substance use services'], section: 'Mental Health & Addiction' },
     ],
     transport: [
-      { name: 'TransLink (Metro Vancouver)', website: 'https://www.translink.ca', address: "400-287 Nelson's Court, New Westminster, BC V3L 0E7", phone: '604-953-3333', services: ['SkyTrain (Expo, Millennium, Canada Lines)', 'Bus network (200+ routes)', 'West Coast Express commuter rail', 'SeaBus (ferry)', 'HandyDART accessible service', 'Compass Card system'], section: 'Metro Vancouver Transit', liveMap: 'https://www.translink.ca/trip-planning' },
+      { name: 'TransLink (Metro Vancouver)', website: 'https://www.translink.ca', address: "400-287 Nelson's Court, New Westminster, BC V3L 0E7", phone: '604-953-3333', services: ['SkyTrain (Expo, Millennium, Canada Lines)', 'Bus network (200+ routes)', 'West Coast Express commuter rail', 'SeaBus (ferry)', 'HandyDART accessible service', 'Compass Card system'], section: 'Metro Vancouver Transit', liveMap: 'https://www.translink.ca/trip-planner' },
       { name: 'BC Transit (Victoria & Other Cities)', website: 'https://www.bctransit.com', address: 'Victoria, BC', phone: '250-382-6161', services: ['Victoria Regional Transit System', 'Bus service in 130+ BC communities', 'Kelowna, Kamloops, Prince George transit'], section: 'BC Transit', liveMap: 'https://www.bctransit.com/plan-your-trip' },
       { name: 'West Coast Express (Commuter Rail)', website: 'https://www.westcoastexpress.com', address: 'Mission to Vancouver', phone: '604-488-8906', services: ['Commuter rail from Mission/Maple Ridge to Vancouver'], section: 'Regional Rail' },
     ],
@@ -481,7 +481,7 @@ export const PROVINCE_DATA = {
       { name: 'CÉGEP French Language Programs', website: 'https://www.quebec.ca/en/education/learn-french', address: 'Multiple CÉGEP campuses across Quebec', phone: '', services: ['Intensive French classes', 'Adapted programs for adult learners', 'Free for eligible newcomers'], section: 'Government French Programs' },
       { name: 'YMCA Montreal Language Programs', website: 'https://www.ymcamontreal.qc.ca', address: 'Montreal, QC', phone: '514-849-8393', services: ['English and French language classes', 'ESL programs', 'Newcomer language support'], section: 'Montreal Language Programs' },
       { name: 'Alliance Française Montreal', website: 'https://www.alliance-francaise.ca', address: 'Montreal, QC', phone: '514-382-1012', services: ['French language courses', 'Cultural programs', 'DELF/DALF certification'], section: 'Montreal Language Programs' },
-      { name: 'IRCC Language Programs Quebec', website: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants/improve-english-french.html', address: 'Montreal and other cities', phone: '', services: ['LINC English programs for eligible newcomers', 'ESL for those needing English'], section: 'English Language Programs' },
+      { name: 'IRCC Language Programs Quebec', website: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/settle-canada/language-skills.html', address: 'Montreal and other cities', phone: '', services: ['LINC English programs for eligible newcomers', 'ESL for those needing English'], section: 'English Language Programs' },
       { name: 'IELTS Canada — Quebec Test Centres', website: 'https://www.ieltscanada.ca', address: 'Montreal, Quebec City', phone: '', services: ['IELTS English proficiency testing'], section: 'Language Testing' },
       { name: 'TEF Canada (French Testing)', website: 'https://www.france-education-international.fr/en/tef-canada', address: 'Montreal, Quebec City', phone: '', services: ['French proficiency test for immigration and employment'], section: 'Language Testing' },
     ],
@@ -585,7 +585,7 @@ export const PROVINCE_DATA = {
       { name: 'Health Links — 24/7 Info Line (Manitoba)', website: 'https://www.gov.mb.ca/health/healthlinks', address: 'Province-wide', phone: '204-788-8200 or 1-888-315-9257', services: ['24/7 nurse advice line', 'Health service referrals', 'Mental health crisis support'], section: 'Telehealth' },
     ],
     transport: [
-      { name: 'Winnipeg Transit', website: 'https://www.winnipegtransit.com', address: 'Winnipeg, MB', phone: '311', services: ['City bus service (95+ routes)', 'BLUE Rapid Transit (BRT) corridor', 'Handi-Transit accessible service', 'Real-time tracking app', 'Transit app and website trip planner'], section: 'Winnipeg Transit', liveMap: 'https://winnipegtransit.com/en/schedules-maps/trip-planner' },
+      { name: 'Winnipeg Transit', website: 'https://www.winnipegtransit.com', address: 'Winnipeg, MB', phone: '311', services: ['City bus service (95+ routes)', 'BLUE Rapid Transit (BRT) corridor', 'Handi-Transit accessible service', 'Real-time tracking app', 'Transit app and website trip planner'], section: 'Winnipeg Transit', liveMap: 'https://winnipegtransit.com/' },
       { name: 'Brandon Transit', website: 'https://www.brandon.ca/transit', address: 'Brandon, MB', phone: '204-729-2468', services: ['City bus service in Brandon'], section: 'Regional Transit' },
       { name: 'Via Rail Canada — Manitoba', website: 'https://www.viarail.ca', address: 'Winnipeg VIA Rail Station', phone: '1-888-842-7245', services: ['Intercity train: Winnipeg ↔ Toronto ↔ Vancouver', 'The Canadian transcontinental service'], section: 'Intercity Rail' },
     ],
@@ -614,7 +614,7 @@ export const PROVINCE_DATA = {
       { name: 'Northlands College', type: 'College', website: 'https://www.northlandscollege.sk.ca', address: 'Air Ronge, SK', phone: '306-425-4480', city: 'Northern SK' },
     ],
     language: [
-      { name: 'LINC Saskatchewan (IRCC-funded)', website: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants/improve-english-french.html', address: 'Regina, Saskatoon, and other locations', phone: '', services: ['Free English for permanent residents and protected persons', 'CLB levels 1–8', 'Childcare support at some sites'], section: 'Government Programs' },
+      { name: 'LINC Saskatchewan (IRCC-funded)', website: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/settle-canada/language-skills.html', address: 'Regina, Saskatoon, and other locations', phone: '', services: ['Free English for permanent residents and protected persons', 'CLB levels 1–8', 'Childcare support at some sites'], section: 'Government Programs' },
       { name: 'Open Door Society — Language Programs (Regina)', website: 'https://www.opendoorsociety.org', address: '2151 Scarth St, Regina, SK', phone: '306-352-5775', services: ['LINC classes', 'ESL programs', 'Language assessment and referral'], section: 'Regina Language Programs' },
       { name: 'SODS Language Programs (Saskatoon)', website: 'https://www.sods.sk.ca', address: '419 4th Ave N, Saskatoon, SK', phone: '306-653-4464', services: ['LINC English classes', 'ESL programs', 'Workplace language training'], section: 'Saskatoon Language Programs' },
       { name: 'Saskatchewan Polytechnic Language Programs', website: 'https://saskpolytech.ca', address: 'Multiple campuses', phone: '1-866-467-4278', services: ['English language upgrading', 'ESL certificate programs'], section: 'College Language Programs' },
@@ -627,7 +627,7 @@ export const PROVINCE_DATA = {
       { name: 'Indeed Canada', website: 'https://ca.indeed.com', address: 'Online', phone: '', services: ['Saskatchewan job listings'], section: 'Online Job Platforms' },
     ],
     housing: [
-      { name: 'Saskatchewan Housing Corporation', website: 'https://www.saskatchewan.ca/residents/housing', address: 'Province-wide', phone: '1-800-667-7567', services: ['Affordable housing programs', 'Rent supplement program', 'Social (subsidized) housing', 'Emergency housing assistance'], section: 'Provincial Housing' },
+      { name: 'Saskatchewan Housing Corporation', website: 'https://www.saskatchewan.ca/residents/housing-and-renting', address: 'Province-wide', phone: '1-800-667-7567', services: ['Affordable housing programs', 'Rent supplement program', 'Social (subsidized) housing', 'Emergency housing assistance'], section: 'Provincial Housing' },
       { name: 'Affordable New Home Development Foundation (ANHDF)', website: 'https://www.anhdf.ca', address: 'Saskatoon, SK', phone: '306-653-6061', services: ['Affordable homeownership programs', 'Housing assistance for low-income families'], section: 'Affordable Housing' },
       { name: 'Carmichael Outreach (Regina)', website: 'https://www.carmichaeloutreach.ca', address: 'Regina, SK', phone: '306-522-0531', services: ['Housing support', 'Emergency shelter referrals', 'Newcomer and homeless support'], section: 'Emergency Housing' },
       { name: '211 Saskatchewan', website: 'https://sk.211.ca', address: 'Province-wide — dial 211', phone: '211', services: ['Emergency housing referrals', 'Social service connections'], section: 'Emergency Resources' },
@@ -647,7 +647,7 @@ export const PROVINCE_DATA = {
       { name: 'Jim Pattison Children\'s Hospital (Saskatoon)', website: 'https://www.saskhealthauthority.ca', address: '103 Hospital Dr, Saskatoon, SK S7N 0W8', phone: '306-655-1000', services: ['Pediatric specialty hospital', 'Emergency care for children'], section: 'Specialty Hospitals' },
     ],
     transport: [
-      { name: 'Regina Transit', website: 'https://www.regina.ca/transportation-roads-parking/public-transit', address: 'Regina, SK', phone: '306-777-7433', services: ['City bus service (20+ routes)', 'Regina Paratransit for accessibility', 'Real-time bus tracking'], section: 'Regina Transit', liveMap: 'https://www.regina.ca/transportation-roads-parking/public-transit' },
+      { name: 'Regina Transit', website: 'https://www.regina.ca/', address: 'Regina, SK', phone: '306-777-7433', services: ['City bus service (20+ routes)', 'Regina Paratransit for accessibility', 'Real-time bus tracking'], section: 'Regina Transit', liveMap: 'https://www.regina.ca/' },
       { name: 'Saskatoon Transit', website: 'https://transit.saskatoon.ca', address: 'Saskatoon, SK', phone: '306-975-3100', services: ['City bus service', 'Access Transit paratransit service', 'Real-time bus tracking'], section: 'Saskatoon Transit', liveMap: 'https://transit.saskatoon.ca' },
       { name: 'Rider Express (Intercity Bus)', website: 'https://riderexpress.ca', address: 'Regina ↔ Saskatoon ↔ Calgary / Edmonton', phone: '1-833-583-3636', services: ['Intercity bus across Saskatchewan and to Alberta'], section: 'Intercity Bus' },
     ],
@@ -688,14 +688,14 @@ export const PROVINCE_DATA = {
       { name: 'NSBI (Nova Scotia Business Inc.)', website: 'https://www.novascotiabusiness.com', address: 'Halifax, NS', phone: '902-424-6650', services: ['Business development support', 'Entrepreneur programs'], section: 'Business / Self-Employment' },
     ],
     housing: [
-      { name: 'Nova Scotia Provincial Housing (NSHA)', website: 'https://www.novascotia.ca/housing', address: 'Province-wide', phone: '1-800-670-4357', services: ['Social housing (RGI)', 'Rent supplement programs', 'Emergency housing assistance', 'Affordable housing programs'], section: 'Provincial Housing' },
+      { name: 'Nova Scotia Provincial Housing (NSHA)', website: 'https://www.novascotia.ca/', address: 'Province-wide', phone: '1-800-670-4357', services: ['Social housing (RGI)', 'Rent supplement programs', 'Emergency housing assistance', 'Affordable housing programs'], section: 'Provincial Housing' },
       { name: 'Metro Non-Profit Housing Association', website: 'https://www.mnpha.com', address: 'Halifax, NS', phone: '902-422-9374', services: ['Affordable and social housing in HRM', 'Housing advocacy'], section: 'Halifax Housing' },
       { name: 'Adsum for Women & Children', website: 'https://www.adsumforwomen.org', address: 'Halifax, NS', phone: '902-423-4159', services: ["Women's and family emergency shelter", 'Transitional housing'], section: 'Emergency / Supportive Housing' },
       { name: '211 Nova Scotia', website: 'https://ns.211.ca', address: 'Province-wide — dial 211', phone: '211', services: ['Emergency housing referrals', 'Social service connections'], section: 'Emergency Resources' },
     ],
     legal: [
       { name: 'Legal Aid Nova Scotia', website: 'https://www.nslegalaid.ca', address: '800 1701 Hollis St, Halifax, NS B3J 3M8', phone: '902-420-6573', services: ['Criminal, family, immigration legal help', 'Duty counsel at court', 'Refugee legal assistance', 'Rural outreach clinics'], section: 'Legal Aid Nova Scotia' },
-      { name: 'Dalhousie Legal Aid Service', website: 'https://www.dal.ca/faculty/law/clinics-advocacy/dlas.html', address: 'Halifax, NS', phone: '902-423-8105', services: ['Free legal help from Dalhousie law students', 'Housing, employment, family law'], section: 'Free Legal Clinics' },
+      { name: 'Dalhousie Legal Aid Service', website: 'https://www.dal.ca/faculty/law.html', address: 'Halifax, NS', phone: '902-423-8105', services: ['Free legal help from Dalhousie law students', 'Housing, employment, family law'], section: 'Free Legal Clinics' },
       { name: 'Nova Scotia Human Rights Commission', website: 'https://humanrights.novascotia.ca', address: 'Halifax, NS', phone: '902-424-4111', services: ['Discrimination complaints', 'Human rights education and resources'], section: 'Human Rights' },
     ],
     health: [
@@ -736,7 +736,7 @@ export const PROVINCE_DATA = {
       { name: 'Collège Communautaire du Nouveau-Brunswick (CCNB)', type: 'College', website: 'https://www.ccnb.ca', address: 'Multiple campuses province-wide (French)', phone: '1-800-576-2262', city: 'Province-Wide' },
     ],
     language: [
-      { name: 'LINC NB (IRCC-funded)', website: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants/improve-english-french.html', address: 'Fredericton, Moncton, Saint John', phone: '', services: ['Free LINC English/French for eligible newcomers', 'CLB levels 1–8', 'Language assessment and referral'], section: 'Government Programs' },
+      { name: 'LINC NB (IRCC-funded)', website: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/settle-canada/language-skills.html', address: 'Fredericton, Moncton, Saint John', phone: '', services: ['Free LINC English/French for eligible newcomers', 'CLB levels 1–8', 'Language assessment and referral'], section: 'Government Programs' },
       { name: 'YMCA Newcomer Connections — Language (Fredericton)', website: 'https://www.ymcanb.ca/newcomers', address: '29 Union St, Fredericton, NB', phone: '506-458-1540', services: ['LINC English classes', 'Language orientation for newcomers'], section: 'Fredericton Language Programs' },
       { name: 'MAGMA Language Programs (Moncton)', website: 'https://www.magma-amgm.org', address: '449 Paul St, Dieppe, NB', phone: '506-858-8189', services: ['ESL and LINC classes', 'French integration support in Moncton'], section: 'Moncton Language Programs' },
       { name: 'NBCC Language Programs', website: 'https://nbcc.ca', address: 'Multiple campuses', phone: '1-888-796-6222', services: ['English language upgrading', 'ESL programs for academic preparation'], section: 'College Language Programs' },
@@ -757,7 +757,7 @@ export const PROVINCE_DATA = {
     legal: [
       { name: 'Legal Aid New Brunswick', website: 'https://www.legalaid.nb.ca', address: 'Multiple offices province-wide (Fredericton, Moncton, Saint John)', phone: '506-444-2776', services: ['Criminal, family, immigration legal help', 'Duty counsel', 'Refugee legal assistance'], section: 'Legal Aid NB' },
       { name: 'Public Legal Education and Information Service of NB (PLEIS-NB)', website: 'https://www.legal-info-legale.nb.ca', address: 'Fredericton, NB', phone: '506-453-5369', services: ['Free legal information resources', 'Know your rights guides (English and French)', 'Tenant rights, family law info'], section: 'Free Legal Information' },
-      { name: 'New Brunswick Human Rights Commission', website: 'https://www.gnb.ca/hrc', address: 'Fredericton, NB', phone: '506-453-2301', services: ['Discrimination complaints', 'Human rights education'], section: 'Human Rights' },
+      { name: 'New Brunswick Human Rights Commission', website: 'https://www.gnb.ca/en.html', address: 'Fredericton, NB', phone: '506-453-2301', services: ['Discrimination complaints', 'Human rights education'], section: 'Human Rights' },
     ],
     health: [
       { name: 'Vitalité Health Network', website: 'https://www.vitalitenb.ca', address: 'Northern and Eastern NB', phone: '506-862-4000', services: ['Francophone hospital network', 'Moncton, Bathurst, Edmundston, Campbellton regions', 'Health services in French'], section: 'Major Health Networks' },
@@ -765,12 +765,12 @@ export const PROVINCE_DATA = {
       { name: 'Saint John Regional Hospital', website: 'https://en.horizonnb.ca', address: '400 University Ave, Saint John, NB E2L 4L2', phone: '506-648-6000', services: ['Major acute care hospital for southern NB', 'Level 2 trauma centre', 'Emergency', 'Cardiac care'], section: 'Major Hospitals' },
       { name: 'The Moncton Hospital', website: 'https://www.vitalitenb.ca', address: '135 MacBeath Ave, Moncton, NB E1C 6Z8', phone: '506-857-5111', services: ['Major acute care hospital for eastern NB', 'Emergency', 'Cancer Care'], section: 'Major Hospitals' },
       { name: 'Dr. Everett Chalmers Regional Hospital (Fredericton)', website: 'https://en.horizonnb.ca', address: '700 Priestman St, Fredericton, NB E3B 5N5', phone: '506-452-5400', services: ['Major acute care for central NB', 'Emergency', 'Specialty services'], section: 'Major Hospitals' },
-      { name: 'Tele-Care 811 NB', website: 'https://www.gnb.ca/tele-care', address: 'Province-wide', phone: '811', services: ['24/7 nurse health advice line', 'Available in English and French'], section: 'Telehealth' },
+      { name: 'Tele-Care 811 NB', website: 'https://www.gnb.ca/en.html', address: 'Province-wide', phone: '811', services: ['24/7 nurse health advice line', 'Available in English and French'], section: 'Telehealth' },
     ],
     transport: [
-      { name: 'Codiac Transpo (Moncton)', website: 'https://www.codiactranspo.ca', address: 'Moncton, NB', phone: '506-857-2008', services: ['City bus service in Greater Moncton (Moncton, Riverview, Dieppe)', 'Para Transpo accessible service'], section: 'Moncton Transit', liveMap: 'https://www.codiactranspo.ca/schedules' },
-      { name: 'Fredericton Transit', website: 'https://www.fredericton.ca/en/transportation/fredericton-transit', address: 'Fredericton, NB', phone: '506-460-2200', services: ['City bus service in Fredericton', 'Accessible transit service'], section: 'Fredericton Transit' },
-      { name: 'Saint John Transit', website: 'https://saintjohn.ca/en/live/transit', address: 'Saint John, NB', phone: '506-658-4700', services: ['City bus service in Saint John', 'Handivan accessible service'], section: 'Saint John Transit' },
+      { name: 'Codiac Transpo (Moncton)', website: 'https://www.codiactranspo.ca', address: 'Moncton, NB', phone: '506-857-2008', services: ['City bus service in Greater Moncton (Moncton, Riverview, Dieppe)', 'Para Transpo accessible service'], section: 'Moncton Transit', liveMap: 'https://www.codiactranspo.ca/' },
+      { name: 'Fredericton Transit', website: 'https://www.fredericton.ca/en', address: 'Fredericton, NB', phone: '506-460-2200', services: ['City bus service in Fredericton', 'Accessible transit service'], section: 'Fredericton Transit' },
+      { name: 'Saint John Transit', website: 'https://saintjohn.ca/en/transit', address: 'Saint John, NB', phone: '506-658-4700', services: ['City bus service in Saint John', 'Handivan accessible service'], section: 'Saint John Transit' },
       { name: 'Maritime Bus (Intercity Coach)', website: 'https://www.maritimebus.com', address: 'Multiple NB stops', phone: '1-800-575-1807', services: ['Intercity bus across NB and Atlantic Canada'], section: 'Intercity Bus' },
     ],
     volunteering: [
@@ -803,7 +803,7 @@ export const PROVINCE_DATA = {
       { name: 'NL Job Bank', website: 'https://www.jobbank.gc.ca', address: 'Online', phone: '', services: ['Federal and provincial job listings for NL'], section: 'Online Job Platforms' },
     ],
     housing: [
-      { name: 'Newfoundland & Labrador Housing Corporation (NLHC)', website: 'https://www.gov.nl.ca/fin/housing', address: "2 Furlong Place, St. John's, NL A1C 5M2", phone: '709-724-3000', services: ['Subsidized housing (RGI)', 'Rent supplement program', 'Emergency housing assistance', 'Affordable homeownership programs'], section: 'Provincial Housing' },
+      { name: 'Newfoundland & Labrador Housing Corporation (NLHC)', website: 'https://www.gov.nl.ca/', address: "2 Furlong Place, St. John's, NL A1C 5M2", phone: '709-724-3000', services: ['Subsidized housing (RGI)', 'Rent supplement program', 'Emergency housing assistance', 'Affordable homeownership programs'], section: 'Provincial Housing' },
       { name: 'Choices for Youth', website: 'https://www.choicesforyouth.ca', address: "St. John's, NL", phone: '709-722-0955', services: ['Youth housing and homeless support', 'Transitional housing programs'], section: 'Youth & Emergency Housing' },
       { name: 'Iris Kirby House (Emergency Shelter)', website: 'https://www.irishkirbyhouse.com', address: "St. John's, NL", phone: '709-753-1492', services: ["Women's emergency shelter", 'Second-stage housing', 'Family support'], section: 'Emergency Housing' },
       { name: '811 NL — Housing Referrals', website: 'https://www.gov.nl.ca/hcs', address: 'Province-wide', phone: '811', services: ['Health and social service referrals including housing'], section: 'Emergency Resources' },
@@ -822,7 +822,7 @@ export const PROVINCE_DATA = {
       { name: 'Labrador Health Centre (Happy Valley-Goose Bay)', website: 'https://nlhealthservices.ca', address: 'Happy Valley-Goose Bay, NL', phone: '709-897-2000', services: ['Hospital serving Labrador region'], section: 'Regional Hospitals' },
     ],
     transport: [
-      { name: 'Metrobus Transit (St. John\'s)', website: 'https://www.metrobus.com', address: "St. John's, NL", phone: '709-570-2020', services: ["City bus service across St. John's metro area", 'GoBus accessible paratransit', 'Real-time tracking via app'], section: "St. John's Transit", liveMap: 'https://www.metrobus.com/route-schedules' },
+      { name: 'Metrobus Transit (St. John\'s)', website: 'https://www.metrobus.com', address: "St. John's, NL", phone: '709-570-2020', services: ["City bus service across St. John's metro area", 'GoBus accessible paratransit', 'Real-time tracking via app'], section: "St. John's Transit", liveMap: 'https://www.metrobus.com/' },
       { name: 'Marine Atlantic Ferries (NL to NS)', website: 'https://www.marineatlantic.ca', address: 'North Sydney, NS ↔ Channel-Port aux Basques, NL', phone: '1-800-341-7981', services: ['Ferry service connecting NL to mainland Canada', 'Vehicle and passenger transport'], section: 'Ferry / Marine' },
       { name: 'Labrador Transportation Initiative', website: 'https://www.gov.nl.ca/ti', address: 'Labrador, NL', phone: '709-729-3679', services: ['Transportation support for remote Labrador communities'], section: 'Labrador Transport' },
     ],

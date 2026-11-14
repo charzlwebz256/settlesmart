@@ -31,14 +31,14 @@ const CREDENTIALS = [
   { label: 'Canada.ca — Get your education assessed', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/education-assessed.html', note: 'Official federal guidance on educational credential assessment' },
   { label: 'WES — World Education Services', url: 'https://www.wes.org/ca/', note: 'One of the designated credential assessment providers' },
   { label: 'ICAS', url: 'https://www.icascanada.ca/', note: 'Another designated assessment provider' },
-  { label: 'IQAS — Alberta', url: 'https://www.alberta.ca/international-qualifications-assessment-service', note: 'Alberta government assessment service' },
+  { label: 'IQAS — Alberta', url: 'https://www.alberta.ca/iqas', note: 'Alberta government assessment service' },
   { label: 'CICIC — Find a regulatory body', url: 'https://www.cicic.ca/1285/regulatory-bodies.canada', note: 'Required for regulated professions such as nursing, engineering and teaching' },
 ];
 
 const APPRENTICESHIPS = [
   { label: 'Red Seal Program', url: 'https://www.red-seal.ca/', note: 'National standard for skilled trades; your certificate is recognized across Canada' },
-  { label: 'Canada Apprentice Loan', url: 'https://www.canada.ca/en/services/benefits/education/student-aid/grants-loans/apprentice-loan.html', note: 'Interest-free loans for registered apprentices in Red Seal trades' },
-  { label: 'Apprenticeship grants', url: 'https://www.canada.ca/en/employment-social-development/services/apprenticeships/grants.html', note: 'Federal grants for apprentices who complete training' },
+  { label: 'Canada Apprentice Loan', url: 'https://www.canada.ca/en/services/benefits/education/student-aid/grants-loans.html', note: 'Interest-free loans for registered apprentices in Red Seal trades' },
+  { label: 'Apprenticeship grants', url: 'https://www.canada.ca/en/employment-social-development.html', note: 'Federal grants for apprentices who complete training' },
   { label: 'Skilled Trades Ontario', url: 'https://www.skilledtradesontario.ca/', note: 'Apprenticeship and certification in Ontario' },
   { label: 'Trades Alberta (Trade Secrets)', url: 'https://tradesecrets.alberta.ca/', note: 'Apprenticeship and certification in Alberta' },
 ];

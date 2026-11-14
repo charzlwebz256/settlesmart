@@ -18,7 +18,6 @@ const CATEGORIES = [
     stores: [
       { name: 'Best Buy Canada', url: 'https://www.bestbuy.ca', logo: 'https://upload.wikimedia.org/wikipedia/commons/c/c4/Best_Buy_logo_2018.svg', logoFit: 'contain', bg: 'bg-blue-50 dark:bg-blue-950/30', border: 'border-blue-200 dark:border-blue-800', text: 'text-blue-700 dark:text-blue-300' },
       { name: 'Canada Computers', url: 'https://www.canadacomputers.com', logo: 'https://miro.medium.com/v2/resize:fit:1400/1*DK3IZ2JtErlA6_EnGvmSrw.png', bg: 'bg-slate-50 dark:bg-slate-800/40', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-300' },
-      { name: 'The Source', url: 'https://www.thesource.ca', logo: 'https://discovergrandforks.ca/wp-content/uploads/348s.jpg', bg: 'bg-indigo-50 dark:bg-indigo-950/30', border: 'border-indigo-200 dark:border-indigo-800', text: 'text-indigo-700 dark:text-indigo-300' },
       { name: 'Newegg Canada', url: 'https://www.newegg.ca', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQL0TqXswBhWTvmN3FhRuVUIlnNVSdokhGn3gdSpSZXpk3pUKCaUxia-P8&s=10', bg: 'bg-orange-50 dark:bg-orange-950/30', border: 'border-orange-200 dark:border-orange-800', text: 'text-orange-700 dark:text-orange-300' },
     ],
   },
@@ -37,7 +36,7 @@ const CATEGORIES = [
     stores: [
       { name: 'Lululemon', url: 'https://shop.lululemon.com/en-ca', logo: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/22/Lululemon_Athletica_logo.svg/1280px-Lululemon_Athletica_logo.svg.png', logoFit: 'contain', bg: 'bg-slate-50 dark:bg-slate-800/40', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-300' },
       { name: 'Aritzia', url: 'https://www.aritzia.com/en/home', logo: 'https://download.logo.wine/logo/Aritzia/Aritzia-Logo.wine.png', bg: 'bg-zinc-50 dark:bg-zinc-800/40', border: 'border-zinc-200 dark:border-zinc-700', text: 'text-zinc-700 dark:text-zinc-300' },
-      { name: 'Simons', url: 'https://www.simons.ca', logo: 'https://www.wem.ca/media/2906/simons-weblogo-color.png?mode=pad&width=600&height=600&rnd=134175280507730000', bg: 'bg-teal-50 dark:bg-teal-950/30', border: 'border-teal-200 dark:border-teal-800', text: 'text-teal-700 dark:text-teal-300' },
+      { name: 'Simons', url: 'https://www.simons.ca', logo: 'https://www.google.com/s2/favicons?sz=64&domain=simons.ca', bg: 'bg-teal-50 dark:bg-teal-950/30', border: 'border-teal-200 dark:border-teal-800', text: 'text-teal-700 dark:text-teal-300' },
       { name: "Hudson's Bay", url: 'https://www.thebay.com', logo: 'https://mms.businesswire.com/media/20210322005442/en/866099/5/HB_Stripes_EN_%284%29_highres.jpg?download=1', bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200 dark:border-amber-800', text: 'text-amber-700 dark:text-amber-300' },
       { name: 'Old Navy Canada', url: 'https://oldnavy.gapcanada.ca', logo: 'https://mallmaverick.imgix.net/web/property_managers/27/properties/244/all/20220214213158/Old-Navy.png', bg: 'bg-blue-50 dark:bg-blue-950/30', border: 'border-blue-200 dark:border-blue-800', text: 'text-blue-700 dark:text-blue-300' },
     ],
@@ -70,7 +69,7 @@ const CATEGORIES = [
   {
     label: '💄 Beauty & Health',
     stores: [
-      { name: 'Sephora Canada', url: 'https://www.sephora.com/ca/en', logo: 'https://www.wem.ca/media/2900/sephora-web-logo.png?mode=pad&width=600&height=600&rnd=134175274434670000', bg: 'bg-slate-50 dark:bg-slate-800/40', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-300' },
+      { name: 'Sephora Canada', url: 'https://www.sephora.com/ca/en', logo: 'https://www.google.com/s2/favicons?sz=64&domain=sephora.ca', bg: 'bg-slate-50 dark:bg-slate-800/40', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-300' },
       { name: 'Shoppers Drug Mart', url: 'https://www.shoppersdrugmart.ca', logo: 'https://www.piccadillymall.com/media/v1/462/2023/02/shoppers-logo-1.png', logoFit: 'contain', bg: 'bg-red-50 dark:bg-red-950/30', border: 'border-red-200 dark:border-red-800', text: 'text-red-700 dark:text-red-300' },
       { name: 'Well.ca', url: 'https://well.ca', logo: 'https://media.licdn.com/dms/image/v2/C510BAQHTjHdWum1cbA/company-logo_200_200/company-logo_200_200/0/1631392013530?e=2147483647&v=beta&t=0j3vQCDGcqPUZocOZKV-oCJk3L2rZJPy4Lmv8SFWmHc', bg: 'bg-green-50 dark:bg-green-950/30', border: 'border-green-200 dark:border-green-800', text: 'text-green-700 dark:text-green-300' },
     ],

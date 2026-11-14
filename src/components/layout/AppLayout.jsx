@@ -17,7 +17,6 @@ import GlobalSearch from '@/components/search/GlobalSearch';
 // Sub-items for tabs with dropdowns
 const TAB_CHILDREN = {
   '/explore': [
-    { path: '/settlement', icon: Compass, label: 'Settlement Navigator' },
     { path: '/healthcare', icon: Heart, label: 'Healthcare' },
     { path: '/benefits', icon: Wallet, label: 'Benefits' },
     { path: '/services', icon: Search, label: 'Settlement Services' },
@@ -27,7 +26,6 @@ const TAB_CHILDREN = {
   ],
   '/work': [
     { path: '/jobs', icon: Briefcase, label: 'Job Search' },
-    { path: '/events', icon: CalendarDays, label: 'Events' },
   ],
   '/resources': [
     { path: '/legal', icon: Scale, label: 'Legal & IRCC' },

@@ -4,7 +4,7 @@ const sources = [
   {
     name: 'Government of Canada',
     url: 'https://www.canada.ca',
-    logo: 'https://www.canada.ca/content/dam/canada/logos/gov_ca_logo_en.svg',
+    logo: 'https://www.canada.ca/favicon.ico',
   },
   {
     name: 'IRCC-Funded',
@@ -14,7 +14,7 @@ const sources = [
   {
     name: 'Newcomer Centre',
     url: 'https://newcomercentre.com/',
-    logo: 'https://www.centrefornewcomers.ca/images/logo.png',
+    logo: 'https://www.google.com/s2/favicons?sz=64&domain=centrefornewcomers.ca',
   },
   {
     name: 'Catholic Social Services',

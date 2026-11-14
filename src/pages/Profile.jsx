@@ -15,28 +15,7 @@ import {
 import { cn } from '@/lib/utils';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useNavigate, Link } from 'react-router-dom';
-
-const PROVINCE_CITIES = {
-  'Alberta': ['Calgary', 'Edmonton', 'Lethbridge', 'Red Deer', 'Athabasca'],
-  'British Columbia': ['Burnaby', 'Kelowna', 'Kamloops', 'New Westminster', 'North Vancouver', 'Prince George', 'Surrey', 'Vancouver', 'Victoria'],
-  'Manitoba': ['Brandon', 'Winnipeg'],
-  'New Brunswick': ['Fredericton', 'Moncton', 'Saint John', 'Sackville'],
-  'Newfoundland and Labrador': ["St. John's", 'Labrador City', 'Happy Valley-Goose Bay'],
-  'Nova Scotia': ['Halifax', 'Sydney', 'Truro', 'Wolfville'],
-  'Ontario': ['Barrie', 'Belleville', 'Brampton', 'Guelph', 'Hamilton', 'Kingston', 'Kitchener', 'London', 'Mississauga', 'North Bay', 'Oakville', 'Oshawa', 'Ottawa', 'Peterborough', 'Sarnia', 'Sault Ste. Marie', 'St. Catharines', 'Sudbury', 'Thunder Bay', 'Timmins', 'Toronto', 'Waterloo', 'Windsor'],
-  'Prince Edward Island': ['Charlottetown', 'Summerside'],
-  'Quebec': ['Montreal', 'Quebec City', 'Sherbrooke'],
-  'Saskatchewan': ['Melville', 'Moose Jaw', 'Regina', 'Saskatoon'],
-  'Northwest Territories': ['Yellowknife'],
-  'Nunavut': ['Iqaluit'],
-  'Yukon': ['Whitehorse'],
-};
-
-const PROVINCES = [
-  'Alberta', 'British Columbia', 'Manitoba', 'New Brunswick',
-  'Newfoundland and Labrador', 'Northwest Territories', 'Nova Scotia',
-  'Nunavut', 'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan', 'Yukon'
-];
+import { PROVINCES, PROVINCE_CITIES } from '@/data/canadaLocations';
 
 const IMMIGRATION_STATUSES = [
   { value: 'permanent_resident', label: 'Permanent Resident' },

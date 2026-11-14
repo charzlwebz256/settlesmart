@@ -11,25 +11,25 @@ const CORE_RIGHTS = [
 ];
 
 const WAGE_LINKS = [
-  { label: 'Job Bank — Minimum wages by province and territory', url: 'https://www.jobbank.gc.ca/trend-analysis/minimum-wages', note: 'Official Government of Canada page with current rates for every province and territory' },
+  { label: 'Job Bank — Minimum wages by province and territory', url: 'https://www.jobbank.gc.ca/trend-analysis/search-wages', note: 'Official Government of Canada page with current rates for every province and territory' },
 ];
 
 const FEDERAL = [
-  { label: 'Federal Labour Program', url: 'https://www.canada.ca/en/employment-social-development/programs/labour-program.html', note: 'Rules for federally regulated jobs: banks, telecom, airlines, interprovincial transport' },
+  { label: 'Federal Labour Program', url: 'https://www.canada.ca/en/employment-social-development.html', note: 'Rules for federally regulated jobs: banks, telecom, airlines, interprovincial transport' },
   { label: 'Temporary Foreign Worker Program — your rights', url: 'https://www.canada.ca/en/employment-social-development/services/foreign-workers.html', note: 'Open work permits, employer abuse and how to report it' },
 ];
 
 const PROVINCIAL = [
-  { label: 'Ontario — Employment Standards', url: 'https://www.ontario.ca/page/employment-standards', note: 'Minimum wage, hours, vacation and complaints' },
+  { label: 'Ontario — Employment Standards', url: 'https://www.ontario.ca/document/your-guide-employment-standards-act-0', note: 'Minimum wage, hours, vacation and complaints' },
   { label: 'Alberta — Employment Standards', url: 'https://www.alberta.ca/employment-standards', note: 'Wages, overtime, termination and complaints' },
   { label: 'British Columbia — Employment Standards', url: 'https://www2.gov.bc.ca/gov/content/employment-business/employment-standards-advice/employment-standards', note: 'Wages, leave and complaint process' },
   { label: 'Quebec — CNESST', url: 'https://www.cnesst.gouv.qc.ca/en', note: 'Working conditions, pay and complaints' },
   { label: 'Manitoba — Employment Standards', url: 'https://www.gov.mb.ca/labour/standards/', note: 'Wages, hours and termination' },
   { label: 'Saskatchewan — Employment Standards', url: 'https://www.saskatchewan.ca/business/employment-standards', note: 'Wages, leave and complaints' },
   { label: 'Nova Scotia — Employment Rights', url: 'https://novascotia.ca/lae/employmentrights/', note: 'Minimum standards and complaints' },
-  { label: 'New Brunswick — Employment Standards', url: 'https://www.gnb.ca/en/topic/employment-standards', note: 'Wages, holidays and complaints' },
+  { label: 'New Brunswick — Employment Standards', url: 'https://www.gnb.ca/en.html', note: 'Wages, holidays and complaints' },
   { label: 'Prince Edward Island — Employment Standards', url: 'https://www.princeedwardisland.ca/en/topic/employment-standards', note: 'Wages, hours and complaints' },
-  { label: 'Newfoundland and Labrador — Employment Standards', url: 'https://www.gov.nl.ca/lae/es/', note: 'Wages, leave and complaints' },
+  { label: 'Newfoundland and Labrador — Employment Standards', url: 'https://www.gov.nl.ca/', note: 'Wages, leave and complaints' },
 ];
 
 function Section({ icon: Icon, title, intro, children }) {

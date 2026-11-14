@@ -142,50 +142,17 @@ export default function Jobs() {
         </div>
       </div>
 
-      {/* Tool Banners */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mb-4">
-        <Link to="/resume-builder" className="flex items-center gap-3 bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-xl px-4 py-3 hover:border-primary/40 transition-all group">
-          <div className="w-8 h-8 rounded-xl bg-primary/15 flex items-center justify-center flex-shrink-0">
-            <FileText className="w-4 h-4 text-primary" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-foreground">🍁 Resume Builder</p>
-            <p className="text-[10px] text-muted-foreground">AI, Canadian format, ATS</p>
-          </div>
-          <ArrowRight className="w-3.5 h-3.5 text-primary flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
-        </Link>
-        <Link to="/job-tracker" className="flex items-center gap-3 bg-gradient-to-r from-blue-500/10 to-blue-500/5 border border-blue-500/20 rounded-xl px-4 py-3 hover:border-blue-500/40 transition-all group">
-          <div className="w-8 h-8 rounded-xl bg-blue-500/15 flex items-center justify-center flex-shrink-0">
-            <Briefcase className="w-4 h-4 text-blue-600" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-foreground">📋 Job Tracker</p>
-            <p className="text-[10px] text-muted-foreground">Track applications, Reminders</p>
-          </div>
-          <ArrowRight className="w-3.5 h-3.5 text-blue-600 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
-        </Link>
-        <Link to="/interview-prep" className="flex items-center gap-3 bg-gradient-to-r from-violet-500/10 to-violet-500/5 border border-violet-500/20 rounded-xl px-4 py-3 hover:border-violet-500/40 transition-all group">
-          <div className="w-8 h-8 rounded-xl bg-violet-500/15 flex items-center justify-center flex-shrink-0">
-            <MessageSquare className="w-4 h-4 text-violet-600" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-foreground">🎤 Interview Prep</p>
-            <p className="text-[10px] text-muted-foreground">Mock interviews, AI feedback</p>
-          </div>
-          <ArrowRight className="w-3.5 h-3.5 text-violet-600 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
-        </Link>
-        <Link to="/job-coach" className="flex items-center gap-3 bg-gradient-to-r from-amber-500/10 to-amber-500/5 border border-amber-500/20 rounded-xl px-4 py-3 hover:border-amber-500/40 transition-all group sm:col-span-3">
-          <div className="w-8 h-8 rounded-xl bg-amber-500/15 flex items-center justify-center flex-shrink-0">
-            <BotMessageSquare className="w-4 h-4 text-amber-600" />
-          </div>
-          <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold text-foreground">🤖 AI Job Coach</p>
-            <p className="text-[10px] text-muted-foreground">Review applications, Personalized advice</p>
-          </div>
-          <ArrowRight className="w-3.5 h-3.5 text-amber-600 flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
-        </Link>
-      </div>
-
+      {/* Career tools live on the Work hub — one entry point, no duplicate cards */}
+      <Link to="/work" className="flex items-center gap-3 bg-card border border-border/50 rounded-xl px-4 py-3 mb-4 hover:border-primary/40 transition-all group">
+        <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+          <Briefcase className="w-4 h-4 text-primary" />
+        </div>
+        <div className="flex-1 min-w-0">
+          <p className="text-xs font-semibold text-foreground">Career tools</p>
+          <p className="text-[10px] text-muted-foreground">Resume builder, interview prep, AI job coach and application tracker</p>
+        </div>
+        <ArrowRight className="w-3.5 h-3.5 text-primary flex-shrink-0 group-hover:translate-x-0.5 transition-transform" />
+      </Link>
       {/* Job Alert */}
       <JobAlertSubscribe defaultCity={city || ''} />
 
@@ -265,8 +232,8 @@ export default function Jobs() {
             {
               name: 'Job Bank Canada',
               href: `https://www.jobbank.gc.ca/jobsearch/jobsearch?searchstring=${encodeURIComponent(searchQuery || '')}&locationstring=${encodeURIComponent(city || 'Canada')}`,
-              logo: 'https://www.jobbank.gc.ca/images/jobbank-logo.svg',
-              fallbackLogo: 'https://www.jobbank.gc.ca/favicon.ico',
+              logo: 'https://www.google.com/s2/favicons?sz=64&domain=jobbank.gc.ca',
+              fallbackLogo: 'https://www.canada.ca/favicon.ico',
               bg: 'bg-red-600/10 border-red-600/25 text-red-700',
               badge: '🍁 Official',
             },
@@ -310,13 +277,13 @@ export default function Jobs() {
             {
               name: 'Workopolis',
               href: `https://www.workopolis.com/jobsearch/find-jobs?ak=${encodeURIComponent(searchQuery || 'jobs')}&l=${encodeURIComponent(city || 'Canada')}`,
-              logo: 'https://www.workopolis.com/favicon.ico',
+              logo: 'https://www.google.com/s2/favicons?sz=64&domain=workopolis.com',
               bg: 'bg-sky-600/10 border-sky-600/25 text-sky-700',
             },
             {
               name: 'SimplyHired',
               href: `https://www.simplyhired.ca/search?q=${encodeURIComponent(searchQuery || 'jobs')}&l=${encodeURIComponent(city || 'Canada')}`,
-              logo: 'https://www.simplyhired.ca/favicon.ico',
+              logo: 'https://www.google.com/s2/favicons?sz=64&domain=simplyhired.ca',
               bg: 'bg-teal-600/10 border-teal-600/25 text-teal-700',
             },
             {
