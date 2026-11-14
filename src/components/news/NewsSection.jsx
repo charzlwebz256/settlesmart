@@ -1,5 +1,5 @@
 import { Badge } from '@/components/ui/badge';
-import { ExternalLink, Clock, MapPin, Radio } from 'lucide-react';
+import { ExternalLink, Clock, MapPin, Radio, Sparkles, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const CATEGORY_STYLES = {
@@ -103,19 +103,27 @@ export default function NewsSection({ articles, category }) {
               <h3 className="font-heading font-bold text-sm leading-snug group-hover:text-primary transition-colors line-clamp-2 mb-1.5">
                 {article.title}
               </h3>
+              <p className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-primary/70 mb-1">
+                <Sparkles className="w-2.5 h-2.5" /> Nexa summary — AI-written, not the publisher's text
+              </p>
               <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">{article.summary}</p>
             </div>
 
             {/* Footer */}
-            <div className="flex items-center justify-between mt-auto pt-1">
-              <span className={cn("text-xs font-bold px-2 py-0.5 rounded-md", getSourceStyle(article.source))}>
-                {article.source}
-              </span>
-              {article.time_ago && (
-                <span className={cn("flex items-center gap-1 text-xs", fresh ? "text-red-500 font-semibold" : "text-muted-foreground")}>
-                  <Clock className="w-3 h-3" /> {article.time_ago}
+            <div className="mt-auto pt-2 border-t border-border/40">
+              <div className="flex items-center justify-between gap-2">
+                <span className={cn("text-xs font-bold px-2 py-0.5 rounded-md", getSourceStyle(article.source))}>
+                  {article.source || 'Source not confirmed'}
                 </span>
-              )}
+                <span className={cn("flex items-center gap-1 text-xs", fresh ? "text-red-500 font-semibold" : "text-muted-foreground")}>
+                  <Clock className="w-3 h-3" />
+                  {article.published_date || article.time_ago || 'Date not confirmed'}
+                </span>
+              </div>
+              <p className="flex items-center gap-1 text-[10px] text-muted-foreground mt-1.5">
+                <Info className="w-2.5 h-2.5 flex-shrink-0" />
+                {isSafeUrl(article.url) ? `Read the original at ${article.source || 'the publisher'}` : 'Original link unavailable — verify before sharing'}
+              </p>
             </div>
           </a>
         );

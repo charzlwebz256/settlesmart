@@ -128,6 +128,17 @@ Return 2 newcomer_insights about health/safety topics newcomers should know.`,
   },
 ];
 
+// Appended to every tab prompt so every article is sourced and dated.
+const SOURCE_RULES = `
+
+For EVERY article also return:
+- published_date: the original publication date in ISO format (YYYY-MM-DD).
+- source_url: the direct link to that original article on the publisher's site.
+- source: the publisher name (for example CBC News, Reuters, IRCC).
+Never invent a date or a link. If you cannot verify the exact publication date, set published_date to an empty string.
+If you cannot verify the direct article URL, set source_url to an empty string. label the summary field as your own
+plain-language summary, not the publisher's text.`;
+
 const ARTICLE_SCHEMA = {
   type: 'object',
   properties: {
@@ -141,6 +152,8 @@ const ARTICLE_SCHEMA = {
           category: { type: 'string' },
           source: { type: 'string' },
           url: { type: 'string' },
+          source_url: { type: 'string' },
+          published_date: { type: 'string' },
           time_ago: { type: 'string' },
           is_local: { type: 'boolean' },
         },
@@ -181,12 +194,16 @@ export default function CanadianNewsUpdates() {
     const loc = city || 'Edmonton';
     const result = await base44.integrations.Core.InvokeLLM({
       model: 'gemini_3_flash',
-      prompt: tab.prompt(loc, province),
+      prompt: tab.prompt(loc, province) + SOURCE_RULES,
       add_context_from_internet: true,
       response_json_schema: ARTICLE_SCHEMA,
     });
     // Filter out any articles older than 7 days by checking time_ago text
-    const filtered = (result?.articles || []).filter(a => {
+    const filtered = (result?.articles || []).map(a => ({
+      ...a,
+      // Prefer the verified original article link.
+      url: a.source_url || a.url,
+    })).filter(a => {
       if (!a.time_ago) return true;
       const t = a.time_ago.toLowerCase();
       // Reject anything explicitly saying 8+ days, weeks, months

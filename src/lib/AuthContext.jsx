@@ -19,6 +19,17 @@ export const AuthProvider = ({ children }) => {
     checkAppState();
   }, []);
 
+  // Watchdog: never leave the app stuck on the splash screen if the
+  // public-settings or auth request stalls (slow network, dead token).
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setIsLoadingPublicSettings(false);
+      setIsLoadingAuth(false);
+      setAuthChecked(true);
+    }, 12000);
+    return () => clearTimeout(timer);
+  }, []);
+
   const checkAppState = async () => {
     try {
       setIsLoadingPublicSettings(true);
@@ -32,7 +43,8 @@ export const AuthProvider = ({ children }) => {
           'X-App-Id': appParams.appId
         },
         token: appParams.token, // Include token if available
-        interceptResponses: true
+        interceptResponses: true,
+        timeout: 12000,
       });
       
       try {
