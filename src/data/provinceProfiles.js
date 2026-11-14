@@ -81,7 +81,7 @@ export const PROVINCE_PROFILES = {
     nickname: 'Yours to Discover',
     languages: 'English (French official services)',
     geography:
-      'From the Great Lakes and the St. Lawrence lowlands in the south, home to most of the population, to Hudson Bay in the far north — plus 250,000 lakes.',
+      'From the Great Lakes and the St. Lawrence lowlands in the south, home to most of the population, to Hudson Bay in the far north, plus 250,000 lakes.',
     leader: { title: 'Premier', name: 'Doug Ford', party: 'Progressive Conservative' },
     note: 'Canada’s most populous province and the top destination for newcomers.',
   },
@@ -111,7 +111,7 @@ export const PROVINCE_PROFILES = {
     geography:
       'Flat to rolling prairie, the Athabasca Sand Dunes and 100,000 lakes. Grain, potash and uranium country, with open horizons in every direction.',
     leader: { title: 'Premier', name: 'Scott Moe', party: 'Saskatchewan Party' },
-    note: 'Most of the province keeps Central Standard Time all year — no clock change.',
+    note: 'Most of the province keeps Central Standard Time all year, no clock change.',
   },
   Alberta: {
     abbr: 'AB',
@@ -167,7 +167,7 @@ export const PROVINCE_PROFILES = {
     geography:
       'Tundra, the Mackenzie River and Great Slave Lake, the deepest lake in North America, spread across the Arctic and subarctic northwest.',
     leader: { title: 'Premier', name: 'R.J. Simpson', party: 'Consensus government' },
-    note: 'Governed by consensus — members choose the premier rather than parties.',
+    note: 'Governed by consensus, members choose the premier rather than parties.',
   },
   Nunavut: {
     abbr: 'NU',

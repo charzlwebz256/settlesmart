@@ -39,7 +39,7 @@ export default function GuestGreeting({ onStartWizard, city, province }) {
       subtitle="Start your new life in Canada with confidence."
     >
       <p className="text-sm text-muted-foreground mt-2 max-w-lg">
-        Free settlement services, housing, jobs and education — all in one place.
+        Free settlement services, housing, jobs and education, all in one place.
       </p>
 
       <div className="mt-3">

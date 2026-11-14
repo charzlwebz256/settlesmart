@@ -55,7 +55,7 @@ export default function WelcomeBanner({ user, profile, city, province }) {
           {part.label}, {name}
         </>
       )}
-      subtitle="Start your new life with confidence — here's where your journey stands today."
+      subtitle="Start your new life with confidence, here's where your journey stands today."
     >
       <div className="flex flex-wrap items-center gap-2 mt-4">
         {place && (

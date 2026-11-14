@@ -17,7 +17,7 @@ export default function MyLocationCard({ address, accuracy, locating, resolving,
               ? 'Asking your device for a GPS fix…'
               : resolving
                 ? 'Finding your address…'
-                : address || (hasPosition ? 'Location found' : 'Location off — allow access to start')}
+                : address || (hasPosition ? 'Location found' : 'Location off, allow access to start')}
           </p>
         </div>
         {hasPosition && (

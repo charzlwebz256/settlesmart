@@ -8,26 +8,26 @@ import { useLocation_ } from '@/lib/LocationContext';
 
 const EMERGENCY = [
   { label: 'Police / Fire / Ambulance', number: '911', tel: '911', color: 'bg-red-500', note: 'For immediate life-threatening emergencies' },
-  { label: 'Suicide Crisis Helpline', number: '9-8-8', tel: '988', color: 'bg-rose-600', note: 'Dial 9-8-8 for suicide crisis support — 24/7' },
-  { label: '211 — Social Services Helpline', number: '211', tel: '211', color: 'bg-blue-500', note: 'Shelter, food, crisis and mental health navigation — 24/7' },
-  { label: 'Kids Help Phone', number: '1-800-668-6868', tel: '18006686868', color: 'bg-pink-500', note: 'For youth in crisis — 24/7' },
+  { label: 'Suicide Crisis Helpline', number: '9-8-8', tel: '988', color: 'bg-rose-600', note: 'Dial 9-8-8 for suicide crisis support, 24/7' },
+  { label: '211, Social Services Helpline', number: '211', tel: '211', color: 'bg-blue-500', note: 'Shelter, food, crisis and mental health navigation, 24/7' },
+  { label: 'Kids Help Phone', number: '1-800-668-6868', tel: '18006686868', color: 'bg-pink-500', note: 'For youth in crisis, 24/7' },
   { label: 'Crisis Text Line (Canada)', number: 'Text HOME to 686868', sms: '686868', smsBody: 'HOME', color: 'bg-purple-500', note: 'Free, confidential crisis support' },
 ];
 
-// IRCC is not an emergency service — kept separate on purpose.
+// IRCC is not an emergency service, kept separate on purpose.
 const GOVERNMENT = [
   {
-    label: 'IRCC — Contact centre',
+    label: 'IRCC, Contact centre',
     url: 'https://www.canada.ca/en/immigration-refugees-citizenship/corporate/contact-ircc.html',
     note: 'General immigration enquiries: 1-888-242-2100 (in Canada). Not for emergencies.',
   },
   {
-    label: 'IRCC — Check processing times',
+    label: 'IRCC, Check processing times',
     url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/application/check-processing-times.html',
     note: 'Official current processing times for applications',
   },
   {
-    label: 'IRCC — Settlement services finder',
+    label: 'IRCC, Settlement services finder',
     url: 'https://ircc.canada.ca/english/newcomers/services/index.asp',
     note: 'Find a federally funded settlement agency near you',
   },
@@ -40,8 +40,8 @@ const GOVERNMENT = [
 
 const SHELTERS = [
   { label: 'Shelter Finder Canada (Homeless Hub)', url: 'https://www.homelesshub.ca/solutions/emergency-response/emergency-shelters', note: 'National shelter directory' },
-  { label: 'YWCA Canada — Women\'s Shelters', url: 'https://www.ywcacanada.ca/', note: 'Women and family emergency housing' },
-  { label: 'Salvation Army — Emergency Shelter', url: 'https://www.salvationarmy.ca/what-we-do/emergency-disaster-services/', note: 'National emergency services' },
+  { label: 'YWCA Canada, Women\'s Shelters', url: 'https://www.ywcacanada.ca/', note: 'Women and family emergency housing' },
+  { label: 'Salvation Army, Emergency Shelter', url: 'https://www.salvationarmy.ca/what-we-do/emergency-disaster-services/', note: 'National emergency services' },
   { label: 'Refugee Housing (COSTI)', url: 'https://www.costi.org/programs/housing/', note: 'Refugee and newcomer housing support (Ontario)' },
 ];
 
@@ -56,8 +56,8 @@ const LEGAL_AID = [
 const MENTAL_HEALTH = [
   { label: 'Canadian Mental Health Association', url: 'https://cmha.ca/', note: 'Mental health resources and support across Canada' },
   { label: 'Newcomer & Refugee Mental Health (Canada.ca)', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/settle-canada/health-care/mental-health.html', note: 'Free mental health resources for newcomers and refugees' },
-  { label: 'CAMH — Centre for Addiction & Mental Health', url: 'https://www.camh.ca/', note: "Canada's largest mental health teaching hospital" },
-  { label: 'CAMH — Access services', url: 'https://www.camh.ca/en/patients-and-families/access-camh', note: 'How to access CAMH programs and support' },
+  { label: 'CAMH, Centre for Addiction & Mental Health', url: 'https://www.camh.ca/', note: "Canada's largest mental health teaching hospital" },
+  { label: 'CAMH, Access services', url: 'https://www.camh.ca/en/patients-and-families/access-camh', note: 'How to access CAMH programs and support' },
 ];
 
 function LinkList({ items }) {
@@ -157,7 +157,7 @@ export default function Emergency() {
         </div>
         <p className="flex items-start gap-1.5 text-[11px] text-muted-foreground mt-3 leading-snug">
           <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
-          These lines are for crisis and emergencies. Immigration and IRCC enquiries are listed separately below — they are not emergency services.
+          These lines are for crisis and emergencies. Immigration and IRCC enquiries are listed separately below, they are not emergency services.
         </p>
       </div>
 
@@ -179,7 +179,7 @@ export default function Emergency() {
         <h2 className="font-heading font-bold text-base mb-1 flex items-center gap-2">
           <Shield className="w-5 h-5 text-teal-600" /> Government & Immigration Contacts
         </h2>
-        <p className="text-xs text-muted-foreground mb-4">For questions about your application, documents or benefits — not for emergencies.</p>
+        <p className="text-xs text-muted-foreground mb-4">For questions about your application, documents or benefits, not for emergencies.</p>
         <LinkList items={GOVERNMENT} />
       </div>
 

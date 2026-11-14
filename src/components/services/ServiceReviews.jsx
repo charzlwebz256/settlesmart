@@ -58,13 +58,13 @@ export default function ServiceReviews({ serviceKey, serviceName, province }) {
 
   const mutation = useMutation({
     mutationFn: async (data) => {
-      // Derive identity from the authenticated session — never trust client-supplied name/email
+      // Derive identity from the authenticated session, never trust client-supplied name/email
       const user = await base44.auth.me();
       const reviewerName = user?.full_name || 'Anonymous';
       const reviewerEmail = user?.email || '';
       const payload = { ...data, reviewer_name: reviewerName, reviewer_email: reviewerEmail };
       const created = await base44.entities.ServiceReview.create(payload);
-      // Fire-and-forget owner notification — never block the review save.
+      // Fire-and-forget owner notification, never block the review save.
       // The backend resolves the recipient; the client only passes the id.
       try {
         await base44.functions.invoke('notifyNewReview', { reviewId: created.id });

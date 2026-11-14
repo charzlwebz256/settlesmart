@@ -104,7 +104,7 @@ export default function NewsSection({ articles, category }) {
                 {article.title}
               </h3>
               <p className="flex items-center gap-1 text-[10px] font-semibold uppercase tracking-wide text-primary/70 mb-1">
-                <Sparkles className="w-2.5 h-2.5" /> Nexa summary — AI-written, not the publisher's text
+                <Sparkles className="w-2.5 h-2.5" /> Nexa summary, AI-written, not the publisher's text
               </p>
               <p className="text-xs text-muted-foreground leading-relaxed line-clamp-3">{article.summary}</p>
             </div>
@@ -122,7 +122,7 @@ export default function NewsSection({ articles, category }) {
               </div>
               <p className="flex items-center gap-1 text-[10px] text-muted-foreground mt-1.5">
                 <Info className="w-2.5 h-2.5 flex-shrink-0" />
-                {isSafeUrl(article.url) ? `Read the original at ${article.source || 'the publisher'}` : 'Original link unavailable — verify before sharing'}
+                {isSafeUrl(article.url) ? `Read the original at ${article.source || 'the publisher'}` : 'Original link unavailable, verify before sharing'}
               </p>
             </div>
           </a>

@@ -83,7 +83,7 @@ export default function Profile() {
 
   const [form, setForm] = useState(null);
 
-  // Populate the form from the profile exactly once — only while form is
+  // Populate the form from the profile exactly once, only while form is
   // still null. We never re-sync from a refetch (which may return a new
   // reference or even a different record), so in-progress edits are never
   // overwritten. After a save, handleSave sets the form explicitly.

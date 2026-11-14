@@ -171,7 +171,7 @@ export default function NexaQuickStart({ defaultProvince, defaultCity, onComplet
               {step === 2 && (
                 <motion.div key="goal" initial={{ opacity: 0, x: 12 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -12 }} transition={{ duration: 0.18 }}>
                   <h3 className="font-heading font-bold text-base mb-1">What do you need first?</h3>
-                  <p className="text-xs text-muted-foreground mb-4">Pick the priority for your first weeks — you can explore everything else later.</p>
+                  <p className="text-xs text-muted-foreground mb-4">Pick the priority for your first weeks, you can explore everything else later.</p>
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                     {GOALS.map((item) => (
                       <OptionButton key={item.id} item={item} selected={goal?.id === item.id} onSelect={() => finish(item)} />

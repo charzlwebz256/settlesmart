@@ -28,7 +28,7 @@ export default function Connect() {
               <p className="text-sm text-muted-foreground">
                 The first time an assistant connects, it opens a page here where you sign in to your own
                 SettleSmart account and approve. The assistant only ever acts as you, with your
-                permissions — deny it and nothing is shared.
+                permissions, deny it and nothing is shared.
               </p>
             </div>
           </div>

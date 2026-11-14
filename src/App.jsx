@@ -71,7 +71,7 @@ const AuthenticatedApp = () => {
   }
 
   // Only block the whole app for unregistered users. An "auth_required" app
-  // state just means the visitor isn't signed in — public pages stay
+  // state just means the visitor isn't signed in, public pages stay
   // accessible; protected routes show a sign-in prompt via ProtectedRoute.
   if (authError?.type === 'user_not_registered') {
     return <UserNotRegisteredError />;
@@ -85,7 +85,7 @@ const AuthenticatedApp = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
-      {/* MCP OAuth consent — must stay outside any auth guard */}
+      {/* MCP OAuth consent, must stay outside any auth guard */}
       <Route path="/oauth/consent" element={<OAuthConsent />} />
       <Route element={<AppLayout />}>
         {/* Publicly browseable without sign-in */}
@@ -116,7 +116,7 @@ const AuthenticatedApp = () => {
         <Route path="/meet-the-developer" element={<MeetTheDeveloper />} />
         <Route path="/connect" element={<Connect />} />
 
-        {/* Sign in required — personal data & tracked actions */}
+        {/* Sign in required, personal data & tracked actions */}
         <Route element={<ProtectedRoute unauthenticatedElement={<ProtectedSignInPrompt />} />}>
           <Route path="/services" element={<Services />} />
           <Route path="/dashboard" element={<Dashboard />} />

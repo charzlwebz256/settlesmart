@@ -132,7 +132,7 @@ export default function Checklist() {
   const generateChecklist = async () => {
     setGenerating(true);
     try {
-      // Instant profile-personalized template (no LLM round-trip) — generates in <1s
+      // Instant profile-personalized template (no LLM round-trip), generates in <1s
       const items = buildChecklist(profile);
       await base44.entities.ChecklistItem.bulkCreate(
         items.map(item => ({ ...item, is_completed: false }))

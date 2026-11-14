@@ -26,7 +26,7 @@ export default function PlayCard({ service, tint = 'slate', index = 0 }) {
       target="_blank"
       rel="noopener noreferrer"
       style={{ animationDelay: `${index * 40}ms` }}
-      className={`group flex flex-col gap-3 rounded-2xl border bg-card p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg animate-fade-in ${TINT[tint] || TINT.slate}`}
+      className={`group flex w-full flex-col gap-3 rounded-2xl border bg-card p-4 transition-all duration-200 hover:-translate-y-1 hover:shadow-lg animate-fade-in sm:w-[19rem] ${TINT[tint] || TINT.slate}`}
     >
       <div className="flex items-start gap-3">
         <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-white p-1.5">

@@ -156,12 +156,12 @@ export default function InterviewPrep() {
           <div className="bg-primary/5 border border-primary/15 rounded-2xl p-4 mb-4">
             <p className="text-sm font-semibold mb-1 flex items-center gap-2"><BookOpen className="w-4 h-4 text-primary" /> Canadian Interview Culture</p>
             <ul className="text-xs text-muted-foreground space-y-1.5 ml-1">
-              <li>🤝 <strong>Warmth matters</strong> — greet the interviewer by name, smile, and make eye contact</li>
-              <li>🕒 <strong>Arrive 5–10 min early</strong> — punctuality is highly valued in Canadian workplaces</li>
-              <li>🇨🇦 <strong>Emphasize diversity</strong> — mention your multicultural background as a strength</li>
-              <li>📧 <strong>Send a thank-you email</strong> within 24 hours — very common and expected in Canada</li>
-              <li>💬 <strong>Be specific</strong> — use the STAR method (Situation, Task, Action, Result)</li>
-              <li>🔇 <strong>Don't oversell</strong> — Canadians value modesty; let your results speak for themselves</li>
+              <li>🤝 <strong>Warmth matters</strong>, greet the interviewer by name, smile, and make eye contact</li>
+              <li>🕒 <strong>Arrive 5–10 min early</strong>, punctuality is highly valued in Canadian workplaces</li>
+              <li>🇨🇦 <strong>Emphasize diversity</strong>, mention your multicultural background as a strength</li>
+              <li>📧 <strong>Send a thank-you email</strong> within 24 hours, very common and expected in Canada</li>
+              <li>💬 <strong>Be specific</strong>, use the STAR method (Situation, Task, Action, Result)</li>
+              <li>🔇 <strong>Don't oversell</strong>, Canadians value modesty; let your results speak for themselves</li>
             </ul>
           </div>
           {CANADIAN_TIPS.map((item, i) => <TipCard key={i} item={item} index={i} />)}
@@ -186,7 +186,7 @@ export default function InterviewPrep() {
                   }
                 }}>
                   <SelectTrigger className="w-full min-h-[44px] rounded-xl text-sm">
-                    <SelectValue placeholder="— Select a saved application —" />
+                    <SelectValue placeholder="Select a saved application" />
                   </SelectTrigger>
                   <SelectContent label="Pick from Job Tracker">
                     {applications.map(a => (
@@ -205,7 +205,7 @@ export default function InterviewPrep() {
               className="w-full text-sm px-3 py-2.5 rounded-xl border border-border/60 bg-background focus:ring-2 focus:ring-primary/20 focus:outline-none mb-3"
             />
 
-            <label className="text-xs text-muted-foreground font-medium block mb-1">Job Description (optional — improves question quality)</label>
+            <label className="text-xs text-muted-foreground font-medium block mb-1">Job Description (optional, improves question quality)</label>
             <textarea
               value={jobDescription}
               onChange={e => setJobDescription(e.target.value)}

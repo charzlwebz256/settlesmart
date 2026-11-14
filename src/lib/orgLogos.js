@@ -1,6 +1,6 @@
 /**
  * Centralized logo registry for all organizations used in the app.
- * Uses Google Favicon API as a reliable fallback — always returns an icon.
+ * Uses Google Favicon API as a reliable fallback, always returns an icon.
  */
 
 const favicon = (domain) =>
@@ -98,7 +98,7 @@ export const ORG_LOGOS = {
   'Edmonton Immigrant Services Association (EISA)': favicon('eisa.ab.ca'),
   'Calgary Catholic Immigration Society (CCIS)': favicon('ccisab.ca'),
   'Centre for Newcomers': favicon('centrefornewcomers.ca'),
-  'Government of Canada — IRCC': favicon('canada.ca'),
+  'Government of Canada, IRCC': favicon('canada.ca'),
   'IRCC (Immigration, Refugees and Citizenship Canada)': favicon('ircc.canada.ca'),
   'Service Canada': favicon('canada.ca'),
   'Alberta Immigration': favicon('alberta.ca'),
@@ -152,15 +152,15 @@ export const ORG_LOGOS = {
   'HomeFront Calgary': favicon('lawcentralalberta.ca'),
 
   // ── Emergency page ────────────────────────────────────────────────────────
-  'Find a Shelter — 211 Ontario': favicon('211ontario.ca'),
+  'Find a Shelter, 211 Ontario': favicon('211ontario.ca'),
   'Shelter Finder Canada (Homeless Hub)': favicon('homelesshub.ca'),
-  "YWCA Canada — Women's Shelters": favicon('ywcacanada.ca'),
-  'Salvation Army — Emergency Shelter': favicon('salvationarmy.ca'),
+  "YWCA Canada, Women's Shelters": favicon('ywcacanada.ca'),
+  'Salvation Army, Emergency Shelter': favicon('salvationarmy.ca'),
   'Refugee Housing (COSTI)': favicon('costi.org'),
   'Legal Aid Ontario': favicon('legalaid.on.ca'),
   'Legal Aid BC': favicon('lss.bc.ca'),
   'Legal Aid Alberta': favicon('legalaid.ab.ca'),
-  'IRCC — Report a Problem / Contact': favicon('ircc.canada.ca'),
+  'IRCC, Report a Problem / Contact': favicon('ircc.canada.ca'),
   'RCMP Victim Services': favicon('rcmp-grc.gc.ca'),
   'Canadian Council for Refugees': favicon('ccrweb.ca'),
   'Canadian Mental Health Association': favicon('cmha.ca'),

@@ -93,7 +93,7 @@ function StoreCard({ store, index, onOpen }) {
       style={{ animationDelay: `${index * 50}ms` }}
       className={`flex flex-col items-center justify-between gap-2 p-2 rounded-2xl border text-left ${store.bg} ${store.border} hover:shadow-xl hover:-translate-y-1 hover:scale-105 transition-all duration-200 group animate-fade-in`}
     >
-      {/* Logo area — landscape fill */}
+      {/* Logo area, landscape fill */}
       <div className="w-full aspect-[16/7] flex items-center justify-center overflow-hidden rounded-xl bg-white/60 dark:bg-white/10">
         {store.logo ? (
           <img
@@ -132,7 +132,7 @@ export default function ShopSmart() {
     link.remove();
     toast({
       title: `Opening ${store.name}`,
-      description: 'Your store opens in a new tab — come back to ShopSmart when you are done.',
+      description: 'Your store opens in a new tab, come back to ShopSmart when you are done.',
     });
   };
 
@@ -143,7 +143,7 @@ export default function ShopSmart() {
           <ShoppingBag className="w-6 h-6 text-primary" />
           ShopSmart Canada
         </h1>
-        <p className="text-muted-foreground text-sm">Popular Canadian online shopping platforms across every category — tap a store to open it in a new tab.</p>
+        <p className="text-muted-foreground text-sm">Popular Canadian online shopping platforms across every category, tap a store to open it in a new tab.</p>
       </div>
 
       <PriceComparison />
@@ -165,10 +165,10 @@ export default function ShopSmart() {
       <div className="mt-10 bg-card rounded-2xl border border-border/50 p-5">
         <h3 className="font-heading font-bold text-base mb-3">🛡️ Shopping Tips for Newcomers</h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-muted-foreground">
-          <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Verify sellers</strong> — Check ratings and reviews before purchasing on marketplace sites.</span></div>
-          <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Compare prices</strong> — Factor in shipping fees and delivery times across platforms.</span></div>
-          <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Check return policies</strong> — Most stores have 30-day return windows; read before buying.</span></div>
-          <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Shop Canadian-made</strong> — Support local businesses for quality goods and faster shipping.</span></div>
+          <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Verify sellers</strong>, Check ratings and reviews before purchasing on marketplace sites.</span></div>
+          <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Compare prices</strong>, Factor in shipping fees and delivery times across platforms.</span></div>
+          <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Check return policies</strong>, Most stores have 30-day return windows; read before buying.</span></div>
+          <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Shop Canadian-made</strong>, Support local businesses for quality goods and faster shipping.</span></div>
         </div>
       </div>
 

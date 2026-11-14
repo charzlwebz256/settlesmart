@@ -64,14 +64,14 @@ export default function ReportResourceDialog({ open, onOpenChange, service }) {
             Report incorrect information
           </DialogTitle>
           <DialogDescription>
-            {service?.name} — a moderator reviews every report. Nothing is changed automatically.
+            {service?.name}, a moderator reviews every report. Nothing is changed automatically.
           </DialogDescription>
         </DialogHeader>
 
         {done ? (
           <div className="text-center py-6">
             <CheckCircle2 className="w-10 h-10 text-primary mx-auto mb-3" />
-            <p className="font-heading font-semibold text-sm mb-1">Thanks — report received</p>
+            <p className="font-heading font-semibold text-sm mb-1">Thanks, report received</p>
             <p className="text-xs text-muted-foreground mb-4">
               A reviewer will check this resource against its official source.
             </p>

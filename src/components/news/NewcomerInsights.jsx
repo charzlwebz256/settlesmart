@@ -19,7 +19,7 @@ export default function NewcomerInsights({ insights }) {
         </div>
         <div>
           <h3 className="font-heading font-bold text-sm">What This Means For You</h3>
-          <p className="text-[11px] text-muted-foreground">Nexa explainer — AI-written analysis, not the original report</p>
+          <p className="text-[11px] text-muted-foreground">Nexa explainer, AI-written analysis, not the original report</p>
         </div>
       </div>
       <div className="space-y-3">

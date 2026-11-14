@@ -5,7 +5,7 @@ const reasons = [
   {
     icon: Heart,
     title: 'Peaceful & Welcoming',
-    description: 'Canadians are internationally recognized for their peaceful, cooperative and generous nature — accepting of what makes each person unique.',
+    description: 'Canadians are internationally recognized for their peaceful, cooperative and generous nature, accepting of what makes each person unique.',
     image: 'https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/38617e4af_generated_image.png',
   },
   {
@@ -17,7 +17,7 @@ const reasons = [
   {
     icon: Mountain,
     title: 'World-Class Nature',
-    description: 'Home to Whistler, Banff, Lake Louise and countless parks — Canada offers breathtaking landscapes for outdoor adventures in every season.',
+    description: 'Home to Whistler, Banff, Lake Louise and countless parks, Canada offers breathtaking landscapes for outdoor adventures in every season.',
     image: 'https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/0fc3c9592_generated_image.png',
   },
   {
@@ -35,7 +35,7 @@ const reasons = [
   {
     icon: Users,
     title: 'Pathways to Belong',
-    description: 'Clear immigration and citizenship pathways — visit, work, study, or settle permanently with support from government settlement services.',
+    description: 'Clear immigration and citizenship pathways, visit, work, study, or settle permanently with support from government settlement services.',
     image: 'https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/6ca393e59_generated_image.png',
   },
   {

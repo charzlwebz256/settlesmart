@@ -83,7 +83,7 @@ export default function CoverLetterGenerator({ resumeData }) {
           </div>
         </div>
         <div>
-          <label className={labelCls}>Job Description (optional — improves alignment)</label>
+          <label className={labelCls}>Job Description (optional, improves alignment)</label>
           <textarea value={jobDesc} onChange={e => setJobDesc(e.target.value)} rows={3} placeholder="Paste the job posting here..." className={`${inputCls} resize-none`} />
         </div>
         <div className="flex gap-4 flex-wrap">

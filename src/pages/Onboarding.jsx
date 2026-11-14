@@ -198,7 +198,7 @@ export default function Onboarding() {
     <div key="interests" className="space-y-6">
       <div className="text-center mb-8">
         <h2 className="font-heading font-bold text-2xl mb-2">What do you need help with?</h2>
-        <p className="text-muted-foreground">Select all that apply — we'll personalize your experience</p>
+        <p className="text-muted-foreground">Select all that apply, we'll personalize your experience</p>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 max-w-lg mx-auto">
         {interests.map(int => (

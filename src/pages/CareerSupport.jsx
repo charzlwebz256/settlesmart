@@ -2,13 +2,13 @@ import { Building2, GraduationCap, Users, Wrench, BadgeCheck, Info } from 'lucid
 import ResourceList from '@/components/work/ResourceList';
 
 const NEWCOMER_EMPLOYERS = [
-  { label: 'Job Bank — Government of Canada', url: 'https://www.jobbank.gc.ca/', note: 'Official job board; filter by location, entry level and newcomer-friendly employers' },
+  { label: 'Job Bank, Government of Canada', url: 'https://www.jobbank.gc.ca/', note: 'Official job board; filter by location, entry level and newcomer-friendly employers' },
   { label: 'Magnet', url: 'https://magnet.today/', note: 'Job matching focused on newcomers and equity-deserving groups' },
   { label: 'ACCES Employment', url: 'https://accesemployment.ca/', note: 'Newcomer employment services (Ontario, online)' },
-  { label: 'COSTI — Employment Services', url: 'https://www.costi.org/programs/employment/', note: 'Free employment help (Ontario)' },
+  { label: 'COSTI, Employment Services', url: 'https://www.costi.org/programs/employment/', note: 'Free employment help (Ontario)' },
   { label: 'ISSofBC', url: 'https://issbc.org/', note: 'Employment and settlement services (British Columbia)' },
   { label: 'Mennonite Centre for Newcomers', url: 'https://www.mcnedmonton.com/', note: 'Employment support in Edmonton' },
-  { label: 'YMCA — Employment Services', url: 'https://www.ymca.ca/', note: 'Free job-search help in many Canadian cities' },
+  { label: 'YMCA, Employment Services', url: 'https://www.ymca.ca/', note: 'Free job-search help in many Canadian cities' },
 ];
 
 const ENTRY_LEVEL = [
@@ -16,23 +16,23 @@ const ENTRY_LEVEL = [
   { label: 'Indeed Canada', url: 'https://ca.indeed.com/', note: 'Large aggregator; filter by entry level and salary' },
   { label: 'LinkedIn Jobs', url: 'https://www.linkedin.com/jobs/', note: 'Search entry-level roles and set job alerts' },
   { label: 'WorkBC', url: 'https://www.workbc.ca/', note: 'British Columbia job board and career tools' },
-  { label: 'ALIS — Alberta careers', url: 'https://alis.alberta.ca/', note: 'Alberta career, wage and job-search information' },
+  { label: 'ALIS, Alberta careers', url: 'https://alis.alberta.ca/', note: 'Alberta career, wage and job-search information' },
 ];
 
 const AGENCIES = [
-  { label: 'IRCC — Find settlement services', url: 'https://ircc.canada.ca/english/newcomers/services/index.asp', note: 'Official list of funded settlement agencies near you' },
+  { label: 'IRCC, Find settlement services', url: 'https://ircc.canada.ca/english/newcomers/services/index.asp', note: 'Official list of funded settlement agencies near you' },
   { label: '211 Canada', url: 'https://www.211.ca/', note: 'Dial 211 for local employment and settlement support' },
   { label: 'ACCES Employment', url: 'https://accesemployment.ca/', note: 'Newcomer-focused employment agency (Ontario, online)' },
   { label: 'COSTI Immigrant Services', url: 'https://www.costi.org/', note: 'Settlement and employment services (Ontario)' },
 ];
 
 const CREDENTIALS = [
-  { label: 'CICIC — International credentials', url: 'https://www.cicic.ca/', note: 'How Canadian credential assessment works and how to find the right body' },
-  { label: 'Canada.ca — Get your education assessed', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/education-assessed.html', note: 'Official federal guidance on educational credential assessment' },
-  { label: 'WES — World Education Services', url: 'https://www.wes.org/ca/', note: 'One of the designated credential assessment providers' },
+  { label: 'CICIC, International credentials', url: 'https://www.cicic.ca/', note: 'How Canadian credential assessment works and how to find the right body' },
+  { label: 'Canada.ca, Get your education assessed', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/education-assessed.html', note: 'Official federal guidance on educational credential assessment' },
+  { label: 'WES, World Education Services', url: 'https://www.wes.org/ca/', note: 'One of the designated credential assessment providers' },
   { label: 'ICAS', url: 'https://www.icascanada.ca/', note: 'Another designated assessment provider' },
-  { label: 'IQAS — Alberta', url: 'https://www.alberta.ca/iqas', note: 'Alberta government assessment service' },
-  { label: 'CICIC — Find a regulatory body', url: 'https://www.cicic.ca/1285/regulatory-bodies.canada', note: 'Required for regulated professions such as nursing, engineering and teaching' },
+  { label: 'IQAS, Alberta', url: 'https://www.alberta.ca/iqas', note: 'Alberta government assessment service' },
+  { label: 'CICIC, Find a regulatory body', url: 'https://www.cicic.ca/1285/regulatory-bodies.canada', note: 'Required for regulated professions such as nursing, engineering and teaching' },
 ];
 
 const APPRENTICESHIPS = [
@@ -84,7 +84,7 @@ export default function CareerSupport() {
         <Section
           icon={GraduationCap}
           title="Employment agencies & settlement employment services"
-          intro="Legitimate agencies are paid by employers — never pay a fee to get a job. Settlement agencies offer free help."
+          intro="Legitimate agencies are paid by employers, never pay a fee to get a job. Settlement agencies offer free help."
           items={AGENCIES}
         />
         <Section
@@ -96,7 +96,7 @@ export default function CareerSupport() {
         <Section
           icon={Wrench}
           title="Apprenticeships & skilled trades"
-          intro="Trades are one of the fastest routes to stable work — and Red Seal certification is recognized across Canada."
+          intro="Trades are one of the fastest routes to stable work, and Red Seal certification is recognized across Canada."
           items={APPRENTICESHIPS}
         />
 

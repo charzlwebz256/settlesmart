@@ -55,7 +55,7 @@ export default function RouteSummary({ route, startLabel, endLabel }) {
 
   return (
     <div className="bg-card rounded-xl border border-border/50 p-3.5 space-y-3">
-      {/* Total time, distance — the Google Maps style summary */}
+      {/* Total time, distance, the Google Maps style summary */}
       <div className="flex items-end gap-3 flex-wrap">
         <div className="flex items-center gap-1.5">
           <Clock className="w-4 h-4 text-primary" />

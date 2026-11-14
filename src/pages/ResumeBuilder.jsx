@@ -37,7 +37,7 @@ export default function ResumeBuilder() {
       <div className="bg-primary/5 border border-primary/20 rounded-xl px-4 py-3 mb-6 flex items-start gap-3">
         <span className="text-lg">🍁</span>
         <div className="text-xs text-muted-foreground leading-relaxed">
-          <span className="font-semibold text-foreground">Canadian Standard:</span> This builder follows Canadian hiring norms — no photo, no age, no gender, no marital status. Resumes are ATS-compliant and use action-verb bullet points with measurable achievements.
+          <span className="font-semibold text-foreground">Canadian Standard:</span> This builder follows Canadian hiring norms, no photo, no age, no gender, no marital status. Resumes are ATS-compliant and use action-verb bullet points with measurable achievements.
         </div>
       </div>
 

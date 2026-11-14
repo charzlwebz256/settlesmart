@@ -17,7 +17,7 @@ export default function ForgotPassword() {
     try {
       await base44.auth.resetPasswordRequest(email);
     } catch {
-      // ignore — show generic success regardless
+      // ignore, show generic success regardless
     } finally {
       setLoading(false);
       setSent(true);

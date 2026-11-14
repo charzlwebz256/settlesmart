@@ -46,55 +46,55 @@ const PROVINCES = [
 const PROVINCE_FINDERS = {
   'British Columbia': [
     { label: 'EducationPlannerBC', url: 'https://educationplannerbc.ca/', note: 'Official BC directory of universities, colleges and trades programs' },
-    { label: 'WorkBC — Training', url: 'https://www.workbc.ca/', note: 'Short-term and skills training across BC' },
+    { label: 'WorkBC, Training', url: 'https://www.workbc.ca/', note: 'Short-term and skills training across BC' },
   ],
   'Ontario': [
-    { label: 'OUInfo — Ontario universities', url: 'https://www.ouinfo.ca/', note: 'Official directory of Ontario universities and programs' },
+    { label: 'OUInfo, Ontario universities', url: 'https://www.ouinfo.ca/', note: 'Official directory of Ontario universities and programs' },
     { label: 'Ontario colleges', url: 'https://www.ontariocolleges.ca/', note: 'Apply to all 24 public colleges in Ontario' },
   ],
   'Quebec': [
-    { label: 'Quebec — Education', url: 'https://www.quebec.ca/en/education', note: 'Provincial education system, CEGEPs and universities' },
+    { label: 'Quebec, Education', url: 'https://www.quebec.ca/en/education', note: 'Provincial education system, CEGEPs and universities' },
   ],
   'Manitoba': [
-    { label: 'Manitoba — Education', url: 'https://www.edu.gov.mb.ca/', note: 'Provincial education and post-secondary information' },
+    { label: 'Manitoba, Education', url: 'https://www.edu.gov.mb.ca/', note: 'Provincial education and post-secondary information' },
   ],
   'Saskatchewan': [
-    { label: 'Saskatchewan — Education', url: 'https://www.saskatchewan.ca/residents/education-and-learning', note: 'Post-secondary and training information' },
+    { label: 'Saskatchewan, Education', url: 'https://www.saskatchewan.ca/residents/education-and-learning', note: 'Post-secondary and training information' },
   ],
   'Nova Scotia': [
-    { label: 'Nova Scotia — Education', url: 'https://novascotia.ca/education/', note: 'Provincial education and post-secondary information' },
+    { label: 'Nova Scotia, Education', url: 'https://novascotia.ca/education/', note: 'Provincial education and post-secondary information' },
   ],
   'New Brunswick': [
-    { label: 'New Brunswick — Education', url: 'https://www.gnb.ca/en.html', note: 'Provincial education and post-secondary information' },
+    { label: 'New Brunswick, Education', url: 'https://www.gnb.ca/en.html', note: 'Provincial education and post-secondary information' },
   ],
   'Prince Edward Island': [
-    { label: 'PEI — Education', url: 'https://www.princeedwardisland.ca/en/topic/education', note: 'Provincial education and post-secondary information' },
+    { label: 'PEI, Education', url: 'https://www.princeedwardisland.ca/en/topic/education', note: 'Provincial education and post-secondary information' },
   ],
   'Newfoundland and Labrador': [
-    { label: 'NL — Education', url: 'https://www.gov.nl.ca/education/', note: 'Provincial education and post-secondary information' },
+    { label: 'NL, Education', url: 'https://www.gov.nl.ca/education/', note: 'Provincial education and post-secondary information' },
   ],
   'Yukon': [
-    { label: 'Yukon — Education', url: 'https://yukon.ca/en/education', note: 'Territorial education and training information' },
+    { label: 'Yukon, Education', url: 'https://yukon.ca/en/education', note: 'Territorial education and training information' },
   ],
   'Northwest Territories': [
-    { label: 'NWT — Education, Culture and Employment', url: 'https://www.ece.gov.nt.ca/', note: 'Territorial education and training information' },
+    { label: 'NWT, Education, Culture and Employment', url: 'https://www.ece.gov.nt.ca/', note: 'Territorial education and training information' },
   ],
   'Nunavut': [
-    { label: 'Government of Nunavut — Education', url: 'https://www.gov.nu.ca/education', note: 'Territorial education and training information' },
+    { label: 'Government of Nunavut, Education', url: 'https://www.gov.nu.ca/education', note: 'Territorial education and training information' },
   ],
 };
 
 const LANGUAGE_PROGRAMS = [
   { label: 'Free language classes for newcomers (LINC)', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/settle-canada/language-skills.html', note: 'Official IRCC page: free LINC classes and language assessment' },
-  { label: 'Mennonite Centre for Newcomers — Edmonton', url: 'https://www.mcnedmonton.com/', note: 'LINC and English classes for newcomers in Edmonton' },
-  { label: 'Bow Valley College — Language training', url: 'https://bowvalleycollege.ca/', note: 'English language programs in Calgary' },
+  { label: 'Mennonite Centre for Newcomers, Edmonton', url: 'https://www.mcnedmonton.com/', note: 'LINC and English classes for newcomers in Edmonton' },
+  { label: 'Bow Valley College, Language training', url: 'https://bowvalleycollege.ca/', note: 'English language programs in Calgary' },
   { label: '211 Canada', url: 'https://www.211.ca/', note: 'Dial 211 for free language classes in your city' },
 ];
 
 const CREDENTIAL_LINKS = [
-  { label: 'CICIC — International credentials', url: 'https://www.cicic.ca/', note: 'How credential assessment works and which body to use' },
-  { label: 'Canada.ca — Get your education assessed', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/education-assessed.html', note: 'Official federal guidance' },
-  { label: 'IQAS — Alberta', url: 'https://www.alberta.ca/iqas', note: 'Alberta government assessment service' },
+  { label: 'CICIC, International credentials', url: 'https://www.cicic.ca/', note: 'How credential assessment works and which body to use' },
+  { label: 'Canada.ca, Get your education assessed', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/immigrate-canada/express-entry/documents/education-assessed.html', note: 'Official federal guidance' },
+  { label: 'IQAS, Alberta', url: 'https://www.alberta.ca/iqas', note: 'Alberta government assessment service' },
   { label: 'WES Canada', url: 'https://www.wes.org/ca/', note: 'Designated credential assessment provider' },
 ];
 
@@ -279,7 +279,7 @@ export default function Education() {
           >
             <ResourceList items={PROVINCE_FINDERS[province] || []} />
             <p className="text-[11px] text-muted-foreground mt-3 leading-snug">
-              Alberta has full campus listings on this page — select Alberta above to browse them.
+              Alberta has full campus listings on this page, select Alberta above to browse them.
             </p>
           </Section>
         )}

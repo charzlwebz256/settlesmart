@@ -1,4 +1,4 @@
-// Real nearby transit stops from OpenStreetMap (Overpass API) — no key required.
+// Real nearby transit stops from OpenStreetMap (Overpass API), no key required.
 const OVERPASS_URL = 'https://overpass-api.de/api/interpreter';
 
 function parseRoutes(tags) {

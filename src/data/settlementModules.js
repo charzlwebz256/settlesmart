@@ -13,7 +13,7 @@ export const settlementModules = [
     id: 'arrival',
     title: 'Arrival in Canada',
     icon: Plane,
-    description: 'Your first hours, days and weeks — documents, SIN, banking, a phone and a personalized checklist.',
+    description: 'Your first hours, days and weeks, documents, SIN, banking, a phone and a personalized checklist.',
     path: '/checklist',
     status: 'live',
     accent: 'bg-sky-500/10 text-sky-600',

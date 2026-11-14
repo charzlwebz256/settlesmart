@@ -164,7 +164,7 @@ export default function CanadianNewsUpdates() {
         </Button>
       </div>
 
-      {/* Location filter — every province and territory in Canada */}
+      {/* Location filter, every province and territory in Canada */}
       <div className="bg-card border border-border/50 rounded-2xl px-3 py-2.5">
         <div className="flex flex-wrap items-center gap-2">
           <span className="flex items-center gap-1.5 text-xs font-semibold text-muted-foreground">

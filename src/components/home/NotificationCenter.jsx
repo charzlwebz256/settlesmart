@@ -27,7 +27,7 @@ function buildNotifications(savedEvents, allEvents, checklist) {
         type: 'event',
         icon: CalendarDays,
         color: daysAway === 0 ? 'text-red-600 bg-red-500/10' : isTomorrow ? 'text-orange-500 bg-orange-500/10' : 'text-violet-600 bg-violet-500/10',
-        title: `"${event.title}" is ${daysAway === 0 ? 'today!' : isTomorrow ? 'tomorrow — reminder!' : `in ${daysAway} days`}`,
+        title: `"${event.title}" is ${daysAway === 0 ? 'today!' : isTomorrow ? 'tomorrow, reminder!' : `in ${daysAway} days`}`,
         subtitle: `${event.city ? event.city + ' · ' : ''}${event.date}`,
         path: '/events',
         urgency: daysAway,

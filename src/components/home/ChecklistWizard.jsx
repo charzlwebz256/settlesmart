@@ -77,7 +77,7 @@ export default function ChecklistWizard({ onComplete }) {
     const statusLabel = STATUSES.find(s => s.value === status)?.label || status;
     const location = city ? `${city}, ${province}` : province;
 
-    // Fire LLM + user fetch simultaneously — don't wait for profile before starting LLM
+    // Fire LLM + user fetch simultaneously, don't wait for profile before starting LLM
     const llmPromise = base44.functions
       .invoke('settlementGuidance', {
         action: 'checklist',

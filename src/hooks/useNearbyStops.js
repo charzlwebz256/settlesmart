@@ -20,7 +20,7 @@ function writeCache(center, stops) {
   try {
     window.localStorage.setItem(cacheKey(center), JSON.stringify({ at: Date.now(), stops }));
   } catch {
-    // Storage disabled — the map still works, it just refetches.
+    // Storage disabled, the map still works, it just refetches.
   }
 }
 

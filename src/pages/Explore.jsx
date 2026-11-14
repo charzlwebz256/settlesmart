@@ -69,7 +69,7 @@ export default function Explore() {
       <div className="mb-6">
         <h1 className="font-heading font-bold text-2xl md:text-3xl mb-2">Settlement Navigator</h1>
         <p className="text-muted-foreground text-sm max-w-2xl">
-          Everything you need to settle in Canada, in one place. Start with what matters most right now —
+          Everything you need to settle in Canada, in one place. Start with what matters most right now.
           you do not have to do it all at once.
         </p>
       </div>

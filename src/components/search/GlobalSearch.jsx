@@ -146,7 +146,7 @@ export default function GlobalSearch({ open, onClose }) {
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
                 onKeyDown={onKeyDown}
-                placeholder="Search SettleSmart — services, jobs, events, guides…"
+                placeholder="Search SettleSmart, services, jobs, events, guides…"
                 className="flex-1 bg-transparent text-sm outline-none placeholder:text-muted-foreground"
               />
               <kbd className="text-[10px] font-semibold text-muted-foreground bg-muted px-1.5 py-0.5 rounded">ESC</kbd>

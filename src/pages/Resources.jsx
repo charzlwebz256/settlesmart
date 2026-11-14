@@ -13,7 +13,7 @@ export default function Resources() {
           Canada Time Zones
         </h1>
         <p className="text-muted-foreground text-sm">
-          Live local time across every province and territory — useful when you are calling a government
+          Live local time across every province and territory, useful when you are calling a government
           office, a school or family back home.
         </p>
       </div>

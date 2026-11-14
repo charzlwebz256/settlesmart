@@ -37,7 +37,7 @@ export function buildChecklist(profile) {
     // Week 1
     {
       title: 'Apply for Social Insurance Number',
-      description: `Visit a Service Canada office to get your SIN — required to work and access government services in ${city}.`,
+      description: `Visit a Service Canada office to get your SIN, required to work and access government services in ${city}.`,
       category: 'documents', day_range: 'week1', order: 1,
       link: 'https://www.canada.ca/en/employment-social-development/services/sin.html',
     },
@@ -101,7 +101,7 @@ export function buildChecklist(profile) {
     // Week 3
     {
       title: 'Create a Canadian-format resume',
-      description: 'Format your resume to Canadian standards — concise, skills-focused, ATS-friendly.',
+      description: 'Format your resume to Canadian standards, concise, skills-focused, ATS-friendly.',
       category: 'employment', day_range: 'week3', order: 11,
       link: '',
     },
@@ -119,7 +119,7 @@ export function buildChecklist(profile) {
     },
     {
       title: 'Understand tenant rights',
-      description: `Review ${province} tenancy laws before signing a lease — know your rights and responsibilities.`,
+      description: `Review ${province} tenancy laws before signing a lease, know your rights and responsibilities.`,
       category: 'legal', day_range: 'week3', order: 14,
       link: '',
     },
@@ -127,7 +127,7 @@ export function buildChecklist(profile) {
     // Week 4
     {
       title: 'Start your job search',
-      description: 'Search Canadian job platforms — Job Bank, LinkedIn, Indeed — and apply to relevant roles.',
+      description: 'Search Canadian job platforms, Job Bank, LinkedIn, Indeed, and apply to relevant roles.',
       category: 'employment', day_range: 'week4', order: 15,
       link: 'https://www.jobbank.gc.ca',
     },

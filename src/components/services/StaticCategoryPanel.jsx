@@ -407,7 +407,7 @@ export default function StaticCategoryPanel({ category }) {
     return (
       <div className="space-y-4">
         <div className="bg-primary/5 border border-primary/20 rounded-2xl p-4">
-          <p className="font-heading font-bold text-sm mb-1">🇨🇦 LINC — Free English for Newcomers</p>
+          <p className="font-heading font-bold text-sm mb-1">🇨🇦 LINC, Free English for Newcomers</p>
           <p className="text-xs text-muted-foreground">LINC (Language Instruction for Newcomers to Canada) is <strong>FREE</strong>, funded by the Government of Canada. Available to permanent residents and protected persons. Covers speaking, listening, reading, writing, and Canadian life skills.</p>
         </div>
         <SectionedGrid

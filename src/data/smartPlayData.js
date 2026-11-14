@@ -1,5 +1,5 @@
 /**
- * SmartPlay — free and paid entertainment in Canada.
+ * SmartPlay, free and paid entertainment in Canada.
  * Logos come from the Google favicon service, which is reliable for every brand.
  */
 
@@ -20,7 +20,7 @@ export const SECTIONS = [
   {
     id: 'free-tv',
     label: '📺 Free movies & TV in Canada',
-    note: 'No subscription needed — most of these are free with ads.',
+    note: 'No subscription needed, most of these are free with ads.',
     tint: 'rose',
     services: [
       {
@@ -108,7 +108,7 @@ export const SECTIONS = [
   {
     id: 'documentaries',
     label: '🍁 Documentaries & Canadian stories',
-    note: 'Homegrown film, animation and educational programming — free to watch.',
+    note: 'Homegrown film, animation and educational programming, free to watch.',
     tint: 'amber',
     services: [
       {
@@ -132,7 +132,7 @@ export const SECTIONS = [
   {
     id: 'audio',
     label: '🎵 Free music, podcasts & radio',
-    note: 'Millions of songs, Canadian radio and podcasts — all free to start.',
+    note: 'Millions of songs, Canadian radio and podcasts, all free to start.',
     tint: 'violet',
     services: [
       {
@@ -172,7 +172,7 @@ export const SECTIONS = [
   {
     id: 'library',
     label: '📚 Free with your library card',
-    note: 'A Canadian library card unlocks these at no cost — ask at your local branch.',
+    note: 'A Canadian library card unlocks these at no cost, ask at your local branch.',
     tint: 'emerald',
     services: [
       {

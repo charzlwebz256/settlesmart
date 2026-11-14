@@ -4,7 +4,7 @@ import { ArrowRight, ListChecks, Scale, Search, Briefcase, FileText, GraduationC
 // Each priority maps to the pages where that newcomer should start.
 const PLANS = {
   documents: [
-    { to: '/checklist', title: 'Your 90-day checklist', desc: 'SIN, health card, bank account and housing — in the right order.', Icon: ListChecks },
+    { to: '/checklist', title: 'Your 90-day checklist', desc: 'SIN, health card, bank account and housing, in the right order.', Icon: ListChecks },
     { to: '/legal', title: 'IRCC & legal basics', desc: 'Permits, PR obligations and official IRCC links.', Icon: Scale },
     { to: '/services', title: 'Settlement agencies', desc: 'Free, in-person help with paperwork near you.', Icon: Search },
   ],

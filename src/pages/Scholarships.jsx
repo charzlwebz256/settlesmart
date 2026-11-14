@@ -48,7 +48,7 @@ function ScholarshipCard({ item, saved, saving, onSave }) {
             saving && 'opacity-50'
           )}
           aria-label={saved ? 'Remove from saved' : 'Save scholarship'}
-          title={saved ? 'Saved — click to remove' : 'Save to My Scholarships'}
+          title={saved ? 'Saved, click to remove' : 'Save to My Scholarships'}
         >
           {saved ? <BookmarkCheck className="w-4 h-4 fill-primary" /> : <Bookmark className="w-4 h-4" />}
         </button>
@@ -269,7 +269,7 @@ export default function Scholarships() {
           Scholarships in Canada
         </h1>
         <p className="text-muted-foreground text-sm">
-          Government-funded grants, university awards, private scholarships, and refugee/newcomer funding — classified by province, city, and type. {totalCount}+ opportunities listed.
+          Government-funded grants, university awards, private scholarships, and refugee/newcomer funding, classified by province, city, and type. {totalCount}+ opportunities listed.
           {!isAuthenticated && <> Tap the bookmark icon on any scholarship to save it (free sign-in required).</>}
         </p>
       </div>
@@ -373,10 +373,10 @@ export default function Scholarships() {
           <BookOpen className="w-4 h-4 text-primary" /> Tips for Newcomers
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-muted-foreground">
-          <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Apply early</strong> — Most government aid and university scholarships have deadlines 6–8 months before the academic year.</span></div>
-          <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">One application</strong> — Provincial student aid automatically assesses federal + provincial grants.</span></div>
-          <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Refugee status</strong> — Protected persons and refugees may qualify for additional bursaries and emergency aid.</span></div>
-          <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">National awards</strong> — Many private scholarships (TD, Loran, Schulich) are open across all provinces.</span></div>
+          <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Apply early</strong>, Most government aid and university scholarships have deadlines 6–8 months before the academic year.</span></div>
+          <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">One application</strong>, Provincial student aid automatically assesses federal + provincial grants.</span></div>
+          <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Refugee status</strong>, Protected persons and refugees may qualify for additional bursaries and emergency aid.</span></div>
+          <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">National awards</strong>, Many private scholarships (TD, Loran, Schulich) are open across all provinces.</span></div>
         </div>
       </div>
     </div>

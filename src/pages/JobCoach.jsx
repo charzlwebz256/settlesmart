@@ -184,7 +184,7 @@ export default function JobCoach() {
       </div>
 
       <div className="flex gap-4 h-[calc(100vh-260px)] min-h-[400px]">
-        {/* Sidebar — conversations */}
+        {/* Sidebar, conversations */}
         <div className="hidden md:flex flex-col w-56 flex-shrink-0 gap-2">
           <Button onClick={newConversation} size="sm" className="w-full rounded-xl gap-1.5 bg-primary">
             <Plus className="w-4 h-4" /> New Session
@@ -223,7 +223,7 @@ export default function JobCoach() {
                 <div className="text-center">
                   <p className="font-heading font-semibold text-base mb-1">Your AI Job Coach</p>
                   <p className="text-xs text-muted-foreground max-w-xs">
-                    Ask me anything about your job applications — I'll review them and suggest improvements.
+                    Ask me anything about your job applications, I'll review them and suggest improvements.
                   </p>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-md">

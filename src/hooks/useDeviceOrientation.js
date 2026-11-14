@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
 // Device compass (deviceorientation). Gives the way the phone is pointing, which
-// the map needs for a Google-Maps style direction arrow — GPS heading alone is
+// the map needs for a Google-Maps style direction arrow, GPS heading alone is
 // null whenever the rider stands still.
 export function useDeviceOrientation() {
   const [heading, setHeading] = useState(null);
@@ -15,7 +15,7 @@ export function useDeviceOrientation() {
     activeRef.current = true;
 
     const handler = (event) => {
-      // Only trust a real compass reading — a laptop's relative tilt sensor would
+      // Only trust a real compass reading, a laptop's relative tilt sensor would
       // otherwise spin the arrow for no reason.
       const compass = Number.isFinite(event.webkitCompassHeading);
       if (!compass && event.type !== 'deviceorientationabsolute' && event.absolute !== true) return;

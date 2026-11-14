@@ -142,7 +142,7 @@ export default function Jobs() {
         </div>
       </div>
 
-      {/* Career tools live on the Work hub — one entry point, no duplicate cards */}
+      {/* Career tools live on the Work hub, one entry point, no duplicate cards */}
       <Link to="/work" className="flex items-center gap-3 bg-card border border-border/50 rounded-xl px-4 py-3 mb-4 hover:border-primary/40 transition-all group">
         <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
           <Briefcase className="w-4 h-4 text-primary" />
@@ -224,7 +224,7 @@ export default function Jobs() {
         <span className="text-xs text-muted-foreground">{filtered.length} job{filtered.length !== 1 ? 's' : ''}</span>
       </div>
 
-      {/* Platform Links — 10 job sites */}
+      {/* Platform Links, 10 job sites */}
       <div className="mb-5">
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">Browse on Job Sites</p>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2">

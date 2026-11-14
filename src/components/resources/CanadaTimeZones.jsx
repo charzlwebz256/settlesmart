@@ -177,7 +177,7 @@ export default function CanadaTimeZones() {
         </div>
         <div className="flex-1 min-w-0">
           <h2 className="font-heading font-bold text-base">Time Zones Across Canada</h2>
-          <p className="text-muted-foreground text-xs leading-snug">Live local time in every province and city — updating in real time.</p>
+          <p className="text-muted-foreground text-xs leading-snug">Live local time in every province and city, updating in real time.</p>
         </div>
         <span className="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-600 bg-emerald-500/10 px-2 py-1 rounded-full flex-shrink-0">
           <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
@@ -192,7 +192,7 @@ export default function CanadaTimeZones() {
 
       <p className="mb-4 flex items-center gap-1.5 rounded-lg bg-primary/5 px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground">
         <MousePointerClick className="h-3.5 w-3.5 flex-shrink-0 text-primary" />
-        Hover over a province for its capital, population, leadership and geography — tap on a phone.
+        Hover over a province for its capital, population, leadership and geography, tap on a phone.
       </p>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

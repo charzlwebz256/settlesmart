@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 /**
  * Detects the user's city via:
  * 1. Their saved UserProfile (most reliable, already personalized)
- * 2. IP-based geolocation (ipapi.co — free, no key needed)
+ * 2. IP-based geolocation (ipapi.co, free, no key needed)
  * 3. Falls back to 'Edmonton' if both fail
  *
  * Returns: { city, province, source, loading }
@@ -32,7 +32,7 @@ export function useCityDetection() {
           return;
         }
       } catch (_) {
-        // not logged in or no profile — continue
+        // not logged in or no profile, continue
       }
 
       // 2. Try IP geolocation
@@ -47,7 +47,7 @@ export function useCityDetection() {
           return;
         }
       } catch (_) {
-        // network issue — continue
+        // network issue, continue
       }
 
       // 3. Fallback

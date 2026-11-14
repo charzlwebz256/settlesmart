@@ -6,7 +6,7 @@ const STEPS = {
   claude: [
     'Click "Add connector" below to open Claude\'s custom connector form with this app already filled in.',
     'Confirm the name and that the server address is there, then click "Add".',
-    'Start a chat and Claude asks to connect — approve it in the window that opens.',
+    'Start a chat and Claude asks to connect, approve it in the window that opens.',
   ],
   chatgpt: [
     'In the ChatGPT desktop app, open Settings and choose Plugins.',
@@ -16,13 +16,13 @@ const STEPS = {
   ],
   cursor: [
     'Open Cursor and go to Customize → MCPs.',
-    'Click "New MCP Server" — this opens mcp.json.',
+    'Click "New MCP Server", this opens mcp.json.',
     'Add an entry whose "url" is the server address, save, then toggle the server on.',
   ],
   others: [
     'Copy the server address above.',
     'In your AI client, add a new streamable HTTP MCP server and paste the address.',
-    'Give it a name (SettleSmart) — name and address is all most clients need.',
+    'Give it a name (SettleSmart), name and address is all most clients need.',
     'Reload the client so it picks up the new server.',
   ],
 };

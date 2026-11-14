@@ -3,7 +3,7 @@ const LOW_INCOME = ['none', 'low', 'moderate'];
 
 /**
  * Curated federal and provincial programs. Each `applies(answers)` decides
- * whether a program is *potentially* relevant — it never confirms eligibility.
+ * whether a program is *potentially* relevant, it never confirms eligibility.
  * Always link people to the official page for the final decision.
  */
 export const benefitsPrograms = [

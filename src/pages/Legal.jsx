@@ -5,10 +5,10 @@ const SECTIONS = [
   {
     icon: FileText,
     color: 'bg-blue-500/10 text-blue-600',
-    title: 'SIN — Social Insurance Number',
+    title: 'SIN, Social Insurance Number',
     description: 'Your SIN is required to work in Canada and access government programs. Apply at a Service Canada Centre or online.',
     links: [
-      { label: 'Apply for SIN — Service Canada', url: 'https://www.canada.ca/en/employment-social-development/services/sin.html' },
+      { label: 'Apply for SIN, Service Canada', url: 'https://www.canada.ca/en/employment-social-development/services/sin.html' },
       { label: 'Find a Service Canada Centre', url: 'https://www.servicecanada.gc.ca/tbsc-fsco/sc-hme.jsp?lang=eng' },
     ],
   },
@@ -18,9 +18,9 @@ const SECTIONS = [
     title: 'PR Card, Work Permit & Refugee Claims',
     description: 'Manage your immigration documents, renew your PR card, extend permits, or check your refugee claim status.',
     links: [
-      { label: 'Renew or Replace PR Card — IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants/pr-card/apply-renew-replace.html' },
-      { label: 'Work Permit Applications — IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/work-canada/permit.html' },
-      { label: 'Refugee Claim Process — IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/refugees/claim-protection-inside-canada.html' },
+      { label: 'Renew or Replace PR Card, IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants/pr-card/apply-renew-replace.html' },
+      { label: 'Work Permit Applications, IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/work-canada/permit.html' },
+      { label: 'Refugee Claim Process, IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/refugees/claim-protection-inside-canada.html' },
       { label: 'Check Application Status (IRCC)', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/application/check-status.html' },
     ],
   },
@@ -30,10 +30,10 @@ const SECTIONS = [
     title: 'Your Rights & Responsibilities',
     description: "Canada's Charter of Rights and Freedoms protects all people in Canada. Know your rights as a newcomer.",
     links: [
-      { label: 'Rights & Responsibilities in Canada — IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants.html' },
+      { label: 'Rights & Responsibilities in Canada, IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/new-immigrants.html' },
       { label: 'Canadian Human Rights Commission', url: 'https://www.chrc-ccdp.gc.ca/en' },
       { label: 'Tenant Rights by Province (CMHC)', url: 'https://www.cmhc-schl.gc.ca/consumers/renting-a-home' },
-      { label: 'Worker Rights — Employment Standards', url: 'https://www.canada.ca/en/employment-social-development/services/labour-standards.html' },
+      { label: 'Worker Rights, Employment Standards', url: 'https://www.canada.ca/en/employment-social-development/services/labour-standards.html' },
     ],
   },
   {
@@ -42,11 +42,11 @@ const SECTIONS = [
     title: 'Immigration, Refugees & Citizenship Canada (IRCC)',
     description: 'The main federal department managing all immigration, citizenship, and refugee matters in Canada.',
     links: [
-      { label: 'IRCC Home — canada.ca', url: 'https://www.canada.ca/en/immigration-refugees-citizenship.html' },
+      { label: 'IRCC Home, canada.ca', url: 'https://www.canada.ca/en/immigration-refugees-citizenship.html' },
       { label: 'Contact IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/corporate/contact-ircc.html' },
       { label: 'IRCC Web Form (Questions)', url: 'https://ircc.canada.ca/english/contacts/web-form.asp' },
-      { label: 'Settlement Services Finder — IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/settle-canada.html' },
-      { label: 'Citizenship Application — IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-citizenship.html' },
+      { label: 'Settlement Services Finder, IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/settle-canada.html' },
+      { label: 'Citizenship Application, IRCC', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/canadian-citizenship.html' },
     ],
   },
 ];

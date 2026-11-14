@@ -41,7 +41,7 @@ const CARE = [
 ];
 
 const HELP_LINES = [
-  { number: '911', label: 'Emergency — police, fire, ambulance', tel: '911', tone: 'bg-red-500/10 text-red-600' },
+  { number: '911', label: 'Emergency, police, fire, ambulance', tel: '911', tone: 'bg-red-500/10 text-red-600' },
   { number: '811', label: 'Health advice line (where available)', tel: '811', tone: 'bg-rose-500/10 text-rose-600' },
   { number: '988', label: 'Suicide crisis helpline, call or text', tel: '988', tone: 'bg-violet-500/10 text-violet-600' },
   { number: '211', label: 'Community and social services', tel: '211', tone: 'bg-sky-500/10 text-sky-600' },
@@ -72,7 +72,7 @@ export default function Healthcare() {
         <div>
           <p className="font-heading font-bold text-sm text-red-700 dark:text-red-400">In an emergency, call 911</p>
           <p className="text-xs text-muted-foreground mt-0.5">
-            For police, fire or ambulance. If you are in danger or unsure, call 911 — it is free and available 24/7.
+            For police, fire or ambulance. If you are in danger or unsure, call 911, it is free and available 24/7.
           </p>
         </div>
       </div>
@@ -96,7 +96,7 @@ export default function Healthcare() {
         <div className="mt-4 p-4 rounded-xl bg-muted/50">
           <p className="text-sm font-semibold mb-0.5">{province}: {health.plan}</p>
           <p className="text-xs text-muted-foreground mb-3">
-            Administered by {health.authority}. Apply as soon as you arrive — some provinces have a waiting
+            Administered by {health.authority}. Apply as soon as you arrive, some provinces have a waiting
             period before coverage starts, so ask about interim coverage if you need care right away.
           </p>
           <a

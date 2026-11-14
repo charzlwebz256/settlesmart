@@ -44,7 +44,7 @@ export default function NavigationBanner({ route, guidance, navigating, arrived,
             </span>
             <div className="min-w-0 flex-1">
               <p className="font-heading text-sm font-bold">You have arrived</p>
-              <p className="truncate text-[11px] text-muted-foreground">Trip finished — well done</p>
+              <p className="truncate text-[11px] text-muted-foreground">Trip finished, well done</p>
             </div>
             <button
               onClick={onEnd}

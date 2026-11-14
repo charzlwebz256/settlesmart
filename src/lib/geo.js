@@ -36,7 +36,7 @@ export function formatDistance(meters) {
   return `${(meters / 1000).toFixed(meters < 9500 ? 1 : 0)} km`;
 }
 
-// The device's own reported accuracy drives the label — never an estimate.
+// The device's own reported accuracy drives the label, never an estimate.
 export function accuracyBand(accuracy) {
   if (!Number.isFinite(accuracy)) return 'unknown';
   if (accuracy < 20) return 'good';

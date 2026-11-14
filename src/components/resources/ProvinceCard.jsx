@@ -92,7 +92,7 @@ export default function ProvinceCard({ name, profile, timeGroups, zoneInfo, open
                 {profile.geography}
               </motion.p>
               <motion.p variants={fadeUp} className="mt-1 text-[10.5px] leading-snug text-muted-foreground">
-                <span className="font-semibold text-primary">{profile.nickname}</span> — {profile.note}
+                <span className="font-semibold text-primary">{profile.nickname}</span>, {profile.note}
               </motion.p>
             </motion.div>
           </motion.div>

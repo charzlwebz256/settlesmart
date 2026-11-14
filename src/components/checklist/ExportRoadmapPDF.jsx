@@ -4,12 +4,12 @@ import { Button } from '@/components/ui/button';
 import jsPDF from 'jspdf';
 
 const dayRangeLabels = {
-  week1: 'Week 1 — First Steps',
-  week2: 'Week 2 — Getting Settled',
-  week3: 'Week 3 — Building Connections',
-  week4: 'Week 4 — Moving Forward',
-  month2: 'Month 2 — Deepening Roots',
-  month3: 'Month 3 — Growing Independence',
+  week1: 'Week 1, First Steps',
+  week2: 'Week 2, Getting Settled',
+  week3: 'Week 3, Building Connections',
+  week4: 'Week 4, Moving Forward',
+  month2: 'Month 2, Deepening Roots',
+  month3: 'Month 3, Growing Independence',
 };
 
 export default function ExportRoadmapPDF({ checklist, upcomingEvents = [], profile }) {
@@ -39,7 +39,7 @@ export default function ExportRoadmapPDF({ checklist, upcomingEvents = [], profi
       doc.setTextColor(255, 255, 255);
       doc.setFont('helvetica', 'bold');
       doc.setFontSize(16);
-      doc.text('SettleSmart Canada — My Settlement Roadmap', margin + 5, y + 9);
+      doc.text('SettleSmart Canada, My Settlement Roadmap', margin + 5, y + 9);
       doc.setFont('helvetica', 'normal');
       doc.setFontSize(8);
       const profileLine = profile

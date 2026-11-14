@@ -9,12 +9,12 @@ export const SCHOLARSHIPS_BY_PROVINCE = [
         type: 'government',
         title: 'Government-Funded Scholarships & Grants',
         items: [
-          { name: 'Ontario Student Assistance Program (OSAP)', desc: 'Largest source of student funding — grants (non-repayable) and loans for eligible students at approved colleges and universities.', link: 'https://www.ontario.ca/page/osap-ontario-student-assistance-program' },
+          { name: 'Ontario Student Assistance Program (OSAP)', desc: 'Largest source of student funding, grants (non-repayable) and loans for eligible students at approved colleges and universities.', link: 'https://www.ontario.ca/page/osap-ontario-student-assistance-program' },
           { name: 'Ontario Graduate Scholarship', desc: 'Merit-based for master\'s and doctoral students at participating Ontario universities. Up to $15,000/year.', link: 'https://www.ontario.ca/page/osap-ontario-student-assistance-program' },
           { name: 'Queen Elizabeth II Graduate Scholarship in Science & Technology', desc: 'For graduate research in science and technology. $10,000–$15,000 annually.', link: 'https://www.ontario.ca/page/osap-ontario-student-assistance-program' },
           { name: 'Ontario Learn and Stay Grant', desc: 'Covers tuition, books, and costs for students entering eligible healthcare programs in underserved communities.', link: 'https://www.ontario.ca/page/ontario-learn-and-stay-grant' },
           { name: 'Indigenous Student Funding', desc: 'Indigenous Student Bursary, Indigenous Bursaries Search Tool, PSSSP, and First Nations/Métis awards.', link: 'https://www.ontario.ca/page/osap-ontario-student-assistance-program' },
-          { name: 'Canada Student Grants (via OSAP)', desc: 'Full-time, part-time, disabilities, and dependants grants — assessed automatically through OSAP.', link: 'https://www.canada.ca/en/services/benefits/education/student-aid/grants-loans.html' },
+          { name: 'Canada Student Grants (via OSAP)', desc: 'Full-time, part-time, disabilities, and dependants grants, assessed automatically through OSAP.', link: 'https://www.canada.ca/en/services/benefits/education/student-aid/grants-loans.html' },
         ],
       },
       {
@@ -239,7 +239,7 @@ export const SCHOLARSHIPS_BY_PROVINCE = [
         type: 'government',
         title: 'Quebec Government Student Aid (AFE)',
         items: [
-          { name: 'Aide financière aux études (AFE)', desc: 'Quebec\'s own system — loans, bursaries, and part-time study loans based on need. Grants are non-repayable.', link: 'https://www.quebec.ca/en/education' },
+          { name: 'Aide financière aux études (AFE)', desc: 'Quebec\'s own system, loans, bursaries, and part-time study loans based on need. Grants are non-repayable.', link: 'https://www.quebec.ca/en/education' },
           { name: 'Québec Perspective Scholarship', desc: 'For students in priority programs to encourage workforce development in shortage fields.', link: 'https://www.quebec.ca/en/education' },
           { name: 'Internship Scholarships', desc: 'For final compulsory internships (health, education, etc.).', link: 'https://www.quebec.ca/en/education' },
           { name: 'Education Excellence Scholarships', desc: 'For teaching-related programs.', link: 'https://www.quebec.ca/en/education' },
@@ -395,7 +395,7 @@ export const SCHOLARSHIPS_BY_PROVINCE = [
           { name: 'Junior Jubilee Scholarship', desc: '$2,500 top award for graduating students.', link: 'https://www.gov.nl.ca/edu/' },
           { name: 'Electoral District Scholarships', desc: '$1,000 awards by electoral district.', link: 'https://www.gov.nl.ca/edu/' },
           { name: 'Centenary Scholarships', desc: '$1,000 awards.', link: 'https://www.gov.nl.ca/edu/' },
-          { name: 'Memorial University Entrance Scholarships', desc: 'Automatically considered when applying — no separate application for many awards.', link: 'https://www.mun.ca/scholarships/' },
+          { name: 'Memorial University Entrance Scholarships', desc: 'Automatically considered when applying, no separate application for many awards.', link: 'https://www.mun.ca/scholarships/' },
           { name: 'RISE STEM Awards', desc: 'Supports students in STEM enrichment programs.', link: 'https://www.gov.nl.ca/edu/' },
           { name: 'NL Housing Corporation Scholarships', desc: '$1,000 for high school students and adult learners returning to education.', link: 'https://www.gov.nl.ca/edu/' },
         ],
@@ -478,7 +478,7 @@ export const SCHOLARSHIPS_BY_PROVINCE = [
         title: 'Government Scholarships & Bursaries (PEI)',
         items: [
           { name: 'PEI Student Financial Assistance', desc: 'Canada Student Loans & Grants + PEI provincial aid, needs-based.', link: 'https://www.princeedwardisland.ca/en/topic/student-financial-assistance' },
-          { name: 'George Coles Bursary', desc: 'Automatic for students entering UPEI or Holland College — no application required.', link: 'https://www.princeedwardisland.ca/en/topic/student-financial-assistance' },
+          { name: 'George Coles Bursary', desc: 'Automatic for students entering UPEI or Holland College, no application required.', link: 'https://www.princeedwardisland.ca/en/topic/student-financial-assistance' },
           { name: 'Community Service Bursary', desc: 'Earn funding through volunteer service.', link: 'https://www.princeedwardisland.ca/en/topic/student-financial-assistance' },
           { name: 'Marion L. Reid Grant', desc: 'For health-related programs across Canada.', link: 'https://www.princeedwardisland.ca/en/topic/student-financial-assistance' },
           { name: 'PEI Debt Reduction Program', desc: 'Up to $3,500/year, reduces student loan debt after graduation.', link: 'https://www.princeedwardisland.ca/en/topic/student-financial-assistance' },
