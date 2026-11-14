@@ -19,22 +19,12 @@ export default function WeatherWidget({ city, province }) {
     const fetchWeather = async () => {
       setLoading(true);
       try {
-        const result = await base44.integrations.Core.InvokeLLM({
-          prompt: `Get current weather conditions for ${city}, ${province || 'Canada'}. Return ONLY: temperature (C), condition (sunny/cloudy/rainy), humidity (%), wind_speed (km/h), visibility (km), feels_like (C). Format as JSON.`,
-          add_context_from_internet: true,
-          response_json_schema: {
-            type: 'object',
-            properties: {
-              temperature: { type: 'number' },
-              condition: { type: 'string' },
-              humidity: { type: 'number' },
-              wind_speed: { type: 'number' },
-              visibility: { type: 'number' },
-              feels_like: { type: 'number' },
-            },
-          },
+        const response = await base44.functions.invoke('localAreaInfo', {
+          action: 'weather',
+          city,
+          province,
         });
-        setWeather(result);
+        setWeather(response.data?.weather || null);
       } catch (err) {
         console.error('Weather fetch failed:', err);
       } finally {

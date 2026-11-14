@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useCityDetection } from '@/hooks/useCityDetection';
+import { safeHref } from '@/lib/safeUrl';
 
 const CATEGORY_CONFIG = {
   food_bank: { label: 'Food Banks', emoji: '🍎', color: 'bg-orange-500/10 text-orange-700 border-orange-200' },
@@ -32,32 +33,12 @@ export default function NearMe() {
   const fetchPlaces = async (loc = city) => {
     if (!loc) return;
     setLoading(true);
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Find 8 real, currently operating local services for newcomers in ${loc}, ${province || 'Canada'}.
-Include 2 of each: food banks, walk-in clinics, settlement agencies, community centres.
-For each return: name, category (food_bank/clinic/settlement/community), address, phone, website, notes (one short sentence).`,
-      add_context_from_internet: true,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          places: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                name: { type: 'string' },
-                category: { type: 'string' },
-                address: { type: 'string' },
-                phone: { type: 'string' },
-                website: { type: 'string' },
-                notes: { type: 'string' },
-              },
-            },
-          },
-        },
-      },
+    const response = await base44.functions.invoke('localAreaInfo', {
+      action: 'nearby_services',
+      city: loc,
+      province,
     });
-    setPlaces(result?.places || []);
+    setPlaces(response.data?.places || []);
     setLoaded(true);
     setLoading(false);
   };
@@ -174,7 +155,7 @@ For each return: name, category (food_bank/clinic/settlement/community), address
                       </a>
                     )}
                     {place.website && (
-                      <a href={place.website} target="_blank" rel="noopener noreferrer"
+                      <a href={safeHref(place.website) || '#'} target="_blank" rel="noopener noreferrer"
                         className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-muted text-muted-foreground text-xs font-semibold hover:bg-muted/70 transition-colors">
                         <Globe className="w-3 h-3" /> Website
                         <ExternalLink className="w-2.5 h-2.5 opacity-60" />

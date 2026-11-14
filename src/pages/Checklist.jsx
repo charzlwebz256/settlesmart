@@ -12,6 +12,7 @@ import { motion } from 'framer-motion';
 import ExportRoadmapPDF from '@/components/checklist/ExportRoadmapPDF';
 import ChecklistTaskModal from '@/components/checklist/ChecklistTaskModal';
 import { buildChecklist } from '@/data/checklistTemplate';
+import { safeHref } from '@/lib/safeUrl';
 
 const dayRangeLabels = {
   week1: 'Week 1: First Steps',
@@ -309,8 +310,8 @@ export default function Checklist() {
                               <Badge className={cn("text-[10px] border-0 capitalize", categoryColors[item.category] || 'bg-muted text-muted-foreground')}>
                                 {item.category}
                               </Badge>
-                              {item.link && (
-                                <a href={item.link} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline">
+                              {safeHref(item.link) && (
+                                <a href={safeHref(item.link)} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-1 text-[10px] text-primary hover:underline">
                                   <ExternalLink className="w-3 h-3" /> Resource
                                 </a>
                               )}

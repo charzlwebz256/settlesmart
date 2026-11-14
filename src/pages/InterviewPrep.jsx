@@ -87,18 +87,14 @@ export default function InterviewPrep() {
     setFeedback('');
     setHistory([]);
 
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are a Canadian interview coach. Generate 6 ${selectedCategory} interview questions for a "${jobTitle}" position in Canada.
-${jobDescription ? `Job description context: ${jobDescription.slice(0, 600)}` : ''}
-Make questions relevant to the Canadian workplace (diversity, teamwork, Canadian standards).
-Return them as a JSON array of strings.`,
-      response_json_schema: {
-        type: 'object',
-        properties: { questions: { type: 'array', items: { type: 'string' } } }
-      }
+    const { data } = await base44.functions.invoke('careerAssistant', {
+      action: 'interview_questions',
+      jobTitle,
+      jobDescription,
+      category: selectedCategory,
     });
 
-    setQuestions(result?.questions || []);
+    setQuestions(data?.questions || []);
     setLoadingQ(false);
   };
 
@@ -106,22 +102,13 @@ Return them as a JSON array of strings.`,
     if (!userAnswer.trim() || !questions[currentQIdx]) return;
     setLoadingFeedback(true);
 
-    const fb = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are an expert Canadian interview coach. Evaluate this interview answer.
-
-Job Role: ${jobTitle}
-Question: ${questions[currentQIdx]}
-Candidate's Answer: ${userAnswer}
-
-Provide structured feedback with:
-1. **Score** (out of 10) — with a brief reason
-2. **What worked well** — 1-2 specific positives
-3. **What to improve** — 1-2 actionable suggestions
-4. **Stronger example answer** — a concise improved version using STAR method if applicable
-5. **Canadian context tip** — one specific tip for Canadian workplace culture
-
-Keep it concise, warm, and encouraging.`,
+    const { data } = await base44.functions.invoke('careerAssistant', {
+      action: 'interview_feedback',
+      jobTitle,
+      question: questions[currentQIdx],
+      answer: userAnswer,
     });
+    const fb = data?.feedback || '';
 
     setFeedback(fb);
     setHistory(prev => [...prev, { question: questions[currentQIdx], answer: userAnswer, feedback: fb }]);

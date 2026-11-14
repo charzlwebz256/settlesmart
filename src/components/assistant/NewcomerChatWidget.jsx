@@ -6,7 +6,6 @@ import ReactMarkdown from 'react-markdown';
 import TypewriterContent from '@/components/assistant/TypewriterContent';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { NEXA_SYSTEM_PROMPT } from '@/lib/nexaPrompt';
 
 const QUICK_QUESTIONS = [
   "What's the nearest emergency shelter?",
@@ -72,22 +71,15 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
     setMessages(prev => [...prev, userMsg]);
     setLoading(true);
 
-    const locationCtx = userCity && userProvince
-      ? `The user is located in ${userCity}, ${userProvince}, Canada.`
-      : userProvince
-      ? `The user is located in ${userProvince}, Canada.`
-      : 'The user is located in Canada (city unknown).';
-
-    const history = [...messages, userMsg]
-      .slice(-8)
-      .map(m => `${m.role === 'user' ? 'User' : 'Assistant'}: ${m.content}`)
-      .join('\n');
-
-    const response = await base44.integrations.Core.InvokeLLM({
-      prompt: `${NEXA_SYSTEM_PROMPT}\n\n${locationCtx}\n\nConversation:\n${history}\n\nRespond as Nexa:`,
+    const { data } = await base44.functions.invoke('nexaChat', {
+      message: query,
+      history: [...messages, userMsg].slice(-8),
+      city: userCity,
+      province: userProvince,
+      mode: 'brief',
     });
 
-    setMessages(prev => [...prev, { role: 'assistant', content: response, typing: true }]);
+    setMessages(prev => [...prev, { role: 'assistant', content: data?.answer || '', typing: true }]);
     setLoading(false);
   };
 

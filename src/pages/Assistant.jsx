@@ -7,7 +7,6 @@ import ReactMarkdown from 'react-markdown';
 import TypewriterContent from '@/components/assistant/TypewriterContent';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { NEXA_SYSTEM_PROMPT } from '@/lib/nexaPrompt';
 
 const suggestedQuestions = [
   "How do I get a SIN number?",
@@ -45,25 +44,14 @@ export default function Assistant() {
     setInput('');
     setLoading(true);
 
-    const contextInfo = profile
-      ? `Province: ${profile.province || 'not provided'}; City: ${profile.city || 'not provided'}; Immigration status: ${profile.immigration_status?.replace(/_/g, ' ') || 'not provided'}; Family size: ${profile.family_size || 'not provided'}; Arrived: ${profile.arrival_date || 'not provided'}; English level: ${profile.english_level || 'not provided'}; Education: ${profile.education_level || 'not provided'}; Interests: ${(profile.interests || []).join(', ') || 'not provided'}.`
-      : '';
-
-    const response = await base44.integrations.Core.InvokeLLM({
-      prompt: `${NEXA_SYSTEM_PROMPT}
-
-${contextInfo ? `About this person — tailor every answer to this location and situation instead of giving generic Canada-wide advice: ${contextInfo}` : ''}
-
-Conversation so far:
-${messages.slice(-6).map(m => `${m.role === 'user' ? 'Newcomer' : 'Nexa'}: ${m.content}`).join('\n')}
-
-Newcomer's question: ${text}
-
-Reply as Nexa.`,
-      add_context_from_internet: true,
+    const { data } = await base44.functions.invoke('nexaChat', {
+      message: text,
+      history: messages.slice(-6),
+      profile,
+      mode: 'full',
     });
 
-    setMessages(prev => [...prev, { role: 'assistant', content: response, typing: true }]);
+    setMessages(prev => [...prev, { role: 'assistant', content: data?.answer || '', typing: true }]);
     setLoading(false);
   };
 

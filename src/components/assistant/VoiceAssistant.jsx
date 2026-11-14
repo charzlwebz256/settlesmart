@@ -140,38 +140,13 @@ export default function VoiceAssistant() {
         ? `Available Services: ${siteData.services?.length || 0} | Available Events: ${siteData.events?.length || 0}`
         : '';
 
-      const response = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are a helpful voice AI assistant for SettleSmart Canada, a newcomer settlement platform.
-
-AVAILABLE SECTIONS ON THE APP:
-- Home: Dashboard and main overview
-- Explore: Browse settlement services, find services near you, transit maps
-- Work: Job search, job tracker, interview prep, resume builder
-- Resources: Legal & IRCC info, news & updates, shopping guides
-- Events: Discover community events and workshops
-- Checklist: 90-day settlement guide and tasks
-- Emergency: Emergency contacts and crisis support
-- Assistant: AI chat for detailed help
-- Profile: Manage your profile and preferences
-
-${context}
-
-YOUR ROLE: Provide CLEAR RECOMMENDATIONS and STEP-BY-STEP GUIDANCE on what to do.
-
-For each question:
-1. Understand their need
-2. Recommend which section or tool they should use (give specific tab/page names)
-3. Explain what they'll find there
-4. Provide clear, actionable next steps
-
-Keep responses under 80 words and speak naturally.
-Be warm, directive, and guide them to the RIGHT SECTION FOR THEIR NEED.
-
-User question: "${question}"`,
-        add_context_from_internet: false,
+      const { data } = await base44.functions.invoke('nexaChat', {
+        message: question,
+        siteContext: context,
+        mode: 'voice',
       });
 
-      speak(response);
+      speak(data?.answer || '');
     } catch (error) {
       speak('Sorry, I encountered an error. Please try again.');
     } finally {

@@ -29,16 +29,10 @@ export function LocationProvider({ children }) {
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const { latitude, longitude } = position.coords;
-        const result = await base44.integrations.Core.InvokeLLM({
-          prompt: `Given latitude ${latitude} and longitude ${longitude} in Canada, determine the nearest city and province. Return JSON with city (string) and province (string, full name e.g. "Ontario") fields only.`,
-          add_context_from_internet: true,
-          response_json_schema: {
-            type: 'object',
-            properties: {
-              city: { type: 'string' },
-              province: { type: 'string' },
-            },
-          },
+        const { data: result } = await base44.functions.invoke('localAreaInfo', {
+          action: 'reverse_geocode',
+          latitude,
+          longitude,
         });
         if (result?.city && result?.province) {
           setLocation(result.city, result.province);

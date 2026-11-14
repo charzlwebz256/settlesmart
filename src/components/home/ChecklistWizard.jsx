@@ -78,30 +78,14 @@ export default function ChecklistWizard({ onComplete }) {
     const location = city ? `${city}, ${province}` : province;
 
     // Fire LLM + user fetch simultaneously — don't wait for profile before starting LLM
-    const llmPromise = base44.integrations.Core.InvokeLLM({
-      model: 'gpt_5_mini',
-      prompt: `Settlement checklist for a ${statusLabel} in ${location}, Canada. Arrival: ${arrivalOpt?.label}.
-Return JSON "items" array, exactly 8 items. Each: title (5 words max), description (1 short sentence), category (documents|housing|banking|health|education|employment|transportation|social|legal), day_range (week1|week2|week3|week4|month2|month3), order (1-8), link (relevant gov/org URL or ""). Be concise and fast.`,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          items: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                title: { type: 'string' },
-                description: { type: 'string' },
-                category: { type: 'string' },
-                day_range: { type: 'string' },
-                order: { type: 'number' },
-                link: { type: 'string' },
-              },
-            },
-          },
-        },
-      },
-    });
+    const llmPromise = base44.functions
+      .invoke('settlementGuidance', {
+        action: 'checklist',
+        statusLabel,
+        location,
+        arrivalLabel: arrivalOpt?.label,
+      })
+      .then((response) => response.data || {});
 
     const userPromise = base44.auth.me().then(user =>
       Promise.all([

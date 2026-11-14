@@ -117,110 +117,36 @@ export default function TransitMap() {
       setSuggestions([]);
       return;
     }
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Find 5 real places/addresses in Canada matching "${query}". Return JSON array: [{"name": "Place Name", "address": "Full Address", "lat": number, "lng": number}, ...]`,
-      add_context_from_internet: true,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          places: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                name: { type: 'string' },
-                address: { type: 'string' },
-                lat: { type: 'number' },
-                lng: { type: 'number' },
-              },
-            },
-          },
-        },
-      },
+    const { data } = await base44.functions.invoke('localAreaInfo', {
+      action: 'place_lookup',
+      query,
     });
-    setSuggestions(result.places || []);
+    setSuggestions(data?.places || []);
     setShow(true);
   };
 
   const geocodeAddress = async (address, setCoords) => {
     if (!address.trim()) return;
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Get the latitude and longitude coordinates for "${address}" in Canada. Return ONLY JSON: {"lat": number, "lng": number}`,
-      add_context_from_internet: true,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          lat: { type: 'number' },
-          lng: { type: 'number' },
-        },
-      },
+    const { data } = await base44.functions.invoke('localAreaInfo', {
+      action: 'geocode',
+      address,
     });
-    setCoords([result.lat, result.lng]);
+    if (data?.lat !== undefined && data?.lng !== undefined) setCoords([data.lat, data.lng]);
   };
 
   const getRoute = async () => {
     if (!startCoords || !endCoords) return;
     setRouteLoading(true);
 
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Calculate a detailed route in Canada from coordinates [${startCoords[0].toFixed(5)}, ${startCoords[1].toFixed(5)}] to [${endCoords[0].toFixed(5)}, ${endCoords[1].toFixed(5)}] using ${selectedMode} mode. Return JSON with:
-- distance_km (number)
-- duration_minutes (number)
-- waypoints: array of [lat, lng] coordinates for the exact route path
-- steps: array of turn-by-turn navigation instructions with distance
-- bus_info: for transit, array of bus routes with numbers and names
-- nearby_bus_stations: for transit, array of nearby station coordinates and bus numbers`,
-      add_context_from_internet: true,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          distance_km: { type: 'number' },
-          duration_minutes: { type: 'number' },
-          waypoints: {
-            type: 'array',
-            items: {
-              type: 'array',
-              items: { type: 'number' },
-            },
-          },
-          steps: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                instruction: { type: 'string' },
-                distance_m: { type: 'number' },
-              },
-            },
-          },
-          bus_info: {
-            type: ['array', 'null'],
-            items: {
-              type: 'object',
-              properties: {
-                name: { type: 'string' },
-                route: { type: 'string' },
-              },
-            },
-          },
-          nearby_bus_stations: {
-            type: ['array', 'null'],
-            items: {
-              type: 'object',
-              properties: {
-                name: { type: 'string' },
-                lat: { type: 'number' },
-                lng: { type: 'number' },
-                buses: { type: 'array', items: { type: 'string' } },
-              },
-            },
-          },
-        },
-      },
+    const { data: result } = await base44.functions.invoke('localAreaInfo', {
+      action: 'route',
+      start: startCoords,
+      end: endCoords,
+      mode: selectedMode,
     });
 
-    setRouteData(result);
-    setBusStations(result.nearby_bus_stations || []);
+    setRouteData(result?.route || null);
+    setBusStations(result?.route?.nearby_bus_stations || []);
     setRouteLoading(false);
   };
 

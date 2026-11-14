@@ -61,38 +61,15 @@ export default function DailySettlementTip({ profile }) {
     const city = profile?.city || 'Canada';
     const province = profile?.province || 'Canada';
 
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `You are a friendly Canadian settlement advisor. Generate ONE practical, actionable daily tip for a ${status} who has been in Canada for ${arrivalCtx.label}, living in ${city}, ${province}.
-
-Settlement phase: ${phase.replace(/_/g, ' ')}
-English level: ${profile?.english_level || 'unknown'}
-Interests: ${(profile?.interests || []).join(', ') || 'general settlement'}
-
-The tip must be:
-- Specific to their immigration status (${status}) and how long they've been here (${arrivalCtx.label})
-- Immediately actionable today or this week
-- Concise and warm in tone
-- Reference real Canadian programs, services, or resources when relevant
-- Include a specific next step they can take
-
-Return JSON with:
-- tip_title: short punchy title (max 8 words)
-- tip_body: 2-3 sentence practical advice
-- action_label: short call-to-action button text (e.g. "Find a settlement office", "Apply on IRCC.ca")
-- action_path: internal app path if relevant ("/services", "/checklist", "/jobs", "/legal", "/resources") or null
-- category: one of: documents, housing, banking, health, employment, language, social, legal
-- emoji: one relevant emoji`,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          tip_title: { type: 'string' },
-          tip_body: { type: 'string' },
-          action_label: { type: 'string' },
-          action_path: { type: 'string' },
-          category: { type: 'string' },
-          emoji: { type: 'string' },
-        },
-      },
+    const { data: result } = await base44.functions.invoke('settlementGuidance', {
+      action: 'daily_tip',
+      status,
+      city,
+      province,
+      arrivalLabel: arrivalCtx.label,
+      phase,
+      english: profile?.english_level || 'unknown',
+      interests: (profile?.interests || []).join(', '),
     });
 
     setTip(result);

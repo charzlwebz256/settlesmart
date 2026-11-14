@@ -24,42 +24,11 @@ export default function AIRecommendations({ profile }) {
   const { data: recommendations, isLoading, isFetching } = useQuery({
     queryKey: ['ai-recommendations', profile?.id, refreshKey],
     queryFn: async () => {
-      const result = await base44.integrations.Core.InvokeLLM({
-        prompt: `You are a Canadian newcomer settlement advisor. Based on this user's profile, recommend 4 specific services or actions they should take NOW.
-
-User Profile:
-- Immigration Status: ${profile.immigration_status?.replace(/_/g, ' ')}
-- Province: ${profile.province}
-- City: ${profile.city}
-- Interests: ${(profile.interests || []).join(', ') || 'not specified'}
-- English Level: ${profile.english_level || 'not specified'}
-- French Level: ${profile.french_level || 'not specified'}
-- Education: ${profile.education_level || 'not specified'}
-- Family Size: ${profile.family_size || 1}
-- Arrival Date: ${profile.arrival_date || 'recent'}
-
-Return EXACTLY 4 targeted recommendations. Each must be specific and actionable for their status and location.`,
-        response_json_schema: {
-          type: 'object',
-          properties: {
-            recommendations: {
-              type: 'array',
-              items: {
-                type: 'object',
-                properties: {
-                  title: { type: 'string' },
-                  description: { type: 'string' },
-                  category: { type: 'string' },
-                  urgency: { type: 'string', enum: ['high', 'medium', 'low'] },
-                  action_label: { type: 'string' },
-                  action_path: { type: 'string' },
-                },
-              },
-            },
-          },
-        },
+      const { data } = await base44.functions.invoke('settlementGuidance', {
+        action: 'recommendations',
+        profile,
       });
-      return result.recommendations || [];
+      return data?.recommendations || [];
     },
     enabled: !!profile,
     staleTime: 1000 * 60 * 10, // 10 min cache

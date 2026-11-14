@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, RefreshCw, ExternalLink, Calendar, MapPin, Globe, Zap } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { safeHref } from '@/lib/safeUrl';
 
 export default function EventbriteFeed({ city = 'Edmonton' }) {
   const [events, setEvents] = useState([]);
@@ -20,47 +21,8 @@ export default function EventbriteFeed({ city = 'Edmonton' }) {
 
   const fetchEvents = async () => {
     setLoading(true);
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Search Eventbrite Canada for upcoming events in ${city}, Alberta. 
-Visit or search: https://www.eventbrite.ca/d/canada--${city.toLowerCase()}/all-events/
-
-Return the 8 most relevant upcoming community, cultural, workshop, or free events. Focus on events relevant to newcomers, immigrants, or community gatherings.
-
-For each event return:
-- title: event name
-- date: formatted as "Day, Mon D" e.g. "Sat, May 10"
-- time: start time e.g. "2:00 PM"
-- location: venue name and area
-- is_free: true/false
-- price: price string if not free e.g. "From CA$20"
-- url: full eventbrite URL
-- image_url: thumbnail image URL from evbuc.com if available
-- category: one of: workshop, community, social, employment, health, orientation, language, other`,
-      add_context_from_internet: true,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          events: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                title: { type: 'string' },
-                date: { type: 'string' },
-                time: { type: 'string' },
-                location: { type: 'string' },
-                is_free: { type: 'boolean' },
-                price: { type: 'string' },
-                url: { type: 'string' },
-                image_url: { type: 'string' },
-                category: { type: 'string' },
-              },
-            },
-          },
-        },
-      },
-    });
-    setEvents(result?.events || []);
+    const response = await base44.functions.invoke('communityFeeds', { action: 'events', city });
+    setEvents(response.data?.events || []);
     setLoaded(true);
     setLoadedCity(city);
     setLoading(false);
@@ -127,14 +89,14 @@ For each event return:
           {events.map((ev, i) => (
             <a
               key={i}
-              href={ev.url}
+              href={safeHref(ev.url) || '#'}
               target="_blank"
               rel="noopener noreferrer"
               className="group flex gap-3 p-3 rounded-xl border border-border/50 hover:border-primary/20 hover:shadow-md transition-all bg-background"
             >
-              {ev.image_url && (
+              {safeHref(ev.image_url) && (
                 <img
-                  src={ev.image_url}
+                  src={safeHref(ev.image_url)}
                   alt={ev.title}
                   className="w-16 h-16 rounded-lg object-cover flex-shrink-0"
                   onError={e => e.target.style.display = 'none'}

@@ -23,28 +23,19 @@ export default function CoverLetterGenerator({ resumeData }) {
     const skills = resumeData?.skills?.map(s => s.items).join(', ') || '';
     const summary = resumeData?.summary || '';
 
-    const prompt = lang === 'fr'
-      ? `Rédigez une lettre de motivation professionnelle en français pour un poste de ${jobTitle || 'poste non précisé'} chez ${company || 'l\'entreprise'}. Suivez la structure canadienne standard.`
-      : `Write a professional Canadian cover letter for the position of "${jobTitle || 'the advertised position'}" at "${company || 'your company'}".
-
-Follow Canadian cover letter structure:
-1. Opening paragraph: State position applying for and express genuine interest. Mention where you found the job.
-2. Body paragraph 1: Highlight 2-3 most relevant skills and experiences that match the role. Use specific examples.
-3. Body paragraph 2: Show knowledge of the company/sector and explain why you are a great cultural fit.
-4. Closing paragraph: Thank the employer, express eagerness for an interview, include professional sign-off.
-
-Details about the applicant:
-- Name: ${contact.fullName || '[Applicant Name]'}
-- City/Province: ${contact.city || ''}${contact.province ? `, ${contact.province}` : ''}
-- Recent experience: ${jobs.slice(0, 2).map(j => `${j.title} at ${j.company}`).join('; ') || 'various roles'}
-- Key skills: ${skills || 'various professional skills'}
-- Professional summary: ${summary || ''}
-${jobDesc ? `\nJob description to align with:\n${jobDesc.slice(0, 500)}` : ''}
-
-Tone: ${tone}. Language: Canadian English. Keep it to 3–4 paragraphs, under 350 words. No overly emotional language. Include "[Today's Date]" as placeholder. Start with "Dear Hiring Manager," or "Dear [Name]," if company is known. End with "Sincerely," and the applicant's name.`;
-
-    const result = await base44.integrations.Core.InvokeLLM({ prompt });
-    setLetter(result);
+    const { data } = await base44.functions.invoke('careerAssistant', {
+      action: 'cover_letter',
+      jobTitle,
+      company,
+      jobDescription: jobDesc,
+      tone,
+      lang,
+      contact,
+      jobs,
+      skills,
+      summary,
+    });
+    setLetter(data?.letter || '');
     setLoading(false);
   };
 

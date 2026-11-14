@@ -40,9 +40,12 @@ export default function ResumeForm({ onSave }) {
     const bullet = jobs[jobIdx].bullets[bulletIdx];
     if (!bullet.trim()) return;
     setLoadingAI(`bullet-${jobIdx}-${bulletIdx}`);
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Rewrite this work experience bullet point using strong Canadian job market language. Use an action verb, quantify achievements where possible, keep it concise (1 sentence). Tone: ${tone}.\n\nOriginal: "${bullet}"\n\nReturn only the rewritten bullet, no quotes.`,
+    const { data } = await base44.functions.invoke('careerAssistant', {
+      action: 'resume_bullet',
+      bullet,
+      tone,
     });
+    const result = data?.text || bullet;
     const updated = jobs.map((j, i) => i === jobIdx ? {
       ...j, bullets: j.bullets.map((b, bi) => bi === bulletIdx ? result : b)
     } : j);
@@ -54,28 +57,28 @@ export default function ResumeForm({ onSave }) {
     setLoadingAI('summary');
     const jobTitles = jobs.map(j => j.title).filter(Boolean).join(', ');
     const skillList = skills.map(s => s.items).join(', ');
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Write a 2-3 sentence professional summary for a Canadian resume. Tone: ${tone}. Format: ${format}. The person has experience in: ${jobTitles || 'various roles'}. Skills include: ${skillList || 'various skills'}. ${jobDesc ? `They are applying for: ${jobDesc.slice(0, 200)}` : ''}\n\nFollow Canadian standards: no personal details, focus on value to employer, use strong professional language. Return only the summary text.`,
+    const { data } = await base44.functions.invoke('careerAssistant', {
+      action: 'resume_summary',
+      jobTitles,
+      skills: skillList,
+      jobDescription: jobDesc,
+      tone,
+      format,
     });
-    setSummary(result);
+    setSummary(data?.text || '');
     setLoadingAI('');
   };
 
   const aiOptimizeForJob = async () => {
     if (!jobDesc.trim()) return;
     setLoadingAI('optimize');
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Analyze this job description and provide resume optimization tips for a Canadian job application. Return as JSON.\n\nJob Description:\n${jobDesc}\n\nCurrent Skills: ${skills.map(s => s.items).join(', ')}\nCurrent Experience: ${jobs.map(j => `${j.title} at ${j.company}`).join(', ')}`,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          missing_keywords: { type: 'array', items: { type: 'string' } },
-          tips: { type: 'array', items: { type: 'string' } },
-          match_score: { type: 'number' },
-        },
-      },
+    const { data } = await base44.functions.invoke('careerAssistant', {
+      action: 'resume_optimize',
+      jobDescription: jobDesc,
+      skills: skills.map(s => s.items).join(', '),
+      experience: jobs.map(j => `${j.title} at ${j.company}`).join(', '),
     });
-    setTips(result?.tips || []);
+    setTips(data?.tips || []);
     setLoadingAI('');
   };
 
