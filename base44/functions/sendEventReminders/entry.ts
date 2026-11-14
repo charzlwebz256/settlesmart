@@ -51,7 +51,7 @@ Deno.serve(async (req) => {
       lines.push('', 'View more in the SettleSmart app → Community Events.', '', '— The SettleSmart Team');
 
       try {
-        await base44.integrations.Core.SendEmail({
+        await base44.asServiceRole.integrations.Core.SendEmail({
           to: eventUser.email,
           subject: `Reminder: ${event.title} — tomorrow`,
           body: lines.join('\n'),

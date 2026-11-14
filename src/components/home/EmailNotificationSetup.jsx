@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Bell, Mail, CheckCircle2, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { differenceInDays, parseISO, isAfter, format } from 'date-fns';
+import { differenceInDays, parseISO, isAfter } from 'date-fns';
 
 const STORAGE_KEY = 'ss_email_notifications_sent_at';
 
@@ -45,35 +45,10 @@ export default function EmailNotificationSetup({ savedEvents, allEvents, checkli
 
       if (urgentEvents.length === 0 && pendingTasks.length === 0) return;
 
-      const eventLines = urgentEvents.map(e =>
-        `• "${e.title}" on ${format(parseISO(e.date), 'EEEE, MMMM d')}${e.location ? ` at ${e.location}` : ''}`
-      ).join('\n');
-
-      const taskLines = pendingTasks.map(t =>
-        `• ${t.title}${t.description ? ` — ${t.description}` : ''}`
-      ).join('\n');
-
-      const subject = '🍁 SettleSmart Daily Update — Your events & checklist';
-      const body = `Hello!
-
-Here's your daily SettleSmart update to help you stay on track with your settlement journey.
-
-${urgentEvents.length > 0 ? `📅 UPCOMING EVENTS (next 3 days):\n${eventLines}\n` : ''}
-${pendingTasks.length > 0 ? `✅ CHECKLIST TASKS TO COMPLETE:\n${taskLines}\n` : ''}
-Stay on track — you're doing great! 🍁
-
-Visit SettleSmart to take action:
-• Events → https://settlesmart.ca/events
-• Checklist → https://settlesmart.ca/checklist
-
-Best,
-The SettleSmart Team`;
-
-      await base44.integrations.Core.SendEmail({
-        to: user.email,
-        subject,
-        body,
-        from_name: 'SettleSmart Canada',
+      await base44.functions.invoke('sendSettleSmartDigest', {
+        mode: 'daily',
+        events: urgentEvents.map(e => ({ title: e.title, date: e.date, location: e.location || '' })),
+        tasks: pendingTasks.map(t => ({ title: t.title, description: t.description || '' })),
       });
 
       localStorage.setItem(STORAGE_KEY, Date.now().toString());
@@ -95,17 +70,10 @@ The SettleSmart Team`;
 
     const pendingTasks = (checklist || []).filter(c => !c.is_completed).slice(0, 8);
 
-    const eventLines = urgentEvents.slice(0, 5).map(e =>
-      `• "${e.title}" on ${format(parseISO(e.date), 'EEEE, MMMM d')}`
-    ).join('\n') || 'No upcoming events saved yet.';
-
-    const taskLines = pendingTasks.map(t => `• ${t.title}`).join('\n') || 'All tasks complete! 🎉';
-
-    await base44.integrations.Core.SendEmail({
-      to: user.email,
-      subject: '🍁 SettleSmart — Your Events & Checklist Summary',
-      body: `Hello!\n\n📅 SAVED EVENTS:\n${eventLines}\n\n✅ PENDING CHECKLIST:\n${taskLines}\n\nKeep going — you're doing amazing! 🍁\n\nSettleSmart Canada`,
-      from_name: 'SettleSmart Canada',
+    await base44.functions.invoke('sendSettleSmartDigest', {
+      mode: 'manual',
+      events: urgentEvents.slice(0, 5).map(e => ({ title: e.title, date: e.date, location: e.location || '' })),
+      tasks: pendingTasks.map(t => ({ title: t.title, description: t.description || '' })),
     });
 
     localStorage.setItem(STORAGE_KEY, Date.now().toString());

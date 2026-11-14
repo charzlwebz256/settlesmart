@@ -9,18 +9,23 @@ export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' });
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.name || !form.email || !form.message) return;
     setSending(true);
-    await base44.integrations.Core.SendEmail({
-      to: 'support@settlesmart.ca',
-      subject: `Contact Form: Message from ${form.name}`,
-      body: `Name: ${form.name}\nEmail: ${form.email}\n\nMessage:\n${form.message}`,
-    });
-    setSending(false);
-    setSent(true);
+    setError('');
+    try {
+      const { data } = await base44.functions.invoke('sendContactMessage', form);
+      if (data?.error) throw new Error(data.error);
+      setSent(true);
+      setForm({ name: '', email: '', message: '' });
+    } catch {
+      setError('Could not send your message. Please email support@settlesmart.ca instead.');
+    } finally {
+      setSending(false);
+    }
   };
 
   return (
@@ -144,6 +149,7 @@ export default function Contact() {
                     className="w-full px-3 py-2 rounded-xl border border-border bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none resize-none"
                   />
                 </div>
+                {error && <p className="text-xs text-destructive">{error}</p>}
                 <Button
                   type="submit"
                   disabled={sending}

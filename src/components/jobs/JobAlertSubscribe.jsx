@@ -1,70 +1,33 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { Bell, BellOff, Loader2, CheckCircle2, X } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { Bell, Loader2, CheckCircle2, X } from 'lucide-react';
 
 export default function JobAlertSubscribe({ defaultCity = '' }) {
   const [open, setOpen] = useState(false);
   const [jobTitle, setJobTitle] = useState('');
   const [location, setLocation] = useState(defaultCity);
-  const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!jobTitle || !email) return;
+    if (!jobTitle) return;
     setLoading(true);
+    setError('');
 
-    // Fetch matching jobs immediately and email the summary
-    const result = await base44.integrations.Core.InvokeLLM({
-      prompt: `Search LinkedIn Jobs and Indeed Canada for current job listings matching:
-- Job title/keyword: "${jobTitle}"
-- Location: ${location || 'Canada'}
-
-Find the top 5 most relevant current job postings. For each include:
-- title, company, location, job_type, salary (if available), posted, url (LinkedIn or Indeed link), source
-
-Return as JSON.`,
-      add_context_from_internet: true,
-      response_json_schema: {
-        type: 'object',
-        properties: {
-          jobs: {
-            type: 'array',
-            items: {
-              type: 'object',
-              properties: {
-                title: { type: 'string' },
-                company: { type: 'string' },
-                location: { type: 'string' },
-                job_type: { type: 'string' },
-                salary: { type: 'string' },
-                posted: { type: 'string' },
-                url: { type: 'string' },
-                source: { type: 'string' },
-              },
-            },
-          },
-        },
-      },
-    });
-
-    const jobs = result?.jobs || [];
-    const jobList = jobs.map((j, i) =>
-      `${i + 1}. ${j.title} at ${j.company} — ${j.location}${j.salary ? ' · ' + j.salary : ''}\n   ${j.source === 'linkedin' ? 'LinkedIn' : 'Indeed'}: ${j.url}`
-    ).join('\n\n');
-
-    await base44.integrations.Core.SendEmail({
-      to: email,
-      subject: `🍁 Job Alert: ${jobTitle} in ${location || 'Canada'}`,
-      body: `Hi there,\n\nHere are the latest job matches for "${jobTitle}" in ${location || 'Canada'}:\n\n${jobList || 'No new listings found right now. We\'ll keep searching!'}\n\n---\nSearch more jobs:\n• LinkedIn: https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(jobTitle)}&location=${encodeURIComponent(location + ' Canada')}\n• Indeed: https://ca.indeed.com/jobs?q=${encodeURIComponent(jobTitle)}&l=${encodeURIComponent(location)}\n\nThis alert was sent from SettleSmart Canada. To manage alerts, visit the app.\n\nGood luck with your job search! 🍁`,
-    });
-
-    setLoading(false);
-    setSuccess(true);
-    setTimeout(() => { setSuccess(false); setOpen(false); setJobTitle(''); setEmail(''); }, 3000);
+    try {
+      // The backend resolves the recipient from the signed-in account.
+      const { data } = await base44.functions.invoke('sendJobAlert', { jobTitle, location });
+      if (data?.error) throw new Error(data.error);
+      setSuccess(true);
+      setTimeout(() => { setSuccess(false); setOpen(false); setJobTitle(''); }, 3000);
+    } catch (err) {
+      setError(err?.message || 'Could not send the alert. Please try again.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   if (!open) {
@@ -91,12 +54,12 @@ Return as JSON.`,
         </button>
       </div>
       <p className="text-xs text-muted-foreground mb-4">
-        Enter your details below — we'll immediately send you matching job listings and you can re-run anytime.
+        Enter a job title and location. We'll email matching listings to the address on your account.
       </p>
       {success ? (
         <div className="flex items-center gap-2 text-green-600 py-4 justify-center">
           <CheckCircle2 className="w-5 h-5" />
-          <span className="font-medium text-sm">Alert sent to {email}!</span>
+          <span className="font-medium text-sm">Alert sent to your account email!</span>
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-3">
@@ -113,14 +76,7 @@ Return as JSON.`,
             placeholder="Location (e.g. Edmonton, Alberta)"
             className="w-full px-3 py-2 rounded-xl border border-border/60 bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none"
           />
-          <input
-            type="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            placeholder="Your email address"
-            required
-            className="w-full px-3 py-2 rounded-xl border border-border/60 bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none"
-          />
+          {error && <p className="text-xs text-destructive">{error}</p>}
           <Button type="submit" disabled={loading} className="w-full rounded-xl gap-2 bg-primary hover:bg-primary/90">
             {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending matches...</> : <><Bell className="w-4 h-4" /> Send Job Alert Now</>}
           </Button>

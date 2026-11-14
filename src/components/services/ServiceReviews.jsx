@@ -4,17 +4,6 @@ import { base44 } from '@/api/base44Client';
 import { Star, MessageSquare, ChevronDown, ChevronUp, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-function escapeHtml(str) {
-  return String(str ?? '').replace(/[&<>"']/g, ch => ({
-    '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;',
-  }[ch]));
-}
-
-function sanitizeUrl(url) {
-  const u = String(url ?? '');
-  return /^https?:\/\//i.test(u) ? u : '#';
-}
-
 function StarRating({ value, onChange, readonly = false, size = 'md' }) {
   const [hovered, setHovered] = useState(0);
   const sz = size === 'sm' ? 'w-3.5 h-3.5' : 'w-5 h-5';
@@ -75,27 +64,10 @@ export default function ServiceReviews({ serviceKey, serviceName, province }) {
       const reviewerEmail = user?.email || '';
       const payload = { ...data, reviewer_name: reviewerName, reviewer_email: reviewerEmail };
       const created = await base44.entities.ServiceReview.create(payload);
-      // Fire-and-forget email — never block the review save
+      // Fire-and-forget owner notification — never block the review save.
+      // The backend resolves the recipient; the client only passes the id.
       try {
-        const stars = '⭐'.repeat(payload.rating);
-        const replySubject = encodeURIComponent(`Re: Review for ${payload.service_name}`);
-        const replyBody = encodeURIComponent(`Hi ${reviewerName},\n\nThank you for your review of ${payload.service_name}!\n\n`);
-        const gmailReplyLink = `https://mail.google.com/mail/?view=cm&to=${encodeURIComponent(reviewerEmail)}&su=${replySubject}&body=${replyBody}`;
-        await base44.integrations.Core.SendEmail({
-          to: import.meta.env.VITE_ADMIN_EMAIL || '',
-          subject: `New Review: ${payload.service_name} — ${stars}`,
-          body: `
-<h2>New Service Review Submitted</h2>
-<table style="border-collapse:collapse;font-family:sans-serif;font-size:14px;">
-  <tr><td style="padding:6px 12px;color:#666;">Service</td><td style="padding:6px 12px;font-weight:bold;">${escapeHtml(payload.service_name)}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666;">Province</td><td style="padding:6px 12px;">${escapeHtml(payload.province)}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666;">Reviewer</td><td style="padding:6px 12px;">${escapeHtml(reviewerName)}</td></tr>
-  <tr><td style="padding:6px 12px;color:#666;">Rating</td><td style="padding:6px 12px;">${stars} (${escapeHtml(payload.rating)}/5)</td></tr>
-  <tr><td style="padding:6px 12px;color:#666;">Review</td><td style="padding:6px 12px;">${escapeHtml(payload.review || '(no text)')}</td></tr>
-</table>
-${reviewerEmail ? `<p><a href="${escapeHtml(sanitizeUrl(gmailReplyLink))}" style="background:#1a73e8;color:#fff;padding:8px 16px;border-radius:6px;text-decoration:none;font-weight:bold;">Reply via Gmail</a></p>` : ''}
-          `.trim(),
-        });
+        await base44.functions.invoke('notifyNewReview', { reviewId: created.id });
       } catch (_) {}
       return created;
     },
