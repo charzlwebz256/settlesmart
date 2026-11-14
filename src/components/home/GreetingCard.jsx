@@ -23,7 +23,7 @@ export default function GreetingCard({ part, eyebrow, title, subtitle, children 
             key={part.image}
             src={part.image}
             alt={part.alt}
-            className="hidden md:block w-72 lg:w-[30rem] xl:w-[34rem] h-56 lg:h-72 object-cover rounded-2xl flex-shrink-0 shadow-sm animate-fade-in"
+            className="hidden md:block w-80 lg:w-[34rem] xl:w-[38rem] h-64 lg:h-80 object-cover object-center rounded-2xl flex-shrink-0 shadow-lg ring-1 ring-black/5 saturate-[1.12] contrast-[1.06] brightness-[1.02] animate-fade-in"
           />
         </div>
       </div>
