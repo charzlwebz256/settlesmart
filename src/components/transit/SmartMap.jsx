@@ -1,0 +1,366 @@
+import { useEffect, useRef, useState } from 'react';
+import {
+  Compass,
+  Layers,
+  Loader2,
+  LocateFixed,
+  Map as MapIcon,
+  MapPinOff,
+  Mountain,
+  Navigation,
+  Satellite,
+  Bus,
+} from 'lucide-react';
+import { cn } from '@/lib/utils';
+import { loadGoogleMaps } from '@/lib/googleMaps';
+
+const MAP_TYPES = [
+  { id: 'roadmap', label: 'Map', icon: MapIcon },
+  { id: 'satellite', label: 'Satellite', icon: Satellite },
+  { id: 'hybrid', label: 'Hybrid', icon: Layers },
+  { id: 'terrain', label: 'Terrain', icon: Mountain },
+];
+
+const FALLBACK_CENTER = { lat: 53.5461, lng: -113.4938 };
+const SAFE_BOTTOM = 'calc(1rem + env(safe-area-inset-bottom))';
+
+function svgIcon(maps, svg, size) {
+  return {
+    url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
+    scaledSize: new maps.Size(size, size),
+    anchor: new maps.Point(size / 2, size / 2),
+  };
+}
+
+// Blue dot, plus a direction wedge only when the device reports a trustworthy heading.
+function userIcon(maps, heading) {
+  const wedge = Number.isFinite(heading)
+    ? `<g transform="rotate(${Math.round(heading)} 24 24)"><path d="M24 3 L31 24 L24 20 L17 24 Z" fill="#1d4ed8" opacity="0.45"/></g>`
+    : '';
+  return svgIcon(
+    maps,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">${wedge}<circle cx="24" cy="24" r="9" fill="#2563eb" stroke="#ffffff" stroke-width="4"/><circle cx="24" cy="24" r="3" fill="#ffffff"/></svg>`,
+    48
+  );
+}
+
+function pinIcon(maps, color) {
+  return svgIcon(
+    maps,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"><circle cx="14" cy="14" r="10" fill="${color}" stroke="#ffffff" stroke-width="3"/></svg>`,
+    28
+  );
+}
+
+function stopIcon(maps) {
+  return svgIcon(
+    maps,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><circle cx="8" cy="8" r="6" fill="#0ea5e9" stroke="#ffffff" stroke-width="2.5"/></svg>`,
+    16
+  );
+}
+
+// Google Maps surface with live location, accuracy radius and touch-friendly controls.
+export default function SmartMap({
+  userPosition,
+  accuracy,
+  heading,
+  startCoords,
+  endCoords,
+  routePath,
+  nearbyStops,
+  busStations,
+  showStops,
+  stopsLoading,
+  onToggleStops,
+  onPickDestination,
+  onStopSelect,
+  onLocate,
+  locating,
+}) {
+  const containerRef = useRef(null);
+  const mapRef = useRef(null);
+  const mapsRef = useRef(null);
+  const overlays = useRef({ user: null, accuracy: null, route: null, points: [] });
+  const handlers = useRef({ onPickDestination, onStopSelect });
+  handlers.current = { onPickDestination, onStopSelect };
+
+  const [ready, setReady] = useState(false);
+  const [failure, setFailure] = useState(null);
+  const [mapType, setMapType] = useState('roadmap');
+  const [follow, setFollow] = useState(true);
+  const [centred, setCentred] = useState(false);
+
+  useEffect(() => {
+    let alive = true;
+    loadGoogleMaps()
+      .then((maps) => {
+        if (!alive) return;
+        mapsRef.current = maps;
+        setReady(true);
+      })
+      .catch((error) => {
+        if (alive) setFailure(error?.message === 'missing-key' ? 'missing-key' : 'load-failed');
+      });
+    return () => {
+      alive = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!ready || !containerRef.current || mapRef.current) return;
+    const maps = mapsRef.current;
+    const map = new maps.Map(containerRef.current, {
+      center: userPosition || FALLBACK_CENTER,
+      zoom: userPosition ? 15 : 12,
+      disableDefaultUI: true,
+      gestureHandling: 'greedy',
+      clickableIcons: false,
+      mapTypeId: 'roadmap',
+      keyboardShortcuts: false,
+    });
+    mapRef.current = map;
+
+    // Exploring the map by hand releases the camera; it never snaps back on its own.
+    map.addListener('dragstart', () => setFollow(false));
+    map.addListener('click', (event) => {
+      handlers.current.onPickDestination?.({ lat: event.latLng.lat(), lng: event.latLng.lng() });
+    });
+
+    // Mobile browser bars and rotation change the canvas size.
+    const resize = () => maps.event.trigger(map, 'resize');
+    window.addEventListener('resize', resize);
+    window.visualViewport?.addEventListener('resize', resize);
+    return () => {
+      window.removeEventListener('resize', resize);
+      window.visualViewport?.removeEventListener('resize', resize);
+      maps.event.clearInstanceListeners(map);
+      mapRef.current = null;
+    };
+  }, [ready]);
+
+  useEffect(() => {
+    if (ready) mapRef.current?.setMapTypeId(mapType);
+  }, [mapType, ready]);
+
+  // Blue dot + accuracy radius.
+  useEffect(() => {
+    if (!ready || !mapRef.current || !userPosition) return;
+    const maps = mapsRef.current;
+    const map = mapRef.current;
+    const radius = Number.isFinite(accuracy) ? Math.max(accuracy, 5) : 0;
+
+    if (!overlays.current.user) {
+      overlays.current.user = new maps.Marker({
+        map,
+        position: userPosition,
+        icon: userIcon(maps, heading),
+        zIndex: 999,
+        clickable: false,
+      });
+      overlays.current.accuracy = new maps.Circle({
+        map,
+        center: userPosition,
+        radius,
+        fillColor: '#2563eb',
+        fillOpacity: 0.15,
+        strokeColor: '#2563eb',
+        strokeOpacity: 0.35,
+        strokeWeight: 1,
+        clickable: false,
+      });
+    } else {
+      overlays.current.user.setPosition(userPosition);
+      overlays.current.user.setIcon(userIcon(maps, heading));
+      overlays.current.accuracy.setCenter(userPosition);
+      overlays.current.accuracy.setRadius(radius);
+    }
+    overlays.current.accuracy.setVisible(radius > 0);
+  }, [ready, userPosition?.lat, userPosition?.lng, accuracy, heading]);
+
+  // Centre once on the first real fix, then only follow when the rider asks for it.
+  useEffect(() => {
+    if (!ready || !mapRef.current || !userPosition) return;
+    if (!centred) {
+      mapRef.current.setCenter(userPosition);
+      mapRef.current.setZoom(15);
+      setCentred(true);
+      return;
+    }
+    if (follow) mapRef.current.panTo(userPosition);
+  }, [ready, userPosition?.lat, userPosition?.lng, follow, centred]);
+
+  // Start, destination, transit stops and bus stations.
+  useEffect(() => {
+    if (!ready || !mapRef.current) return;
+    const maps = mapsRef.current;
+    const map = mapRef.current;
+    overlays.current.points.forEach((marker) => marker.setMap(null));
+    const points = [];
+
+    if (startCoords) {
+      points.push(new maps.Marker({ map, position: { lat: startCoords[0], lng: startCoords[1] }, icon: pinIcon(maps, '#2563eb'), title: 'Start' }));
+    }
+    if (endCoords) {
+      points.push(new maps.Marker({ map, position: { lat: endCoords[0], lng: endCoords[1] }, icon: pinIcon(maps, '#ef4444'), title: 'Destination' }));
+    }
+
+    if (showStops) {
+      nearbyStops
+        .filter((stop) => Number.isFinite(stop.lat) && Number.isFinite(stop.lng))
+        .slice(0, 40)
+        .forEach((stop) => {
+          const marker = new maps.Marker({ map, position: { lat: stop.lat, lng: stop.lng }, icon: stopIcon(maps), title: stop.name });
+          marker.addListener('click', () => handlers.current.onStopSelect?.(stop));
+          points.push(marker);
+        });
+    }
+
+    busStations
+      .filter((station) => Number.isFinite(station.lat) && Number.isFinite(station.lng))
+      .forEach((station) => {
+        points.push(new maps.Marker({ map, position: { lat: station.lat, lng: station.lng }, icon: pinIcon(maps, '#f59e0b'), title: station.name }));
+      });
+
+    overlays.current.points = points;
+  }, [ready, startCoords?.join(','), endCoords?.join(','), showStops, nearbyStops, busStations]);
+
+  // Planned route.
+  useEffect(() => {
+    if (!ready || !mapRef.current) return;
+    const maps = mapsRef.current;
+    const map = mapRef.current;
+    overlays.current.route?.setMap(null);
+    overlays.current.route = null;
+    if (!routePath || routePath.length < 2) return;
+
+    const path = routePath.map(([lat, lng]) => ({ lat, lng }));
+    overlays.current.route = new maps.Polyline({ map, path, strokeColor: '#2563eb', strokeWeight: 5, strokeOpacity: 0.9 });
+    const bounds = new maps.LatLngBounds();
+    path.forEach((point) => bounds.extend(point));
+    map.fitBounds(bounds, 56);
+    setFollow(false);
+  }, [ready, routePath]);
+
+  const recentre = () => {
+    setFollow(true);
+    if (userPosition) {
+      mapRef.current?.panTo(userPosition);
+      mapRef.current?.setZoom(Math.max(mapRef.current.getZoom() || 15, 15));
+    }
+    if (!userPosition || !Number.isFinite(accuracy) || accuracy > 50) onLocate?.();
+  };
+
+  const toggleFollow = () => {
+    const next = !follow;
+    setFollow(next);
+    if (!next) return;
+    if (userPosition) mapRef.current?.panTo(userPosition);
+    else onLocate?.();
+  };
+
+  // Compass: reset to north where the map supports rotation, otherwise recentre.
+  const resetNorth = () => {
+    const map = mapRef.current;
+    if (!map) return;
+    if (typeof map.setHeading === 'function') {
+      map.setHeading(0);
+      map.setTilt(0);
+    }
+    if (userPosition) map.panTo(userPosition);
+  };
+
+  return (
+    <div className="relative h-full w-full overflow-hidden bg-muted">
+      <div ref={containerRef} className="absolute inset-0" aria-label="Transit map" />
+
+      {(failure || !ready) && (
+        <div className="absolute inset-0 flex items-center justify-center bg-muted p-4">
+          {failure ? (
+            <div className="max-w-sm rounded-2xl border border-border/60 bg-card p-5 text-center shadow-sm">
+              <MapPinOff className="mx-auto mb-2 h-6 w-6 text-primary" />
+              <p className="font-heading text-sm font-semibold">
+                {failure === 'missing-key' ? 'Google Maps key needed' : 'The map could not load'}
+              </p>
+              <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
+                {failure === 'missing-key'
+                  ? 'Add your Google Maps JavaScript API key in the dashboard under Secrets to switch the map on. Directions and nearby stops still work below.'
+                  : 'Check your connection and reload the page. Directions and nearby stops still work below.'}
+              </p>
+            </div>
+          ) : (
+            <div className="flex flex-col items-center gap-2">
+              <Loader2 className="h-5 w-5 animate-spin text-primary" />
+              <p className="text-[11px] font-medium text-muted-foreground">Loading Google Maps…</p>
+            </div>
+          )}
+        </div>
+      )}
+
+      {ready && (
+        <>
+          <div className="absolute right-3 top-3 z-10 flex flex-col gap-1 rounded-xl border border-border/60 bg-card/95 p-1 shadow-lg backdrop-blur">
+            {MAP_TYPES.map((type) => (
+              <button
+                key={type.id}
+                onClick={() => setMapType(type.id)}
+                className={cn(
+                  'flex min-h-[38px] items-center gap-1.5 rounded-lg px-2.5 py-2 text-[11px] font-semibold transition-colors',
+                  mapType === type.id
+                    ? 'bg-primary text-primary-foreground'
+                    : 'text-muted-foreground hover:bg-muted hover:text-foreground'
+                )}
+              >
+                <type.icon className="h-3.5 w-3.5" />
+                {type.label}
+              </button>
+            ))}
+          </div>
+
+          <div className="absolute right-3 z-10 flex flex-col items-end gap-2" style={{ bottom: SAFE_BOTTOM }}>
+            <button
+              onClick={resetNorth}
+              aria-label="Reset map to north"
+              className="flex h-11 w-11 items-center justify-center rounded-full border border-border/60 bg-card/95 shadow-lg backdrop-blur transition-colors hover:bg-card"
+            >
+              <Compass className="h-4 w-4 text-foreground" />
+            </button>
+            <button
+              onClick={toggleFollow}
+              className={cn(
+                'flex min-h-[40px] items-center gap-1.5 rounded-full border px-3 py-2 text-[11px] font-bold shadow-lg backdrop-blur transition-colors',
+                follow
+                  ? 'border-primary bg-primary text-primary-foreground'
+                  : 'border-border/60 bg-card/95 text-foreground hover:bg-card'
+              )}
+            >
+              <Navigation className={cn('h-3.5 w-3.5', follow && 'fill-current')} />
+              {follow ? 'Following' : 'Follow me'}
+            </button>
+            <button
+              onClick={recentre}
+              aria-label="Locate me"
+              className="flex h-14 w-14 items-center justify-center rounded-full bg-primary text-primary-foreground shadow-xl transition-transform active:scale-95"
+            >
+              {locating ? <Loader2 className="h-5 w-5 animate-spin" /> : <LocateFixed className="h-5 w-5" />}
+            </button>
+          </div>
+
+          <button
+            onClick={onToggleStops}
+            className={cn(
+              'absolute left-3 z-10 flex min-h-[40px] items-center gap-1.5 rounded-xl border px-3 py-2 text-[11px] font-semibold shadow-lg backdrop-blur transition-colors',
+              showStops
+                ? 'border-primary bg-primary text-primary-foreground'
+                : 'border-border/60 bg-card/95 text-foreground hover:bg-card'
+            )}
+            style={{ bottom: SAFE_BOTTOM }}
+          >
+            {stopsLoading ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Bus className="h-3.5 w-3.5" />}
+            {showStops ? 'Hide stops' : 'Transit stops'}
+          </button>
+        </>
+      )}
+    </div>
+  );
+}
