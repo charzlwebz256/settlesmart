@@ -19,6 +19,7 @@ export function MapLayerTiles({ type }) {
         url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
         attribution='Tiles &copy; Esri, Maxar, Earthstar Geographics'
         maxZoom={19}
+        maxNativeZoom={18}
       />
     );
   }
@@ -31,12 +32,14 @@ export function MapLayerTiles({ type }) {
           url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
           attribution='Tiles &copy; Esri, Maxar, Earthstar Geographics'
           maxZoom={19}
+          maxNativeZoom={18}
         />
         <TileLayer
           key="hybrid-transport"
           url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}"
           attribution=""
           maxZoom={19}
+          maxNativeZoom={18}
           opacity={0.9}
         />
         <TileLayer
@@ -44,6 +47,7 @@ export function MapLayerTiles({ type }) {
           url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer/tile/{z}/{y}/{x}"
           attribution=""
           maxZoom={19}
+          maxNativeZoom={18}
         />
       </>
     );
@@ -56,6 +60,7 @@ export function MapLayerTiles({ type }) {
         url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}"
         attribution='Tiles &copy; Esri, HERE, Garmin, USGS'
         maxZoom={19}
+        maxNativeZoom={17}
       />
     );
   }
@@ -63,8 +68,8 @@ export function MapLayerTiles({ type }) {
   return (
     <TileLayer
       key="street"
-      url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}"
-      attribution='Tiles &copy; Esri, HERE, Garmin, OpenStreetMap contributors'
+      url="https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
       maxZoom={19}
     />
   );
