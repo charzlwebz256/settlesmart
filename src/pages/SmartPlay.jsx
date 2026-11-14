@@ -27,15 +27,15 @@ export default function SmartPlay() {
         </p>
       </div>
 
-      <div className="mb-6 flex flex-col items-center gap-2 sm:flex-row sm:justify-center">
+      <div className="mb-6 flex items-center gap-2">
         <label htmlFor="smartplay-category" className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
           Category
         </label>
         <Select value={filter} onValueChange={setFilter}>
-          <SelectTrigger id="smartplay-category" className="w-full sm:w-64">
+          <SelectTrigger id="smartplay-category" className="w-40 text-left sm:w-56">
             <SelectValue placeholder="All categories" />
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent align="start" side="bottom" sideOffset={6} className="w-48 sm:w-56">
             {FILTERS.map((option) => (
               <SelectItem key={option.id} value={option.id}>{option.label}</SelectItem>
             ))}
