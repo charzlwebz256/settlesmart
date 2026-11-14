@@ -1,18 +1,30 @@
 import { Link } from 'react-router-dom';
-import { Briefcase, CalendarDays, ArrowRight, FileText, MessagesSquare, BadgeCheck, Scale, Sparkles, Clapperboard } from 'lucide-react';
+import { Briefcase, CalendarDays, ArrowRight, FileText, MessagesSquare, BadgeCheck, Scale, Sparkles, Clapperboard, ShoppingBag } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const groups = [
   {
-    title: 'Find work',
+    title: 'SmartLife essentials',
     items: [
       {
-        icon: Briefcase,
-        color: 'bg-amber-500/10 text-amber-600',
-        label: 'Job Search',
-        desc: 'Browse live listings from LinkedIn and Indeed, filtered for newcomers and entry-level roles.',
-        path: '/jobs',
+        icon: ShoppingBag,
+        color: 'bg-emerald-500/10 text-emerald-600',
+        label: 'ShopSmart',
+        desc: 'Popular Canadian shopping platforms, price comparison and newcomer shopping tips.',
+        path: '/shop-smart',
       },
+      {
+        icon: Clapperboard,
+        color: 'bg-sky-500/10 text-sky-600',
+        label: 'SmartPlay',
+        desc: 'Free movies, live TV, music, podcasts, documentaries, audiobooks and kids shows in Canada.',
+        path: '/smart-play',
+      },
+    ],
+  },
+  {
+    title: 'Find work',
+    items: [
       {
         icon: BadgeCheck,
         color: 'bg-emerald-500/10 text-emerald-600',
@@ -68,18 +80,6 @@ const groups = [
     ],
   },
   {
-    title: 'Entertainment & downtime',
-    items: [
-      {
-        icon: Clapperboard,
-        color: 'bg-sky-500/10 text-sky-600',
-        label: 'SmartPlay',
-        desc: 'Free movies, live TV, music, podcasts, documentaries, audiobooks and kids shows in Canada.',
-        path: '/smart-play',
-      },
-    ],
-  },
-  {
     title: 'Community',
     items: [
       {
@@ -97,8 +97,8 @@ export default function Work() {
   return (
     <div className="max-w-3xl mx-auto px-4 py-10 pb-24 md:pb-12">
       <div className="mb-8">
-        <h1 className="font-heading font-bold text-2xl md:text-3xl mb-2">Work & Opportunities</h1>
-        <p className="text-muted-foreground text-sm">Find work, get your credentials recognized and know your rights.</p>
+        <h1 className="font-heading font-bold text-2xl md:text-3xl mb-2">SmartLife</h1>
+        <p className="text-muted-foreground text-sm">Shopping, entertainment and work — the everyday essentials for life in Canada.</p>
       </div>
 
       <div className="space-y-8">

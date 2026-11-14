@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, CalendarDays, ChevronDown, Moon, Sun, Heart, Info, GraduationCap, Wallet, LogIn, LogOut, Plug, Bus, Clock, Clapperboard } from 'lucide-react';
+import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, CalendarDays, ChevronDown, Moon, Sun, Heart, Info, GraduationCap, Wallet, LogIn, LogOut, Plug, Bus, Clock, Clapperboard, Sparkles } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -21,10 +21,10 @@ const TAB_CHILDREN = {
     { path: '/services', icon: Search, label: 'Settlement Services' },
     { path: '/near-me', icon: MapPin, label: 'Near Me' },
     { path: '/scholarships', icon: GraduationCap, label: 'Scholarships' },
-    { path: '/shop-smart', icon: ShoppingBag, label: 'ShopSmart' },
+    { path: '/jobs', icon: Briefcase, label: 'Job Search' },
   ],
   '/work': [
-    { path: '/jobs', icon: Briefcase, label: 'Job Search' },
+    { path: '/shop-smart', icon: ShoppingBag, label: 'ShopSmart' },
     { path: '/smart-play', icon: Clapperboard, label: 'SmartPlay' },
   ],
   '/resources': [
@@ -39,7 +39,7 @@ const TAB_CHILDREN = {
 const primaryNav = [
   { path: '/', icon: Home, label: 'Home' },
   { path: '/explore', icon: Compass, label: 'Explore' },
-  { path: '/work', icon: Briefcase, label: 'Work' },
+  { path: '/work', icon: Sparkles, label: 'SmartLife' },
   { path: '/resources', icon: BookOpen, label: 'Resources' },
   { path: '/emergency', icon: AlertTriangle, label: 'Emergency' },
 ];
