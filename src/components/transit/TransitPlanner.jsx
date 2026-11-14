@@ -8,6 +8,7 @@ import TransitAppPromo from '@/components/transit/TransitAppPromo';
 import LocationStatusBar from '@/components/transit/LocationStatusBar';
 import NearbyTransitPanel from '@/components/transit/NearbyTransitPanel';
 import { useDeviceLocation } from '@/hooks/useDeviceLocation';
+import { useDeviceOrientation } from '@/hooks/useDeviceOrientation';
 import { useNearbyStops } from '@/hooks/useNearbyStops';
 import { accuracyBand, distanceMeters } from '@/lib/geo';
 
@@ -57,6 +58,9 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
     locating,
     requestOnce,
   } = useDeviceLocation({ autoStart: autoLocate || !embedded });
+
+  // The compass is what makes the direction arrow point the right way while standing still.
+  const compass = useDeviceOrientation();
 
   const { stops, loading: stopsLoading, error: stopsError, load: loadStops, clear: clearStops } = useNearbyStops();
   // Stops around the destination, so the closest alighting option is visible too.
@@ -253,7 +257,9 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
         <SmartMap
           userPosition={position}
           accuracy={accuracy}
-          heading={heading}
+          heading={Number.isFinite(compass.heading) ? compass.heading : heading}
+          needsCompass={compass.needsPermission}
+          onEnableCompass={compass.requestPermission}
           startCoords={startCoords}
           endCoords={endCoords}
           routePath={routePath}

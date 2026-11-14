@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, CalendarDays, ChevronDown, Moon, Sun, Heart, Info, GraduationCap, Wallet, LogIn, LogOut, Plug, ShieldCheck, Bus } from 'lucide-react';
+import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, CalendarDays, ChevronDown, Moon, Sun, Heart, Info, GraduationCap, Wallet, LogIn, LogOut, Plug, ShieldCheck, Bus, Clock } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -29,6 +29,7 @@ const TAB_CHILDREN = {
   ],
   '/resources': [
     { path: '/transit-map', icon: Bus, label: 'Transit Map' },
+    { path: '/time-zones', icon: Clock, label: 'Time Zones' },
     { path: '/legal', icon: Scale, label: 'Legal & IRCC' },
     { path: '/news', icon: Newspaper, label: 'News & Updates' },
   ],

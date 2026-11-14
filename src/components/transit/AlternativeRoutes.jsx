@@ -1,5 +1,6 @@
 import { Bus, Clock, Footprints } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatMinutes } from '@/lib/duration';
 
 function time(value) {
   if (!value) return null;
@@ -27,7 +28,7 @@ export default function AlternativeRoutes({ options }) {
           <div key={index} className="rounded-lg border border-border/50 bg-muted/30 p-2 space-y-1.5">
             <div className="flex items-center gap-2 text-[11px] flex-wrap">
               <Clock className="w-3 h-3 text-primary" />
-              <span className="font-bold text-foreground">{option.duration_minutes} min</span>
+              <span className="font-bold text-foreground">{formatMinutes(option.duration_minutes)}</span>
               {depart && arrive && (
                 <span className="font-medium text-muted-foreground">
                   {depart} → {arrive}

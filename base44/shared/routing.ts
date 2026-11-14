@@ -300,17 +300,31 @@ async function transitPlan(start, end) {
     };
   }
 
-  // No transit service covers these points — show the walking route instead.
-  const walk = await osrmRoute('foot', start, end, true);
-  if (!walk) return straightPlan(start, end, 'walking');
+  // No transit service covers these points — give a sensible estimate instead of
+  // a long walk dressed up as a commute.
+  const straightKm = haversineKm(start, end);
+  const [walk, drive] = await Promise.all([
+    osrmRoute('foot', start, end, true),
+    osrmRoute('car', start, end, true),
+  ]);
+  const walkMinutes = Math.round(walk ? walk.minutes : (straightKm * 1.25 / SPEEDS.walking) * 60);
+  // Anything beyond a short hop is shown as an estimated drive time.
+  const preferWalk = Boolean(walk) && (walk.distanceKm <= 2.5 || !drive);
+  const picked = preferWalk ? walk : drive;
+  if (!picked) return straightPlan(start, end, 'walking');
+
+  const minutes = Math.max(1, Math.round(preferWalk ? walkMinutes : drive.minutes));
   return {
-    distance_km: round1(walk.distanceKm),
-    duration_minutes: Math.max(1, Math.round(walk.minutes)),
-    waypoints: walk.path,
-    steps: walk.steps.slice(0, 24).map((s) => ({ ...s, mode: 'walk' })),
+    distance_km: round1(picked.distanceKm),
+    duration_minutes: minutes,
+    waypoints: picked.path,
+    steps: picked.steps.slice(0, 24).map((s) => ({ ...s, mode: preferWalk ? 'walk' : 'driving' })),
     bus_info: [],
     nearby_bus_stations: [],
-    note: 'No transit trip covers this route, so this is the walking route.',
+    estimated: true,
+    note: preferWalk
+      ? `No transit service covers this trip, so this is an estimated walk: about ${walkMinutes} min.`
+      : `No transit service covers this trip, so this is an estimated drive time. Walking would take about ${walkMinutes} min.`,
   };
 }
 
@@ -324,6 +338,7 @@ function straightPlan(start, end, mode) {
     steps: [{ instruction: 'Travel to your destination', distance_m: Math.round(km * 1000), mode }],
     bus_info: [],
     nearby_bus_stations: [],
+    estimated: true,
     note: 'Straight-line estimate — live routing was unavailable.',
   };
 }

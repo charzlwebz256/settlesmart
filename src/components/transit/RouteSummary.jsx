@@ -4,6 +4,7 @@ import { cn } from '@/lib/utils';
 import { ETS_LINKS } from '@/data/etsTransit';
 import JourneyTimeline from './JourneyTimeline';
 import AlternativeRoutes from './AlternativeRoutes';
+import { formatMinutes } from '@/lib/duration';
 
 const MODE_META = {
   walk: { icon: Footprints, tint: 'text-green-600 bg-green-500/10' },
@@ -60,7 +61,15 @@ export default function RouteSummary({ route, startLabel, endLabel }) {
       <div className="flex items-end gap-3 flex-wrap">
         <div className="flex items-center gap-1.5">
           <Clock className="w-4 h-4 text-primary" />
-          <span className="font-heading font-bold text-xl leading-none">{route.duration_minutes} min</span>
+          <span className="font-heading font-bold text-xl leading-none">
+            {route.estimated ? '≈ ' : ''}
+            {formatMinutes(route.duration_minutes)}
+          </span>
+          {route.estimated && (
+            <span className="rounded bg-muted px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
+              estimate
+            </span>
+          )}
         </div>
         <div className="flex items-center gap-1.5 text-muted-foreground">
           <Route className="w-3.5 h-3.5" />

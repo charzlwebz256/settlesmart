@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Bike, Bus, Car, ChevronDown, Footprints, Ship, Train } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatMinutes } from '@/lib/duration';
 
 const KIND_META = {
   walk: { icon: Footprints },
@@ -87,7 +88,7 @@ export default function JourneyTimeline({ legs, startLabel, endLabel }) {
                       </span>
                     </div>
                     <p className="mt-1 text-[11px] text-muted-foreground">
-                      {leg.duration_minutes} min
+                      {formatMinutes(leg.duration_minutes)}
                       {leg.stops_count ? ` · ${leg.stops_count} stops` : ''}
                       {distance ? ` · ${distance}` : ''}
                       {leg.agency ? ` · ${leg.agency}` : ''}
@@ -128,7 +129,7 @@ export default function JourneyTimeline({ legs, startLabel, endLabel }) {
                       <Icon className="h-3.5 w-3.5 text-foreground" />
                       <span className="text-[11px] font-semibold text-foreground">{leg.label}</span>
                       <span className="text-[11px] text-muted-foreground">
-                        {leg.duration_minutes} min{distance ? ` · ${distance}` : ''}
+                        {formatMinutes(leg.duration_minutes)}{distance ? ` · ${distance}` : ''}
                       </span>
                       <button
                         onClick={() => setExpanded((prev) => ({ ...prev, [index]: !open }))}

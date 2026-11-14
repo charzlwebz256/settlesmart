@@ -7,12 +7,13 @@ import {
   Map as MapIcon,
   MapPinOff,
   Mountain,
-  Navigation,
   Satellite,
   Bus,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { loadGoogleMaps } from '@/lib/googleMaps';
+import { bearingBetween, distanceMeters } from '@/lib/geo';
+import DirectionArrow from '@/components/transit/DirectionArrow';
 
 const MAP_TYPES = [
   { id: 'roadmap', label: 'Map', icon: MapIcon },
@@ -48,14 +49,15 @@ function svgIcon(maps, svg, size) {
   };
 }
 
-// Blue dot, plus a direction wedge only when the device reports a trustworthy heading.
+// Google-Maps style arrow for the rider: a full arrowhead when the compass or
+// GPS reports a heading, a plain blue dot when nothing is known yet.
 function userIcon(maps, heading) {
-  const wedge = Number.isFinite(heading)
-    ? `<g transform="rotate(${Math.round(heading)} 24 24)"><path d="M24 3 L31 24 L24 20 L17 24 Z" fill="#1d4ed8" opacity="0.45"/></g>`
-    : '';
+  const body = Number.isFinite(heading)
+    ? `<g transform="rotate(${Math.round(heading)} 24 24)"><path d="M24 3 L34 32 L24 26 L14 32 Z" fill="#2563eb" stroke="#ffffff" stroke-width="3" stroke-linejoin="round"/></g>`
+    : `<circle cx="24" cy="24" r="9" fill="#2563eb" stroke="#ffffff" stroke-width="4"/><circle cx="24" cy="24" r="3" fill="#ffffff"/>`;
   return svgIcon(
     maps,
-    `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">${wedge}<circle cx="24" cy="24" r="9" fill="#2563eb" stroke="#ffffff" stroke-width="4"/><circle cx="24" cy="24" r="3" fill="#ffffff"/></svg>`,
+    `<svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 48 48">${body}</svg>`,
     48
   );
 }
@@ -94,6 +96,8 @@ export default function SmartMap({
   onStopSelect,
   onLocate,
   locating,
+  needsCompass,
+  onEnableCompass,
 }) {
   const containerRef = useRef(null);
   const mapRef = useRef(null);
@@ -105,7 +109,6 @@ export default function SmartMap({
   const [ready, setReady] = useState(false);
   const [failure, setFailure] = useState(null);
   const [mapType, setMapType] = useState('roadmap');
-  const [follow, setFollow] = useState(true);
   const [centred, setCentred] = useState(false);
 
   useEffect(() => {
@@ -138,8 +141,7 @@ export default function SmartMap({
     });
     mapRef.current = map;
 
-    // Exploring the map by hand releases the camera; it never snaps back on its own.
-    map.addListener('dragstart', () => setFollow(false));
+    // Exploring the map by hand never makes it snap back on its own.
     map.addListener('click', (event) => {
       handlers.current.onPickDestination?.({ lat: event.latLng.lat(), lng: event.latLng.lng() });
     });
@@ -195,17 +197,15 @@ export default function SmartMap({
     overlays.current.accuracy.setVisible(radius > 0);
   }, [ready, userPosition?.lat, userPosition?.lng, accuracy, heading]);
 
-  // Centre once on the first real fix, then only follow when the rider asks for it.
+  // Centre once on the first real fix and then stay put: the rider keeps their
+  // bearings from the direction arrow instead of the map chasing them.
   useEffect(() => {
     if (!ready || !mapRef.current || !userPosition) return;
-    if (!centred) {
-      mapRef.current.setCenter(userPosition);
-      mapRef.current.setZoom(zoomForAccuracy(accuracy));
-      setCentred(true);
-      return;
-    }
-    if (follow) mapRef.current.panTo(userPosition);
-  }, [ready, userPosition?.lat, userPosition?.lng, follow, centred]);
+    if (centred) return;
+    mapRef.current.setCenter(userPosition);
+    mapRef.current.setZoom(zoomForAccuracy(accuracy));
+    setCentred(true);
+  }, [ready, userPosition?.lat, userPosition?.lng, centred]);
 
   // Start, destination, transit stops and bus stations.
   useEffect(() => {
@@ -288,7 +288,6 @@ export default function SmartMap({
       });
 
       map.fitBounds(bounds, fitPadding());
-      setFollow(false);
       return;
     }
 
@@ -297,24 +296,14 @@ export default function SmartMap({
     overlays.current.route = new maps.Polyline({ map, path, strokeColor: '#2563eb', strokeWeight: 5, strokeOpacity: 0.9 });
     path.forEach((point) => bounds.extend(point));
     map.fitBounds(bounds, fitPadding());
-    setFollow(false);
   }, [ready, routeLegs, routePath]);
 
   const recentre = () => {
-    setFollow(true);
     if (userPosition) {
       mapRef.current?.panTo(userPosition);
       mapRef.current?.setZoom(zoomForAccuracy(accuracy));
     }
     if (!userPosition || !Number.isFinite(accuracy) || accuracy > 50) onLocate?.();
-  };
-
-  const toggleFollow = () => {
-    const next = !follow;
-    setFollow(next);
-    if (!next) return;
-    if (userPosition) mapRef.current?.panTo(userPosition);
-    else onLocate?.();
   };
 
   // Compass: reset to north where the map supports rotation, otherwise recentre.
@@ -327,6 +316,10 @@ export default function SmartMap({
     }
     if (userPosition) map.panTo(userPosition);
   };
+
+  const destination = endCoords ? { lat: endCoords[0], lng: endCoords[1] } : null;
+  const destinationBearing = userPosition && destination ? bearingBetween(userPosition, destination) : null;
+  const destinationDistance = userPosition && destination ? distanceMeters(userPosition, destination) : null;
 
   return (
     <div className="relative h-full w-full overflow-hidden bg-muted">
@@ -357,6 +350,14 @@ export default function SmartMap({
 
       {ready && (
         <>
+          <DirectionArrow
+            bearing={destinationBearing}
+            heading={heading}
+            distance={destinationDistance}
+            needsCompass={needsCompass}
+            onEnableCompass={onEnableCompass}
+          />
+
           <div className="absolute right-3 top-3 z-10 flex flex-col gap-1 rounded-xl border border-border/60 bg-card/95 p-1 shadow-lg backdrop-blur">
             {MAP_TYPES.map((type) => (
               <button
@@ -382,18 +383,6 @@ export default function SmartMap({
               className="flex h-11 w-11 items-center justify-center rounded-full border border-border/60 bg-card/95 shadow-lg backdrop-blur transition-colors hover:bg-card"
             >
               <Compass className="h-4 w-4 text-foreground" />
-            </button>
-            <button
-              onClick={toggleFollow}
-              className={cn(
-                'flex min-h-[40px] items-center gap-1.5 rounded-full border px-3 py-2 text-[11px] font-bold shadow-lg backdrop-blur transition-colors',
-                follow
-                  ? 'border-primary bg-primary text-primary-foreground'
-                  : 'border-border/60 bg-card/95 text-foreground hover:bg-card'
-              )}
-            >
-              <Navigation className={cn('h-3.5 w-3.5', follow && 'fill-current')} />
-              {follow ? 'Following' : 'Follow me'}
             </button>
             <button
               onClick={recentre}
