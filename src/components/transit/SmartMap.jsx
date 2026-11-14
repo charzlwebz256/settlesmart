@@ -96,6 +96,7 @@ export default function SmartMap({
   onStopSelect,
   onLocate,
   locating,
+  navigating,
   needsCompass,
   onEnableCompass,
 }) {
@@ -103,6 +104,8 @@ export default function SmartMap({
   const mapRef = useRef(null);
   const mapsRef = useRef(null);
   const overlays = useRef({ user: null, accuracy: null, route: null, routeLines: [], routeStops: [], points: [] });
+  // Only navigation follows the rider; otherwise the map stays where they left it.
+  const followRef = useRef(false);
   const handlers = useRef({ onPickDestination, onStopSelect });
   handlers.current = { onPickDestination, onStopSelect };
 
@@ -141,9 +144,13 @@ export default function SmartMap({
     });
     mapRef.current = map;
 
-    // Exploring the map by hand never makes it snap back on its own.
     map.addListener('click', (event) => {
       handlers.current.onPickDestination?.({ lat: event.latLng.lat(), lng: event.latLng.lng() });
+    });
+
+    // Taking the map by hand ends the follow, until they tap locate again.
+    map.addListener('dragstart', () => {
+      followRef.current = false;
     });
 
     // Mobile browser bars and rotation change the canvas size.
@@ -298,11 +305,31 @@ export default function SmartMap({
     map.fitBounds(bounds, fitPadding());
   }, [ready, routeLegs, routePath]);
 
+  // Navigating: frame the rider up close and keep them centred as they move.
+  useEffect(() => {
+    if (!ready || !mapRef.current) return;
+    if (!navigating) {
+      followRef.current = false;
+      return;
+    }
+    followRef.current = true;
+    if (userPosition) {
+      mapRef.current.setCenter(userPosition);
+      mapRef.current.setZoom(zoomForAccuracy(accuracy));
+    }
+  }, [navigating]);
+
+  useEffect(() => {
+    if (!ready || !navigating || !followRef.current || !userPosition || !mapRef.current) return;
+    mapRef.current.panTo(userPosition);
+  }, [ready, navigating, userPosition?.lat, userPosition?.lng]);
+
   const recentre = () => {
     if (userPosition) {
       mapRef.current?.panTo(userPosition);
       mapRef.current?.setZoom(zoomForAccuracy(accuracy));
     }
+    if (navigating) followRef.current = true;
     if (!userPosition || !Number.isFinite(accuracy) || accuracy > 50) onLocate?.();
   };
 
@@ -350,13 +377,15 @@ export default function SmartMap({
 
       {ready && (
         <>
-          <DirectionArrow
-            bearing={destinationBearing}
-            heading={heading}
-            distance={destinationDistance}
-            needsCompass={needsCompass}
-            onEnableCompass={onEnableCompass}
-          />
+          {!navigating && (
+            <DirectionArrow
+              bearing={destinationBearing}
+              heading={heading}
+              distance={destinationDistance}
+              needsCompass={needsCompass}
+              onEnableCompass={onEnableCompass}
+            />
+          )}
 
           <div className="absolute right-3 top-3 z-10 flex flex-col gap-1 rounded-xl border border-border/60 bg-card/95 p-1 shadow-lg backdrop-blur">
             {MAP_TYPES.map((type) => (

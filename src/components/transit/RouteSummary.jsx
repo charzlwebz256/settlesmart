@@ -3,7 +3,6 @@ import { Footprints, Bus, Train, Ship, Bike, Car, Clock, Route, ArrowRight, Info
 import { cn } from '@/lib/utils';
 import { ETS_LINKS } from '@/data/etsTransit';
 import JourneyTimeline from './JourneyTimeline';
-import AlternativeRoutes from './AlternativeRoutes';
 import { formatMinutes } from '@/lib/duration';
 
 const MODE_META = {
@@ -48,7 +47,6 @@ export default function RouteSummary({ route, startLabel, endLabel }) {
   const steps = Array.isArray(route.steps) ? route.steps : [];
   const journey = Array.isArray(route.journey) ? route.journey : [];
   const buses = Array.isArray(route.bus_info) ? route.bus_info : [];
-  const alternatives = Array.isArray(route.alternatives) ? route.alternatives : [];
   const depart = formatTime(route.depart_at);
   const arrive = formatTime(route.arrive_at);
   const leaveIn = route.depart_at
@@ -147,8 +145,6 @@ export default function RouteSummary({ route, startLabel, endLabel }) {
           })}
         </ol>
       )}
-
-      <AlternativeRoutes options={alternatives} />
 
       {route.transfer_note && (
         <p className="flex items-start gap-1.5 text-[11px] text-muted-foreground border-t border-border/40 pt-2">

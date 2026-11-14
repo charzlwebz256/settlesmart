@@ -126,7 +126,7 @@ function legPath(leg) {
   return from && to ? [from, to] : [];
 }
 
-function describeItinerary(itinerary) {
+function describeItinerary(itinerary, pathLimit = 800) {
   const legs = Array.isArray(itinerary.legs) ? itinerary.legs : [];
   const steps = [];
   const waypoints = [];
@@ -179,7 +179,7 @@ function describeItinerary(itinerary) {
       distance_m: Math.round(meters),
       stops_count: isTransit ? intermediate.length + 1 : null,
       intermediate_stops: intermediate.slice(0, 40).map((s) => ({ name: s.name, lat: s.lat, lng: s.lon })),
-      path: path.slice(0, 800),
+      path: path.slice(0, pathLimit),
     });
 
     if (!isTransit) {
@@ -245,6 +245,8 @@ async function transitPlan(start, end) {
 
     // Other buses and later departures for the same trip, each with its timetable.
     const describeOption = (it) => {
+      // Enough geometry for the map and turn-by-turn guidance once picked.
+      const full = describeItinerary(it, 300);
       const legs = (it.legs || []).map((l) => {
         const kind = LEG_KIND[l.mode] || 'bus';
         const isTransit = kind !== 'walk' && kind !== 'bike' && kind !== 'driving';
@@ -263,7 +265,7 @@ async function transitPlan(start, end) {
         };
       });
       return {
-        duration_minutes: Math.max(1, Math.round((it.duration || 0) / 60)),
+        ...full,
         transfers: it.transfers || 0,
         depart_at: it.startTime || null,
         arrive_at: it.endTime || null,

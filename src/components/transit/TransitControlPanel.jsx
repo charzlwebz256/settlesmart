@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import MyLocationCard from './MyLocationCard';
 import RouteSummary from './RouteSummary';
+import RouteOptions from './RouteOptions';
 
 const inputClass =
   'w-full px-3 py-2 rounded-lg border border-border/60 bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none';
@@ -39,6 +40,11 @@ export default function TransitControlPanel({
   busStations,
   startLabel,
   endLabel,
+  routeOptions,
+  selectedOption,
+  onSelectOption,
+  onStartNavigation,
+  navigating,
 }) {
   return (
     <div className="space-y-4">
@@ -165,6 +171,15 @@ export default function TransitControlPanel({
 
       {/* Itinerary */}
       {routeData && <RouteSummary route={routeData} startLabel={startLabel} endLabel={endLabel} />}
+
+      {/* Pick the route to take, then start it */}
+      <RouteOptions
+        options={routeOptions}
+        selectedIndex={selectedOption}
+        onSelect={onSelectOption}
+        onStart={onStartNavigation}
+        navigating={navigating}
+      />
 
       {/* Nearby bus stations */}
       {busStations.length > 0 && (

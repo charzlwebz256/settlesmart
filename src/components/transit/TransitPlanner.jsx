@@ -7,10 +7,12 @@ import TransitControlPanel from '@/components/transit/TransitControlPanel';
 import TransitAppPromo from '@/components/transit/TransitAppPromo';
 import LocationStatusBar from '@/components/transit/LocationStatusBar';
 import NearbyTransitPanel from '@/components/transit/NearbyTransitPanel';
+import NavigationBanner from '@/components/transit/NavigationBanner';
 import { useDeviceLocation } from '@/hooks/useDeviceLocation';
 import { useDeviceOrientation } from '@/hooks/useDeviceOrientation';
 import { useNearbyStops } from '@/hooks/useNearbyStops';
 import { accuracyBand, distanceMeters } from '@/lib/geo';
+import { buildTrack, buildGuidance } from '@/lib/navigation';
 
 const MODES = [
   { id: 'driving', label: 'Car', icon: Fuel },
@@ -39,13 +41,15 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
   const [endCoords, setEndCoords] = useState(null);
   const [selectedMode, setSelectedMode] = useState('transit');
   const [routeData, setRouteData] = useState(null);
-  const [busStations, setBusStations] = useState([]);
   const [routeLoading, setRouteLoading] = useState(false);
   const [startSuggestions, setStartSuggestions] = useState([]);
   const [endSuggestions, setEndSuggestions] = useState([]);
   const [showStartSuggestions, setShowStartSuggestions] = useState(false);
   const [showEndSuggestions, setShowEndSuggestions] = useState(false);
   const [showStops, setShowStops] = useState(true);
+  const [selectedOption, setSelectedOption] = useState(0);
+  const [navigating, setNavigating] = useState(false);
+  const [clock, setClock] = useState(() => Date.now());
   const stopsCenterRef = useRef(null);
 
   const {
@@ -210,7 +214,8 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
         mode: mode === 'bicycling' ? 'cycling' : mode,
       });
       setRouteData(result?.route || null);
-      setBusStations(result?.route?.nearby_bus_stations || []);
+      setSelectedOption(0);
+      setNavigating(false);
     } finally {
       setRouteLoading(false);
     }
@@ -230,9 +235,41 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
     setEndInput(address || 'Dropped pin');
   };
 
+  // Every way to make the trip: the best one first, then the alternatives.
+  const routeOptions = useMemo(() => {
+    if (!routeData) return [];
+    const alternatives = Array.isArray(routeData.alternatives) ? routeData.alternatives : [];
+    return [routeData, ...alternatives];
+  }, [routeData]);
+  const activeRoute = routeOptions[selectedOption] || routeData || null;
+
+  // Live position along the chosen route, refreshed as the rider moves.
+  const track = useMemo(() => (navigating ? buildTrack(activeRoute) : null), [navigating, activeRoute]);
+  const guidance = useMemo(
+    () => (navigating ? buildGuidance(activeRoute, track, position, clock) : null),
+    [navigating, activeRoute, track, position?.lat, position?.lng, clock]
+  );
+  const arrived = Boolean(navigating && guidance?.arrived);
+
+  useEffect(() => {
+    if (!navigating) return undefined;
+    const id = setInterval(() => setClock(Date.now()), 15000);
+    return () => clearInterval(id);
+  }, [navigating]);
+
+  const startNavigation = (index = selectedOption) => {
+    if (!routeOptions[index]) return;
+    setSelectedOption(index);
+    setClock(Date.now());
+    setNavigating(true);
+    if (!position) requestOnce();
+  };
+
+  const endNavigation = () => setNavigating(false);
+
   // Memoised so the map only redraws the route when a new one is calculated.
-  const routePath = useMemo(() => routeData?.waypoints || [], [routeData]);
-  const routeLegs = useMemo(() => routeData?.journey || [], [routeData]);
+  const routePath = useMemo(() => activeRoute?.waypoints || [], [activeRoute]);
+  const routeLegs = useMemo(() => activeRoute?.journey || [], [activeRoute]);
   // Both ends' closest stops share the map; memoised so markers are not rebuilt.
   const mapStops = useMemo(() => [...destStops, ...stops], [destStops, stops]);
 
@@ -265,7 +302,7 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
           routePath={routePath}
           routeLegs={routeLegs}
           nearbyStops={mapStops}
-          busStations={busStations}
+          busStations={activeRoute?.nearby_bus_stations || []}
           showStops={showStops}
           stopsLoading={stopsLoading}
           onToggleStops={toggleStops}
@@ -273,8 +310,19 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
           onStopSelect={walkToStop}
           onLocate={requestOnce}
           locating={locating}
+          navigating={navigating}
         />
         <TransitAppPromo />
+        <NavigationBanner
+          route={activeRoute}
+          guidance={guidance}
+          navigating={navigating}
+          arrived={arrived}
+          onStart={() => startNavigation()}
+          onEnd={endNavigation}
+          canStart={Boolean(position)}
+          heading={Number.isFinite(compass.heading) ? compass.heading : heading}
+        />
       </div>
 
       <aside
@@ -309,10 +357,15 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
             hasPosition={Boolean(position)}
             onLocate={requestOnce}
             onUseMyLocation={useMyLocation}
-            routeData={routeData}
-            busStations={busStations}
+            routeData={activeRoute}
+            busStations={activeRoute?.nearby_bus_stations || []}
             startLabel={startInput}
             endLabel={endInput}
+            routeOptions={routeOptions}
+            selectedOption={selectedOption}
+            onSelectOption={setSelectedOption}
+            onStartNavigation={startNavigation}
+            navigating={navigating}
           />
 
           <LocationStatusBar
