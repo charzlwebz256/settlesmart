@@ -27,18 +27,22 @@ export default function QuickAccessGrid() {
         {categories.map((cat, i) => (
           <motion.div
             key={cat.label}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: i * 0.05, duration: 0.4 }}
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true, amount: 0.3 }}
+            transition={{ delay: i * 0.05, duration: 0.4, ease: 'easeOut' }}
+            whileHover={{ y: -6, scale: 1.03 }}
+            whileTap={{ scale: 0.97 }}
+            className="h-full"
           >
             <Link
               to={cat.path}
-              className="group flex flex-col items-center gap-3 p-5 md:p-6 rounded-2xl bg-card border border-border/50 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5 transition-all duration-300"
+              className="group flex h-full flex-col items-center gap-3 p-5 md:p-6 rounded-2xl bg-card border border-border/50 shadow-sm hover:border-primary/40 hover:shadow-xl hover:shadow-primary/10 transition-[box-shadow,border-color] duration-300"
             >
-              <div className={`w-12 h-12 rounded-xl ${cat.color} flex items-center justify-center group-hover:scale-110 transition-transform duration-300`}>
+              <div className={`w-12 h-12 rounded-xl ${cat.color} flex items-center justify-center transition-transform duration-300 group-hover:scale-110 group-hover:-rotate-6`}>
                 <cat.icon className="w-6 h-6" />
               </div>
-              <span className="text-sm font-semibold text-center text-foreground">{cat.label}</span>
+              <span className="text-sm font-semibold text-center text-foreground group-hover:text-primary transition-colors">{cat.label}</span>
             </Link>
           </motion.div>
         ))}

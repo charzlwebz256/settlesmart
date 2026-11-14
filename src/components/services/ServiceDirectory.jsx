@@ -17,8 +17,6 @@ const EMPTY_FILTERS = {
   cost: '',
 };
 
-const STATUS_RANK = { verified: 0, review_due: 1, pending: 2, needs_correction: 3, inactive: 4 };
-
 export default function ServiceDirectory({ initialProvince = '', initialCategory = '' }) {
   const queryClient = useQueryClient();
   const [filters, setFilters] = useState({
@@ -90,10 +88,7 @@ export default function ServiceDirectory({ initialProvince = '', initialCategory
       if (filters.cost === 'paid') query.is_free = false;
 
       const page = await base44.entities.Service.filter(query, { limit: 200 });
-      return (page.items || []).sort((a, b) => {
-        const rank = (STATUS_RANK[a.verification_status] ?? STATUS_RANK.pending) - (STATUS_RANK[b.verification_status] ?? STATUS_RANK.pending);
-        return rank !== 0 ? rank : (a.name || '').localeCompare(b.name || '');
-      });
+      return (page.items || []).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     },
   });
 

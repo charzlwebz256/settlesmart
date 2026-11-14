@@ -3,7 +3,6 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { getOrgLogo } from '@/lib/orgLogos';
 import { safeHref } from '@/lib/safeUrl';
-import VerificationBadge from './VerificationBadge';
 
 const CATEGORY_META = {
   education:        { icon: '🎓', label: 'Education',      bar: 'from-blue-500 to-blue-400',        chip: 'bg-blue-500/10 text-blue-700 dark:text-blue-300' },
@@ -52,7 +51,6 @@ export default function ServiceCard({ service, onSave, saved, onOpen }) {
               <span>{meta.icon}</span>
               {meta.label}
             </span>
-            <VerificationBadge status={service.verification_status} />
           </div>
           {onSave && (
             <button

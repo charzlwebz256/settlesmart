@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, CalendarDays, ChevronDown, Moon, Sun, Heart, Info, GraduationCap, Wallet, LogIn, LogOut, Plug, ShieldCheck, Bus, Clock } from 'lucide-react';
+import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, CalendarDays, ChevronDown, Moon, Sun, Heart, Info, GraduationCap, Wallet, LogIn, LogOut, Plug, Bus, Clock } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -55,9 +55,6 @@ const secondaryNav = [
   { path: '/connect', icon: Plug, label: 'Connect AI Assistants' },
   { path: '/about', icon: Info, label: 'About SettleSmart' },
 ];
-
-// Admin-only entry, added to the menu for reviewers
-const ADMIN_NAV = { path: '/admin/resources', icon: ShieldCheck, label: 'Resource Verification' };
 
 const ALL_NAV_PATHS = [
   ...primaryNav.map(i => i.path),
@@ -316,7 +313,7 @@ export default function AppLayout() {
 
               {/* Secondary nav */}
               <div className="border-t border-border/40 pt-1.5 mt-1 space-y-0.5">
-                {(user?.role === 'admin' ? [...secondaryNav, ADMIN_NAV] : secondaryNav).map(item => (
+                {secondaryNav.map(item => (
                   <Link key={item.path} to={item.path} onClick={() => setMenuOpen(false)}
                     className={cn("flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition-all",
                       location.pathname === item.path ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>

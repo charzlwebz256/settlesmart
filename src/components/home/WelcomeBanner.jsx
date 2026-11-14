@@ -70,7 +70,7 @@ export default function WelcomeBanner({ user, profile, city, province }) {
         )}
         {daysInCanada !== null && (
           <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-card/80 border border-border/60 text-xs font-medium">
-            Day {daysInCanada} in Canada
+            {daysInCanada} {daysInCanada === 1 ? 'day' : 'days'} in Canada
           </span>
         )}
         <BannerWeather city={activeCity} province={activeProvince} />

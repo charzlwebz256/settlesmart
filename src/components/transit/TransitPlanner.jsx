@@ -23,7 +23,7 @@ const MODES = [
   { id: 'bicycling', label: 'Bike', icon: Bike },
 ];
 
-const REVERSE_AFTER_M = 150;
+const REVERSE_AFTER_M = 25;
 const RELOAD_STOPS_AFTER_M = 400;
 
 /**
@@ -305,14 +305,16 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
     <div
       className={cn(
         'flex flex-col overflow-hidden md:flex-row',
-        embedded ? 'rounded-2xl border border-border/50 md:h-[620px]' : 'md:h-[calc(100vh-4rem)]'
+        embedded
+          ? 'rounded-2xl border border-border/50 md:h-[clamp(480px,72dvh,680px)]'
+          : 'md:h-[calc(100dvh-4rem)] md:min-h-[500px]'
       )}
     >
       {/* Map first on mobile, at full height, so nothing covers the rider's position */}
       <div
         className={cn(
           'relative order-1 w-full md:order-2 md:h-full md:w-3/4',
-          embedded ? 'h-[380px]' : 'h-[calc(100dvh-8.5rem)]'
+          embedded ? 'h-[clamp(300px,45dvh,420px)]' : 'h-[clamp(320px,58dvh,720px)]'
         )}
       >
         <SmartMap

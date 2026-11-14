@@ -1,6 +1,8 @@
-import { ExternalLink, ShoppingBag } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowRight, ShoppingBag } from 'lucide-react';
 import PriceComparison from '@/components/shop/PriceComparison';
 import PriceAlertSignup from '@/components/shop/PriceAlertSignup';
+import StoreViewer from '@/components/shop/StoreViewer';
 
 const CATEGORIES = [
   {
@@ -11,6 +13,7 @@ const CATEGORIES = [
       { name: 'eBay Canada', url: 'https://www.ebay.ca', logo: 'https://upload.wikimedia.org/wikipedia/commons/1/1b/EBay_logo.svg', logoFit: 'contain', bg: 'bg-slate-50 dark:bg-slate-800/40', border: 'border-slate-200 dark:border-slate-700', text: 'text-slate-700 dark:text-slate-300' },
       { name: 'Kijiji Canada', url: 'https://www.kijiji.ca', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcShYoLy5s-mhjg_m8y5mJRdYEOEI2DTRTTixTxnSIFqPQ&s=10', bg: 'bg-green-50 dark:bg-green-950/30', border: 'border-green-200 dark:border-green-800', text: 'text-green-700 dark:text-green-300' },
       { name: 'Temu Canada', url: 'https://www.temu.com/ca', logo: 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTOVFv40vabVYeuM_RFVa2-MJDeQeDDEyckGeTGv_u7K-fOVrB_KVK0rQGh&s=10', bg: 'bg-orange-50 dark:bg-orange-950/30', border: 'border-orange-200 dark:border-orange-800', text: 'text-orange-700 dark:text-orange-300' },
+      { name: 'AliExpress', url: 'https://www.aliexpress.com', logo: 'https://www.google.com/s2/favicons?sz=128&domain=aliexpress.com', bg: 'bg-red-50 dark:bg-red-950/30', border: 'border-red-200 dark:border-red-800', text: 'text-red-700 dark:text-red-300' },
     ],
   },
   {
@@ -82,15 +85,14 @@ const CATEGORIES = [
   },
 ];
 
-function StoreCard({ store, index }) {
+function StoreCard({ store, index, onOpen }) {
   const imgFit = store.logoFit === 'contain' ? 'object-contain p-2' : 'object-cover';
   return (
-    <a
-      href={store.url}
-      target="_blank"
-      rel="noopener noreferrer"
+    <button
+      type="button"
+      onClick={() => onOpen(store)}
       style={{ animationDelay: `${index * 50}ms` }}
-      className={`flex flex-col items-center justify-between gap-2 p-2 rounded-2xl border ${store.bg} ${store.border} hover:shadow-xl hover:-translate-y-1 hover:scale-105 transition-all duration-200 group animate-fade-in`}
+      className={`flex flex-col items-center justify-between gap-2 p-2 rounded-2xl border text-left ${store.bg} ${store.border} hover:shadow-xl hover:-translate-y-1 hover:scale-105 transition-all duration-200 group animate-fade-in`}
     >
       {/* Logo area — landscape fill */}
       <div className="w-full aspect-[16/7] flex items-center justify-center overflow-hidden rounded-xl bg-white/60 dark:bg-white/10">
@@ -111,13 +113,15 @@ function StoreCard({ store, index }) {
       {/* Label */}
       <div className={`flex items-center gap-1 text-xs font-semibold ${store.text} w-full justify-center pb-1`}>
         <span className="text-center leading-tight truncate">{store.name}</span>
-        <ExternalLink className="w-3 h-3 opacity-50 group-hover:opacity-100 flex-shrink-0 transition-opacity" />
+        <ArrowRight className="w-3 h-3 opacity-50 group-hover:opacity-100 flex-shrink-0 transition-opacity" />
       </div>
-    </a>
+    </button>
   );
 }
 
 export default function ShopSmart() {
+  const [activeStore, setActiveStore] = useState(null);
+
   return (
     <div className="max-w-5xl mx-auto px-4 py-6 pb-24 md:pb-10">
       <div className="mb-8">
@@ -125,7 +129,7 @@ export default function ShopSmart() {
           <ShoppingBag className="w-6 h-6 text-primary" />
           ShopSmart Canada
         </h1>
-        <p className="text-muted-foreground text-sm">Popular Canadian online shopping platforms across every category — all in one place.</p>
+        <p className="text-muted-foreground text-sm">Popular Canadian online shopping platforms across every category — tap a store to shop without leaving SettleSmart.</p>
       </div>
 
       <PriceComparison />
@@ -137,7 +141,7 @@ export default function ShopSmart() {
             <h2 className="font-heading font-bold text-base mb-3 text-foreground">{cat.label}</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
               {cat.stores.map((store, i) => (
-                <StoreCard key={store.name} store={store} index={i} />
+                <StoreCard key={store.name} store={store} index={i} onOpen={setActiveStore} />
               ))}
             </div>
           </div>
@@ -153,6 +157,8 @@ export default function ShopSmart() {
           <div className="flex gap-2"><span className="text-primary font-bold">✓</span><span><strong className="text-foreground">Shop Canadian-made</strong> — Support local businesses for quality goods and faster shipping.</span></div>
         </div>
       </div>
+
+      <StoreViewer store={activeStore} onClose={() => setActiveStore(null)} />
     </div>
   );
 }

@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { MapPin, Phone, Mail, Globe, ExternalLink, Bookmark, Flag, Users, CheckCircle2, ShieldCheck, CalendarClock } from 'lucide-react';
+import { MapPin, Phone, Mail, Globe, ExternalLink, Bookmark, Flag, Users, CheckCircle2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { safeHref } from '@/lib/safeUrl';
-import VerificationBadge from './VerificationBadge';
 import ReportResourceDialog from './ReportResourceDialog';
 
 const ELIGIBILITY_LABELS = {
@@ -16,19 +15,12 @@ const ELIGIBILITY_LABELS = {
   citizen: 'Citizen',
 };
 
-function formatDate(value) {
-  if (!value) return null;
-  const d = new Date(value);
-  return isNaN(d.getTime()) ? null : d.toLocaleDateString('en-CA', { year: 'numeric', month: 'short', day: 'numeric' });
-}
-
 export default function ResourceDetailDialog({ service, open, onOpenChange, saved, onToggleSave }) {
   const [reportOpen, setReportOpen] = useState(false);
   if (!service) return null;
 
   const website = safeHref(service.website);
   const source = safeHref(service.source_url);
-  const verifiedOn = formatDate(service.verified_at);
   const eligibility = service.eligibility || [];
 
   return (
@@ -37,7 +29,6 @@ export default function ResourceDetailDialog({ service, open, onOpenChange, save
         <DialogContent className="max-w-lg rounded-2xl max-h-[90vh] overflow-y-auto">
           <DialogHeader>
             <div className="flex items-center gap-2 flex-wrap mb-1">
-              <VerificationBadge status={service.verification_status} />
               {service.is_free && (
                 <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/10 text-emerald-700 dark:text-emerald-300">FREE</span>
               )}
@@ -101,33 +92,16 @@ export default function ResourceDetailDialog({ service, open, onOpenChange, save
               )}
             </div>
 
-            <div className="rounded-xl border border-border/50 p-3 space-y-1.5 text-[11px] text-muted-foreground">
-              {service.verification_status === 'verified' && verifiedOn && (
-                <p className="flex items-center gap-1.5">
-                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-600" />
-                  Last verified {verifiedOn}
-                </p>
-              )}
-              {service.next_review_at && (
-                <p className="flex items-center gap-1.5">
-                  <CalendarClock className="w-3.5 h-3.5" />
-                  Next review {formatDate(service.next_review_at)}
-                </p>
-              )}
-              {source && (
+            {source && (
+              <div className="rounded-xl border border-border/50 p-3 text-[11px] text-muted-foreground">
                 <p className="flex items-center gap-1.5">
                   <ExternalLink className="w-3.5 h-3.5" />
                   <a href={source} target="_blank" rel="noopener noreferrer" className="text-primary underline underline-offset-2">
                     Original information source
                   </a>
                 </p>
-              )}
-              {service.verification_status !== 'verified' && (
-                <p className="text-amber-700 dark:text-amber-300">
-                  This listing has not been verified against its official source yet — confirm details before relying on them.
-                </p>
-              )}
-            </div>
+              </div>
+            )}
 
             <div className="flex flex-wrap gap-2">
               {website && (

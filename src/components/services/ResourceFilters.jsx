@@ -112,7 +112,7 @@ export default function ResourceFilters({ filters, onChange, cities = [], langua
           label="Cost"
           value={filters.cost}
           onChange={set('cost')}
-          placeholder="Free or paid"
+          placeholder="Any"
           options={[{ value: 'free', label: 'Free' }, { value: 'paid', label: 'Paid' }]}
         />
       </div>

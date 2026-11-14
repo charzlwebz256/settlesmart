@@ -8,7 +8,9 @@ const MAX_ACCURACY_M = 500;
 // Anything implying a faster move than this over land is a bad fix, not travel.
 const MAX_SPEED_MPS = 90;
 
-const WATCH_OPTIONS = { enableHighAccuracy: true, timeout: 20000, maximumAge: 3000 };
+// Always ask for a brand-new high-accuracy fix: maximumAge 0 keeps the pin at
+// the metre-level precision GPS can report, never a cached reading.
+const WATCH_OPTIONS = { enableHighAccuracy: true, timeout: 30000, maximumAge: 0 };
 const ONCE_OPTIONS = { enableHighAccuracy: true, timeout: 15000, maximumAge: 0 };
 
 const STATUS_MESSAGES = {
@@ -53,7 +55,15 @@ export function useDeviceLocation({ autoStart = true } = {}) {
     let smoothed = next;
     if (previous) {
       const moved = distanceMeters(previous, next);
-      const weight = moved < 4 ? 0.18 : moved < 25 ? 0.4 : 0.65;
+      // A tight fix (a few metres) is trusted as-is; rougher ones are smoothed.
+      const weight =
+        reportedAccuracy != null && reportedAccuracy <= 8
+          ? 1
+          : moved < 4
+            ? 0.18
+            : moved < 25
+              ? 0.4
+              : 0.65;
       smoothed = {
         lat: previous.lat + (next.lat - previous.lat) * weight,
         lng: previous.lng + (next.lng - previous.lng) * weight,

@@ -48,6 +48,7 @@ const BLANK_PROFILE = {
   province: '',
   city: '',
   language_preference: 'en',
+  arrival_date: '',
   interests: [],
   english_level: '',
   french_level: '',
@@ -200,6 +201,19 @@ export default function Profile() {
                   {cities.map(c => <SelectItem key={c} value={c}>{c}</SelectItem>)}
                 </SelectContent>
               </Select>
+            </div>
+            <div className="sm:col-span-2">
+              <label className="text-xs font-medium text-muted-foreground mb-1.5 block">Date landed in Canada</label>
+              <input
+                type="date"
+                value={form.arrival_date || ''}
+                max={new Date().toISOString().slice(0, 10)}
+                onChange={e => updateField('arrival_date', e.target.value)}
+                className="w-full h-9 rounded-lg border border-input bg-transparent px-3 text-sm shadow-sm focus:outline-none focus:ring-1 focus:ring-ring"
+              />
+              <p className="text-[11px] text-muted-foreground mt-1.5">
+                We use this to count how many days you have spent in Canada on your home page.
+              </p>
             </div>
           </div>
         </div>

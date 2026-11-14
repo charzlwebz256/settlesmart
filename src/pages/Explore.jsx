@@ -16,11 +16,11 @@ function ModuleCard({ module, index }) {
       className={cn(
         "h-full flex items-start gap-4 p-5 rounded-2xl bg-card border transition-all",
         available
-          ? "border-border/50 hover:border-primary/40 hover:shadow-md group"
+          ? "border-border/50 shadow-sm hover:border-primary/40 hover:shadow-lg hover:shadow-primary/10 group"
           : "border-border/40 opacity-70"
       )}
     >
-      <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0", module.accent)}>
+      <div className={cn("w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-300", available && "group-hover:scale-110", module.accent)}>
         <Icon className="w-5 h-5" />
       </div>
       <div className="flex-1 min-w-0">
@@ -46,9 +46,12 @@ function ModuleCard({ module, index }) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 12 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.25, delay: index * 0.03 }}
+      initial={{ opacity: 0, y: 14 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, amount: 0.3 }}
+      transition={{ duration: 0.3, delay: index * 0.04, ease: 'easeOut' }}
+      whileHover={available ? { y: -5 } : undefined}
+      whileTap={available ? { scale: 0.98 } : undefined}
       className="h-full"
     >
       {available ? (
