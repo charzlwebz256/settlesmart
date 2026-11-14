@@ -37,6 +37,8 @@ export default function TransitControlPanel({
   onUseMyLocation,
   routeData,
   busStations,
+  startLabel,
+  endLabel,
 }) {
   return (
     <div className="space-y-4">
@@ -162,7 +164,7 @@ export default function TransitControlPanel({
       </section>
 
       {/* Itinerary */}
-      {routeData && <RouteSummary route={routeData} />}
+      {routeData && <RouteSummary route={routeData} startLabel={startLabel} endLabel={endLabel} />}
 
       {/* Nearby bus stations */}
       {busStations.length > 0 && (

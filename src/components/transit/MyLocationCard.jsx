@@ -1,5 +1,6 @@
 import { Crosshair, Loader2, LocateFixed } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { formatAccuracy } from '@/lib/geo';
 
 // Shows the address the GPS resolved, and lets the rider refresh it.
 export default function MyLocationCard({ address, accuracy, locating, resolving, error, hasPosition, onLocate }) {
@@ -32,7 +33,7 @@ export default function MyLocationCard({ address, accuracy, locating, resolving,
       <div className="mt-2 flex items-center gap-1.5 text-[11px] text-muted-foreground">
         <span className={cn('inline-flex items-center gap-1', hasPosition && 'text-green-600 font-semibold')}>
           <span className={cn('w-1.5 h-1.5 rounded-full', hasPosition ? 'bg-green-500 animate-pulse' : 'bg-muted-foreground/40')} />
-          {hasPosition ? (accuracy ? `GPS active · ±${accuracy} m` : 'GPS active') : 'GPS off'}
+          {hasPosition ? (accuracy ? `GPS active · ±${formatAccuracy(accuracy)}` : 'GPS active') : 'GPS off'}
         </span>
         {hasPosition && <span className="truncate">· used as your starting point</span>}
       </div>

@@ -24,6 +24,12 @@ export function bearingBetween(a, b) {
   return (toDeg(Math.atan2(y, x)) + 360) % 360;
 }
 
+// Reported accuracy at 1 m resolution (one decimal below 10 m).
+export function formatAccuracy(meters) {
+  if (!Number.isFinite(meters)) return '';
+  return meters < 10 ? `${meters.toFixed(1)} m` : `${Math.round(meters)} m`;
+}
+
 export function formatDistance(meters) {
   if (!Number.isFinite(meters)) return '—';
   if (meters < 950) return `${Math.round(meters / 10) * 10} m`;

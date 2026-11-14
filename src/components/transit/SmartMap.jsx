@@ -24,6 +24,22 @@ const MAP_TYPES = [
 const FALLBACK_CENTER = { lat: 53.5461, lng: -113.4938 };
 const SAFE_BOTTOM = 'calc(1rem + env(safe-area-inset-bottom))';
 
+// Zoom tracks the reported accuracy: the tighter the fix, the closer the view.
+function zoomForAccuracy(accuracy) {
+  if (!Number.isFinite(accuracy)) return 15;
+  if (accuracy <= 12) return 18;
+  if (accuracy <= 25) return 17;
+  if (accuracy <= 60) return 16;
+  return 14;
+}
+
+// Room for the floating controls so the whole journey stays visible.
+function fitPadding() {
+  return typeof window !== 'undefined' && window.innerWidth >= 768
+    ? { top: 72, right: 104, bottom: 96, left: 72 }
+    : { top: 64, right: 64, bottom: 128, left: 64 };
+}
+
 function svgIcon(maps, svg, size) {
   return {
     url: `data:image/svg+xml;charset=UTF-8,${encodeURIComponent(svg)}`,
@@ -68,6 +84,7 @@ export default function SmartMap({
   startCoords,
   endCoords,
   routePath,
+  routeLegs,
   nearbyStops,
   busStations,
   showStops,
@@ -81,7 +98,7 @@ export default function SmartMap({
   const containerRef = useRef(null);
   const mapRef = useRef(null);
   const mapsRef = useRef(null);
-  const overlays = useRef({ user: null, accuracy: null, route: null, points: [] });
+  const overlays = useRef({ user: null, accuracy: null, route: null, routeLines: [], routeStops: [], points: [] });
   const handlers = useRef({ onPickDestination, onStopSelect });
   handlers.current = { onPickDestination, onStopSelect };
 
@@ -183,7 +200,7 @@ export default function SmartMap({
     if (!ready || !mapRef.current || !userPosition) return;
     if (!centred) {
       mapRef.current.setCenter(userPosition);
-      mapRef.current.setZoom(15);
+      mapRef.current.setZoom(zoomForAccuracy(accuracy));
       setCentred(true);
       return;
     }
@@ -225,28 +242,69 @@ export default function SmartMap({
     overlays.current.points = points;
   }, [ready, startCoords?.join(','), endCoords?.join(','), showStops, nearbyStops, busStations]);
 
-  // Planned route.
+  // Planned journey: every leg in its own style, its stops, framed in full.
   useEffect(() => {
     if (!ready || !mapRef.current) return;
     const maps = mapsRef.current;
     const map = mapRef.current;
+
     overlays.current.route?.setMap(null);
     overlays.current.route = null;
-    if (!routePath || routePath.length < 2) return;
+    (overlays.current.routeLines || []).forEach((line) => line.setMap(null));
+    (overlays.current.routeStops || []).forEach((marker) => marker.setMap(null));
+    overlays.current.routeLines = [];
+    overlays.current.routeStops = [];
 
+    const bounds = new maps.LatLngBounds();
+    const legs = (routeLegs || []).filter((leg) => Array.isArray(leg.path) && leg.path.length > 1);
+
+    if (legs.length > 0) {
+      legs.forEach((leg) => {
+        const walking = leg.kind === 'walk' || leg.kind === 'bike';
+        const path = leg.path.map(([lat, lng]) => ({ lat, lng }));
+        path.forEach((point) => bounds.extend(point));
+
+        overlays.current.routeLines.push(
+          new maps.Polyline({
+            map,
+            path,
+            strokeColor: walking ? '#5f6368' : leg.color || '#1a73e8',
+            strokeOpacity: walking ? 0 : 0.95,
+            strokeWeight: walking ? 4 : 6,
+            zIndex: walking ? 1 : 2,
+            icons: walking
+              ? [{ icon: { path: 'M 0,-1 0,1', strokeOpacity: 0.9, strokeColor: '#5f6368', scale: 3 }, offset: '0', repeat: '12px' }]
+              : [],
+          })
+        );
+
+        if (walking) return;
+        (leg.intermediate_stops || []).slice(0, 40).forEach((stop) => {
+          if (!Number.isFinite(stop.lat) || !Number.isFinite(stop.lng)) return;
+          overlays.current.routeStops.push(
+            new maps.Marker({ map, position: { lat: stop.lat, lng: stop.lng }, icon: stopIcon(maps), title: stop.name, zIndex: 3 })
+          );
+        });
+      });
+
+      map.fitBounds(bounds, fitPadding());
+      setFollow(false);
+      return;
+    }
+
+    if (!routePath || routePath.length < 2) return;
     const path = routePath.map(([lat, lng]) => ({ lat, lng }));
     overlays.current.route = new maps.Polyline({ map, path, strokeColor: '#2563eb', strokeWeight: 5, strokeOpacity: 0.9 });
-    const bounds = new maps.LatLngBounds();
     path.forEach((point) => bounds.extend(point));
-    map.fitBounds(bounds, 56);
+    map.fitBounds(bounds, fitPadding());
     setFollow(false);
-  }, [ready, routePath]);
+  }, [ready, routeLegs, routePath]);
 
   const recentre = () => {
     setFollow(true);
     if (userPosition) {
       mapRef.current?.panTo(userPosition);
-      mapRef.current?.setZoom(Math.max(mapRef.current.getZoom() || 15, 15));
+      mapRef.current?.setZoom(zoomForAccuracy(accuracy));
     }
     if (!userPosition || !Number.isFinite(accuracy) || accuracy > 50) onLocate?.();
   };

@@ -206,6 +206,7 @@ export default function TransitMap() {
 
   // Memoised so the map only redraws the route when a new one is calculated.
   const routePath = useMemo(() => routeData?.waypoints || [], [routeData]);
+  const routeLegs = useMemo(() => routeData?.journey || [], [routeData]);
 
   return (
     <div className="pb-16 md:pb-0">
@@ -219,6 +220,7 @@ export default function TransitMap() {
             startCoords={startCoords}
             endCoords={endCoords}
             routePath={routePath}
+            routeLegs={routeLegs}
             nearbyStops={stops}
             busStations={busStations}
             showStops={showStops}
@@ -266,6 +268,8 @@ export default function TransitMap() {
               onUseMyLocation={useMyLocation}
               routeData={routeData}
               busStations={busStations}
+              startLabel={startInput}
+              endLabel={endInput}
             />
 
             <LocationStatusBar

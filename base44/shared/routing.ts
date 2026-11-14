@@ -89,24 +89,24 @@ function decodePolyline(str, precision = 5) {
   let i = 0;
   let lat = 0;
   let lng = 0;
-  while (i < str.length) {
-    let shift = 0;
+
+  // Plain arithmetic, not bitwise: longitudes scaled by 1e7 overflow 32-bit
+  // shifts and would put the whole bus leg in the wrong place on the map.
+  const readValue = () => {
     let result = 0;
+    let scale = 1;
     let byte;
     do {
       byte = str.charCodeAt(i++) - 63;
-      result |= (byte & 0x1f) << shift;
-      shift += 5;
+      result += (byte & 0x1f) * scale;
+      scale *= 32;
     } while (byte >= 0x20);
-    lat += result & 1 ? ~(result >> 1) : result >> 1;
-    shift = 0;
-    result = 0;
-    do {
-      byte = str.charCodeAt(i++) - 63;
-      result |= (byte & 0x1f) << shift;
-      shift += 5;
-    } while (byte >= 0x20);
-    lng += result & 1 ? ~(result >> 1) : result >> 1;
+    return result % 2 ? -(result + 1) / 2 : result / 2;
+  };
+
+  while (i < str.length) {
+    lat += readValue();
+    lng += readValue();
     path.push([lat / factor, lng / factor]);
   }
   return path;
@@ -136,6 +136,8 @@ function describeItinerary(itinerary) {
 
   const place = (name, fallback) => (!name || name === 'START' || name === 'END' ? fallback : name);
 
+  const journey = [];
+
   legs.forEach((leg) => {
     const kind = LEG_KIND[leg.mode] || 'bus';
     const mins = Math.max(1, Math.round((leg.duration || 0) / 60));
@@ -147,29 +149,55 @@ function describeItinerary(itinerary) {
     const meters = Number(leg.distance) || Math.round(pathKm * 1000);
     distance += meters;
 
-    if (kind === 'walk' || kind === 'bike') {
-      steps.push({ instruction: `${KIND_LABEL[kind]} ${mins} min to ${toName}`, distance_m: Math.round(meters), mode: kind });
-      return;
-    }
-
     const label = KIND_LABEL[kind] || 'Transit';
-    const routeName = leg.routeShortName || leg.routeLongName || label;
+    const routeName = leg.routeShortName || leg.routeLongName || '';
     const cleanedHeadsign = String(leg.headsign || '')
       .replace(leg.routeLongName || '\u0000', '')
       .replace(/^[\s,-]+/, '')
       .trim();
-    const headsign = cleanedHeadsign && cleanedHeadsign !== leg.routeShortName ? ` toward ${cleanedHeadsign}` : '';
+    const headsign = cleanedHeadsign && cleanedHeadsign !== leg.routeShortName ? cleanedHeadsign : '';
+    const isTransit = kind !== 'walk' && kind !== 'bike' && kind !== 'driving';
+    const intermediate = Array.isArray(leg.intermediateStops) ? leg.intermediateStops : [];
+    const color = String(leg.routeColor || '').replace('#', '').trim();
+
+    // Every leg of the whole journey, for the full itinerary and the map.
+    journey.push({
+      kind,
+      label,
+      route_name: routeName || null,
+      long_name: leg.routeLongName || null,
+      headsign: headsign || null,
+      agency: leg.agencyName || null,
+      color: /^[0-9a-fA-F]{6}$/.test(color) ? `#${color}` : null,
+      from_name: fromName,
+      from_coords: leg.from?.lat !== undefined ? [leg.from.lat, leg.from.lon] : null,
+      to_name: toName,
+      to_coords: leg.to?.lat !== undefined ? [leg.to.lat, leg.to.lon] : null,
+      start_at: leg.startTime || null,
+      end_at: leg.endTime || null,
+      duration_minutes: mins,
+      distance_m: Math.round(meters),
+      stops_count: isTransit ? intermediate.length + 1 : null,
+      intermediate_stops: intermediate.slice(0, 40).map((s) => ({ name: s.name, lat: s.lat, lng: s.lon })),
+      path: path.slice(0, 800),
+    });
+
+    if (!isTransit) {
+      steps.push({ instruction: `${label} ${mins} min to ${toName}`, distance_m: Math.round(meters), mode: kind });
+      return;
+    }
+
     steps.push({
-      instruction: `${label} ${routeName}${headsign} — ${fromName} → ${toName} (${mins} min)`,
+      instruction: `${label} ${routeName}${headsign ? ` toward ${headsign}` : ''} — ${fromName} → ${toName} (${mins} min)`,
       distance_m: Math.round(meters),
       mode: kind,
     });
-    buses.push({ name: `${KIND_LABEL[kind] || 'Transit'} ${routeName}`, route: routeName, kind });
+    buses.push({ name: `${label} ${routeName}`, route: routeName, kind });
     if (leg.from?.lat !== undefined) {
-      stops.push({ name: fromName, lat: leg.from.lat, lng: leg.from.lon, buses: [routeName] });
+      stops.push({ name: fromName, lat: leg.from.lat, lng: leg.from.lon, buses: [routeName || label] });
     }
     if (leg.to?.lat !== undefined) {
-      stops.push({ name: toName, lat: leg.to.lat, lng: leg.to.lon, buses: [routeName] });
+      stops.push({ name: toName, lat: leg.to.lat, lng: leg.to.lon, buses: [routeName || label] });
     }
   });
 
@@ -177,6 +205,7 @@ function describeItinerary(itinerary) {
     duration_minutes: Math.max(1, Math.round((itinerary.duration || 0) / 60)),
     distance_km: round1(distance / 1000),
     waypoints,
+    journey,
     steps,
     bus_info: buses,
     nearby_bus_stations: stops,

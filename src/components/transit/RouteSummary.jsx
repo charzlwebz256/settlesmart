@@ -1,6 +1,7 @@
 import { Footprints, Bus, Train, Ship, Bike, Car, Clock, Route, ArrowRight, Info, Repeat, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ETS_LINKS } from '@/data/etsTransit';
+import JourneyTimeline from './JourneyTimeline';
 
 const MODE_META = {
   walk: { icon: Footprints, tint: 'text-green-600 bg-green-500/10' },
@@ -31,10 +32,11 @@ function formatTime(iso) {
   return Number.isNaN(d.getTime()) ? null : d.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' });
 }
 
-export default function RouteSummary({ route }) {
+export default function RouteSummary({ route, startLabel, endLabel }) {
   if (!route) return null;
 
   const steps = Array.isArray(route.steps) ? route.steps : [];
+  const journey = Array.isArray(route.journey) ? route.journey : [];
   const buses = Array.isArray(route.bus_info) ? route.bus_info : [];
   const alternatives = Array.isArray(route.alternatives) ? route.alternatives : [];
   const depart = formatTime(route.depart_at);
@@ -77,8 +79,16 @@ export default function RouteSummary({ route }) {
         </div>
       )}
 
-      {/* Step by step */}
-      {steps.length > 0 && (
+      {/* The whole journey, leg by leg */}
+      {journey.length > 0 && (
+        <div className="border-t border-border/40 pt-2.5">
+          <p className="mb-1.5 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Full journey</p>
+          <JourneyTimeline legs={journey} startLabel={startLabel} endLabel={endLabel} />
+        </div>
+      )}
+
+      {/* Step by step (street routes) */}
+      {journey.length === 0 && steps.length > 0 && (
         <ol className="space-y-1.5 border-t border-border/40 pt-2.5">
           {steps.map((s, i) => {
             const meta = MODE_META[s.mode] || MODE_META.walk;

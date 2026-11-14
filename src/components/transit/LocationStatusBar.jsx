@@ -1,6 +1,6 @@
 import { RefreshCw } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { BAND_STYLES, formatUpdatedAgo } from '@/lib/geo';
+import { BAND_STYLES, formatAccuracy, formatUpdatedAgo } from '@/lib/geo';
 
 const STATE_LABELS = {
   idle: 'Location off',
@@ -36,7 +36,7 @@ export default function LocationStatusBar({ band, accuracy, lastFixAt, status, o
           {meta.label}
         </span>
         {Number.isFinite(accuracy) && (
-          <span className="text-[11px] font-medium text-muted-foreground">±{Math.round(accuracy)} m reported</span>
+          <span className="text-[11px] font-medium text-muted-foreground">±{formatAccuracy(accuracy)} reported</span>
         )}
       </div>
 
