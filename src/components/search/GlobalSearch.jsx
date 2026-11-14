@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { Search, CornerDownLeft, Sparkles, Home, Briefcase, CalendarDays, Info } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -45,6 +45,7 @@ const CATALOG = [
 
 export default function GlobalSearch({ open, onClose }) {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
   const [query, setQuery] = useState('');
   const [activeIndex, setActiveIndex] = useState(0);
   const inputRef = useRef(null);
@@ -88,7 +89,16 @@ export default function GlobalSearch({ open, onClose }) {
 
   useEffect(() => { setActiveIndex(0); }, [query]);
 
-  const goTo = (path) => { navigate(path); onClose(); };
+  // Close the card as soon as a destination is opened
+  const prevPath = useRef(pathname);
+  useEffect(() => {
+    if (prevPath.current !== pathname) {
+      prevPath.current = pathname;
+      onClose();
+    }
+  }, [pathname, onClose]);
+
+  const goTo = (path) => { onClose(); navigate(path); };
 
   const onKeyDown = (e) => {
     if (e.key === 'ArrowDown') { e.preventDefault(); setActiveIndex(i => Math.min(i + 1, results.length - 1)); }

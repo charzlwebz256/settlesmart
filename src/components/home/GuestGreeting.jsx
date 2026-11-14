@@ -3,18 +3,21 @@ import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CalendarDays, Sparkles } from 'lucide-react';
 import GreetingCard from './GreetingCard';
+import BannerWeather from './BannerWeather';
 import { getDayPart } from '@/lib/dayParts';
+import { timezoneForLocation, formatClock, formatDate } from '@/lib/canadaTimezones';
 
 // Signed-out visitors: a greeting card that follows the time of day, no name.
-export default function GuestGreeting({ onStartWizard }) {
+export default function GuestGreeting({ onStartWizard, city, province }) {
   const [now, setNow] = useState(new Date());
 
   useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 60000);
+    const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
 
-  const part = getDayPart(now);
+  const timeZone = timezoneForLocation(province);
+  const part = getDayPart(now, timeZone);
 
   return (
     <GreetingCard
@@ -22,9 +25,9 @@ export default function GuestGreeting({ onStartWizard }) {
       eyebrow={(
         <>
           <CalendarDays className="w-3.5 h-3.5" />
-          {now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}
+          {formatDate(now, timeZone)}
           <span className="opacity-50">·</span>
-          {now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+          <span className="tabular-nums">{formatClock(now, timeZone)}</span>
         </>
       )}
       title={(
@@ -38,6 +41,10 @@ export default function GuestGreeting({ onStartWizard }) {
       <p className="text-sm text-muted-foreground mt-2 max-w-lg">
         Free settlement services, housing, jobs and education — all in one place.
       </p>
+
+      <div className="mt-3">
+        <BannerWeather city={city} province={province} />
+      </div>
 
       <div className="flex flex-wrap gap-2 mt-5">
         <Button

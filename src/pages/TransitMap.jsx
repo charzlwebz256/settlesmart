@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from 'react-leaflet';
+import { MapContainer, Marker, Popup, Polyline, ScaleControl, useMap } from 'react-leaflet';
 import { base44 } from '@/api/base44Client';
 import { Loader2, Navigation, Bus, MapPin, RotateCcw, ExternalLink, Info, Clock, Route, Fuel, Footprints, Bike, ArrowLeft, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -7,6 +7,7 @@ import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { useCityDetection } from '@/hooks/useCityDetection';
 import WeatherWidget from '@/components/transit/WeatherWidget';
+import { MapLayerTiles, MapTypeSwitcher, MapClickToPin } from '@/components/transit/MapLayers';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
 
@@ -67,6 +68,7 @@ export default function TransitMap() {
   const [startCoords, setStartCoords] = useState(null);
   const [endCoords, setEndCoords] = useState(null);
   const [selectedMode, setSelectedMode] = useState('driving');
+  const [mapType, setMapType] = useState('street');
   const [routeData, setRouteData] = useState(null);
   const [busStations, setBusStations] = useState([]);
   const [routeLoading, setRouteLoading] = useState(false);
@@ -167,7 +169,7 @@ export default function TransitMap() {
               Directions & Transit Map
             </h1>
             <p className="text-xs text-muted-foreground mt-0.5">
-              Route planning with GPS · Bus stations · Multiple transport modes
+              GPS routing · Map, satellite, hybrid and terrain layers · Tap the map to set a destination
             </p>
           </div>
           <Button
@@ -453,16 +455,17 @@ export default function TransitMap() {
           style={{ height: '100%', width: '100%' }}
           zoomControl={true}
         >
-          <TileLayer
-            url="https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-            attribution='Tiles &copy; Esri'
-            maxZoom={19}
-          />
-          <TileLayer
-            url="https://server.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer/tile/{z}/{y}/{x}"
-            attribution=''
-            maxZoom={19}
-            opacity={0.8}
+          <MapLayerTiles type={mapType} />
+          <ScaleControl position="bottomleft" imperial={false} />
+
+          {/* Tap the map to drop the destination pin */}
+          <MapClickToPin
+            enabled={showDirections}
+            onPick={(latlng) => {
+              setEndCoords([latlng.lat, latlng.lng]);
+              setEndInput(`${latlng.lat.toFixed(5)}, ${latlng.lng.toFixed(5)}`);
+              setShowEndSuggestions(false);
+            }}
           />
 
           {position && (
@@ -517,6 +520,8 @@ export default function TransitMap() {
             </Marker>
           ))}
         </MapContainer>
+
+        <MapTypeSwitcher value={mapType} onChange={setMapType} />
 
         {routeLoading && (
           <div className="absolute inset-0 flex items-center justify-center bg-background/70 z-[1000]">

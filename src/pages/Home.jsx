@@ -62,6 +62,8 @@ export default function Home() {
           ) : (
             <GuestGreeting
               onStartWizard={() => requireAuth(() => setShowWizard(true))}
+              city={city}
+              province={province}
             />
           )}
           {hasProfile && (

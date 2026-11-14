@@ -4,7 +4,9 @@ import { Button } from '@/components/ui/button';
 import { MapPin, ListChecks, Sparkles, User, CalendarDays } from 'lucide-react';
 import { differenceInDays, parseISO, isValid } from 'date-fns';
 import GreetingCard from './GreetingCard';
+import BannerWeather from './BannerWeather';
 import { getDayPart } from '@/lib/dayParts';
+import { timezoneForLocation, formatClock, formatDate } from '@/lib/canadaTimezones';
 
 const STATUS_LABELS = {
   permanent_resident: 'Permanent resident',
@@ -21,13 +23,17 @@ export default function WelcomeBanner({ user, profile, city, province }) {
 
   // Keep the greeting, photo and clock in step with the time of day
   useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 60000);
+    const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
 
-  const part = getDayPart(now);
+  // Local time at the visitor's own province
+  const activeProvince = profile?.province || province;
+  const activeCity = profile?.city || city;
+  const timeZone = timezoneForLocation(activeProvince);
+  const part = getDayPart(now, timeZone);
   const name = (user?.full_name || '').trim().split(' ')[0] || 'there';
-  const place = [profile?.city || city, profile?.province || province].filter(Boolean).join(', ');
+  const place = [activeCity, activeProvince].filter(Boolean).join(', ');
   const status = STATUS_LABELS[profile?.immigration_status];
   const arrival = profile?.arrival_date ? parseISO(profile.arrival_date) : null;
   const daysInCanada = arrival && isValid(arrival) ? Math.max(0, differenceInDays(now, arrival)) : null;
@@ -38,9 +44,9 @@ export default function WelcomeBanner({ user, profile, city, province }) {
       eyebrow={(
         <>
           <CalendarDays className="w-3.5 h-3.5" />
-          {now.toLocaleDateString([], { weekday: 'long', month: 'long', day: 'numeric' })}
+          {formatDate(now, timeZone)}
           <span className="opacity-50">·</span>
-          {now.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+          <span className="tabular-nums">{formatClock(now, timeZone)}</span>
         </>
       )}
       title={(
@@ -67,6 +73,7 @@ export default function WelcomeBanner({ user, profile, city, province }) {
             Day {daysInCanada} in Canada
           </span>
         )}
+        <BannerWeather city={activeCity} province={activeProvince} />
       </div>
 
       <div className="flex flex-wrap gap-2 mt-5">
@@ -81,7 +88,7 @@ export default function WelcomeBanner({ user, profile, city, province }) {
           </Button>
         </Link>
         <Link to="/assistant">
-          <Button size="sm" variant="ghost" className="rounded-xl gap-1.5 h-10 px-4 font-semibold text-primary hover:bg-primary/10">
+          <Button size="sm" variant="ghost" className="rounded-xl gap-1.5 h-10 px-4 font-semibold text-primary hover:bg-black hover:text-white">
             <Sparkles className="w-4 h-4" /> Ask Nexa
           </Button>
         </Link>
