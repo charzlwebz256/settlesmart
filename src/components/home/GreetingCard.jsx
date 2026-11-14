@@ -11,10 +11,10 @@ export default function GreetingCard({ part, eyebrow, title, subtitle, children 
         />
 
         {/* Time-of-day tint */}
-        <div className={`absolute inset-0 bg-gradient-to-br ${part.grad} opacity-70`} />
+        <div className={`absolute inset-0 bg-gradient-to-br ${part.grad} opacity-25`} />
 
         {/* Scrim so the greeting stays readable over the photo */}
-        <div className="absolute inset-0 bg-gradient-to-r from-card via-card/90 to-card/70 md:via-card/85 md:to-card/25" />
+        <div className="absolute inset-0 bg-gradient-to-r from-card/95 via-card/75 to-card/10" />
 
         <div className="relative p-6 md:p-8">
           <p className="flex items-center gap-1.5 text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">
