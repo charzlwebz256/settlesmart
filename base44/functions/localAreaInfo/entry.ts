@@ -175,6 +175,38 @@ For each return: name, category (food_bank/clinic/settlement/community), address
       });
     }
 
+    // Street address for a coordinate pair, so the map can name a place instead of numbers.
+    if (action === 'reverse_address') {
+      const latitude = Number(payload.latitude);
+      const longitude = Number(payload.longitude);
+      if (!Number.isFinite(latitude) || !Number.isFinite(longitude)) {
+        return Response.json({ error: 'Valid coordinates are required.' }, { status: 400 });
+      }
+
+      const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1&accept-language=en`;
+      const response = await fetch(url, {
+        headers: { 'User-Agent': 'SettleSmart/1.0 (newcomer settlement app)', 'Accept': 'application/json' },
+      });
+      if (!response.ok) return Response.json({ address: '' });
+
+      const data = await response.json().catch(() => null);
+      const address = data?.address || {};
+      const street = [address.house_number, address.road].filter(Boolean).join(' ');
+      const locality = address.city || address.town || address.village || address.hamlet || address.suburb || '';
+      const parts = [street, locality, address.state || address.province || '', address.postcode || '']
+        .map((part) => String(part || '').trim())
+        .filter(Boolean);
+
+      const fallback = String(data?.display_name || '')
+        .split(',')
+        .map((part) => part.trim())
+        .filter(Boolean)
+        .slice(0, 3)
+        .join(', ');
+
+      return Response.json({ address: cleanText(parts.join(', ') || fallback, 200) });
+    }
+
     return Response.json({ error: 'Unknown action.' }, { status: 400 });
   } catch (error) {
     return Response.json({ error: error.message }, { status: 500 });

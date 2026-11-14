@@ -1,5 +1,6 @@
-import { Footprints, Bus, Train, Ship, Bike, Car, Clock, Route, ArrowRight, Info, Repeat } from 'lucide-react';
+import { Footprints, Bus, Train, Ship, Bike, Car, Clock, Route, ArrowRight, Info, Repeat, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { ETS_LINKS } from '@/data/etsTransit';
 
 const MODE_META = {
   walk: { icon: Footprints, tint: 'text-green-600 bg-green-500/10' },
@@ -126,6 +127,30 @@ export default function RouteSummary({ route }) {
           <Info className="w-3 h-3 mt-0.5 flex-shrink-0" />
           {route.note}
         </p>
+      )}
+
+      {/* Live times and published schedules for Edmonton riders */}
+      {buses.length > 0 && (
+        <div className="flex flex-wrap gap-x-3 gap-y-1 border-t border-border/40 pt-2 text-[11px] font-semibold">
+          <a
+            href={ETS_LINKS.transitApp}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-primary hover:underline"
+          >
+            Live arrivals in the Transit app
+            <ExternalLink className="w-2.5 h-2.5" />
+          </a>
+          <a
+            href={ETS_LINKS.schedules}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 text-muted-foreground hover:text-foreground"
+          >
+            ETS route schedules
+            <ExternalLink className="w-2.5 h-2.5" />
+          </a>
+        </div>
       )}
     </div>
   );

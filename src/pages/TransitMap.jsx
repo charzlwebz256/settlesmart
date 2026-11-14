@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { MapContainer, Marker, Popup, Polyline, ScaleControl, useMap } from 'react-leaflet';
 import { base44 } from '@/api/base44Client';
 import { Loader2, Navigation, Bus, MapPin, RotateCcw, ExternalLink, Info, Clock, Route, Fuel, Footprints, Bike, ArrowLeft, X, Crosshair } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
-import { useCityDetection } from '@/hooks/useCityDetection';
-import WeatherWidget from '@/components/transit/WeatherWidget';
 import { MapLayerTiles, MapTypeSwitcher, MapClickToPin, MapResizer, MapCenterWatcher, FitRoute } from '@/components/transit/MapLayers';
 import RouteSummary from '@/components/transit/RouteSummary';
+import TransitAppPromo from '@/components/transit/TransitAppPromo';
+import EtsNetworkPanel from '@/components/transit/EtsNetworkPanel';
 import { useNearbyStops } from '@/hooks/useNearbyStops';
 import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
@@ -65,8 +65,10 @@ function RecenterMap({ position }) {
 }
 
 export default function TransitMap() {
-  const { city, province } = useCityDetection();
   const [position, setPosition] = useState(null);
+  const [myAddress, setMyAddress] = useState('');
+  const [resolvingAddress, setResolvingAddress] = useState(false);
+  const startTouchedRef = useRef(false);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [accuracy, setAccuracy] = useState(null);
@@ -96,6 +98,41 @@ export default function TransitMap() {
     { id: 'bicycling', label: 'Bike', icon: Bike, color: 'text-purple-600' },
   ];
 
+  // Street address for a set of coordinates, so a point reads like a place.
+  const reverseAddress = async (coords) => {
+    if (!coords) return '';
+    const { data } = await base44.functions.invoke('localAreaInfo', {
+      action: 'reverse_address',
+      latitude: coords[0],
+      longitude: coords[1],
+    });
+    return data?.address || '';
+  };
+
+  // Puts the visitor's own street address into the starting point.
+  const resolveMyAddress = async (coords) => {
+    if (!coords) return;
+    setResolvingAddress(true);
+    const address = await reverseAddress(coords);
+    setResolvingAddress(false);
+    if (!address) return;
+    setMyAddress(address);
+    if (!startTouchedRef.current) setStartInput(address);
+  };
+
+  const useMyLocation = async () => {
+    if (!position) return;
+    setShowStartSuggestions(false);
+    setStartCoords(position);
+    if (myAddress) {
+      setStartInput(myAddress);
+      return;
+    }
+    startTouchedRef.current = false;
+    setStartInput('My current location');
+    await resolveMyAddress(position);
+  };
+
   // Asks the browser for location access. Never blocks the map: if permission is
   // denied the map stays fully usable and the visitor can search or tap instead.
   const getLocation = () => {
@@ -107,9 +144,11 @@ export default function TransitMap() {
     setLoading(true);
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        setPosition([pos.coords.latitude, pos.coords.longitude]);
+        const coords = [pos.coords.latitude, pos.coords.longitude];
+        setPosition(coords);
         setAccuracy(Math.round(pos.coords.accuracy));
         setLoading(false);
+        resolveMyAddress(coords);
       },
       () => {
         setLoading(false);
@@ -192,7 +231,7 @@ export default function TransitMap() {
   };
 
   return (
-    <div className="flex flex-col h-screen pb-16 md:pb-0">
+    <div className="flex flex-col min-h-screen pb-16 md:pb-0">
       {/* Header */}
       <div className="px-4 py-4 bg-card border-b border-border/50 flex-shrink-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
@@ -271,11 +310,12 @@ export default function TransitMap() {
                     <input
                       value={startInput}
                       onChange={e => {
+                        startTouchedRef.current = true;
                         setStartInput(e.target.value);
                         getPlaceSuggestions(e.target.value, setStartSuggestions, setShowStartSuggestions);
                       }}
                       onFocus={() => startSuggestions.length > 0 && setShowStartSuggestions(true)}
-                      placeholder="Your location or address"
+                      placeholder={resolvingAddress ? 'Finding your address…' : 'Your location or address'}
                       className="w-full px-3 py-2 rounded-lg border border-border/60 bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none"
                     />
                     {showStartSuggestions && startSuggestions.length > 0 && (
@@ -284,6 +324,7 @@ export default function TransitMap() {
                           <button
                             key={i}
                             onClick={() => {
+                              startTouchedRef.current = true;
                               setStartInput(place.address);
                               setStartCoords([place.lat, place.lng]);
                               setShowStartSuggestions(false);
@@ -300,15 +341,12 @@ export default function TransitMap() {
                   <Button
                     size="sm"
                     variant="outline"
-                    onClick={() => {
-                      setStartInput(`${position[0].toFixed(5)}, ${position[1].toFixed(5)}`);
-                      setStartCoords(position);
-                      setShowStartSuggestions(false);
-                    }}
-                    disabled={!position}
+                    onClick={useMyLocation}
+                    disabled={!position || resolvingAddress}
+                    title="Use my address"
                     className="rounded-lg"
                   >
-                    <Navigation className="w-3.5 h-3.5" />
+                    {resolvingAddress ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Navigation className="w-3.5 h-3.5" />}
                   </Button>
                 </div>
               </div>
@@ -396,7 +434,7 @@ export default function TransitMap() {
                     </div>
                   ))}
                   <a
-                    href="https://www.edmonton.ca/ets/maps-routes-schedules-service"
+                    href="https://www.edmonton.ca/ets/route-schedules-and-maps"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-[10px] text-primary hover:underline font-semibold flex items-center gap-1"
@@ -447,7 +485,7 @@ export default function TransitMap() {
       )}
 
       {/* Map */}
-      <div className="flex-1 relative min-h-0">
+      <div className="relative h-[70vh] md:h-[78vh] flex-shrink-0">
         <MapContainer
           center={displayCenter}
           zoom={13}
@@ -468,10 +506,11 @@ export default function TransitMap() {
           {/* Tap the map to drop the destination pin */}
           <MapClickToPin
             enabled={showDirections}
-            onPick={(latlng) => {
+            onPick={async (latlng) => {
               setEndCoords([latlng.lat, latlng.lng]);
-              setEndInput(`${latlng.lat.toFixed(5)}, ${latlng.lng.toFixed(5)}`);
               setShowEndSuggestions(false);
+              const address = await reverseAddress([latlng.lat, latlng.lng]);
+              setEndInput(address || 'Dropped pin');
             }}
           />
 
@@ -545,6 +584,7 @@ export default function TransitMap() {
         </MapContainer>
 
         <MapTypeSwitcher value={mapType} onChange={setMapType} />
+        <TransitAppPromo />
 
         {/* Map controls — never cover the map, it stays fully usable */}
         <div className="absolute bottom-6 right-3 z-[1000] flex flex-col items-end gap-2">
@@ -611,12 +651,8 @@ export default function TransitMap() {
         )}
       </div>
 
-      {/* Weather Widget */}
-      <div className="px-4 py-6 bg-background border-t border-border/50">
-        <div className="max-w-7xl mx-auto">
-          <WeatherWidget city={city} province={province} />
-        </div>
-      </div>
+      {/* ETS routes, commutes and schedules */}
+      <EtsNetworkPanel />
     </div>
   );
 }
