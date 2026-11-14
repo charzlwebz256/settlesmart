@@ -20,11 +20,13 @@ function cardinalName(heading) {
  * accent arrow keeps pointing at the destination, so the rider sees at a
  * glance which way they face and which way they need to go.
  */
-export default function MapCompass({ heading, bearing, needsPermission, onEnableCompass }) {
+export default function MapCompass({ heading, bearing, tilt, needsPermission, onEnableCompass }) {
   const hasHeading = Number.isFinite(heading);
   const hasBearing = Number.isFinite(bearing);
   // The dial turns against the phone so north stays true to the ground.
   const dialRotation = hasHeading ? -heading : 0;
+  // The phone's tilt leans the rose, so it reads like a hand-held compass.
+  const dialTilt = Number.isFinite(tilt) ? Math.max(-28, Math.min(28, tilt)) : 0;
   const targetRotation = hasBearing ? bearing - (hasHeading ? heading : 0) : null;
 
   return (
@@ -32,7 +34,8 @@ export default function MapCompass({ heading, bearing, needsPermission, onEnable
       <div className="relative h-[74px] w-[74px] rounded-full border border-border/60 bg-card/95 shadow-lg backdrop-blur">
         <motion.div
           className="absolute inset-0"
-          animate={{ rotate: dialRotation }}
+          style={{ transformPerspective: 360 }}
+          animate={{ rotate: dialRotation, rotateX: dialTilt }}
           transition={{ type: 'spring', stiffness: 110, damping: 22 }}
         >
           {ROSE.map((point) => (

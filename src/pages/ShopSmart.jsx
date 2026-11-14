@@ -41,6 +41,7 @@ const CATEGORIES = [
       { name: 'Simons', url: 'https://www.simons.ca', logo: 'https://www.google.com/s2/favicons?sz=64&domain=simons.ca', bg: 'bg-teal-50 dark:bg-teal-950/30', border: 'border-teal-200 dark:border-teal-800', text: 'text-teal-700 dark:text-teal-300' },
       { name: "Hudson's Bay", url: 'https://www.thebay.com', logo: 'https://mms.businesswire.com/media/20210322005442/en/866099/5/HB_Stripes_EN_%284%29_highres.jpg?download=1', bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200 dark:border-amber-800', text: 'text-amber-700 dark:text-amber-300' },
       { name: 'Old Navy Canada', url: 'https://oldnavy.gapcanada.ca', logo: 'https://mallmaverick.imgix.net/web/property_managers/27/properties/244/all/20220214213158/Old-Navy.png', bg: 'bg-blue-50 dark:bg-blue-950/30', border: 'border-blue-200 dark:border-blue-800', text: 'text-blue-700 dark:text-blue-300' },
+      { name: 'SHEIN Canada', url: 'https://ca.shein.com', logo: 'https://www.google.com/s2/favicons?sz=128&domain=shein.com', bg: 'bg-zinc-100 dark:bg-zinc-800/40', border: 'border-zinc-200 dark:border-zinc-700', text: 'text-zinc-800 dark:text-zinc-200' },
     ],
   },
   {

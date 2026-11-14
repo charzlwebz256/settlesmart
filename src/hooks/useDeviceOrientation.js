@@ -1,10 +1,16 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 
-// Device compass (deviceorientation). Gives the way the phone is pointing, which
-// the map needs for a Google-Maps style direction arrow, GPS heading alone is
-// null whenever the rider stands still.
+// Device compass (deviceorientation) plus its tilt. Heading tells the map which
+// way the phone points, tilt lets the compass rose lean with the hand holding it.
+const ease = (prev, next) => {
+  if (!Number.isFinite(prev)) return next;
+  const delta = ((next - prev + 540) % 360) - 180; // turn the short way round
+  return (((prev + delta * 0.25) % 360) + 360) % 360;
+};
+
 export function useDeviceOrientation() {
   const [heading, setHeading] = useState(null);
+  const [tilt, setTilt] = useState(null);
   const [granted, setGranted] = useState(false);
   const [needsPermission, setNeedsPermission] = useState(false);
   const handlerRef = useRef(null);
@@ -15,13 +21,27 @@ export function useDeviceOrientation() {
     activeRef.current = true;
 
     const handler = (event) => {
-      // Only trust a real compass reading, a laptop's relative tilt sensor would
-      // otherwise spin the arrow for no reason.
-      const compass = Number.isFinite(event.webkitCompassHeading);
-      if (!compass && event.type !== 'deviceorientationabsolute' && event.absolute !== true) return;
-      const raw = compass ? event.webkitCompassHeading : 360 - (Number(event.alpha) || 0);
-      if (!Number.isFinite(raw)) return;
-      setHeading(((raw % 360) + 360) % 360);
+      const alpha = Number(event.alpha);
+      const beta = Number(event.beta);
+      const gamma = Number(event.gamma);
+      const absolute = event.absolute === true || event.type === 'deviceorientationabsolute';
+
+      if (Number.isFinite(beta)) setTilt(Math.max(-45, Math.min(45, beta - 90)));
+
+      let raw = null;
+      if (Number.isFinite(event.webkitCompassHeading)) {
+        // iOS gives a true compass bearing directly.
+        raw = event.webkitCompassHeading;
+      } else if (absolute && Number.isFinite(alpha)) {
+        raw = 360 - alpha;
+      } else if (Number.isFinite(beta) && Number.isFinite(gamma) && (Math.abs(beta - 90) > 12 || Math.abs(gamma) > 12)) {
+        // Only a relative sensor here: follow how the phone is tilted instead.
+        raw = (Math.atan2(-gamma, beta - 90) * 180) / Math.PI;
+      }
+
+      if (raw === null || !Number.isFinite(raw)) return;
+      const normalised = ((raw % 360) + 360) % 360;
+      setHeading((prev) => ease(prev, normalised));
     };
 
     handlerRef.current = handler;
@@ -59,5 +79,5 @@ export function useDeviceOrientation() {
     }
   }, [listen]);
 
-  return { heading, granted, needsPermission, requestPermission };
+  return { heading, tilt, granted, needsPermission, requestPermission };
 }

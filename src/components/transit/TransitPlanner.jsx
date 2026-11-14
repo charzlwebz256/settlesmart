@@ -30,7 +30,7 @@ const RELOAD_STOPS_AFTER_M = 400;
  * The live transit planner: map plus directions sidebar.
  * `embedded` shrinks it to fit inside a card (Explore) instead of a full page.
  */
-export default function TransitPlanner({ embedded = false, autoLocate = false }) {
+export default function TransitPlanner({ embedded = false, autoLocate = false, refreshSignal = 0 }) {
   const [myAddress, setMyAddress] = useState('');
   const [resolvingAddress, setResolvingAddress] = useState(false);
   const startTouchedRef = useRef(false);
@@ -240,6 +240,15 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
     setEndInput(address || 'Dropped pin');
   };
 
+  // Pulling down on the transit page fixes the position again and re-plans the trip.
+  const lastRefreshRef = useRef(refreshSignal);
+  useEffect(() => {
+    if (refreshSignal === lastRefreshRef.current) return;
+    lastRefreshRef.current = refreshSignal;
+    requestOnce();
+    if (endCoords) getRoute();
+  }, [refreshSignal]); // eslint-disable-line
+
   // Every way to make the trip: the best one first, then the alternatives.
   const routeOptions = useMemo(() => {
     if (!routeData) return [];
@@ -321,6 +330,7 @@ export default function TransitPlanner({ embedded = false, autoLocate = false })
           userPosition={position}
           accuracy={accuracy}
           heading={Number.isFinite(compass.heading) ? compass.heading : heading}
+          tilt={compass.tilt}
           needsCompass={compass.needsPermission}
           onEnableCompass={compass.requestPermission}
           startCoords={startCoords}

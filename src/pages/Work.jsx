@@ -1,27 +1,8 @@
 import { Link } from 'react-router-dom';
-import { Briefcase, CalendarDays, ArrowRight, FileText, MessagesSquare, BadgeCheck, Scale, Sparkles, Clapperboard, ShoppingBag } from 'lucide-react';
+import { Briefcase, CalendarDays, ArrowRight, FileText, MessagesSquare, BadgeCheck, Scale, Sparkles } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 const groups = [
-  {
-    title: 'SmartLife essentials',
-    items: [
-      {
-        icon: ShoppingBag,
-        color: 'bg-emerald-500/10 text-emerald-600',
-        label: 'ShopSmart',
-        desc: 'Popular Canadian shopping platforms, price comparison and newcomer shopping tips.',
-        path: '/shop-smart',
-      },
-      {
-        icon: Clapperboard,
-        color: 'bg-sky-500/10 text-sky-600',
-        label: 'SmartPlay',
-        desc: 'Free movies, live TV, music, podcasts, documentaries, audiobooks and kids shows in Canada.',
-        path: '/smart-play',
-      },
-    ],
-  },
   {
     title: 'Find work',
     items: [

@@ -1,17 +1,68 @@
 import { useState } from 'react';
-import { Bell, Loader2, CheckCircle, Mail, LogIn } from 'lucide-react';
+import { Bell, Loader2, CheckCircle, Mail, LogIn, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  MobileSelect as Select, MobileSelectContent as SelectContent, MobileSelectItem as SelectItem,
+  MobileSelectTrigger as SelectTrigger, MobileSelectValue as SelectValue,
+} from '@/components/ui/mobile-select';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
 
 const STORES = [
   'Walmart', 'Costco', 'Real Canadian Superstore', 'Amazon', 'Best Buy',
-  'Shoppers Drug Mart', 'Canadian Tire', 'IKEA', 'Staples', 'No Frills',
+  'Shoppers Drug Mart', 'Canadian Tire', 'IKEA', 'Staples', 'No Frills', 'SHEIN',
 ];
 
 const CATEGORIES = [
   'Groceries & Essentials', 'Electronics', 'Household & Cleaning', 'Clothing', 'Furniture & Home',
 ];
+
+function PickerSection({ label, hint, placeholder, options, selected, onAdd, onRemove, tone }) {
+  const chipTone = tone === 'accent'
+    ? 'bg-accent/10 text-accent border-accent/30'
+    : 'bg-primary/10 text-primary border-primary/30';
+
+  return (
+    <div className="mb-4">
+      <label className="text-xs font-medium text-muted-foreground block mb-2">
+        {label} {hint && <span className="text-muted-foreground/70">{hint}</span>}
+      </label>
+      <Select value="" onValueChange={onAdd}>
+        <SelectTrigger className="h-10 w-full rounded-xl border border-input bg-background px-3 text-sm">
+          <SelectValue placeholder={placeholder} />
+        </SelectTrigger>
+        <SelectContent>
+          {options
+            .filter((option) => !selected.includes(option))
+            .map((option) => (
+              <SelectItem key={option} value={option}>{option}</SelectItem>
+            ))}
+        </SelectContent>
+      </Select>
+
+      {selected.length > 0 && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          {selected.map((item) => (
+            <span
+              key={item}
+              className={`flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-medium ${chipTone}`}
+            >
+              {item}
+              <button
+                type="button"
+                onClick={() => onRemove(item)}
+                aria-label={`Remove ${item}`}
+                className="rounded-full p-0.5 hover:bg-foreground/10"
+              >
+                <X className="h-3 w-3" />
+              </button>
+            </span>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function PriceAlertSignup() {
   const { isAuthenticated, user, requireAuth } = useAuth();
@@ -21,8 +72,8 @@ export default function PriceAlertSignup() {
   const [done, setDone] = useState(false);
   const [error, setError] = useState('');
 
-  const toggle = (list, setList, item) =>
-    setList(prev => prev.includes(item) ? prev.filter(x => x !== item) : [...prev, item]);
+  const add = (setList) => (item) => setList((prev) => (prev.includes(item) ? prev : [...prev, item]));
+  const remove = (setList) => (item) => setList((prev) => prev.filter((x) => x !== item));
 
   const handleSubmit = async () => {
     if (!isAuthenticated) {
@@ -90,45 +141,26 @@ export default function PriceAlertSignup() {
         )}
       </div>
 
-      {/* Stores */}
-      <div className="mb-4">
-        <label className="text-xs font-medium text-muted-foreground block mb-2">Watch these stores (select at least one)</label>
-        <div className="flex flex-wrap gap-2">
-          {STORES.map(store => (
-            <button
-              key={store}
-              onClick={() => toggle(selectedStores, setSelectedStores, store)}
-              className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-all ${
-                selectedStores.includes(store)
-                  ? 'bg-primary text-primary-foreground border-primary'
-                  : 'bg-muted/40 text-muted-foreground border-border/50 hover:border-primary/30'
-              }`}
-            >
-              {store}
-            </button>
-          ))}
-        </div>
-      </div>
+      <PickerSection
+        label="Watch these stores"
+        hint="(pick at least one)"
+        placeholder="Choose a store"
+        options={STORES}
+        selected={selectedStores}
+        onAdd={add(setSelectedStores)}
+        onRemove={remove(setSelectedStores)}
+      />
 
-      {/* Categories */}
-      <div className="mb-4">
-        <label className="text-xs font-medium text-muted-foreground block mb-2">Categories (optional)</label>
-        <div className="flex flex-wrap gap-2">
-          {CATEGORIES.map(cat => (
-            <button
-              key={cat}
-              onClick={() => toggle(selectedCategories, setSelectedCategories, cat)}
-              className={`text-xs px-3 py-1.5 rounded-full border font-medium transition-all ${
-                selectedCategories.includes(cat)
-                  ? 'bg-accent text-accent-foreground border-accent'
-                  : 'bg-muted/40 text-muted-foreground border-border/50 hover:border-primary/30'
-              }`}
-            >
-              {cat}
-            </button>
-          ))}
-        </div>
-      </div>
+      <PickerSection
+        label="Categories"
+        hint="(optional)"
+        placeholder="Choose a category"
+        options={CATEGORIES}
+        selected={selectedCategories}
+        onAdd={add(setSelectedCategories)}
+        onRemove={remove(setSelectedCategories)}
+        tone="accent"
+      />
 
       {error && <p className="text-xs text-destructive mb-3">{error}</p>}
 

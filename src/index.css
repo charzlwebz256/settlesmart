@@ -12,6 +12,31 @@
   animation: fade-in 0.35s ease-out both;
 }
 
+/* Shared card motion: every card surface eases in and lifts under the pointer. */
+@keyframes card-rise {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.bg-card.rounded-2xl,
+.bg-card.rounded-xl {
+  animation: card-rise 0.42s ease-out;
+  transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+}
+@media (hover: hover) {
+  .bg-card.rounded-2xl:hover,
+  .bg-card.rounded-xl:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 16px 34px -18px hsl(var(--foreground) / 0.3);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .bg-card.rounded-2xl,
+  .bg-card.rounded-xl {
+    animation: none;
+    transition: none;
+  }
+}
+
 @keyframes nav-pulse {
   0% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.45); }
   70% { box-shadow: 0 0 0 10px hsl(var(--primary) / 0); }

@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, CalendarDays, ChevronDown, Moon, Sun, Heart, Info, GraduationCap, Wallet, LogIn, LogOut, Plug, Bus, Clock, Clapperboard, Sparkles } from 'lucide-react';
+import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, ChevronDown, Moon, Sun, Heart, Info, GraduationCap, Wallet, LogIn, LogOut, Plug, Bus, Clock, Clapperboard, Sparkles } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -48,7 +48,6 @@ const primaryNav = [
 const secondaryNav = [
   { path: '/assistant', icon: MessageCircle, label: 'Nexa AI' },
   { path: '/checklist', icon: BookOpen, label: 'Checklist' },
-  { path: '/events', icon: CalendarDays, label: 'Community Events' },
   { path: '/profile', icon: User, label: 'My Profile' },
   { path: '/support-us', icon: Heart, label: 'Support Us' },
   { path: '/meet-the-developer', icon: Info, label: 'Meet the Developer' },

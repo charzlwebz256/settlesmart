@@ -84,6 +84,7 @@ export default function SmartMap({
   userPosition,
   accuracy,
   heading,
+  tilt,
   startCoords,
   endCoords,
   routePath,
@@ -381,6 +382,7 @@ export default function SmartMap({
           <MapCompass
             heading={Number.isFinite(heading) ? heading : null}
             bearing={destinationBearing}
+            tilt={tilt}
             needsPermission={needsCompass}
             onEnableCompass={onEnableCompass}
           />
