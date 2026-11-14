@@ -2,7 +2,7 @@ import { Sunrise, Sun, Sunset, Moon } from 'lucide-react';
 
 // One card per part of the day: greeting wording, icon and colour wash.
 // Every part shares the same welcome photo.
-const WELCOME_IMAGE = 'https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/302dc30c0_generated_image.png';
+const WELCOME_IMAGE = 'https://liveassets.ca/wp-content/uploads/2022/01/section-planningforcanada-1.png';
 
 export const DAY_PARTS = [
   {
