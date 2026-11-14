@@ -216,7 +216,7 @@ function describeItinerary(itinerary) {
 }
 
 async function transitPlan(start, end) {
-  const url = `${TRANSITOUS}?fromPlace=${start[0]},${start[1]}&toPlace=${end[0]},${end[1]}&numItineraries=4`;
+  const url = `${TRANSITOUS}?fromPlace=${start[0]},${start[1]}&toPlace=${end[0]},${end[1]}&numItineraries=7`;
   let itineraries = [];
   try {
     const res = await fetch(url, { headers: { ...UA, Accept: 'application/json' }, signal: AbortSignal.timeout(18000) });
@@ -242,13 +242,55 @@ async function transitPlan(start, end) {
       .sort((a, b) => a.score - b.score);
 
     const primary = describeItinerary(scored[0].it);
-    const alternatives = scored.slice(1, 3).map(({ it }) => ({
-      duration_minutes: Math.max(1, Math.round((it.duration || 0) / 60)),
-      transfers: it.transfers || 0,
-      routes: (it.legs || [])
-        .filter((l) => LEG_KIND[l.mode] && LEG_KIND[l.mode] !== 'walk')
-        .map((l) => l.routeShortName || l.routeLongName || KIND_LABEL[LEG_KIND[l.mode]]),
-    }));
+
+    // Other buses and later departures for the same trip, each with its timetable.
+    const describeOption = (it) => {
+      const legs = (it.legs || []).map((l) => {
+        const kind = LEG_KIND[l.mode] || 'bus';
+        const isTransit = kind !== 'walk' && kind !== 'bike' && kind !== 'driving';
+        const fromName = !l.from?.name || l.from.name === 'START' ? 'your start' : l.from.name;
+        const toName = !l.to?.name || l.to.name === 'END' ? 'your destination' : l.to.name;
+        return {
+          kind,
+          is_transit: isTransit,
+          route_name: l.routeShortName || l.routeLongName || null,
+          headsign: l.headsign || null,
+          from_name: fromName,
+          to_name: toName,
+          depart_at: l.startTime || null,
+          arrive_at: l.endTime || null,
+          minutes: Math.max(1, Math.round((l.duration || 0) / 60)),
+        };
+      });
+      return {
+        duration_minutes: Math.max(1, Math.round((it.duration || 0) / 60)),
+        transfers: it.transfers || 0,
+        depart_at: it.startTime || null,
+        arrive_at: it.endTime || null,
+        routes: legs.filter((l) => l.is_transit).map((l) => l.route_name || KIND_LABEL[l.kind] || 'Transit'),
+        legs,
+      };
+    };
+
+    const seenOptions = new Set();
+    const options = [];
+    for (const { it } of scored.slice(1)) {
+      const option = describeOption(it);
+      const key = `${option.routes.join('>')}|${option.depart_at}`;
+      if (seenOptions.has(key)) continue;
+      seenOptions.add(key);
+      options.push(option);
+      if (options.length >= 6) break;
+    }
+
+    // Prefer departures that have not already left; if none remain, show the closest ones.
+    const primaryDepart = primary.depart_at ? new Date(primary.depart_at).getTime() : 0;
+    const upcoming = options.filter(
+      (o) => primaryDepart && o.depart_at && new Date(o.depart_at).getTime() >= primaryDepart
+    );
+    const alternatives = (upcoming.length ? upcoming : options).slice(0, 4);
+    // Soonest departure first, so the list reads like a timetable.
+    alternatives.sort((a, b) => new Date(a.depart_at || 0) - new Date(b.depart_at || 0));
     return {
       ...primary,
       alternatives,

@@ -245,13 +245,6 @@ export default function AppLayout() {
           {/* Right side: search + theme + language + hamburger */}
           <div className="flex items-center gap-1">
             <button
-              onClick={() => setSearchOpen(true)}
-              className="p-2 rounded-lg hover:bg-muted min-w-[44px] min-h-[44px] flex items-center justify-center"
-              aria-label="Search SettleSmart"
-            >
-              <Search className="w-5 h-5" />
-            </button>
-            <button
               onClick={toggleTheme}
               className="p-2 rounded-lg hover:bg-muted min-w-[44px] min-h-[44px] flex items-center justify-center"
               aria-label="Toggle theme"

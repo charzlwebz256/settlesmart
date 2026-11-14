@@ -1,7 +1,8 @@
-import { Footprints, Bus, Train, Ship, Bike, Car, Clock, Route, ArrowRight, Info, Repeat, ExternalLink } from 'lucide-react';
+import { Footprints, Bus, Train, Ship, Bike, Car, Clock, Route, ArrowRight, Info, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ETS_LINKS } from '@/data/etsTransit';
 import JourneyTimeline from './JourneyTimeline';
+import AlternativeRoutes from './AlternativeRoutes';
 
 const MODE_META = {
   walk: { icon: Footprints, tint: 'text-green-600 bg-green-500/10' },
@@ -109,21 +110,7 @@ export default function RouteSummary({ route, startLabel, endLabel }) {
         </ol>
       )}
 
-      {alternatives.length > 0 && (
-        <div className="border-t border-border/40 pt-2 space-y-1">
-          <p className="text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Other options</p>
-          {alternatives.map((a, i) => (
-            <div key={i} className="flex items-center gap-2 text-[11px] text-foreground">
-              <Repeat className="w-3 h-3 text-muted-foreground" />
-              <span className="font-semibold">{a.duration_minutes} min</span>
-              {a.routes.length > 0 && <span className="text-muted-foreground">· {a.routes.join(', ')}</span>}
-              <span className="text-muted-foreground ml-auto">
-                {a.transfers === 0 ? 'no transfers' : `${a.transfers} transfer${a.transfers > 1 ? 's' : ''}`}
-              </span>
-            </div>
-          ))}
-        </div>
-      )}
+      <AlternativeRoutes options={alternatives} />
 
       {route.transfer_note && (
         <p className="flex items-start gap-1.5 text-[11px] text-muted-foreground border-t border-border/40 pt-2">
