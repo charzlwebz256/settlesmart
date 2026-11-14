@@ -7,7 +7,6 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
-import NewcomerChatWidget from '@/components/assistant/NewcomerChatWidget';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
 import { useLocation_ } from '@/lib/LocationContext';
 
@@ -370,13 +369,6 @@ export default function AppLayout() {
       {/* Global Search */}
       <GlobalSearch open={searchOpen} onClose={() => setSearchOpen(false)} />
 
-      {/* Global AI Chat Widget */}
-      {location.pathname !== '/assistant' && (
-        <NewcomerChatWidget
-          userCity={profile?.city || detectedCity}
-          userProvince={profile?.province || detectedProvince}
-        />
-      )}
     </div>
   );
 }

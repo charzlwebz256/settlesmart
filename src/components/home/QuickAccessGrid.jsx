@@ -23,7 +23,7 @@ export default function QuickAccessGrid() {
       <h2 className="font-heading font-bold text-xl md:text-2xl mb-2">Find What You Need</h2>
       <p className="text-muted-foreground text-sm mb-8">Explore free services across Canada for newcomers</p>
 
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
+      <div className="flex flex-wrap justify-center gap-3 md:gap-4">
         {categories.map((cat, i) => (
           <motion.div
             key={cat.label}
@@ -33,7 +33,7 @@ export default function QuickAccessGrid() {
             transition={{ delay: i * 0.05, duration: 0.4, ease: 'easeOut' }}
             whileHover={{ y: -6, scale: 1.03 }}
             whileTap={{ scale: 0.97 }}
-            className="h-full"
+            className="h-full w-[calc(50%-0.375rem)] md:w-[calc(25%-0.75rem)]"
           >
             <Link
               to={cat.path}

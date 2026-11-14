@@ -18,14 +18,15 @@ export default function StoreViewer({ store, onClose }) {
     return () => clearTimeout(t);
   }, [store?.url]);
 
-  // Keep the page behind from scrolling while the store is open.
+  // Keep the page behind from scrolling only while a store is open.
   useEffect(() => {
+    if (!store) return undefined;
     const previous = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
     return () => {
       document.body.style.overflow = previous;
     };
-  }, []);
+  }, [store]);
 
   if (!store) return null;
 
