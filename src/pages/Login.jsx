@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { safeReturnTo } from '@/lib/authReturnTo';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -8,10 +9,8 @@ import { Mail, Lock, Loader2, AlertCircle } from 'lucide-react';
 
 export default function Login() {
   const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const rawFrom = searchParams.get('from') || '/';
-  // Only allow same-origin relative paths to prevent open redirect / XSS via `javascript:` or external URLs
-  const fromUrl = rawFrom.startsWith('/') && !rawFrom.startsWith('//') && !rawFrom.startsWith('/\\') ? rawFrom : '/';
+  // Preserves the MCP OAuth consent round-trip (and any other returnTo flow)
+  const fromUrl = safeReturnTo();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');

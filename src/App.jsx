@@ -49,6 +49,7 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import ForgotPassword from './pages/ForgotPassword';
 import ResetPassword from './pages/ResetPassword';
+import OAuthConsent from './pages/OAuthConsent';
 import ProtectedSignInPrompt from '@/components/ProtectedSignInPrompt';
 import LoadingScreen from '@/components/LoadingScreen';
 
@@ -82,6 +83,8 @@ const AuthenticatedApp = () => {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password" element={<ResetPassword />} />
+      {/* MCP OAuth consent — must stay outside any auth guard */}
+      <Route path="/oauth/consent" element={<OAuthConsent />} />
       <Route element={<AppLayout />}>
         {/* Publicly browseable without sign-in */}
         <Route path="/" element={<Home />} />
