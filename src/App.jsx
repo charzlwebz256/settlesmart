@@ -42,6 +42,8 @@ const ShopSmart = React.lazy(() => import('./pages/ShopSmart'));
 import SupportUs from './pages/SupportUs';
 import MeetTheDeveloper from './pages/MeetTheDeveloper';
 import JobCoach from './pages/JobCoach';
+import CareerSupport from './pages/CareerSupport';
+import WorkplaceRights from './pages/WorkplaceRights';
 import Scholarships from './pages/Scholarships';
 import Login from './pages/Login';
 import Register from './pages/Register';
@@ -85,6 +87,8 @@ const AuthenticatedApp = () => {
         <Route path="/" element={<Home />} />
         <Route path="/explore" element={<Explore />} />
         <Route path="/work" element={<Work />} />
+        <Route path="/career-support" element={<CareerSupport />} />
+        <Route path="/workplace-rights" element={<WorkplaceRights />} />
         <Route path="/resources" element={<Resources />} />
         <Route path="/assistant" element={<Assistant />} />
         <Route path="/transit-map" element={<TransitMap />} />

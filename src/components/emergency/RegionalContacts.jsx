@@ -1,12 +1,36 @@
 import { ExternalLink } from 'lucide-react';
 
+// Official 211 service per province/territory. Territories fall back to the
+// national 211.ca directory.
+export const PROVINCE_211 = {
+  'Ontario': { label: '211 Ontario', url: 'https://211ontario.ca/', note: 'Shelters, food, crisis and social services in Ontario — dial 211' },
+  'British Columbia': { label: '211 British Columbia', url: 'https://bc.211.ca/', note: 'Community and social services across BC — dial 211' },
+  'Alberta': { label: '211 Alberta', url: 'https://ab.211.ca/', note: 'Shelters, food and social services in Alberta — dial 211' },
+  'Quebec': { label: '211 Quebec', url: 'https://www.211qc.ca/', note: 'Community and social services in Quebec — dial 211' },
+  'Manitoba': { label: '211 Manitoba', url: 'https://mb.211.ca/', note: 'Province-wide community services — dial 211' },
+  'Saskatchewan': { label: '211 Saskatchewan', url: 'https://sk.211.ca/', note: 'Province-wide community services — dial 211' },
+  'Nova Scotia': { label: '211 Nova Scotia', url: 'https://ns.211.ca/', note: 'Province-wide community services — dial 211' },
+  'New Brunswick': { label: '211 New Brunswick', url: 'https://nb.211.ca/', note: 'Province-wide community services — dial 211' },
+  'Newfoundland and Labrador': { label: '211 Newfoundland and Labrador', url: 'https://nl.211.ca/', note: 'Province-wide community services — dial 211' },
+  'Prince Edward Island': { label: '211 Prince Edward Island', url: 'https://pei.211.ca/', note: 'Province-wide community services — dial 211' },
+};
+
+const NATIONAL_211 = { label: '211 Canada', url: 'https://www.211.ca/', note: 'Community and social services directory — dial 211' };
+
+export function get211(province) {
+  if (!province) return NATIONAL_211;
+  const key = Object.keys(PROVINCE_211).find(
+    k => k.toLowerCase() === province.toLowerCase() || province.toLowerCase().includes(k.toLowerCase())
+  );
+  return key ? PROVINCE_211[key] : NATIONAL_211;
+}
+
 const REGIONAL_DATA = {
   'Ontario': {
     settlement: [
       { label: 'ACCES Employment', url: 'https://accesemployment.ca/', note: 'Job integration for newcomers' },
       { label: 'COSTI Immigrant Services', url: 'https://www.costi.org/', note: 'Comprehensive settlement in Toronto' },
       { label: 'Newcomer Centre of Peel', url: 'https://www.newcomerpeel.ca/', note: 'Brampton/Mississauga newcomer hub' },
-      { label: '211 Ontario', url: 'https://211ontario.ca/', note: 'All social services — phone or web' },
     ],
     crisis: [
       { label: 'Distress Centre Toronto', number: '416-408-4357', note: '24/7 crisis line' },
@@ -19,12 +43,11 @@ const REGIONAL_DATA = {
       { label: 'SUCCESS BC', url: 'https://successbc.ca/', note: 'Settlement services across BC' },
       { label: 'DIVERSEcity', url: 'https://www.dcrs.ca/', note: 'Surrey and Lower Mainland' },
       { label: 'Immigrant Services Society of BC', url: 'https://issbc.org/', note: 'Housing, employment, integration' },
-      { label: '211 BC', url: 'https://www.211.ca/', note: 'Social services across BC' },
     ],
     crisis: [
       { label: 'BC Crisis Line', number: '1-800-784-2433', note: '24/7 suicide and crisis support' },
       { label: 'Vancouver Crisis Centre', number: '604-872-3311', note: 'Metro Vancouver crisis support' },
-      { label: 'VictimLinkBC', number: '1-800-563-0808', note: 'Crime & trauma victims support' },
+      { label: 'VictimLinkBC', number: '1-800-563-0808', note: 'Crime and trauma victims support' },
     ],
   },
   'Alberta': {
@@ -32,7 +55,6 @@ const REGIONAL_DATA = {
       { label: 'Catholic Social Services', url: 'https://www.catholicsocialservices.ab.ca/', note: 'Edmonton newcomer services' },
       { label: 'CIWA Calgary', url: 'https://ciwa-online.com/', note: 'Calgary Immigrant Women Association' },
       { label: 'Mennonite Centre for Newcomers', url: 'https://www.mcnedmonton.com/', note: 'Edmonton settlement support' },
-      { label: '211 Alberta', url: 'https://ab.211.ca/', note: 'Province-wide services directory' },
     ],
     crisis: [
       { label: 'Distress Line Alberta', number: '1-800-232-7288', note: '24/7 crisis and suicide support' },
@@ -44,7 +66,6 @@ const REGIONAL_DATA = {
     settlement: [
       { label: 'Quebec Immigration (MIDI)', url: 'https://www.quebec.ca/en/immigration', note: 'Provincial immigration services' },
       { label: 'TCRI (Immigrants & Refugees)', url: 'https://tcri.qc.ca/', note: 'Refugee and immigrant support' },
-      { label: '211 Quebec', url: 'https://www.211qc.ca/', note: 'Quebec social services directory' },
     ],
     crisis: [
       { label: 'Tel-Aide Quebec', number: '514-935-1101', note: '24/7 crisis support line' },
@@ -56,7 +77,6 @@ const REGIONAL_DATA = {
     settlement: [
       { label: 'Immigration Partnership Winnipeg', url: 'https://www.immigrationpartnership.mb.ca/', note: 'Newcomer coordination' },
       { label: 'IRCOM — Inner City Refugees', url: 'https://ircom.ca/', note: 'Refugee housing and support' },
-      { label: '211 Manitoba', url: 'https://mb.211.ca/', note: 'Province-wide helpline' },
     ],
     crisis: [
       { label: 'Manitoba Suicide Line', number: '1-877-435-7170', note: '24/7 crisis support' },
@@ -67,7 +87,6 @@ const REGIONAL_DATA = {
     settlement: [
       { label: 'Regina Open Door Society', url: 'https://rods.sk.ca/', note: 'Regina newcomer services' },
       { label: 'Saskatoon Open Door Society', url: 'https://www.sods.sk.ca/', note: 'Saskatoon settlement support' },
-      { label: '211 Saskatchewan', url: 'https://sk.211.ca/', note: 'Province-wide directory' },
     ],
     crisis: [
       { label: 'Mobile Crisis Services Regina', number: '306-525-5333', note: '24/7 mobile crisis response' },
@@ -78,11 +97,63 @@ const REGIONAL_DATA = {
     settlement: [
       { label: 'ISANS — Immigrant Services', url: 'https://isans.ca/', note: 'Halifax newcomer hub' },
       { label: 'Halifax Refugee Clinic', url: 'https://halifaxrefugeeclinic.ca/', note: 'Legal aid for refugees' },
-      { label: '211 Nova Scotia', url: 'https://ns.211.ca/', note: 'NS social services directory' },
     ],
     crisis: [
       { label: 'NS Mental Health Crisis Line', number: '1-888-429-8167', note: '24/7 province-wide' },
       { label: 'Tearmann Society DV', number: '902-893-3232', note: 'Domestic violence support' },
+    ],
+  },
+  'New Brunswick': {
+    settlement: [
+      { label: 'New Brunswick Multicultural Council', url: 'https://www.nbmc-cnbm.ca/', note: 'Province-wide newcomer services' },
+      { label: 'Saint John Newcomers Centre', url: 'https://sjnc.ca/', note: 'Settlement support in Saint John' },
+    ],
+    crisis: [
+      { label: 'Chimo Helpline', number: '1-800-667-5005', note: 'Province-wide crisis line' },
+    ],
+  },
+  'Newfoundland and Labrador': {
+    settlement: [
+      { label: 'Association for New Canadians', url: 'https://www.ancnl.ca/', note: 'Settlement services across NL' },
+      { label: 'Government of NL — Immigration', url: 'https://www.gov.nl.ca/immigration/', note: 'Provincial immigration programs' },
+    ],
+    crisis: [
+      { label: 'NL Mental Health Crisis Line', number: '1-888-737-4668', note: '24/7 province-wide' },
+    ],
+  },
+  'Prince Edward Island': {
+    settlement: [
+      { label: 'PEI Association for Newcomers', url: 'https://www.peianc.com/', note: 'Settlement services across PEI' },
+      { label: 'Government of PEI — Immigration', url: 'https://www.princeedwardisland.ca/en/topic/immigration', note: 'Provincial immigration programs' },
+    ],
+    crisis: [
+      { label: 'Island Helpline', number: '1-800-218-2885', note: '24/7 mental health and crisis support' },
+    ],
+  },
+  'Yukon': {
+    settlement: [
+      { label: 'Multicultural Centre of the Yukon', url: 'https://www.mcyukon.ca/', note: 'Newcomer settlement support' },
+      { label: 'Government of Yukon — Immigration', url: 'https://yukon.ca/en/immigration', note: 'Provincial immigration programs' },
+    ],
+    crisis: [
+      { label: 'Suicide Crisis Helpline', number: '988', note: 'National 24/7 crisis support' },
+    ],
+  },
+  'Northwest Territories': {
+    settlement: [
+      { label: 'NWT Immigration', url: 'https://www.immigratenwt.ca/', note: 'Northwest Territories immigration programs' },
+      { label: 'Government of NWT', url: 'https://www.gov.nt.ca/', note: 'Territorial services and programs' },
+    ],
+    crisis: [
+      { label: 'NWT Helpline', number: '1-800-661-0844', note: '24/7 community and mental health support' },
+    ],
+  },
+  'Nunavut': {
+    settlement: [
+      { label: 'Government of Nunavut', url: 'https://www.gov.nu.ca/', note: 'Territorial services and programs' },
+    ],
+    crisis: [
+      { label: 'Kamatsiaqtut Help Line', number: '1-800-265-3333', note: '24/7 confidential support' },
     ],
   },
 };
@@ -99,6 +170,7 @@ export function RegionalContacts({ province }) {
   const result = getRegionalData(province);
   if (!result) return null;
   const { data, name } = result;
+  const local211 = get211(name);
 
   return (
     <div className="space-y-5">
@@ -108,7 +180,7 @@ export function RegionalContacts({ province }) {
           Settlement Services in {name}
         </h3>
         <div className="space-y-2">
-          {data.settlement.map(item => (
+          {[...data.settlement, local211].map(item => (
             <a
               key={item.label}
               href={item.url}
@@ -153,6 +225,11 @@ export function RegionalContacts({ province }) {
           })}
         </div>
       </div>
+
+      <p className="text-[11px] text-muted-foreground leading-snug">
+        For immediate danger call 911. If a local line is busy, call 988 for suicide crisis support or 211 to reach a
+        local service navigator. Numbers can change — confirm on the official site.
+      </p>
     </div>
   );
 }

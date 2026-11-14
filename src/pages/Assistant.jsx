@@ -46,13 +46,13 @@ export default function Assistant() {
     setLoading(true);
 
     const contextInfo = profile
-      ? `User context: ${profile.immigration_status?.replace(/_/g, ' ')}, living in ${profile.city}, ${profile.province}. English level: ${profile.english_level}. Interests: ${profile.interests?.join(', ')}.`
+      ? `Province: ${profile.province || 'not provided'}; City: ${profile.city || 'not provided'}; Immigration status: ${profile.immigration_status?.replace(/_/g, ' ') || 'not provided'}; Family size: ${profile.family_size || 'not provided'}; Arrived: ${profile.arrival_date || 'not provided'}; English level: ${profile.english_level || 'not provided'}; Education: ${profile.education_level || 'not provided'}; Interests: ${(profile.interests || []).join(', ') || 'not provided'}.`
       : '';
 
     const response = await base44.integrations.Core.InvokeLLM({
       prompt: `${NEXA_SYSTEM_PROMPT}
 
-${contextInfo ? `About this person: ${contextInfo}` : ''}
+${contextInfo ? `About this person — tailor every answer to this location and situation instead of giving generic Canada-wide advice: ${contextInfo}` : ''}
 
 Conversation so far:
 ${messages.slice(-6).map(m => `${m.role === 'user' ? 'Newcomer' : 'Nexa'}: ${m.content}`).join('\n')}

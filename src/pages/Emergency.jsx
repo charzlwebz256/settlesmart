@@ -1,41 +1,63 @@
 import { useState } from 'react';
-import { Phone, MapPin, Scale, Heart, Home, Shield, ExternalLink, AlertTriangle, ChevronDown } from 'lucide-react';
+import { Phone, MapPin, Scale, Heart, Home, ExternalLink, AlertTriangle, ChevronDown, Shield, Info } from 'lucide-react';
 import { getOrgLogo } from '@/lib/orgLogos';
-import { RegionalContacts } from '@/components/emergency/RegionalContacts';
+import { RegionalContacts, get211 } from '@/components/emergency/RegionalContacts';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { useLocation_ } from '@/lib/LocationContext';
 
 const EMERGENCY = [
   { label: 'Police / Fire / Ambulance', number: '911', tel: '911', color: 'bg-red-500', note: 'For immediate life-threatening emergencies' },
-  { label: '211 — Social Services Helpline', number: '211', tel: '211', color: 'bg-blue-500', note: 'Housing, food, crisis, mental health — 24/7' },
+  { label: 'Suicide Crisis Helpline', number: '9-8-8', tel: '988', color: 'bg-rose-600', note: 'Dial 9-8-8 for suicide crisis support — 24/7' },
+  { label: '211 — Social Services Helpline', number: '211', tel: '211', color: 'bg-blue-500', note: 'Shelter, food, crisis and mental health navigation — 24/7' },
   { label: 'Kids Help Phone', number: '1-800-668-6868', tel: '18006686868', color: 'bg-pink-500', note: 'For youth in crisis — 24/7' },
   { label: 'Crisis Text Line (Canada)', number: 'Text HOME to 686868', sms: '686868', smsBody: 'HOME', color: 'bg-purple-500', note: 'Free, confidential crisis support' },
-  { label: 'Suicide Crisis Helpline', number: '9-8-8', tel: '988', color: 'bg-rose-600', note: 'Dial 9-8-8 for suicide crisis support' },
-  { label: 'IRCC — Immigration Canada', number: '1-888-242-2100', tel: '18882422100', color: 'bg-teal-600', note: 'Canada only — immigration inquiries & urgent help' },
+];
+
+// IRCC is not an emergency service — kept separate on purpose.
+const GOVERNMENT = [
+  {
+    label: 'IRCC — Contact centre',
+    url: 'https://www.canada.ca/en/immigration-refugees-citizenship/corporate/contact-ircc.html',
+    note: 'General immigration enquiries: 1-888-242-2100 (in Canada). Not for emergencies.',
+  },
+  {
+    label: 'IRCC — Check processing times',
+    url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/application/check-processing-times.html',
+    note: 'Official current processing times for applications',
+  },
+  {
+    label: 'IRCC — Settlement services finder',
+    url: 'https://ircc.canada.ca/english/newcomers/services/index.asp',
+    note: 'Find a federally funded settlement agency near you',
+  },
+  {
+    label: 'Service Canada',
+    url: 'https://www.canada.ca/en/employment-social-development/corporate/contact.html',
+    note: 'SIN, Employment Insurance and federal benefits',
+  },
 ];
 
 const SHELTERS = [
-  { label: 'Find a Shelter — 211 Ontario', url: 'https://211ontario.ca/', note: 'Search shelters and housing by city' },
   { label: 'Shelter Finder Canada (Homeless Hub)', url: 'https://www.homelesshub.ca/solutions/emergency-response/emergency-shelters', note: 'National shelter directory' },
   { label: 'YWCA Canada — Women\'s Shelters', url: 'https://www.ywcacanada.ca/', note: 'Women and family emergency housing' },
   { label: 'Salvation Army — Emergency Shelter', url: 'https://www.salvationarmy.ca/what-we-do/emergency-disaster-services/', note: 'National emergency services' },
-  { label: 'Refugee Housing (COSTI)', url: 'https://www.costi.org/programs/housing/', note: 'Refugee and newcomer housing support' },
+  { label: 'Refugee Housing (COSTI)', url: 'https://www.costi.org/programs/housing/', note: 'Refugee and newcomer housing support (Ontario)' },
 ];
 
 const LEGAL_AID = [
   { label: 'Legal Aid Ontario', url: 'https://www.legalaid.on.ca/', note: 'Free legal help in Ontario' },
   { label: 'Legal Aid BC', url: 'https://lss.bc.ca/', note: 'Free legal services in British Columbia' },
   { label: 'Legal Aid Alberta', url: 'https://www.legalaid.ab.ca/', note: 'Free legal help in Alberta' },
-  { label: 'IRCC — Report a Problem / Contact', url: 'https://ircc.canada.ca/english/contacts/web-form.asp', note: 'Official IRCC immigration inquiries' },
   { label: 'RCMP Victim Services', url: 'https://www.rcmp-grc.gc.ca/en/victim-services', note: 'Victim support from federal police' },
   { label: 'Canadian Council for Refugees', url: 'https://ccrweb.ca/', note: 'Advocacy and legal rights for refugees' },
 ];
 
 const MENTAL_HEALTH = [
   { label: 'Canadian Mental Health Association', url: 'https://cmha.ca/', note: 'Mental health resources and support across Canada' },
-  { label: 'Newcomer & Refugee Mental Health (CAMH)', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/settle-canada/health-care/mental-health.html', note: 'Free mental health resources tailored for newcomers & refugees in Canada' },
-  { label: 'CAMH — Centre for Addiction & Mental Health', url: 'https://www.camh.ca/', note: "Canada's largest mental health teaching hospital & research centre" },
-  { label: 'CAMH Mental Health Line', url: 'https://www.camh.ca/en/patients-and-families/access-camh', note: 'COVID-19 & ongoing support resources for newcomers' },
+  { label: 'Newcomer & Refugee Mental Health (Canada.ca)', url: 'https://www.canada.ca/en/immigration-refugees-citizenship/services/settle-canada/health-care/mental-health.html', note: 'Free mental health resources for newcomers and refugees' },
+  { label: 'CAMH — Centre for Addiction & Mental Health', url: 'https://www.camh.ca/', note: "Canada's largest mental health teaching hospital" },
+  { label: 'CAMH — Access services', url: 'https://www.camh.ca/en/patients-and-families/access-camh', note: 'How to access CAMH programs and support' },
 ];
 
 function LinkList({ items }) {
@@ -68,25 +90,28 @@ function LinkList({ items }) {
 }
 
 const PROVINCES = [
-  'Ontario', 'British Columbia', 'Alberta', 'Quebec',
-  'Manitoba', 'Saskatchewan', 'Nova Scotia',
+  'Alberta', 'British Columbia', 'Manitoba', 'New Brunswick',
+  'Newfoundland and Labrador', 'Northwest Territories', 'Nova Scotia',
+  'Nunavut', 'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan', 'Yukon',
 ];
 
 export default function Emergency() {
   const [selectedProvince, setSelectedProvince] = useState('');
   const [showProvinceMenu, setShowProvinceMenu] = useState(false);
+  const { province: detectedProvince } = useLocation_();
 
   const { data: profile } = useQuery({
     queryKey: ['myProfile'],
     queryFn: async () => {
       const user = await base44.auth.me();
-      const results = await base44.entities.UserProfile.filter({ created_by: user.email });
+      const results = await base44.entities.UserProfile.filter({ created_by_id: user.id });
       return results[0] || null;
     },
   });
 
-  // Auto-set province from profile
-  const activeProvince = selectedProvince || profile?.province || '';
+  // Profile province first, then the province picked on this page.
+  const activeProvince = selectedProvince || profile?.province || detectedProvince || '';
+  const local211 = get211(activeProvince);
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-6 pb-24 md:pb-8">
@@ -130,20 +155,38 @@ export default function Emergency() {
             );
           })}
         </div>
+        <p className="flex items-start gap-1.5 text-[11px] text-muted-foreground mt-3 leading-snug">
+          <Info className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" />
+          These lines are for crisis and emergencies. Immigration and IRCC enquiries are listed separately below — they are not emergency services.
+        </p>
       </div>
 
       {/* Shelters */}
       <div className="bg-card rounded-2xl border border-border/50 p-5 mb-5">
-        <h2 className="font-heading font-bold text-base mb-4 flex items-center gap-2">
+        <h2 className="font-heading font-bold text-base mb-1 flex items-center gap-2">
           <Home className="w-5 h-5 text-emerald-600" /> Shelters & Emergency Housing
         </h2>
-        <LinkList items={SHELTERS} />
+        <p className="text-xs text-muted-foreground mb-4">
+          {activeProvince
+            ? `Showing shelter navigation for ${activeProvince}.`
+            : 'Select your province in Regional Resources below for local shelter help.'}
+        </p>
+        <LinkList items={[local211, ...SHELTERS]} />
+      </div>
+
+      {/* Government contacts (not emergency) */}
+      <div className="bg-card rounded-2xl border border-border/50 p-5 mb-5">
+        <h2 className="font-heading font-bold text-base mb-1 flex items-center gap-2">
+          <Shield className="w-5 h-5 text-teal-600" /> Government & Immigration Contacts
+        </h2>
+        <p className="text-xs text-muted-foreground mb-4">For questions about your application, documents or benefits — not for emergencies.</p>
+        <LinkList items={GOVERNMENT} />
       </div>
 
       {/* Legal Aid */}
       <div className="bg-card rounded-2xl border border-border/50 p-5 mb-5">
         <h2 className="font-heading font-bold text-base mb-4 flex items-center gap-2">
-          <Scale className="w-5 h-5 text-purple-600" /> Legal Aid & Police/IRCC Links
+          <Scale className="w-5 h-5 text-purple-600" /> Legal Aid & Victim Support
         </h2>
         <LinkList items={LEGAL_AID} />
       </div>
@@ -172,7 +215,7 @@ export default function Emergency() {
               <ChevronDown className={`w-3.5 h-3.5 transition-transform ${showProvinceMenu ? 'rotate-180' : ''}`} />
             </button>
             {showProvinceMenu && (
-              <div className="absolute right-0 top-full mt-1 w-44 bg-card border border-border/60 rounded-xl shadow-lg z-20 overflow-hidden">
+              <div className="absolute right-0 top-full mt-1 w-52 max-h-72 overflow-y-auto bg-card border border-border/60 rounded-xl shadow-lg z-20">
                 {PROVINCES.map(p => (
                   <button
                     key={p}
