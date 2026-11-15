@@ -99,11 +99,11 @@ function TabDropdown({ item, isActive }) {
       <AnimatePresence>
         {open && (
           <motion.div
-            initial={{ opacity: 0, y: -4 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -4 }}
+            initial={{ opacity: 0, y: -4, x: '-50%' }}
+            animate={{ opacity: 1, y: 0, x: '-50%' }}
+            exit={{ opacity: 0, y: -4, x: '-50%' }}
             transition={{ duration: 0.12 }}
-            className="absolute top-full left-0 mt-1.5 flex items-center gap-1 bg-card border border-border/60 rounded-xl shadow-lg p-1.5 z-50"
+            className="absolute top-full left-1/2 mt-1.5 grid w-max max-w-[calc(100vw-2rem)] grid-cols-3 gap-1 bg-card border border-border/60 rounded-xl shadow-lg p-1.5 z-50"
           >
             {children.map(child => (
               <Link
@@ -218,7 +218,7 @@ export default function AppLayout() {
           )}
 
           {/* Desktop + Mobile Nav */}
-          <nav className="hidden md:flex items-center gap-1">
+          <nav className="hidden md:flex min-w-0 items-center gap-1 [&_a]:whitespace-nowrap [&_button]:whitespace-nowrap">
             {primaryNav.map(item => {
               const hasChildren = !!TAB_CHILDREN[item.path];
               const isActive = activeTab === item.path;
