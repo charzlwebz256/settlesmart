@@ -1,7 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
-// Workspace-registered "SettleSmart Calendar Base44" connector (APP_USER mode).
-const CONNECTOR_ID = '6af9214b48ac7a4e3d1442a5';
+// Workspace-registered "Calendar" connector, Base44 credentials (APP_USER mode).
+const CONNECTOR_ID = '6af922bb85bbbfb2a45644b7';
 
 Deno.serve(async (req) => {
   try {
