@@ -1,12 +1,10 @@
 import { Link } from 'react-router-dom';
 import { ShieldCheck, FileText, HelpCircle, MessageSquareHeart, ArrowRight, ArrowUp } from 'lucide-react';
+import { FEEDBACK_URL } from '@/lib/gmailLink';
 
 const LOGO = 'https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/34a7de8f6_generated_image.png';
 
-const FEEDBACK_EMAIL = 'charzlwebz256@gmail.com';
-const FEEDBACK_HREF = `mailto:${FEEDBACK_EMAIL}?subject=${encodeURIComponent(
-  'SettleSmart feedback'
-)}&body=${encodeURIComponent('What I was doing:\n\nWhat was wrong or what could be better:\n\n')}`;
+const FEEDBACK_HREF = FEEDBACK_URL;
 
 const LEGAL_LINKS = [
   { label: 'Privacy Policy', to: '/privacy', icon: ShieldCheck },
@@ -66,20 +64,18 @@ export default function SiteFooter() {
           <div>
             <h3 className="text-[11px] font-bold uppercase tracking-wider text-foreground">Share Feedback</h3>
             <p className="mt-3 text-[13px] leading-relaxed text-muted-foreground">
-              Outdated phone number, wrong deadline, or an idea that would help you settle faster? Write
-              to the site admin.
+              Got an idea, suggestion, or something we could do better? We'd love to hear from you! Write
+              directly to our site administrator and help us make SettleSmart better for everyone.
             </p>
             <a
               href={FEEDBACK_HREF}
-              className="group mt-3 inline-flex max-w-full items-center gap-2 rounded-xl bg-primary px-3 py-2 text-primary-foreground shadow-sm transition-transform hover:-translate-y-0.5"
-              aria-label={`Send an email to ${FEEDBACK_EMAIL}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group mt-3 inline-flex items-center gap-2 rounded-xl bg-primary px-3.5 py-2 text-xs font-bold text-primary-foreground shadow-sm transition-all duration-300 hover:-translate-y-0.5 hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/30 active:translate-y-0"
             >
-              <MessageSquareHeart className="w-3.5 h-3.5 flex-shrink-0" />
-              <span className="flex min-w-0 flex-col items-start leading-tight">
-                <span className="text-[11px] font-bold">Send an email</span>
-                <span className="truncate text-[10px] font-medium text-primary-foreground/80">{FEEDBACK_EMAIL}</span>
-              </span>
-              <ArrowRight className="w-3.5 h-3.5 flex-shrink-0 transition-transform group-hover:translate-x-0.5" />
+              <MessageSquareHeart className="h-4 w-4 flex-shrink-0 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110" />
+              Send an email
+              <ArrowRight className="h-3.5 w-3.5 flex-shrink-0 transition-transform duration-300 group-hover:translate-x-1" />
             </a>
           </div>
         </div>

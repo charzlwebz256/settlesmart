@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { MapPin, Globe, Code, Palette, Video, Heart, Mail, Phone, ExternalLink } from 'lucide-react';
+import { gmailComposeUrl, ADMIN_EMAIL } from '@/lib/gmailLink';
 
 const SKILLS = [
   { icon: Code, label: 'Web Development' },
@@ -86,9 +87,11 @@ export default function MeetTheDeveloper() {
 
               {/* Contact */}
               <div className="flex flex-wrap gap-3 justify-center md:justify-start">
-                <a href="mailto:charzlwebz256@gmail.com"
-                  className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
-                  <Mail className="w-4 h-4" />
+                <a href={gmailComposeUrl({ to: ADMIN_EMAIL, subject: 'Hello Charles, from SettleSmart' })}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="group inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300">
+                  <Mail className="w-4 h-4 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110" />
                   Email Charles
                 </a>
                 <a href="tel:+14372475086"
@@ -166,10 +169,12 @@ export default function MeetTheDeveloper() {
             about technology, community, and innovation.
           </p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <a href="mailto:charzlwebz256@gmail.com"
-              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 transition-colors">
-              <Mail className="w-4 h-4" />
-              charzlwebz256@gmail.com
+            <a href={gmailComposeUrl({ to: ADMIN_EMAIL, subject: 'Hello Charles, from SettleSmart' })}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-medium hover:bg-primary/90 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-primary/30 transition-all duration-300">
+              <Mail className="w-4 h-4 transition-transform duration-300 group-hover:-rotate-6 group-hover:scale-110" />
+              Send an email
             </a>
             <a href="tel:+14372475086"
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-border bg-card text-foreground text-sm font-medium hover:bg-muted transition-colors">

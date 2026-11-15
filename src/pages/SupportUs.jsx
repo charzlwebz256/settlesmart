@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion';
 import { Heart, Mail, Phone, DollarSign, Users, Lightbulb, Globe, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { gmailComposeUrl, ADMIN_EMAIL } from '@/lib/gmailLink';
 
 const WAYS_TO_SUPPORT = [
   {
@@ -110,17 +111,19 @@ export default function SupportUs() {
 
           <div className="space-y-4">
             <a
-              href="mailto:charzlwebz256@gmail.com"
-              className="flex items-center gap-4 p-4 rounded-xl bg-muted hover:bg-primary/10 hover:text-primary transition-colors group"
+              href={gmailComposeUrl({ to: ADMIN_EMAIL, subject: 'Supporting SettleSmart' })}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 p-4 rounded-xl bg-muted hover:bg-primary/10 hover:text-primary hover:-translate-y-0.5 hover:shadow-md transition-all duration-300 group"
             >
-              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center group-hover:bg-primary/20 transition-all duration-300 group-hover:scale-110">
                 <Mail className="w-5 h-5 text-primary" />
               </div>
               <div>
-                <p className="text-xs text-muted-foreground mb-0.5">Email us at</p>
-                <p className="font-semibold text-foreground">charzlwebz256@gmail.com</p>
+                <p className="text-xs text-muted-foreground mb-0.5">Write to the site admin</p>
+                <p className="font-semibold text-foreground">Send an email</p>
               </div>
-              <ArrowRight className="w-4 h-4 ml-auto text-muted-foreground group-hover:text-primary transition-colors" />
+              <ArrowRight className="w-4 h-4 ml-auto text-muted-foreground group-hover:text-primary group-hover:translate-x-1 transition-all duration-300" />
             </a>
 
             <a

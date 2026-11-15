@@ -92,7 +92,7 @@ function StoreCard({ store, index, onOpen }) {
       type="button"
       onClick={() => onOpen(store)}
       style={{ animationDelay: `${index * 50}ms` }}
-      className={`flex flex-col items-center justify-between gap-2 p-2 rounded-2xl border text-left ${store.bg} ${store.border} hover:shadow-xl hover:-translate-y-1 hover:scale-105 transition-all duration-200 group animate-fade-in`}
+      className={`flex flex-col items-center justify-between gap-2 p-2 rounded-2xl border text-left ${store.bg} ${store.border} hover:shadow-2xl hover:-translate-y-1.5 hover:scale-[1.03] hover:ring-2 hover:ring-primary/20 transition-all duration-300 group animate-fade-in`}
     >
       {/* Logo area, landscape fill */}
       <div className="w-full aspect-[16/7] flex items-center justify-center overflow-hidden rounded-xl bg-white/60 dark:bg-white/10">
@@ -100,7 +100,7 @@ function StoreCard({ store, index, onOpen }) {
           <img
             src={store.logo}
             alt={store.name}
-            className={`w-full h-full ${imgFit}`}
+            className={`w-full h-full transition-transform duration-300 group-hover:scale-110 ${imgFit}`}
             onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex'; }}
           />
         ) : null}
@@ -113,7 +113,7 @@ function StoreCard({ store, index, onOpen }) {
       {/* Label */}
       <div className={`flex items-center gap-1 text-xs font-semibold ${store.text} w-full justify-center pb-1`}>
         <span className="text-center leading-tight truncate">{store.name}</span>
-        <ArrowRight className="w-3 h-3 opacity-50 group-hover:opacity-100 flex-shrink-0 transition-opacity" />
+        <ArrowRight className="w-3 h-3 opacity-50 group-hover:opacity-100 group-hover:translate-x-0.5 flex-shrink-0 transition-all duration-300" />
       </div>
     </button>
   );
@@ -142,7 +142,7 @@ export default function ShopSmart() {
       <div className="mb-8">
         <h1 className="font-heading font-bold text-2xl md:text-3xl mb-2 flex items-center gap-2">
           <ShoppingBag className="w-6 h-6 text-primary" />
-          ShopSmart Canada
+          ShopSmart
         </h1>
         <p className="text-muted-foreground text-sm">Popular Canadian online shopping platforms across every category, tap a store to open it in a new tab.</p>
       </div>

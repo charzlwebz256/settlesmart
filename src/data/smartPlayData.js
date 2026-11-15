@@ -22,8 +22,8 @@ export const FILTERS = [
 export const SECTIONS = [
   {
     id: 'canadian-tv',
-    label: '🍁 Canadian movies & TV',
-    note: 'Canadian film, series and television, mostly free with ads or a free account.',
+    label: '🍁 Movies & TV',
+    note: 'Film, series and television, mostly free with ads or a free account.',
     tint: 'amber',
     services: [
       {
@@ -110,7 +110,7 @@ export const SECTIONS = [
   },
   {
     id: 'canadian-news',
-    label: '📰 Canadian live TV & news',
+    label: '📰 Live TV & news',
     note: 'Live news and public affairs from across the country, free to watch.',
     tint: 'rose',
     services: [
@@ -438,8 +438,8 @@ export const SECTIONS = [
   },
   {
     id: 'audio-canada',
-    label: '🎧 Canadian music, radio & podcasts',
-    note: 'Canadian radio, podcasts and music, free to start.',
+    label: '🎧 Music, radio & podcasts',
+    note: 'Radio, podcasts and music, free to start.',
     tint: 'amber',
     services: [
       {

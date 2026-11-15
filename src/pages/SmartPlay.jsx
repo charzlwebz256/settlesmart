@@ -20,7 +20,7 @@ export default function SmartPlay() {
       <div className="mb-6">
         <h1 className="mb-2 flex items-center gap-2 font-heading text-2xl font-bold md:text-3xl">
           <Clapperboard className="h-6 w-6 text-primary" />
-          SmartPlay Canada
+          SmartPlay
         </h1>
         <p className="text-sm text-muted-foreground">
           Free and paid movies, TV, live channels, music, podcasts, documentaries and eBooks in Canada. Tap any service to open it in a new tab.

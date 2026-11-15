@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, ChevronDown, Moon, Sun, Heart, Info, GraduationCap, Wallet, LogIn, LogOut, Plug, Bus, Clock, Clapperboard, Sparkles } from 'lucide-react';
+import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, ChevronDown, Moon, Sun, Heart, Info, GraduationCap, Wallet, LogIn, LogOut, Plug, Bus, Clock, Clapperboard, Sparkles, Plane } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -28,6 +28,7 @@ const TAB_CHILDREN = {
   '/work': [
     { path: '/shop-smart', icon: ShoppingBag, label: 'ShopSmart' },
     { path: '/smart-play', icon: Clapperboard, label: 'SmartPlay' },
+    { path: '/fly-smart', icon: Plane, label: 'FlySmart' },
   ],
   '/resources': [
     { path: '/transit-map', icon: Bus, label: 'Transit Map' },

@@ -1,5 +1,5 @@
 import { Link, useNavigate } from 'react-router-dom';
-import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Search, MapPin, ShoppingBag, CalendarDays, Scale, Newspaper, ChevronUp, GraduationCap, Bus, Clock, Clapperboard, Sparkles } from 'lucide-react';
+import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Search, MapPin, ShoppingBag, CalendarDays, Scale, Newspaper, ChevronUp, GraduationCap, Bus, Clock, Clapperboard, Sparkles, Plane } from 'lucide-react';
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -30,6 +30,7 @@ const TAB_CHILDREN = {
   '/work': [
     { path: '/shop-smart', icon: ShoppingBag, label: 'ShopSmart' },
     { path: '/smart-play', icon: Clapperboard, label: 'SmartPlay' },
+    { path: '/fly-smart', icon: Plane, label: 'FlySmart' },
   ],
   '/resources': [
     { path: '/transit-map', icon: Bus, label: 'Transit Map' },

@@ -42,6 +42,7 @@ import JobTracker from './pages/JobTracker';
 import InterviewPrep from './pages/InterviewPrep';
 import ShopSmart from './pages/ShopSmart';
 import SmartPlay from './pages/SmartPlay';
+import FlySmart from './pages/FlySmart';
 import SupportUs from './pages/SupportUs';
 import MeetTheDeveloper from './pages/MeetTheDeveloper';
 import Connect from './pages/Connect';
@@ -116,6 +117,7 @@ const AuthenticatedApp = () => {
         <Route path="/volunteer" element={<Volunteer />} />
         <Route path="/shop-smart" element={<ShopSmart />} />
         <Route path="/smart-play" element={<SmartPlay />} />
+        <Route path="/fly-smart" element={<FlySmart />} />
         <Route path="/support-us" element={<SupportUs />} />
         <Route path="/meet-the-developer" element={<MeetTheDeveloper />} />
         <Route path="/connect" element={<Connect />} />
