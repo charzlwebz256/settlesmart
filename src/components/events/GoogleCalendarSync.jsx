@@ -3,8 +3,8 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Calendar, CalendarCheck, Loader2, LogOut, RefreshCw } from 'lucide-react';
 
-// Workspace-registered "SettleSmart Calendar" connector (APP_USER mode)
-const CONNECTOR_ID = '6af920bb57dbacca42a3946c';
+// Workspace-registered "SettleSmart Calendar Base44" connector (APP_USER mode)
+const CONNECTOR_ID = '6af9214b48ac7a4e3d1442a5';
 
 /** Connect, sync and disconnect the visitor's own Google Calendar. */
 export default function GoogleCalendarSync() {
