@@ -53,6 +53,7 @@ export default function MobileBottomNav({ activeTab, location }) {
   const [openMenu, setOpenMenu] = useState(null); // which tab's submenu is open
   const navigate = useNavigate();
   const ref = useRef(null);
+  const keepOpenRef = useRef(false);
 
   // Save scroll position when leaving a route
   useEffect(() => {
@@ -92,8 +93,14 @@ export default function MobileBottomNav({ activeTab, location }) {
     }
   }, [location.pathname]);
 
-  // Close submenu on route change
-  useEffect(() => { setOpenMenu(null); }, [location.pathname]);
+  // Close submenu on route change, unless the change is the tap that opened it.
+  useEffect(() => {
+    if (keepOpenRef.current) {
+      keepOpenRef.current = false;
+      return;
+    }
+    setOpenMenu(null);
+  }, [location.pathname]);
 
   const handleTabPress = (item) => {
     const children = TAB_CHILDREN[item.path];
@@ -105,6 +112,7 @@ export default function MobileBottomNav({ activeTab, location }) {
       }
       // Always land on the tab's own page first (Explore = Settlement Navigator,
       // which holds the transit map), with its sub-pages offered above.
+      keepOpenRef.current = true;
       setOpenMenu(item.path);
       if (activeTab !== item.path) navigate(item.path);
     } else {

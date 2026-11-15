@@ -12,12 +12,12 @@ export default function LoadingScreen() {
   }, []);
 
   return (
-    <div className="fixed inset-0 flex flex-col items-center justify-center bg-background overflow-hidden">
+    <div className="fixed inset-0 z-50 flex h-[100dvh] w-screen flex-col items-center justify-center bg-background overflow-hidden">
       <div
-        className="absolute inset-0 animate-fade-in"
+        className="absolute inset-0 h-full w-full animate-fade-in"
         style={{
           backgroundImage: 'url( https://cdn-res.keymedia.com/cdn-cgi/image/w=1000,h=600,f=auto/https://cdn-res.keymedia.com/cms/images/us/036/0363_639179796181705278.png',
-          backgroundSize: 'contain',
+          backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
           opacity: 0.85,

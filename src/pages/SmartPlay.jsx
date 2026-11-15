@@ -48,7 +48,7 @@ export default function SmartPlay() {
           <div key={section.id} className="text-center">
             <h2 className="font-heading text-base font-bold text-foreground">{section.label}</h2>
             <p className="mb-3 mt-0.5 text-xs text-muted-foreground">{section.note}</p>
-            <div className="flex flex-wrap justify-center gap-3 text-left">
+            <div className="grid grid-cols-2 justify-items-center gap-3 text-left sm:grid-cols-3 lg:grid-cols-4">
               {section.services.map((service, i) => (
                 <PlayCard key={service.name} service={service} tint={section.tint} index={i} />
               ))}

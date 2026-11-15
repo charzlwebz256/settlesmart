@@ -11,7 +11,7 @@ import {
   Bus,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { loadGoogleMaps } from '@/lib/googleMaps';
+import { loadGoogleMaps, onMapsAuthFailure } from '@/lib/googleMaps';
 import { bearingBetween, distanceMeters } from '@/lib/geo';
 import DirectionArrow from '@/components/transit/DirectionArrow';
 import MapCompass from '@/components/transit/MapCompass';
@@ -89,8 +89,8 @@ export default function SmartMap({
   endCoords,
   routePath,
   routeLegs,
-  nearbyStops,
-  busStations,
+  nearbyStops = [],
+  busStations = [],
   showStops,
   stopsLoading,
   onToggleStops,
@@ -115,6 +115,9 @@ export default function SmartMap({
   const [failure, setFailure] = useState(null);
   const [mapType, setMapType] = useState('roadmap');
   const [centred, setCentred] = useState(false);
+
+  // A rejected key or referrer would otherwise leave Google's own error panel on screen.
+  useEffect(() => onMapsAuthFailure(() => setFailure('auth-failed')), []);
 
   useEffect(() => {
     let alive = true;
@@ -360,12 +363,14 @@ export default function SmartMap({
             <div className="max-w-sm rounded-2xl border border-border/60 bg-card p-5 text-center shadow-sm">
               <MapPinOff className="mx-auto mb-2 h-6 w-6 text-primary" />
               <p className="font-heading text-sm font-semibold">
-                {failure === 'missing-key' ? 'Google Maps key needed' : 'The map could not load'}
+                {failure === 'missing-key' ? 'Google Maps key needed' : 'The map could not load here'}
               </p>
               <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">
                 {failure === 'missing-key'
                   ? 'Add your Google Maps JavaScript API key in the dashboard under Secrets to switch the map on. Directions and nearby stops still work below.'
-                  : 'Check your connection and reload the page. Directions and nearby stops still work below.'}
+                  : failure === 'auth-failed'
+                    ? 'This browser blocked the map. Open the page in Chrome or Safari, or use the directions and nearby stops below.'
+                    : 'Check your connection and reload the page. Directions and nearby stops still work below.'}
               </p>
             </div>
           ) : (
