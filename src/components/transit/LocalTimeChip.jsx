@@ -1,5 +1,5 @@
-import { useEffect, useState } from 'react';
 import { Clock } from 'lucide-react';
+import { useSyncedNow } from '@/lib/internetTime';
 
 // Short zone name for the rider's own timezone, e.g. "MST".
 function zoneName(date) {
@@ -12,12 +12,7 @@ function zoneName(date) {
  * device's own timezone, so this is the clock those departure times are in.
  */
 export default function LocalTimeChip() {
-  const [now, setNow] = useState(() => new Date());
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(id);
-  }, []);
+  const now = useSyncedNow();
 
   return (
     <span className="inline-flex items-center gap-1.5 rounded-full bg-muted px-2.5 py-1 text-[11px] font-semibold text-muted-foreground">

@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { ArrowRight, CalendarDays, Sparkles } from 'lucide-react';
@@ -6,16 +5,11 @@ import GreetingCard from './GreetingCard';
 import BannerWeather from './BannerWeather';
 import { getDayPart } from '@/lib/dayParts';
 import { timezoneForLocation, formatClock, formatDate } from '@/lib/canadaTimezones';
+import { useSyncedNow } from '@/lib/internetTime';
 
 // Signed-out visitors: a greeting card that follows the time of day, no name.
 export default function GuestGreeting({ onStartWizard, city, province }) {
-  const [now, setNow] = useState(new Date());
-
-  useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(t);
-  }, []);
-
+  const now = useSyncedNow();
   const timeZone = timezoneForLocation(province);
   const part = getDayPart(now, timeZone);
 

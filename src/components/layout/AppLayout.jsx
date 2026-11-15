@@ -22,6 +22,7 @@ const TAB_CHILDREN = {
     { path: '/near-me', icon: MapPin, label: 'Near Me' },
     { path: '/scholarships', icon: GraduationCap, label: 'Scholarships' },
     { path: '/jobs', icon: Briefcase, label: 'Job Search' },
+    { path: '/work', icon: Sparkles, label: 'Career Tools' },
   ],
   '/work': [
     { path: '/shop-smart', icon: ShoppingBag, label: 'ShopSmart' },

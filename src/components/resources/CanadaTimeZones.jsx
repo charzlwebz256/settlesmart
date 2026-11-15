@@ -1,5 +1,6 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { Globe, Clock, MousePointerClick } from 'lucide-react';
+import { useSyncedNow } from '@/lib/internetTime';
 import ProvinceCard from '@/components/resources/ProvinceCard';
 import { PROVINCE_PROFILES } from '@/data/provinceProfiles';
 
@@ -144,12 +145,8 @@ function groupByZone(cities) {
 }
 
 export default function CanadaTimeZones() {
-  const [now, setNow] = useState(new Date());
-
-  useEffect(() => {
-    const id = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(id);
-  }, []);
+  // Network-corrected time, so every province clock is right on any device
+  const now = useSyncedNow();
 
   const uniqueTzs = useMemo(() => {
     const set = new Set();

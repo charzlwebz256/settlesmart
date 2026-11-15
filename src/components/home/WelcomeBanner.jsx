@@ -1,4 +1,3 @@
-import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { MapPin, ListChecks, Sparkles, User, CalendarDays } from 'lucide-react';
@@ -7,6 +6,7 @@ import GreetingCard from './GreetingCard';
 import BannerWeather from './BannerWeather';
 import { getDayPart } from '@/lib/dayParts';
 import { timezoneForLocation, formatClock, formatDate } from '@/lib/canadaTimezones';
+import { useSyncedNow } from '@/lib/internetTime';
 
 const STATUS_LABELS = {
   permanent_resident: 'Permanent resident',
@@ -19,17 +19,12 @@ const STATUS_LABELS = {
 };
 
 export default function WelcomeBanner({ user, profile, city, province }) {
-  const [now, setNow] = useState(new Date());
+  // Network-corrected time, so the clock is right even when the phone's clock is not
+  const now = useSyncedNow();
 
-  // Keep the greeting, photo and clock in step with the time of day
-  useEffect(() => {
-    const t = setInterval(() => setNow(new Date()), 1000);
-    return () => clearInterval(t);
-  }, []);
-
-  // Local time at the visitor's own province
-  const activeProvince = profile?.province || province;
-  const activeCity = profile?.city || city;
+  // Local time where the visitor actually is: GPS first, saved province second
+  const activeProvince = province || profile?.province;
+  const activeCity = city || profile?.city;
   const timeZone = timezoneForLocation(activeProvince);
   const part = getDayPart(now, timeZone);
   const name = (user?.full_name || '').trim().split(' ')[0] || 'there';

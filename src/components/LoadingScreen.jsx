@@ -13,17 +13,20 @@ export default function LoadingScreen() {
 
   return (
     <div className="fixed inset-0 z-50 flex h-[100dvh] w-screen flex-col items-center justify-center bg-background overflow-hidden">
-      <div
-        className="absolute inset-0 h-full w-full animate-fade-in"
-        style={{
-          backgroundImage: 'url( https://cdn-res.keymedia.com/cdn-cgi/image/w=1000,h=600,f=auto/https://cdn-res.keymedia.com/cms/images/us/036/0363_639179796181705278.png',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat',
-          opacity: 0.85,
-        }}
-      />
+      <div className="loading-flags absolute inset-0 h-full w-full animate-fade-in" style={{ opacity: 0.85 }} />
       <style>{`
+        .loading-flags {
+          background-image: url('https://cdn-res.keymedia.com/cdn-cgi/image/w=1000,h=600,f=auto/https://cdn-res.keymedia.com/cms/images/us/036/0363_639179796181705278.png');
+          background-position: center;
+          background-repeat: no-repeat;
+          background-size: cover;
+        }
+        /* On phones keep the whole flag artwork visible and centred */
+        @media (max-width: 639px) {
+          .loading-flags {
+            background-size: contain;
+          }
+        }
         @keyframes loading-float {
           0%, 100% { transform: translateY(0) scale(1); }
           50% { transform: translateY(-8px) scale(1.04); }

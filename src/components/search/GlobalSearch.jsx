@@ -28,7 +28,7 @@ const CATALOG = [
   { path: '/job-tracker', label: 'Job Tracker', category: 'career', keywords: 'track applications job tracker follow up applied status' },
   { path: '/interview-prep', label: 'Interview Prep', category: 'career', keywords: 'interview preparation practice questions job interview' },
   { path: '/job-coach', label: 'AI Job Coach', category: 'career', keywords: 'job coach career advice ai coach mentor' },
-  { path: '/work', label: 'SmartLife', category: 'career', keywords: 'smartlife shopping entertainment work employment career jobs hub' },
+  { path: '/work', label: 'Career Tools', category: 'career', keywords: 'career tools resume interview job coach employment workplace rights' },
   { path: '/events', label: 'Community Events', category: 'community', keywords: 'events community workshops calendar gatherings meetings sessions' },
   { path: '/volunteer', label: 'Volunteer', category: 'community', keywords: 'volunteer community service give back opportunities' },
   { path: '/shop-smart', label: 'ShopSmart', category: 'community', keywords: 'shopping prices deals compare groceries budget savings' },

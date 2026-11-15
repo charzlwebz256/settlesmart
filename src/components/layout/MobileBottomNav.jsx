@@ -25,6 +25,7 @@ const TAB_CHILDREN = {
     { path: '/near-me', icon: MapPin, label: 'Near Me' },
     { path: '/scholarships', icon: GraduationCap, label: 'Scholarships' },
     { path: '/jobs', icon: Briefcase, label: 'Job Search' },
+    { path: '/work', icon: Sparkles, label: 'Career Tools' },
   ],
   '/work': [
     { path: '/shop-smart', icon: ShoppingBag, label: 'ShopSmart' },
@@ -110,7 +111,12 @@ export default function MobileBottomNav({ activeTab, location }) {
         setOpenMenu(null);
         return;
       }
-      // Always land on the tab's own page first (Explore = Settlement Navigator,
+      // SmartLife is a menu of its two hubs, it has no page of its own.
+      if (item.path === '/work') {
+        setOpenMenu(item.path);
+        return;
+      }
+      // Otherwise land on the tab's own page first (Explore = Settlement Navigator,
       // which holds the transit map), with its sub-pages offered above.
       keepOpenRef.current = true;
       setOpenMenu(item.path);
@@ -139,7 +145,7 @@ export default function MobileBottomNav({ activeTab, location }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 16 }}
             transition={{ duration: 0.18, ease: 'easeOut' }}
-            className="bg-card/95 backdrop-blur-xl border-t border-border/50 px-3 py-2 flex gap-2 justify-center"
+            className="bg-card/95 backdrop-blur-xl border-t border-border/50 px-3 py-2 flex flex-wrap gap-2 justify-center"
           >
             {TAB_CHILDREN[openMenu].map(child => {
               const isActive = location.pathname === child.path;

@@ -115,6 +115,7 @@ export default function SmartMap({
   const [failure, setFailure] = useState(null);
   const [mapType, setMapType] = useState('roadmap');
   const [centred, setCentred] = useState(false);
+  const [attempt, setAttempt] = useState(0);
 
   // A rejected key or referrer would otherwise leave Google's own error panel on screen.
   useEffect(() => onMapsAuthFailure(() => setFailure('auth-failed')), []);
@@ -128,12 +129,26 @@ export default function SmartMap({
         setReady(true);
       })
       .catch((error) => {
-        if (alive) setFailure(error?.message === 'missing-key' ? 'missing-key' : 'load-failed');
+        if (!alive) return;
+        const kind = ['missing-key', 'auth-failed'].includes(error?.message) ? error.message : 'load-failed';
+        // Keep a key rejection reported by Google itself rather than downgrading it.
+        setFailure((current) => current || kind);
       });
     return () => {
       alive = false;
     };
-  }, []);
+  }, [attempt]);
+
+  const retry = () => {
+    if (containerRef.current) containerRef.current.innerHTML = '';
+    overlays.current = { user: null, accuracy: null, route: null, routeLines: [], routeStops: [], points: [] };
+    mapRef.current = null;
+    mapsRef.current = null;
+    setReady(false);
+    setFailure(null);
+    setCentred(false);
+    setAttempt((n) => n + 1);
+  };
 
   useEffect(() => {
     if (!ready || !containerRef.current || mapRef.current) return;
@@ -369,9 +384,15 @@ export default function SmartMap({
                 {failure === 'missing-key'
                   ? 'Add your Google Maps JavaScript API key in the dashboard under Secrets to switch the map on. Directions and nearby stops still work below.'
                   : failure === 'auth-failed'
-                    ? 'This browser blocked the map. Open the page in Chrome or Safari, or use the directions and nearby stops below.'
-                    : 'Check your connection and reload the page. Directions and nearby stops still work below.'}
+                    ? `Google Maps refused the key for ${typeof window !== 'undefined' ? window.location.hostname : 'this site'}. Add that address to the key's allowed websites in Google Cloud, then tap Try again.`
+                    : 'The map service did not answer in time. Check your connection and tap Try again. Directions and nearby stops still work below.'}
               </p>
+              <button
+                onClick={retry}
+                className="mt-3 rounded-xl border border-border/60 bg-card px-3 py-1.5 text-[11px] font-semibold text-primary transition-colors hover:bg-muted"
+              >
+                Try again
+              </button>
             </div>
           ) : (
             <div className="flex flex-col items-center gap-2">
