@@ -179,11 +179,15 @@ export default function SmartMap({
         return;
       }
 
+      // On a phone the map covers most of the screen, so a one-finger drag has to
+      // scroll the page instead of trapping the rider on the map. Two fingers move it.
+      const coarsePointer = window.matchMedia?.('(pointer: coarse)').matches;
+
       const map = new maps.Map(container, {
         center: userPosition || FALLBACK_CENTER,
         zoom: userPosition ? 15 : 12,
         disableDefaultUI: true,
-        gestureHandling: 'greedy',
+        gestureHandling: coarsePointer ? 'cooperative' : 'greedy',
         clickableIcons: false,
         mapTypeId: 'roadmap',
         keyboardShortcuts: false,

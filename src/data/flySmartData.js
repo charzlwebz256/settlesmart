@@ -132,6 +132,20 @@ export const SECTIONS = [
         desc: 'Low-cost domestic and transborder flights, baggage is paid separately.',
         cta: 'Book flights',
       },
+      {
+        name: 'Air North',
+        url: 'https://www.flyairnorth.com',
+        logo: logo('flyairnorth.com'),
+        desc: 'Yukon-based airline flying to northern communities and western Canada.',
+        cta: 'Book flights',
+      },
+      {
+        name: 'Canadian North',
+        url: 'https://www.canadiannorth.com',
+        logo: logo('canadiannorth.com'),
+        desc: 'Northern carrier connecting the territories with Edmonton, Winnipeg and Ottawa.',
+        cta: 'Book flights',
+      },
     ],
   },
 ];

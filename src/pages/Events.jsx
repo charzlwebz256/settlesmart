@@ -13,6 +13,7 @@ import YearCalendarView from '@/components/events/YearCalendarView';
 import EventCard from '@/components/events/EventCard';
 import UpcomingReminders from '@/components/events/UpcomingReminders';
 import EventbriteFeed from '@/components/events/EventbriteFeed';
+import GoogleCalendarSync from '@/components/events/GoogleCalendarSync';
 import { useLocation_ } from '@/lib/LocationContext';
 
 const CATEGORIES = [
@@ -181,6 +182,9 @@ export default function Events() {
           )}
         </div>
       </div>
+
+      {/* Google Calendar connection and sync */}
+      <GoogleCalendarSync />
 
       {/* Sync status message */}
       {syncStatus && (

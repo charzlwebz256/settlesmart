@@ -11,7 +11,7 @@ export default function FlySmart() {
           FlySmart
         </h1>
         <p className="text-sm text-muted-foreground">
-          Compare fares, book with a trusted agency or go straight to the airline. Tap any card to open it in a new tab.
+          Compare fares, book with a trusted agency or go straight to the airline. Every link is secure (HTTPS) and opens in a new tab, so you can compare options side by side.
         </p>
       </div>
 

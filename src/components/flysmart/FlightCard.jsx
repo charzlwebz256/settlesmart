@@ -16,6 +16,7 @@ export default function FlightCard({ item, tint = 'blue', index = 0 }) {
       href={item.url}
       target="_blank"
       rel="noopener noreferrer"
+      referrerPolicy="no-referrer"
       style={{ animationDelay: `${index * 45}ms` }}
       className={`group flex w-full flex-col gap-2 rounded-2xl border bg-card p-3 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-xl animate-fade-in sm:gap-3 sm:p-4 ${TINT[tint] || TINT.blue}`}
     >
