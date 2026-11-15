@@ -57,7 +57,12 @@ export default function GoogleCalendarSync() {
         setBusy(false);
       }, 120000);
     } catch (err) {
-      setError(err?.message || 'Could not start Google authorization');
+      const message = err?.message || 'Could not start Google authorization';
+      setError(
+        /denied|blocked|verif|403/i.test(message)
+          ? 'Google blocked the sign-in: the calendar app needs its permissions approved before other people can connect.'
+          : message
+      );
       setBusy(false);
     }
   };
@@ -98,6 +103,9 @@ export default function GoogleCalendarSync() {
             {connected
               ? `Connected · ${count} upcoming event${count === 1 ? '' : 's'} synced`
               : 'Connect to see your own events alongside community events.'}
+          </p>
+          <p className="text-[10px] text-muted-foreground/80">
+            Access requested: read-only view of your Google Calendar events.
           </p>
           {error && <p className="text-[11px] text-destructive">{error}</p>}
         </div>
