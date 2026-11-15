@@ -103,14 +103,14 @@ function TabDropdown({ item, isActive }) {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -4 }}
             transition={{ duration: 0.12 }}
-            className="absolute top-full left-0 mt-1.5 w-48 bg-card border border-border/60 rounded-xl shadow-lg overflow-hidden z-50"
+            className="absolute top-full left-0 mt-1.5 flex items-center gap-1 bg-card border border-border/60 rounded-xl shadow-lg p-1.5 z-50"
           >
             {children.map(child => (
               <Link
                 key={child.path}
                 to={child.path}
                 onClick={() => setOpen(false)}
-                className="flex items-center gap-2.5 px-4 py-2.5 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
+                className="flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
               >
                 <child.icon className="w-4 h-4 text-primary/60" />
                 {child.label}
