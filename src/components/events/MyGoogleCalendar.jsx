@@ -4,8 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Calendar, Loader2, RefreshCw, LogOut, Plus, MapPin } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
-// Workspace-registered "User Google Calendar" connector (APP_USER mode)
-const CONNECTOR_ID = '6a4b29efdb6c44ab9da95d9f';
+// Workspace-registered connector backed by the builder's own Google OAuth client
+const CONNECTOR_ID = '6af930323f86f688bd469d8d';
 
 function fmtMonth(iso) {
   try { return new Date(iso).toLocaleString('en', { month: 'short' }); } catch { return ''; }
