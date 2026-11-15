@@ -54,7 +54,7 @@ export default function GoogleCalendarSync() {
           load().then((ok) => {
             if (!ok) {
               setError(
-                'Google did not finish the sign-in. If it showed "Access blocked", this calendar app\'s own Google configuration is rejecting the request and needs to be switched to Base44 credentials.'
+                'Google did not finish the sign-in. If Google showed a message, the exact wording helps us fix it.'
               );
             }
             setBusy(false);
