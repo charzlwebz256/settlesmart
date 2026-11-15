@@ -1,7 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
-// Workspace-registered "User Google Calendar" connector (APP_USER mode).
-const CONNECTOR_ID = '6a4b29efdb6c44ab9da95d9f';
+// Workspace-registered "SettleSmart Calendar" connector (APP_USER mode).
+const CONNECTOR_ID = '6af920bb57dbacca42a3946c';
 
 Deno.serve(async (req) => {
   try {
