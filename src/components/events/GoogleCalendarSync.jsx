@@ -19,8 +19,10 @@ export default function GoogleCalendarSync() {
       setCount((res.data?.events || []).length);
       setStatus('connected');
       setError(null);
+      return true;
     } catch {
       setStatus('disconnected');
+      return false;
     }
   };
 
@@ -49,7 +51,14 @@ export default function GoogleCalendarSync() {
       const timer = setInterval(() => {
         if (!popup || popup.closed) {
           clearInterval(timer);
-          load().finally(() => setBusy(false));
+          load().then((ok) => {
+            if (!ok) {
+              setError(
+                'Google did not finish the sign-in. If it showed "Access blocked", this calendar app\'s own Google configuration is rejecting the request and needs to be switched to Base44 credentials.'
+              );
+            }
+            setBusy(false);
+          });
         }
       }, 500);
       setTimeout(() => {
