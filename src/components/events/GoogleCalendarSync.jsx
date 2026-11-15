@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Calendar, CalendarCheck, Loader2, LogOut, RefreshCw } from 'lucide-react';
 
 // Workspace-registered "Calendar" connector, Base44 credentials (APP_USER mode)
-const CONNECTOR_ID = '6af922bb85bbbfb2a45644b7';
+const CONNECTOR_ID = '6af926ae031bf772489c4e5d';
 
 /** Connect, sync and disconnect the visitor's own Google Calendar. */
 export default function GoogleCalendarSync() {
