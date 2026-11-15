@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import MobileBottomNav from '@/components/layout/MobileBottomNav';
+import SiteFooter from '@/components/layout/SiteFooter';
 import { useLocation_ } from '@/lib/LocationContext';
 
 import LanguageTranslator from '@/components/layout/LanguageTranslator';
@@ -47,7 +48,7 @@ const primaryNav = [
 
 // Secondary items in hamburger menu (no duplicates with primary nav)
 const secondaryNav = [
-  { path: '/assistant', icon: MessageCircle, label: 'Nexa AI' },
+  { path: '/assistant', icon: MessageCircle, label: 'Ask Nexa' },
   { path: '/checklist', icon: BookOpen, label: 'Checklist' },
   { path: '/profile', icon: User, label: 'My Profile' },
   { path: '/support-us', icon: Heart, label: 'Support Us' },
@@ -70,56 +71,49 @@ function getActiveTab(pathname) {
   return pathname;
 }
 
-// Desktop dropdown for a tab with children
-function TabDropdown({ item, isActive }) {
-  const [open, setOpen] = useState(false);
-  const ref = useRef(null);
-  const children = TAB_CHILDREN[item.path];
-
-  useEffect(() => {
-    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
-    document.addEventListener('mousedown', handler);
-    return () => document.removeEventListener('mousedown', handler);
-  }, []);
-
+// Desktop tab button. The menu itself is shared, so every dropdown opens in the
+// same place instead of jumping around with the tab it belongs to.
+function NavTab({ item, isActive, isOpen, onToggle }) {
   return (
-    <div ref={ref} className="relative">
-      <button
-        onClick={() => setOpen(o => !o)}
-        className={cn(
-          "nav-pulse-btn flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
-          isActive ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"
-        )}
-      >
-        <item.icon className="w-4 h-4" />
-        {item.label}
-        <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", open && "rotate-180")} />
-      </button>
+    <button
+      onClick={onToggle}
+      aria-expanded={isOpen}
+      className={cn(
+        "nav-pulse-btn flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200",
+        isActive || isOpen ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted"
+      )}
+    >
+      <item.icon className="w-4 h-4" />
+      {item.label}
+      <ChevronDown className={cn("w-3.5 h-3.5 transition-transform", isOpen && "rotate-180")} />
+    </button>
+  );
+}
 
-      <AnimatePresence>
-        {open && (
-          <motion.div
-            initial={{ opacity: 0, y: -4, x: '-50%' }}
-            animate={{ opacity: 1, y: 0, x: '-50%' }}
-            exit={{ opacity: 0, y: -4, x: '-50%' }}
-            transition={{ duration: 0.12 }}
-            className="absolute top-full left-1/2 mt-1.5 grid w-max max-w-[calc(100vw-2rem)] grid-cols-3 gap-1 bg-card border border-border/60 rounded-xl shadow-lg p-1.5 z-50"
-          >
-            {children.map(child => (
-              <Link
-                key={child.path}
-                to={child.path}
-                onClick={() => setOpen(false)}
-                className="flex items-center gap-2 whitespace-nowrap rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-              >
-                <child.icon className="w-4 h-4 text-primary/60" />
-                {child.label}
-              </Link>
-            ))}
-          </motion.div>
-        )}
-      </AnimatePresence>
-    </div>
+// The single dropdown panel: fixed anchor under the nav, three columns, clipped
+// to the viewport so it can never push the page sideways.
+function NavPanel({ path, onClose }) {
+  const children = TAB_CHILDREN[path] || [];
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -4, x: '-50%' }}
+      animate={{ opacity: 1, y: 0, x: '-50%' }}
+      exit={{ opacity: 0, y: -4, x: '-50%' }}
+      transition={{ duration: 0.12 }}
+      className="absolute left-1/2 top-full z-50 mt-1.5 grid w-max max-w-[calc(100vw-2rem)] grid-cols-3 gap-1 overflow-hidden rounded-xl border border-border/60 bg-card p-1.5 shadow-lg"
+    >
+      {children.map(child => (
+        <Link
+          key={child.path}
+          to={child.path}
+          onClick={onClose}
+          className="flex items-center gap-2 overflow-hidden rounded-lg px-3 py-2 text-sm font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground"
+        >
+          <child.icon className="w-4 h-4 flex-shrink-0 text-primary/60" />
+          <span className="truncate">{child.label}</span>
+        </Link>
+      ))}
+    </motion.div>
   );
 }
 
@@ -128,18 +122,31 @@ export default function AppLayout() {
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
   const [searchOpen, setSearchOpen] = useState(false);
+  const [navMenu, setNavMenu] = useState(null);
   const [isDark, setIsDark] = useState(() => document.documentElement.classList.contains('dark'));
   const menuRef = useRef(null);
+  const navRef = useRef(null);
   const { city: detectedCity, province: detectedProvince } = useLocation_();
   const { user, isAuthenticated, logout, navigateToLogin } = useAuth();
   const activeTab = getActiveTab(location.pathname);
   const ROOT_TABS = ['/', '/explore', '/work', '/resources', '/emergency'];
   const isRootTab = ROOT_TABS.includes(location.pathname);
 
-  // Scroll to top on every route change
+  // Scroll to top on every route change; any open dropdown closes with the page
   useEffect(() => {
     window.scrollTo(0, 0);
+    setNavMenu(null);
   }, [location.pathname]);
+
+  // Close the nav dropdown on an outside click
+  useEffect(() => {
+    if (!navMenu) return;
+    const handler = (e) => {
+      if (navRef.current && !navRef.current.contains(e.target)) setNavMenu(null);
+    };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, [navMenu]);
 
   // Open global search with Cmd/Ctrl + K
   useEffect(() => {
@@ -194,7 +201,7 @@ export default function AppLayout() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       {/* Top Bar */}
-      <header ref={menuRef} className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border/50 safe-top select-none">
+      <header ref={menuRef} className="sticky top-0 z-50 bg-card/80 backdrop-blur-xl border-b border-border/50 safe-top select-none overflow-x-clip">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           {!isRootTab ? (
             <button
@@ -218,12 +225,20 @@ export default function AppLayout() {
           )}
 
           {/* Desktop + Mobile Nav */}
-          <nav className="hidden md:flex min-w-0 items-center gap-1 [&_a]:whitespace-nowrap [&_button]:whitespace-nowrap">
+          <nav ref={navRef} className="relative hidden md:flex min-w-0 items-center gap-1 [&_a]:whitespace-nowrap [&_button]:whitespace-nowrap">
             {primaryNav.map(item => {
               const hasChildren = !!TAB_CHILDREN[item.path];
               const isActive = activeTab === item.path;
               if (hasChildren) {
-                return <TabDropdown key={item.path} item={item} isActive={isActive} />;
+                return (
+                  <NavTab
+                    key={item.path}
+                    item={item}
+                    isActive={isActive}
+                    isOpen={navMenu === item.path}
+                    onToggle={() => setNavMenu(prev => (prev === item.path ? null : item.path))}
+                  />
+                );
               }
               return (
                 <Link
@@ -239,6 +254,9 @@ export default function AppLayout() {
                 </Link>
               );
             })}
+            <AnimatePresence>
+              {navMenu && <NavPanel key={navMenu} path={navMenu} onClose={() => setNavMenu(null)} />}
+            </AnimatePresence>
           </nav>
 
           {/* Right side: search + theme + language + hamburger */}
@@ -363,6 +381,11 @@ export default function AppLayout() {
           </motion.div>
         </AnimatePresence>
       </main>
+
+      {/* Site footer */}
+      <div className="pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-0">
+        <SiteFooter />
+      </div>
 
       {/* Mobile Bottom Nav */}
       <MobileBottomNav activeTab={activeTab} location={location} />

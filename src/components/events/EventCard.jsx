@@ -1,4 +1,4 @@
-import { Calendar, Clock, MapPin, Globe, Bookmark, BookmarkCheck, ExternalLink, Users, Bell, BellRing } from 'lucide-react';
+import { Calendar, CalendarPlus, Clock, MapPin, Globe, Bookmark, BookmarkCheck, ExternalLink, Users, Bell, BellRing } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -16,8 +16,31 @@ const categoryConfig = {
   orientation: { color: 'bg-teal-500/10 text-teal-600', label: 'Orientation' },
 };
 
+// All-day Google Calendar entry for the event date, so the deadline lands in the
+// user's own calendar without any account connection.
+function googleCalendarUrl(event) {
+  const day = (event.date || '').replace(/-/g, '');
+  if (!/^\d{8}$/.test(day)) return null;
+  const next = new Date(`${event.date}T00:00:00`);
+  if (Number.isNaN(next.getTime())) return null;
+  next.setDate(next.getDate() + 1);
+  const params = new URLSearchParams({
+    action: 'TEMPLATE',
+    text: event.title || 'SettleSmart event',
+    dates: `${day}/${format(next, 'yyyyMMdd')}`,
+    details: [
+      event.description,
+      event.organizer ? `Organizer: ${event.organizer}` : '',
+      event.registration_url,
+    ].filter(Boolean).join('\n\n'),
+    location: event.is_online ? (event.online_link || 'Online event') : (event.location || ''),
+  });
+  return `https://calendar.google.com/calendar/render?${params.toString()}`;
+}
+
 export default function EventCard({ event, saved, onSave, onSetReminder }) {
   const config = categoryConfig[event.category] || categoryConfig.community;
+  const calendarUrl = googleCalendarUrl(event);
 
   let dateDisplay = '';
   try {
@@ -112,6 +135,19 @@ export default function EventCard({ event, saved, onSave, onSetReminder }) {
             <Bell className="w-3.5 h-3.5" />
             Set Reminder
           </Button>
+        )}
+        {calendarUrl && (
+          <a
+            href={calendarUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            title="Add this event to Google Calendar"
+            aria-label="Add this event to Google Calendar"
+            className="inline-flex items-center gap-1.5 rounded-xl border border-border/60 px-2.5 h-8 text-xs font-medium text-muted-foreground transition-colors hover:border-primary/30 hover:text-primary"
+          >
+            <CalendarPlus className="w-3.5 h-3.5" />
+            <span className="hidden sm:inline">Calendar</span>
+          </a>
         )}
       </div>
     </div>

@@ -1,9 +1,12 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { Phone, Globe, MapPin, Mail, ExternalLink, GraduationCap, BadgeCheck, BookOpen, Sparkles, Info } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { getOrgLogo } from '@/lib/orgLogos';
 import ResourceList from '@/components/work/ResourceList';
+import ScholarshipSearch from '@/components/education/ScholarshipSearch';
+import { SCHOLARSHIPS_BY_PROVINCE } from '@/data/scholarshipsData';
+import { useLocation_ } from '@/lib/LocationContext';
 
 const institutions = [
   // Edmonton
@@ -42,6 +45,28 @@ const PROVINCES = [
   'Newfoundland and Labrador', 'Northwest Territories', 'Nova Scotia',
   'Nunavut', 'Ontario', 'Prince Edward Island', 'Quebec', 'Saskatchewan', 'Yukon',
 ];
+
+const PROVINCE_ALIASES = {
+  AB: 'Alberta', BC: 'British Columbia', MB: 'Manitoba', NB: 'New Brunswick',
+  NL: 'Newfoundland and Labrador', NS: 'Nova Scotia', NT: 'Northwest Territories',
+  NU: 'Nunavut', ON: 'Ontario', PE: 'Prince Edward Island', PEI: 'Prince Edward Island',
+  QC: 'Quebec', 'Québec': 'Quebec', SK: 'Saskatchewan', YT: 'Yukon',
+};
+
+const SCHOLARSHIP_PROVINCES = SCHOLARSHIPS_BY_PROVINCE.map(p => p.province);
+
+// Province names never quite agree across sources; line them up with this page.
+function matchProvince(value) {
+  if (!value) return null;
+  const alias = PROVINCE_ALIASES[value] || value;
+  return PROVINCES.includes(alias) ? alias : null;
+}
+
+// Only provinces with scholarship data can pre-filter the award search.
+function scholarshipProvinceFor(province) {
+  const alias = province === 'Newfoundland and Labrador' ? 'Newfoundland & Labrador' : province;
+  return SCHOLARSHIP_PROVINCES.includes(alias) ? alias : 'all';
+}
 
 const PROVINCE_FINDERS = {
   'British Columbia': [
@@ -111,10 +136,19 @@ function Section({ icon: Icon, title, intro, children }) {
 }
 
 export default function Education() {
+  const { province: detectedProvince } = useLocation_();
   const [province, setProvince] = useState('Alberta');
   const [cityFilter, setCityFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [newcomerOnly, setNewcomerOnly] = useState(false);
+  const pickedRef = useRef(false);
+
+  // Start on the province the visitor is actually in, unless they pick another.
+  useEffect(() => {
+    if (pickedRef.current) return;
+    const detected = matchProvince(detectedProvince);
+    if (detected) setProvince(detected);
+  }, [detectedProvince]);
 
   const filtered = institutions.filter(i => {
     const cityMatch = cityFilter === 'all' || i.city === cityFilter;
@@ -149,7 +183,7 @@ export default function Education() {
             {PROVINCES.map(p => (
               <button
                 key={p}
-                onClick={() => { setProvince(p); setCityFilter('all'); setTypeFilter('all'); setNewcomerOnly(false); }}
+                onClick={() => { pickedRef.current = true; setProvince(p); setCityFilter('all'); setTypeFilter('all'); setNewcomerOnly(false); }}
                 className={cn(
                   "px-3 py-1.5 min-h-[36px] rounded-xl text-xs font-semibold transition-all border",
                   province === p
@@ -162,6 +196,9 @@ export default function Education() {
             ))}
           </div>
         </div>
+
+        {/* Searchable scholarship and tuition funding finder */}
+        <ScholarshipSearch initialProvince={scholarshipProvinceFor(province)} />
 
         {province === 'Alberta' ? (
           <>
