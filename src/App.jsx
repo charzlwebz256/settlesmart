@@ -34,6 +34,8 @@ import Education from './pages/Education';
 import Healthcare from './pages/Healthcare';
 import Benefits from './pages/Benefits';
 import PrivacyPolicy from './pages/PrivacyPolicy';
+import Terms from './pages/Terms';
+import Faq from './pages/Faq';
 import Volunteer from './pages/Volunteer';
 import ResumeBuilder from './pages/ResumeBuilder';
 import JobTracker from './pages/JobTracker';
@@ -109,6 +111,8 @@ const AuthenticatedApp = () => {
         <Route path="/healthcare" element={<Healthcare />} />
         <Route path="/benefits" element={<Benefits />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
+        <Route path="/terms" element={<Terms />} />
+        <Route path="/faq" element={<Faq />} />
         <Route path="/volunteer" element={<Volunteer />} />
         <Route path="/shop-smart" element={<ShopSmart />} />
         <Route path="/smart-play" element={<SmartPlay />} />
