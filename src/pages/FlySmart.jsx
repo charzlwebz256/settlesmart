@@ -20,7 +20,7 @@ export default function FlySmart() {
           <div key={section.id}>
             <h2 className="font-heading text-base font-bold text-foreground">{section.label}</h2>
             <p className="mb-3 mt-0.5 text-xs text-muted-foreground">{section.note}</p>
-            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid grid-cols-2 gap-2 sm:gap-3 lg:grid-cols-3">
               {section.items.map((item, i) => (
                 <FlightCard key={item.name} item={item} tint={section.tint} index={i} />
               ))}

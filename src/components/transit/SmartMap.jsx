@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
 import {
-  Compass,
   Layers,
   Loader2,
   LocateFixed,
@@ -14,7 +13,6 @@ import { cn } from '@/lib/utils';
 import { loadGoogleMaps, onMapsAuthFailure } from '@/lib/googleMaps';
 import { bearingBetween, distanceMeters } from '@/lib/geo';
 import DirectionArrow from '@/components/transit/DirectionArrow';
-import MapCompass from '@/components/transit/MapCompass';
 
 const MAP_TYPES = [
   { id: 'roadmap', label: 'Map', icon: MapIcon },
@@ -116,6 +114,7 @@ export default function SmartMap({
   const [mapType, setMapType] = useState('roadmap');
   const [centred, setCentred] = useState(false);
   const [attempt, setAttempt] = useState(0);
+  const autoRetried = useRef(false);
 
   // A rejected key or referrer would otherwise leave Google's own error panel on screen.
   useEffect(() => onMapsAuthFailure(() => setFailure('auth-failed')), []);
@@ -131,6 +130,15 @@ export default function SmartMap({
       .catch((error) => {
         if (!alive) return;
         const kind = ['missing-key', 'auth-failed'].includes(error?.message) ? error.message : 'load-failed';
+        // A slow phone connection often trips the first attempt, so try once more
+        // on our own before asking the rider to tap anything.
+        if (kind === 'load-failed' && !autoRetried.current) {
+          autoRetried.current = true;
+          setTimeout(() => {
+            if (alive) setAttempt((n) => n + 1);
+          }, 1500);
+          return;
+        }
         // Keep a key rejection reported by Google itself rather than downgrading it.
         setFailure((current) => current || kind);
       });
@@ -144,6 +152,7 @@ export default function SmartMap({
     overlays.current = { user: null, accuracy: null, route: null, routeLines: [], routeStops: [], points: [] };
     mapRef.current = null;
     mapsRef.current = null;
+    autoRetried.current = false;
     setReady(false);
     setFailure(null);
     setCentred(false);
@@ -153,34 +162,61 @@ export default function SmartMap({
   useEffect(() => {
     if (!ready || !containerRef.current || mapRef.current) return;
     const maps = mapsRef.current;
-    const map = new maps.Map(containerRef.current, {
-      center: userPosition || FALLBACK_CENTER,
-      zoom: userPosition ? 15 : 12,
-      disableDefaultUI: true,
-      gestureHandling: 'greedy',
-      clickableIcons: false,
-      mapTypeId: 'roadmap',
-      keyboardShortcuts: false,
-    });
-    mapRef.current = map;
+    let cancelled = false;
+    let tries = 0;
+    let settleTimer = null;
 
-    map.addListener('click', (event) => {
-      handlers.current.onPickDestination?.({ lat: event.latLng.lat(), lng: event.latLng.lng() });
-    });
+    // On a phone the page can still be laying out when the API resolves. A map
+    // built inside a 0×0 box paints grey and never recovers, so wait for real
+    // size (about 1s at most) before handing the element to Google.
+    const build = () => {
+      if (cancelled || mapRef.current) return;
+      const container = containerRef.current;
+      if (!container) return;
+      if ((container.clientWidth === 0 || container.clientHeight === 0) && tries < 40) {
+        tries += 1;
+        requestAnimationFrame(build);
+        return;
+      }
 
-    // Taking the map by hand ends the follow, until they tap locate again.
-    map.addListener('dragstart', () => {
-      followRef.current = false;
-    });
+      const map = new maps.Map(container, {
+        center: userPosition || FALLBACK_CENTER,
+        zoom: userPosition ? 15 : 12,
+        disableDefaultUI: true,
+        gestureHandling: 'greedy',
+        clickableIcons: false,
+        mapTypeId: 'roadmap',
+        keyboardShortcuts: false,
+      });
+      mapRef.current = map;
 
-    // Mobile browser bars and rotation change the canvas size.
-    const resize = () => maps.event.trigger(map, 'resize');
+      map.addListener('click', (event) => {
+        handlers.current.onPickDestination?.({ lat: event.latLng.lat(), lng: event.latLng.lng() });
+      });
+
+      // Taking the map by hand ends the follow, until they tap locate again.
+      map.addListener('dragstart', () => {
+        followRef.current = false;
+      });
+
+      // Let Google measure the canvas once the layout has settled.
+      settleTimer = setTimeout(() => maps.event.trigger(map, 'resize'), 200);
+    };
+
+    build();
+
+    // Mobile browser bars, rotation and the keyboard change the canvas size.
+    const resize = () => {
+      if (mapRef.current) maps.event.trigger(mapRef.current, 'resize');
+    };
     window.addEventListener('resize', resize);
     window.visualViewport?.addEventListener('resize', resize);
     return () => {
+      cancelled = true;
+      if (settleTimer) clearTimeout(settleTimer);
       window.removeEventListener('resize', resize);
       window.visualViewport?.removeEventListener('resize', resize);
-      maps.event.clearInstanceListeners(map);
+      if (mapRef.current) maps.event.clearInstanceListeners(mapRef.current);
       mapRef.current = null;
     };
   }, [ready]);
@@ -353,23 +389,12 @@ export default function SmartMap({
     if (!userPosition || !Number.isFinite(accuracy) || accuracy > 50) onLocate?.();
   };
 
-  // Compass: reset to north where the map supports rotation, otherwise recentre.
-  const resetNorth = () => {
-    const map = mapRef.current;
-    if (!map) return;
-    if (typeof map.setHeading === 'function') {
-      map.setHeading(0);
-      map.setTilt(0);
-    }
-    if (userPosition) map.panTo(userPosition);
-  };
-
   const destination = endCoords ? { lat: endCoords[0], lng: endCoords[1] } : null;
   const destinationBearing = userPosition && destination ? bearingBetween(userPosition, destination) : null;
   const destinationDistance = userPosition && destination ? distanceMeters(userPosition, destination) : null;
 
   return (
-    <div className="relative h-full w-full overflow-hidden bg-muted">
+    <div className="relative h-full min-h-[280px] w-full overflow-hidden bg-muted">
       <div ref={containerRef} className="absolute inset-0" aria-label="Transit map" />
 
       {(failure || !ready) && (
@@ -405,14 +430,6 @@ export default function SmartMap({
 
       {ready && (
         <>
-          <MapCompass
-            heading={Number.isFinite(heading) ? heading : null}
-            bearing={destinationBearing}
-            tilt={tilt}
-            needsPermission={needsCompass}
-            onEnableCompass={onEnableCompass}
-          />
-
           {!navigating && (
             <DirectionArrow
               bearing={destinationBearing}
@@ -440,13 +457,6 @@ export default function SmartMap({
           </div>
 
           <div className="absolute right-3 z-10 flex flex-col items-end gap-2" style={{ bottom: SAFE_BOTTOM }}>
-            <button
-              onClick={resetNorth}
-              aria-label="Reset map to north"
-              className="flex h-11 w-11 items-center justify-center rounded-full border border-border/60 bg-card/95 shadow-lg backdrop-blur transition-colors hover:bg-card"
-            >
-              <Compass className="h-4 w-4 text-foreground" />
-            </button>
             <button
               onClick={recentre}
               aria-label="Locate me"

@@ -17,10 +17,10 @@ export default function FlightCard({ item, tint = 'blue', index = 0 }) {
       target="_blank"
       rel="noopener noreferrer"
       style={{ animationDelay: `${index * 45}ms` }}
-      className={`group flex w-full flex-col gap-3 rounded-2xl border bg-card p-4 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-xl animate-fade-in ${TINT[tint] || TINT.blue}`}
+      className={`group flex w-full flex-col gap-2 rounded-2xl border bg-card p-3 transition-all duration-300 hover:-translate-y-1 hover:scale-[1.02] hover:shadow-xl animate-fade-in sm:gap-3 sm:p-4 ${TINT[tint] || TINT.blue}`}
     >
-      <div className="flex items-start gap-3">
-        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center overflow-hidden rounded-xl border border-border/60 bg-white p-1.5 transition-transform duration-300 group-hover:scale-110">
+      <div className="flex items-start gap-2 sm:gap-3">
+        <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center overflow-hidden rounded-lg border border-border/60 bg-white p-1 transition-transform duration-300 group-hover:scale-110 sm:h-12 sm:w-12 sm:rounded-xl sm:p-1.5">
           <img
             src={item.logo}
             alt={item.name}
@@ -36,15 +36,15 @@ export default function FlightCard({ item, tint = 'blue', index = 0 }) {
           </span>
         </div>
         <div className="min-w-0 flex-1">
-          <h3 className="font-heading text-sm font-bold leading-tight text-foreground transition-colors group-hover:text-primary">
+          <h3 className="font-heading text-xs font-bold leading-tight text-foreground transition-colors group-hover:text-primary sm:text-sm">
             {item.name}
           </h3>
-          <p className="mt-1 text-xs leading-relaxed text-muted-foreground">{item.desc}</p>
+          <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground sm:text-xs">{item.desc}</p>
         </div>
-        <ExternalLink className="h-4 w-4 flex-shrink-0 text-muted-foreground/40 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary" />
+        <ExternalLink className="hidden h-4 w-4 flex-shrink-0 text-muted-foreground/40 transition-all group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:text-primary sm:block" />
       </div>
 
-      <span className="mt-auto inline-flex items-center gap-1 text-[11px] font-bold text-primary">
+      <span className="mt-auto inline-flex items-center gap-1 text-[10px] font-bold text-primary sm:text-[11px]">
         {callToAction}
         <ArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-1" />
       </span>

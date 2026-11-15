@@ -226,7 +226,7 @@ export default function AppLayout() {
           )}
 
           {/* Desktop + Mobile Nav */}
-          <nav ref={navRef} className="relative hidden md:flex min-w-0 items-center gap-1 [&_a]:whitespace-nowrap [&_button]:whitespace-nowrap">
+          <nav ref={navRef} className="hidden md:flex min-w-0 items-center gap-1 [&_a]:whitespace-nowrap [&_button]:whitespace-nowrap">
             {primaryNav.map(item => {
               const hasChildren = !!TAB_CHILDREN[item.path];
               const isActive = activeTab === item.path;
