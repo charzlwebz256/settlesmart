@@ -3,8 +3,8 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Calendar, CalendarCheck, Loader2, LogOut, RefreshCw } from 'lucide-react';
 
-// Workspace-registered "Calendar" connector, Base44 credentials (APP_USER mode)
-const CONNECTOR_ID = '6af929e772c56ab9e0a1084d';
+// Workspace-registered connector backed by the builder's own Google OAuth client
+const CONNECTOR_ID = '6af930323f86f688bd469d8d';
 
 /** Connect, sync and disconnect the visitor's own Google Calendar. */
 export default function GoogleCalendarSync() {

@@ -1,7 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
-// Workspace-registered "Calendar" connector, Base44 credentials (APP_USER mode).
-const CONNECTOR_ID = '6af929e772c56ab9e0a1084d';
+// Workspace-registered connector backed by the builder's own Google OAuth client.
+const CONNECTOR_ID = '6af930323f86f688bd469d8d';
 
 Deno.serve(async (req) => {
   try {
