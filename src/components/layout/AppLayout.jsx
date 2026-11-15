@@ -100,7 +100,7 @@ function NavPanel({ path, onClose }) {
       animate={{ opacity: 1, y: 0, x: '-50%' }}
       exit={{ opacity: 0, y: -4, x: '-50%' }}
       transition={{ duration: 0.12 }}
-      className="absolute left-1/2 top-full z-50 mt-1.5 grid w-max max-w-[calc(100vw-2rem)] grid-cols-3 gap-1 overflow-hidden rounded-xl border border-border/60 bg-card p-1.5 shadow-lg"
+      className="absolute left-1/2 top-full z-[80] mt-2 grid w-[27rem] max-w-[calc(100vw-2rem)] grid-cols-3 gap-1 overflow-hidden rounded-xl border border-border bg-popover p-1.5 shadow-2xl"
     >
       {children.map(child => (
         <Link
