@@ -4,6 +4,8 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle, Loader2, Mic, PhoneOff, Volume2 } from 'lucide-react';
 import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
 import { playNexaVoice, stopNexaVoice } from '@/lib/nexaVoice';
+import { playBell } from '@/lib/bellChime';
+import VoiceRings from '@/components/nexa/VoiceRings';
 import { cn } from '@/lib/utils';
 
 const STATUS_TEXT = {
@@ -76,8 +78,13 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
     recognition.continuous = false;
     recognition.interimResults = false;
     let said = '';
+    let chimed = false;
 
     recognition.onresult = (event) => {
+      if (!chimed && (event.results[event.resultIndex]?.[0]?.transcript || '').trim()) {
+        chimed = true;
+        playBell();
+      }
       for (let i = event.resultIndex; i < event.results.length; i += 1) {
         if (event.results[i].isFinal) said += event.results[i][0].transcript;
       }
@@ -120,14 +127,13 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
   return (
     <div className={cn('overflow-hidden rounded-2xl border border-border/50 bg-card', className)}>
       <div className="relative flex aspect-[4/5] w-full flex-col items-center justify-center gap-3 overflow-hidden bg-gradient-to-b from-primary/20 via-primary/5 to-foreground/10 p-6 text-center">
-        <img
-          src={NEXA_PORTRAIT}
-          alt="Nexa"
-          className={cn(
-            'h-28 w-28 rounded-full object-cover shadow-lg ring-4 ring-white/70 dark:ring-white/10',
-            status === 'speaking' && 'animate-pulse'
-          )}
-        />
+        <VoiceRings nexa={status === 'speaking'} you={status === 'listening'} className="h-28 w-28">
+          <img
+            src={NEXA_PORTRAIT}
+            alt="Nexa"
+            className="h-28 w-28 rounded-full object-cover shadow-lg ring-4 ring-white/70 dark:ring-white/10"
+          />
+        </VoiceRings>
 
         {!live ? (
           <>

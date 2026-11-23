@@ -33,6 +33,7 @@ const TAB_CHILDREN = {
     { path: '/fly-smart', icon: Plane, label: 'FlySmart' },
   ],
   '/resources': [
+    { path: '/resources/directory', icon: BookOpen, label: 'National Directory' },
     { path: '/transit-map', icon: Bus, label: 'Transit Map' },
     { path: '/time-zones', icon: Clock, label: 'Time Zones' },
     { path: '/legal', icon: Scale, label: 'Legal & IRCC' },

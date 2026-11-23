@@ -4,6 +4,8 @@ import { createNuanceConversation } from '@nuancelabs/js-sdk';
 import { Button } from '@/components/ui/button';
 import { Mic, MicOff, PhoneOff, Loader2, AlertCircle, Radio, Keyboard } from 'lucide-react';
 import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
+import { playBell } from '@/lib/bellChime';
+import VoiceRings from '@/components/nexa/VoiceRings';
 import { cn } from '@/lib/utils';
 
 const STATE_TEXT = {
@@ -50,6 +52,7 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
   const [creditsOut, setCreditsOut] = useState(false);
   const [muted, setMuted] = useState(false);
   const [speaking, setSpeaking] = useState(false);
+  const [youSpeaking, setYouSpeaking] = useState(false);
 
   const teardown = () => {
     unsubscribersRef.current.forEach((off) => {
@@ -114,6 +117,10 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
           if (event.participant === 'avatar') {
             setSpeaking(event.isSpeaking);
             if (event.isSpeaking) setCaption('');
+          }
+          if (event.participant === 'user') {
+            setYouSpeaking(event.isSpeaking);
+            if (event.isSpeaking) playBell();
           }
           break;
         case 'avatar-presented':
@@ -212,9 +219,17 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
         {live && (
           <>
             <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 backdrop-blur">
-              <span className={cn('h-1.5 w-1.5 rounded-full', speaking ? 'bg-emerald-400 animate-pulse' : 'bg-white/70')} />
+              <VoiceRings nexa={speaking} className="h-2.5 w-2.5">
+                <span className={cn('h-1.5 w-1.5 rounded-full', speaking ? 'bg-emerald-400' : 'bg-white/70')} />
+              </VoiceRings>
               <span className="text-[10px] font-semibold text-white">Nexa</span>
               <span className="text-[10px] text-white/70">· {STATE_TEXT[state] || 'Live'}</span>
+            </div>
+            <div className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 backdrop-blur">
+              <VoiceRings you={youSpeaking} className="h-2.5 w-2.5">
+                <span className={cn('h-1.5 w-1.5 rounded-full', youSpeaking ? 'bg-accent' : 'bg-white/70')} />
+              </VoiceRings>
+              <span className="text-[10px] font-semibold text-white">You</span>
             </div>
             {state !== 'connected' && (
               <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-background/70 backdrop-blur-sm">

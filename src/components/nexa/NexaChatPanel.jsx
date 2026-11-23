@@ -3,6 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Plus, History, Volume2, VolumeX, Trash2, AlertCircle, Loader2, Sparkles, ChevronRight } from 'lucide-react';
 import ChatMessage from '@/components/nexa/ChatMessage';
+import VoiceRings from '@/components/nexa/VoiceRings';
+import { playBell } from '@/lib/bellChime';
 import NexaComposer from '@/components/nexa/NexaComposer';
 import { useSpeech } from '@/hooks/useSpeech';
 import { loadConversations, saveConversation, deleteConversation, newConversation } from '@/lib/nexaHistory';
@@ -311,10 +313,20 @@ export default function NexaChatPanel({ profile = null, guest = null, className,
           </div>
         )}
 
-        {speaking && (
-          <button onClick={stopSpeaking} className="text-[11px] font-medium text-primary underline">
-            Stop reading aloud
-          </button>
+        {(speaking || listening) && (
+          <div className="flex items-center gap-2">
+            <VoiceRings nexa={speaking} you={listening} className="h-5 w-5">
+              <span className={cn('h-5 w-5 rounded-full', speaking ? 'bg-primary/15' : 'bg-accent/20')} />
+            </VoiceRings>
+            <span className="text-[11px] font-medium text-foreground">
+              {speaking ? 'Nexa is reading aloud' : 'Listening to you'}
+            </span>
+            {speaking && (
+              <button onClick={stopSpeaking} className="text-[11px] font-medium text-primary underline">
+                Stop
+              </button>
+            )}
+          </div>
         )}
 
         {error && (
@@ -335,7 +347,14 @@ export default function NexaChatPanel({ profile = null, guest = null, className,
         uploading={uploading}
         onPickFile={pickFile}
         onRemoveFile={() => setAttachment(null)}
-        onMic={() => (listening ? stopListening() : listen(setInput))}
+        onMic={() => {
+          if (listening) {
+            stopListening();
+            return;
+          }
+          playBell();
+          listen(setInput);
+        }}
         listening={listening}
         micSupported={recognitionSupported}
       />
