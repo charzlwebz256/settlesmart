@@ -1,8 +1,9 @@
 import { useMemo, useState } from 'react';
-import { AlertTriangle, BookOpen, Bus, Compass, Download, FileDown, HeartHandshake, Home, Landmark, MapPin, PawPrint, Search, ShoppingBag, Trees, Users } from 'lucide-react';
+import { AlertTriangle, BookOpen, Bus, Compass, Download, ExternalLink, FileDown, HeartHandshake, Home, Landmark, MapPin, PawPrint, Search, ShoppingBag, Trees, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SERVICE_DIRECTORY as DIRECTORY, PROVINCES } from '@/data/nationalDirectory';
 import { institutionLogo } from '@/data/institutionLogos';
+import { officialLinks } from '@/data/officialLinks';
 import { downloadDirectoryHtml, downloadDirectoryPdf } from '@/lib/directoryDownload';
 import { useLocation_ } from '@/lib/LocationContext';
 
@@ -33,6 +34,7 @@ function EntryList({ items, emptyText }) {
     <div className="space-y-2">
       {items.map((item) => {
         const logo = institutionLogo(item.name);
+        const links = officialLinks(item.name);
         return (
           <div key={item.name} className="flex gap-2.5 rounded-xl bg-muted/40 p-3">
             {logo ? (
@@ -52,6 +54,22 @@ function EntryList({ items, emptyText }) {
             <div className="min-w-0">
               <p className="text-sm font-semibold text-foreground">{item.name}</p>
               {item.note && <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{item.note}</p>}
+              {links.length > 0 && (
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {links.map((link) => (
+                    <a
+                      key={link.url}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1 rounded-lg bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary transition-colors hover:bg-primary/20"
+                    >
+                      {link.label}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  ))}
+                </div>
+              )}
             </div>
           </div>
         );

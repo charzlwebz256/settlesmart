@@ -1,22 +1,29 @@
 import jsPDF from 'jspdf';
 import { SERVICE_DIRECTORY as DIRECTORY, PROVINCES } from '@/data/nationalDirectory';
+import { officialLinks } from '@/data/officialLinks';
 
 const escapeHtml = (value) =>
   String(value).replace(/[&<>"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[char]));
 
+const itemHtml = (item) => {
+  const links = officialLinks(item.name);
+  const linkRow = links.length
+    ? `<br/><span class="links">${links
+        .map((link) => `<a href="${escapeHtml(link.url)}" target="_blank" rel="noopener">${escapeHtml(link.label)}</a>`)
+        .join(' · ')}</span>`
+    : '';
+  return `<li><strong>${escapeHtml(item.name)}</strong>${item.note ? ` — ${escapeHtml(item.note)}` : ''}${linkRow}</li>`;
+};
+
 function buildHtml() {
   const sections = DIRECTORY.map((category) => {
     const national = category.national.length
-      ? `<h3>Across Canada</h3><ul>${category.national
-          .map((item) => `<li><strong>${escapeHtml(item.name)}</strong>${item.note ? ` — ${escapeHtml(item.note)}` : ''}</li>`)
-          .join('')}</ul>`
+      ? `<h3>Across Canada</h3><ul>${category.national.map(itemHtml).join('')}</ul>`
       : '';
     const provincial = PROVINCES.map((province) => {
       const items = category.provinces[province] || [];
       if (items.length === 0) return '';
-      return `<h3>${escapeHtml(province)}</h3><ul>${items
-        .map((item) => `<li><strong>${escapeHtml(item.name)}</strong>${item.note ? ` — ${escapeHtml(item.note)}` : ''}</li>`)
-        .join('')}</ul>`;
+      return `<h3>${escapeHtml(province)}</h3><ul>${items.map(itemHtml).join('')}</ul>`;
     }).join('');
     return `<section><h2>${escapeHtml(category.label)}</h2><p class="blurb">${escapeHtml(category.blurb)}</p>${national}${provincial}</section>`;
   }).join('');
@@ -35,6 +42,7 @@ function buildHtml() {
   h3 { font-size: 14px; margin: 16px 0 6px; text-transform: uppercase; letter-spacing: .04em; color: #676f7e; }
   ul { margin: 0; padding-left: 18px; }
   li { font-size: 13px; margin-bottom: 6px; }
+  .links a { color: #279b84; font-size: 12px; text-decoration: none; }
   .blurb { color: #676f7e; font-size: 13px; margin: 0; }
   footer { margin-top: 26px; font-size: 12px; color: #676f7e; }
 </style></head>
@@ -79,6 +87,14 @@ export function downloadDirectoryPdf() {
     y += gap - 3;
   };
 
+  const writeEntry = (item) => {
+    write(`• ${item.name}${item.note ? ` — ${item.note}` : ''}`, 9, 'normal', 2);
+    const links = officialLinks(item.name);
+    if (links.length) {
+      write(`   ${links.map((link) => `${link.label}: ${link.url}`).join(' | ')}`, 8, 'normal', 2);
+    }
+  };
+
   write('SettleSmart Canada – National Services Directory', 18, 'bold', 6);
   write(`Downloaded ${new Date().toLocaleDateString('en-CA')}`, 9, 'normal', 16);
 
@@ -87,14 +103,14 @@ export function downloadDirectoryPdf() {
     write(category.blurb, 9, 'normal', 8);
     if (category.national.length) {
       write('Across Canada', 10, 'bold', 4);
-      category.national.forEach((item) => write(`• ${item.name}${item.note ? ` — ${item.note}` : ''}`, 9, 'normal', 2));
+      category.national.forEach(writeEntry);
       y += 6;
     }
     PROVINCES.forEach((province) => {
       const items = category.provinces[province] || [];
       if (!items.length) return;
       write(province, 10, 'bold', 4);
-      items.forEach((item) => write(`• ${item.name}${item.note ? ` — ${item.note}` : ''}`, 9, 'normal', 2));
+      items.forEach(writeEntry);
       y += 6;
     });
     y += 8;

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom';
 import { Globe, Bus, ArrowRight, Compass } from 'lucide-react';
 import CanadaTimeZones from '@/components/resources/CanadaTimeZones';
+import DirectoryCard from '@/components/resources/DirectoryCard';
 import TransitPlanner from '@/components/transit/TransitPlanner';
 import LocalTimeChip from '@/components/transit/LocalTimeChip';
 
@@ -42,22 +43,24 @@ export default function Resources() {
         <TransitPlanner embedded autoLocate />
       </section>
 
-      <Link
-        to="/directory"
-        className="mt-8 flex items-center justify-between gap-3 rounded-2xl border border-border/50 bg-card p-4 transition-colors hover:border-primary/50"
-      >
-        <div>
-          <p className="flex items-center gap-2 font-heading text-sm font-bold">
-            <Compass className="h-4 w-4 text-primary" />
-            National Services Directory
-          </p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Emergency, housing, banking, family, seniors, transit, shopping, parks, libraries and pet services in every
-            province and territory.
-          </p>
+      <section className="mt-8">
+        <div className="flex items-center justify-between gap-3 mb-3 flex-wrap">
+          <h2 className="font-heading font-bold text-sm uppercase tracking-wide text-muted-foreground flex items-center gap-2">
+            <Compass className="w-4 h-4 text-primary" />
+            National services directory
+          </h2>
+          <Link
+            to="/directory"
+            className="inline-flex items-center gap-1 text-xs font-semibold text-primary hover:underline"
+          >
+            Open directory <ArrowRight className="w-3 h-3" />
+          </Link>
         </div>
-        <ArrowRight className="h-4 w-4 flex-shrink-0 text-primary" />
-      </Link>
+        <p className="text-xs text-muted-foreground mb-3">
+          Search by category and province, and open the official website of each organisation.
+        </p>
+        <DirectoryCard />
+      </section>
     </div>
   );
 }
