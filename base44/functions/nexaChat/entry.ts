@@ -172,6 +172,18 @@ Reply as Nexa.`;
     const fileUri = cleanText(payload.document?.file_uri, 500);
     let fileUrls = null;
     if (fileUri) {
+      // A private document may only be read for the account that uploaded it.
+      const caller = await base44.auth.me().catch(() => null);
+      if (!caller?.id) {
+        return Response.json({ error: 'Sign in to attach a document.' }, { status: 401 });
+      }
+      const owned = await base44.asServiceRole.entities.NexaDocument.filter(
+        { file_uri: fileUri, created_by_id: caller.id },
+        { limit: 1 }
+      );
+      if (!(owned?.items || []).length) {
+        return Response.json({ error: 'That document is not available to this account.' }, { status: 403 });
+      }
       try {
         const signed = await base44.asServiceRole.integrations.Core.CreateFileSignedUrl({ file_uri: fileUri, expires_in: 600 });
         if (signed?.signed_url) fileUrls = [signed.signed_url];

@@ -143,6 +143,8 @@ export default function NexaChatPanel({
     setError(null);
     try {
       const { file_uri } = await base44.integrations.Core.UploadPrivateFile({ file });
+      // Record the uploader so the document can only be read back for them.
+      await base44.entities.NexaDocument.create({ file_uri, file_name: file.name });
       setAttachment({ name: file.name, file_uri });
     } catch (_err) {
       setError('That file could not be uploaded. Try a PDF, Word document, text file or image.');

@@ -1,0 +1,40 @@
+{
+  "name": "NexaDocument",
+  "type": "object",
+  "properties": {
+    "file_uri": {
+      "type": "string",
+      "description": "Private storage URI of a document the person attached to Nexa"
+    },
+    "file_name": {
+      "type": "string",
+      "description": "Original name of the attached file"
+    }
+  },
+  "required": [
+    "file_uri"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "$or": [
+        {
+          "created_by_id": "{{user.id}}"
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}
