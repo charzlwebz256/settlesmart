@@ -31,6 +31,33 @@ export function stopNexaVoice() {
   }
 }
 
+// Holds the current sentence where it is, so it can be picked up again.
+export function pauseNexaVoice() {
+  try {
+    currentAudio?.pause();
+  } catch (_e) {
+    // Nothing playing.
+  }
+  try {
+    window.speechSynthesis?.pause();
+  } catch (_e) {
+    // No browser speech to pause.
+  }
+}
+
+export function resumeNexaVoice() {
+  try {
+    currentAudio?.play();
+  } catch (_e) {
+    // Nothing to resume.
+  }
+  try {
+    window.speechSynthesis?.resume();
+  } catch (_e) {
+    // No browser speech to resume.
+  }
+}
+
 function browserFallback(plain, handlers) {
   if (!('speechSynthesis' in window)) {
     handlers.onEnd?.();

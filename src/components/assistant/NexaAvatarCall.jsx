@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createNuanceConversation } from '@nuancelabs/js-sdk';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, PhoneOff, Loader2, AlertCircle, Radio, Keyboard } from 'lucide-react';
+import { Mic, MicOff, PhoneOff, Loader2, AlertCircle, Radio, Keyboard, Pause, Play } from 'lucide-react';
 import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
 import { HeartbeatDot } from '@/components/nexa/Heartbeat';
 import { cn } from '@/lib/utils';
@@ -49,6 +49,7 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
   const [error, setError] = useState(null);
   const [creditsOut, setCreditsOut] = useState(false);
   const [muted, setMuted] = useState(false);
+  const [paused, setPaused] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [youSpeaking, setYouSpeaking] = useState(false);
 
@@ -200,6 +201,23 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
     }
   };
 
+  // Pause holds her picture and voice; resume picks the live call back up.
+  const togglePause = () => {
+    const next = !paused;
+    try {
+      if (next) {
+        audioRef.current?.pause();
+        videoRef.current?.pause();
+      } else {
+        audioRef.current?.play();
+        videoRef.current?.play();
+      }
+    } catch (_e) {
+      // The call keeps running either way.
+    }
+    setPaused(next);
+  };
+
   const live = phase === 'live' || phase === 'starting';
 
   return (
@@ -295,10 +313,20 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
       {live && (
         <div className="flex items-center justify-between gap-2 border-t border-border/50 px-3 py-2">
           <span className="flex items-center gap-1.5 text-[10px] font-medium text-muted-foreground">
-            <Radio className="h-3 w-3 text-primary" />
-            {muted ? 'Your microphone is muted' : 'Nexa can hear you'}
+          <Radio className="h-3 w-3 text-primary" />
+          {paused ? 'Nexa is paused' : muted ? 'Your microphone is muted' : 'Nexa can hear you'}
           </span>
           <div className="flex gap-1.5">
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={togglePause}
+              className="h-8 gap-1.5 rounded-lg px-2.5 text-xs"
+              aria-label={paused ? 'Resume Nexa' : 'Pause Nexa'}
+            >
+              {paused ? <Play className="h-3.5 w-3.5" /> : <Pause className="h-3.5 w-3.5" />}
+              {paused ? 'Resume' : 'Pause'}
+            </Button>
             <Button
               size="sm"
               variant="outline"
