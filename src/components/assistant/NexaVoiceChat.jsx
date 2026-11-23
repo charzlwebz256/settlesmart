@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
+import { useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, Loader2, Mic, PhoneOff } from 'lucide-react';
@@ -21,6 +22,8 @@ const TIP_PROMPT =
 
 // Hands-free voice conversation: speak straight to Nexa, she answers out loud.
 export default function NexaVoiceChat({ guest = null, profile = null, className }) {
+  const { pathname } = useLocation();
+  const historyRef = useRef([]);
   const [status, setStatus] = useState('idle');
   const [youSpeaking, setYouSpeaking] = useState(false);
   const [error, setError] = useState(null);
@@ -55,18 +58,23 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
     clearIdle();
     setStatus('thinking');
     setError(null);
+    const history = historyRef.current.slice(-10);
     try {
       const res = await base44.functions.invoke('nexaChat', {
         message: question,
-        history: [],
+        history,
         profile,
         city: profile?.city || guest?.city,
         province: profile?.province || guest?.province,
-        pageContext: 'Ask Nexa',
+        pageContext: `SettleSmart page: ${pathname}`,
         mode: 'voice',
       });
       const answer = res?.data?.answer;
       if (!answer) throw new Error('No answer');
+      const turn = question === TIP_PROMPT
+        ? [{ role: 'assistant', content: answer }]
+        : [{ role: 'user', content: question }, { role: 'assistant', content: answer }];
+      historyRef.current = [...historyRef.current, ...turn].slice(-12);
       speakReply(answer);
     } catch (_err) {
       activeRef.current = false;
@@ -109,6 +117,12 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
       if (heard.trim()) {
         setYouSpeaking(true);
         clearIdle();
+        // Cut her off the moment the visitor starts speaking.
+        if (speakingRef.current) {
+          stopNexaVoice();
+          speakingRef.current = false;
+          setStatus('listening');
+        }
       }
     };
     recognition.onspeechend = () => setYouSpeaking(false);

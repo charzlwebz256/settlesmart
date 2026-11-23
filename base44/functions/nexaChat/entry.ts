@@ -4,6 +4,17 @@ import { cleanText } from '../../shared/safeUrl.ts';
 
 const PAGE_CONTEXT = `The person is reading this page of SettleSmart right now. Lean the answer toward it when it fits, but still answer their actual question:`;
 
+// Spoken answers carry no markup, links or web addresses.
+function spokenText(value) {
+  if (typeof value !== 'string') return '';
+  return value
+    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
+    .replace(/https?:\/\/\S+/g, '')
+    .replace(/[*_`#>]/g, '')
+    .replace(/\s+/g, ' ')
+    .trim();
+}
+
 function buildProfileContext(profile) {
   if (!profile || typeof profile !== 'object') return '';
   const fields = [
@@ -108,24 +119,31 @@ export default async function (req) {
     const pageContext = cleanText(payload.pageContext, 120);
     const language = cleanText(payload.language, 40);
 
-    if (mode === 'voice') {
-      const siteContext = cleanText(payload.siteContext, 200);
-      const prompt = `You are Nexa, the voice assistant inside SettleSmart Canada, a newcomer settlement platform.
-Speak like a warm, experienced settlement worker: natural, unhurried, one idea at a time, no lists, headings, emoji or links.
-${siteContext ? `Current app data: ${siteContext}` : ''}
-Answer in two or three spoken sentences, then name the SettleSmart page or the official office that helps.
-Newcomer: "${message}"`;
-
-      const answer = await base44.asServiceRole.integrations.Core.InvokeLLM({ prompt });
-      return Response.json({ answer: typeof answer === 'string' ? answer : '' });
-    }
-
     const profileContext = buildProfileContext(payload.profile);
     const city = cleanText(payload.city, 80);
     const province = cleanText(payload.province, 80);
     const locationContext = !profileContext && (city || province)
       ? `The user is located in ${city ? (province ? `${city}, ${province}` : city) : province}, Canada.`
       : '';
+
+    if (mode === 'voice') {
+      const prompt = `${NEXA_SYSTEM_PROMPT}
+
+${profileContext ? `ABOUT THIS PERSON — tailor the answer to this location and situation: ${profileContext}.` : locationContext}
+
+${pageContext ? `${PAGE_CONTEXT} ${pageContext}` : ''}
+
+${history ? `Conversation so far:\n${history}\n` : ''}
+Newcomer said: ${message}
+
+This reply is spoken out loud, so answer as natural speech: two or three short sentences, warm and professional, no lists, headings, emoji, links or web addresses at all. Say the name of the office or the page instead of a URL. Answer the question directly first, then give the one next step that matters, then ask one short follow-up question when it would help you guide them better. Name the official office that helps, and say where in SettleSmart to tap to continue, for example "open Explore, then Education".`;
+
+      const answer = await base44.asServiceRole.integrations.Core.InvokeLLM({
+        prompt,
+        add_context_from_internet: true,
+      });
+      return Response.json({ answer: spokenText(answer) });
+    }
 
     let serviceContext = '';
     try {

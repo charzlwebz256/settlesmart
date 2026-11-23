@@ -1,4 +1,5 @@
 import ReactMarkdown from 'react-markdown';
+import { Link } from 'react-router-dom';
 import { ThumbsUp, ThumbsDown, Volume2, Paperclip } from 'lucide-react';
 import TypewriterContent from '@/components/assistant/TypewriterContent';
 import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
@@ -45,7 +46,14 @@ export default function ChatMessage({ message, index, feedback, onFeedback, onSp
             <div className={markdownStyles}>
               <ReactMarkdown
                 components={{
-                  a: ({ node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" />,
+                  a: ({ node, href, children, ...props }) => {
+                    const internal = typeof href === 'string' && href.startsWith('/') && !href.startsWith('//');
+                    return internal ? (
+                      <Link to={href} {...props}>{children}</Link>
+                    ) : (
+                      <a href={href} target="_blank" rel="noopener noreferrer" {...props}>{children}</a>
+                    );
+                  },
                 }}
               >
                 {message.content}
