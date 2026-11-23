@@ -28,6 +28,8 @@ export default function Assistant() {
   const [guest, setGuest] = useState(null);
   const [mode, setMode] = useState('talk');
   const [chatMessages, setChatMessages] = useState([]);
+  const [voiceMessages, setVoiceMessages] = useState([]);
+  const contactMessages = [...chatMessages, ...voiceMessages];
 
   const useChat = (withVoice) => setMode(withVoice ? 'voice' : 'type');
 
@@ -157,14 +159,18 @@ export default function Assistant() {
             </p>
           </div>
 
-          <NexaContactCard messages={chatMessages} />
+          <NexaContactCard messages={contactMessages} />
 
           {guest && <StartingPoints goal={guest.goal} province={guest.province} />}
         </div>
       </div>
       ) : mode === 'voice' ? (
         <div className="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,20rem)_1fr] md:items-start">
-          <NexaVoiceChat guest={guestContext} profile={profile} />
+          <NexaVoiceChat
+            guest={guestContext}
+            profile={profile}
+            onAnswer={(content) => setVoiceMessages((prev) => [...prev, { role: 'assistant', content }])}
+          />
 
           <div className="space-y-4">
             <div className="rounded-2xl border border-border/50 bg-card p-4">
@@ -179,7 +185,7 @@ export default function Assistant() {
               </p>
             </div>
 
-            <NexaContactCard messages={chatMessages} />
+            <NexaContactCard messages={contactMessages} />
 
             {guest && <StartingPoints goal={guest.goal} province={guest.province} />}
           </div>
@@ -192,7 +198,7 @@ export default function Assistant() {
             onMessagesChange={setChatMessages}
             className="h-[calc(100vh-20rem)] min-h-[420px]"
           />
-          <NexaContactCard messages={chatMessages} />
+          <NexaContactCard messages={contactMessages} />
         </div>
       )}
     </div>

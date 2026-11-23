@@ -3,21 +3,30 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/AuthContext';
 import { extractContacts } from '@/lib/nexaLinks';
-import { loadConversations } from '@/lib/nexaHistory';
-import { Building2, Check, Clock, Copy, Globe, Loader2, Mail, MapPin, Phone } from 'lucide-react';
+import { Building2, Check, Copy, Loader2, Mail } from 'lucide-react';
 
-// The organisations Nexa named, with their contact details, ready to be sent.
+function formatEntry(contact) {
+  return [
+    contact.name,
+    contact.website && `Website: ${contact.website.href}`,
+    contact.phone && `Phone: ${contact.phone.label}`,
+    contact.address && `Address: ${contact.address.label}`,
+    contact.hours && `Hours: ${contact.hours}`,
+  ]
+    .filter(Boolean)
+    .join('\n');
+}
+
+// A blank space Nexa fills with the contact details she gives, ready to be sent.
 export default function NexaContactCard({ messages = [] }) {
   const { isAuthenticated, user } = useAuth();
   const [sending, setSending] = useState(false);
   const [sentTo, setSentTo] = useState('');
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState(null);
-  // Falls back to the last saved chat, so the panel keeps what Nexa wrote.
-  const contacts = useMemo(() => {
-    const source = messages.length ? messages : loadConversations()[0]?.messages || [];
-    return extractContacts(source);
-  }, [messages]);
+
+  const contacts = useMemo(() => extractContacts(messages), [messages]);
+  const text = contacts.map(formatEntry).join('\n\n');
 
   const send = async () => {
     setSending(true);
@@ -35,19 +44,12 @@ export default function NexaContactCard({ messages = [] }) {
   };
 
   const copy = async () => {
-    const text = contacts
-      .map((contact) =>
-        [contact.name, contact.website?.href, contact.phone?.label, contact.address?.label, contact.hours]
-          .filter(Boolean)
-          .join(' · ')
-      )
-      .join('\n');
     try {
       await navigator.clipboard.writeText(text);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch (_err) {
-      setError('Your browser would not let Nexa copy that. Select the details and copy them yourself.');
+      setError('Your browser would not let Nexa copy that. Select the text and copy it yourself.');
     }
   };
 
@@ -60,57 +62,14 @@ export default function NexaContactCard({ messages = [] }) {
         </p>
       </div>
 
-      <div className="max-h-72 space-y-2.5 overflow-y-auto p-3">
-        {contacts.length === 0 ? (
-          <p className="text-xs leading-relaxed text-muted-foreground">
-            Ask Nexa about an organisation and she writes its website, phone number, address and opening hours here,
-            ready to send to you.
-          </p>
-        ) : (
-          contacts.map((contact) => (
-            <div key={`${contact.name}-${contact.website?.href || contact.phone?.href}`} className="space-y-1">
-              <p className="text-xs font-semibold leading-snug text-foreground">{contact.name}</p>
-              {contact.website && (
-                <a
-                  href={contact.website.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-start gap-1.5 text-[11px] text-primary underline"
-                >
-                  <Globe className="mt-0.5 h-3 w-3 flex-shrink-0" /> {contact.website.label}
-                </a>
-              )}
-              {contact.phone && (
-                <a
-                  href={contact.phone.href}
-                  className="flex items-center gap-1.5 text-[11px] font-medium text-primary"
-                >
-                  <Phone className="h-3 w-3" /> {contact.phone.label}
-                </a>
-              )}
-              {contact.address && (
-                <a
-                  href={contact.address.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-start gap-1.5 text-[11px] text-foreground"
-                >
-                  <MapPin className="mt-0.5 h-3 w-3 flex-shrink-0 text-primary" /> {contact.address.label}
-                </a>
-              )}
-              {contact.hours && (
-                <a
-                  href={`https://www.google.com/search?q=${encodeURIComponent(`${contact.name} opening hours`)}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="flex items-start gap-1.5 text-[11px] text-muted-foreground underline decoration-dotted"
-                >
-                  <Clock className="mt-0.5 h-3 w-3 flex-shrink-0 text-primary" /> {contact.hours}
-                </a>
-              )}
-            </div>
-          ))
-        )}
+      <div className="p-3">
+        <textarea
+          readOnly
+          value={text}
+          aria-label="Contacts Nexa found"
+          placeholder="This space stays empty until Nexa gives you an organisation's website, phone number, address, location or opening hours. She writes them here as she answers."
+          className="h-44 w-full resize-none rounded-xl border border-border/50 bg-secondary/40 p-2.5 text-[11px] leading-relaxed text-foreground outline-none placeholder:text-muted-foreground"
+        />
       </div>
 
       <div className="space-y-1.5 border-t border-border/50 p-3">

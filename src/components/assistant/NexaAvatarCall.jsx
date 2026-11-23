@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Mic, MicOff, PhoneOff, Loader2, AlertCircle, Radio, Keyboard, Pause, Play } from 'lucide-react';
 import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
 import { HeartbeatDot } from '@/components/nexa/Heartbeat';
+import { MIC_DENIED_MESSAGE, MIC_FAILED_MESSAGE, requestMicrophone } from '@/lib/micPermission';
 import { cn } from '@/lib/utils';
 
 const STATE_TEXT = {
@@ -54,6 +55,7 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
   const [youSpeaking, setYouSpeaking] = useState(false);
 
   const quietTimerRef = useRef(null);
+  const quietCountRef = useRef(0);
   const pausedRef = useRef(false);
 
   const clearQuiet = () => {
@@ -67,13 +69,14 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
     quietTimerRef.current = setTimeout(() => {
       const conversation = conversationRef.current;
       if (!conversation) return;
+      const instructions = quietCountRef.current === 0
+        ? 'The person has not answered you yet. Do not repeat yourself. Ask one short, friendly question about what is keeping them busy right now, such as work, school, housing, paperwork or family, and nothing else.'
+        : 'The conversation has gone quiet. Do not repeat what you already said. Gently start it again with one short, practical SettleSmart tip about settling in Canada, and name the SettleSmart page that helps if it fits.';
+      quietCountRef.current += 1;
       conversation
         .sendInterfaceEvent({
           type: 'response.create',
-          response: {
-            instructions:
-              'The conversation has gone quiet. Do not repeat what you already said. Gently start it again with one short, practical SettleSmart tip about settling in Canada, and name the SettleSmart page that helps if it fits.',
-          },
+          response: { instructions },
         })
         .catch(() => {});
       resetQuiet();
@@ -105,6 +108,12 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
     setMuted(false);
     pausedRef.current = false;
     setPaused(false);
+    quietCountRef.current = 0;
+    const mic = await requestMicrophone();
+    if (!mic.ok) {
+      setError(mic.reason === 'denied' ? MIC_DENIED_MESSAGE : MIC_FAILED_MESSAGE);
+      return;
+    }
     setPhase('starting');
     setState('connecting');
 

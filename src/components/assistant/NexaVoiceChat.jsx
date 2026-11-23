@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle, Mic, Pause, PhoneOff, Play } from 'lucide-react';
 import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
 import { pauseNexaVoice, playNexaVoice, resumeNexaVoice, stopNexaVoice } from '@/lib/nexaVoice';
+import { MIC_DENIED_MESSAGE, MIC_FAILED_MESSAGE, requestMicrophone } from '@/lib/micPermission';
 import { HeartbeatDot } from '@/components/nexa/Heartbeat';
 import { cn } from '@/lib/utils';
 
@@ -19,8 +20,11 @@ const SILENCE_MS = 30000;
 const TIP_PROMPT =
   'The person has been quiet for a while. Do not repeat anything you already said. Open the conversation again with one short, practical SettleSmart tip about settling in Canada, in one or two spoken sentences, and name the SettleSmart page that helps if it fits.';
 
+const BUSY_PROMPT =
+  'The person has not said anything yet. Do not repeat yourself. Ask one short, friendly question about what is keeping them busy right now, such as work, school, housing, paperwork or family, and nothing else. Two short spoken sentences at most.';
+
 // Hands-free voice conversation: speak straight to Nexa, she answers out loud.
-export default function NexaVoiceChat({ guest = null, profile = null, className }) {
+export default function NexaVoiceChat({ guest = null, profile = null, className, onAnswer }) {
   const { pathname } = useLocation();
   const historyRef = useRef([]);
   const [status, setStatus] = useState('idle');
@@ -32,6 +36,7 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
   const pausedRef = useRef(false);
   const recognitionRef = useRef(null);
   const idleTimerRef = useRef(null);
+  const silenceCountRef = useRef(0);
   const supported = typeof window !== 'undefined' && Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
 
   const clearIdle = () => {
@@ -79,10 +84,12 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
       });
       const answer = res?.data?.answer;
       if (!answer) throw new Error('No answer');
-      const turn = question === TIP_PROMPT
+      const unprompted = question === TIP_PROMPT || question === BUSY_PROMPT;
+      const turn = unprompted
         ? [{ role: 'assistant', content: answer }]
         : [{ role: 'user', content: question }, { role: 'assistant', content: answer }];
       historyRef.current = [...historyRef.current, ...turn].slice(-12);
+      onAnswer?.(answer);
       speakReply(answer);
     } catch (_err) {
       activeRef.current = false;
@@ -91,9 +98,12 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
     }
   };
 
+  // The first quiet stretch asks what is keeping them busy, later ones offer a tip.
   const offerTip = () => {
     if (!activeRef.current || speakingRef.current || pausedRef.current) return;
-    ask(TIP_PROMPT);
+    const prompt = silenceCountRef.current === 0 ? BUSY_PROMPT : TIP_PROMPT;
+    silenceCountRef.current += 1;
+    ask(prompt);
   };
 
   // Pause holds Nexa mid-sentence but keeps the microphone open, so speaking
@@ -201,10 +211,16 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
     });
   }
 
-  const start = () => {
+  const start = async () => {
     if (!supported) return;
-    activeRef.current = true;
     setError(null);
+    const mic = await requestMicrophone();
+    if (!mic.ok) {
+      setError(mic.reason === 'denied' ? MIC_DENIED_MESSAGE : MIC_FAILED_MESSAGE);
+      return;
+    }
+    activeRef.current = true;
+    silenceCountRef.current = 0;
     armIdle();
     listenForUser();
   };

@@ -91,6 +91,24 @@ function parseLine(line) {
   return { links, fields, namePart, trailing };
 }
 
+const SPOKEN_PHONE = /(?:\+?1[\s.\-]?)?\(?\d{3}\)?[\s.\-]?\d{3}[\s.\-]?\d{4}/;
+
+// A phone number Nexa said out loud, with the organisation named just before it.
+function spokenContact(line) {
+  const match = line.match(SPOKEN_PHONE);
+  if (!match) return null;
+  const phone = phoneLink(match[0]);
+  if (!phone) return null;
+  let before = trimEdges(line.slice(0, match.index));
+  const verb = before.match(/^.*\b(?:call|contact|reach|phone|ring)\b\s*/i);
+  before = (verb ? before.slice(verb[0].length) : before)
+    .replace(/\s+(?:at|on|is)\s*$/i, '')
+    .replace(/[.,;:]$/, '')
+    .trim();
+  if (!before || before.length > 60) return null;
+  return { name: before.split(/\s+/).slice(-5).join(' ').slice(0, 120), phone };
+}
+
 // The organisations Nexa named, with each detail as a tappable link.
 export function extractContacts(messages = []) {
   const contacts = [];
@@ -109,6 +127,19 @@ export function extractContacts(messages = []) {
 
           // A heading on its own line names the organisation whose details follow.
           if (!parsed.links.length && !parsed.fields.length) {
+            const spoken = spokenContact(line);
+            if (spoken) {
+              const known = contacts.find((contact) => contact.name.toLowerCase() === spoken.name.toLowerCase());
+              if (known) {
+                known.phone = known.phone || spoken.phone;
+                current = known;
+              } else {
+                const created = { ...spoken, hours: '', website: null, address: null };
+                contacts.push(created);
+                current = created;
+              }
+              return;
+            }
             const candidate = trimEdges(line).replace(/[:\-–—,]\s*$/, '');
             if (candidate && candidate.length <= 80 && !/[.!?]$/.test(candidate)) pendingName = candidate;
             return;
