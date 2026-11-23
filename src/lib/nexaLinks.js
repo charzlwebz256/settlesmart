@@ -177,26 +177,3 @@ function collectContacts(messages = []) {
 
   return contacts.filter((contact) => contact.phone || contact.website || contact.address).slice(-12);
 }
-
-// What the panel shows: the organisations from Nexa's latest answer, so the
-// details follow the question. A partial answer keeps what she said before.
-export function extractContacts(messages = []) {
-  const answers = messages.filter((message) => message.role === 'assistant');
-  const latest = answers[answers.length - 1];
-  if (!latest) return [];
-  const all = collectContacts(messages);
-  return collectContacts([latest])
-    .map((contact) => {
-      const known = all.find((item) => item.name.toLowerCase() === contact.name.toLowerCase());
-      if (!known) return contact;
-      return {
-        ...known,
-        ...contact,
-        hours: contact.hours || known.hours,
-        phone: contact.phone || known.phone,
-        website: contact.website || known.website,
-        address: contact.address || known.address,
-      };
-    })
-    .slice(0, 6);
-}

@@ -8,7 +8,6 @@ import StartingPoints from '@/components/assistant/StartingPoints';
 import NexaAvatarCall from '@/components/assistant/NexaAvatarCall';
 import NexaVoiceChat from '@/components/assistant/NexaVoiceChat';
 import NexaChatPanel from '@/components/nexa/NexaChatPanel';
-import NexaContactCard from '@/components/nexa/NexaContactCard';
 import { useAuth } from '@/lib/AuthContext';
 import { useLocation_ } from '@/lib/LocationContext';
 
@@ -27,9 +26,6 @@ export default function Assistant() {
   const { city: detectedCity, province: detectedProvince } = useLocation_();
   const [guest, setGuest] = useState(null);
   const [mode, setMode] = useState('talk');
-  const [chatMessages, setChatMessages] = useState([]);
-  const [voiceMessages, setVoiceMessages] = useState([]);
-  const contactMessages = [...chatMessages, ...voiceMessages];
 
   const useChat = (withVoice) => setMode(withVoice ? 'voice' : 'type');
 
@@ -159,18 +155,12 @@ export default function Assistant() {
             </p>
           </div>
 
-          <NexaContactCard messages={contactMessages} />
-
           {guest && <StartingPoints goal={guest.goal} province={guest.province} />}
         </div>
       </div>
       ) : mode === 'voice' ? (
         <div className="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,20rem)_1fr] md:items-start">
-          <NexaVoiceChat
-            guest={guestContext}
-            profile={profile}
-            onAnswer={(content) => setVoiceMessages((prev) => [...prev, { role: 'assistant', content }])}
-          />
+          <NexaVoiceChat guest={guestContext} profile={profile} />
 
           <div className="space-y-4">
             <div className="rounded-2xl border border-border/50 bg-card p-4">
@@ -185,21 +175,15 @@ export default function Assistant() {
               </p>
             </div>
 
-            <NexaContactCard messages={contactMessages} />
-
             {guest && <StartingPoints goal={guest.goal} province={guest.province} />}
           </div>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
-          <NexaChatPanel
-            guest={guestContext}
-            profile={profile}
-            onMessagesChange={setChatMessages}
-            className="h-[calc(100vh-20rem)] min-h-[420px]"
-          />
-          <NexaContactCard messages={contactMessages} />
-        </div>
+        <NexaChatPanel
+          guest={guestContext}
+          profile={profile}
+          className="h-[calc(100vh-20rem)] min-h-[420px]"
+        />
       )}
     </div>
   );
