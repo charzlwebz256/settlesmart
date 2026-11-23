@@ -1,19 +1,31 @@
 import { useEffect, useRef, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, Square, Loader2, AlertCircle, Keyboard, Volume2 } from 'lucide-react';
-import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
+import { Mic, Square, Loader2, AlertCircle, Keyboard } from 'lucide-react';
+import NexaPresence from '@/components/assistant/NexaPresence';
 import { cn } from '@/lib/utils';
 
 const SpeechRecognition =
   typeof window !== 'undefined' ? window.SpeechRecognition || window.webkitSpeechRecognition : null;
 
-const STATE_TEXT = {
-  idle: 'Ready when you are',
-  listening: 'Listening',
-  thinking: 'Thinking',
-  speaking: 'Speaking',
-};
+// Voices that sound like a person rather than a machine, best first.
+const VOICE_NAMES = [
+  'Natural',
+  'Neural',
+  'Google US English',
+  'Google UK English Female',
+  'Ava',
+  'Allison',
+  'Samantha',
+  'Aria',
+  'Jenny',
+  'Michelle',
+  'Karen',
+  'Serena',
+  'Moira',
+  'Tessa',
+  'Zira',
+];
 
 function plainText(markdown) {
   return String(markdown || '')
@@ -24,29 +36,50 @@ function plainText(markdown) {
     .trim();
 }
 
+function toSentences(text) {
+  const clean = plainText(text);
+  const parts = clean.match(/[^.!?]+[.!?]*/g) || [clean];
+  return parts.map((part) => part.trim()).filter(Boolean).slice(0, 6);
+}
+
 function pickVoice() {
   const voices = window.speechSynthesis?.getVoices?.() || [];
   if (!voices.length) return null;
   const english = voices.filter((voice) => String(voice.lang || '').toLowerCase().startsWith('en'));
-  const preferred = ['Google US English', 'Samantha', 'Karen', 'Serena', 'Google UK English Female'];
-  return (
-    preferred.map((name) => english.find((voice) => voice.name.includes(name))).find(Boolean) ||
-    english[0] ||
-    voices[0]
-  );
+  if (!english.length) return voices[0];
+
+  const scored = english.map((voice) => {
+    const name = String(voice.name || '');
+    let score = 0;
+    if (voice.lang === 'en-CA') score += 12;
+    else if (voice.lang === 'en-US') score += 8;
+    else if (voice.lang === 'en-GB') score += 6;
+    VOICE_NAMES.forEach((keyword, index) => {
+      if (name.includes(keyword)) score += VOICE_NAMES.length - index;
+    });
+    if (/compact/i.test(name)) score -= 20;
+    if (voice.localService) score -= 2;
+    return { voice, score };
+  });
+
+  return scored.sort((a, b) => b.score - a.score)[0].voice;
 }
 
-// Voice conversation with Nexa in the browser: the microphone transcribes you,
-// her answer is read aloud. No external voice credits, so it works at any hour.
+// Voice conversation with Nexa in the browser: your microphone, her spoken answer.
 export default function NexaVoiceChat({ guest = null, profile = null, className, onSwitchToText }) {
   const recognitionRef = useRef(null);
   const finalTextRef = useRef('');
+  const mutedRef = useRef(false);
   const [phase, setPhase] = useState('idle');
   const [interim, setInterim] = useState('');
   const [answer, setAnswer] = useState('');
   const [messages, setMessages] = useState([]);
   const [error, setError] = useState(null);
   const [muted, setMuted] = useState(false);
+
+  useEffect(() => {
+    mutedRef.current = muted;
+  }, [muted]);
 
   useEffect(
     () => () => {
@@ -62,21 +95,27 @@ export default function NexaVoiceChat({ guest = null, profile = null, className,
 
   const speak = (text) => {
     const synth = window.speechSynthesis;
-    if (!synth || muted) {
+    if (!synth || mutedRef.current) {
       setPhase('idle');
       return;
     }
     synth.cancel();
-    const utterance = new SpeechSynthesisUtterance(plainText(text).slice(0, 900));
     const voice = pickVoice();
-    if (voice) utterance.voice = voice;
-    utterance.lang = voice?.lang || 'en-CA';
-    utterance.rate = 1;
-    utterance.pitch = 1;
-    utterance.onend = () => setPhase('idle');
-    utterance.onerror = () => setPhase('idle');
+    const parts = toSentences(text);
     setPhase('speaking');
-    synth.speak(utterance);
+    parts.forEach((part, index) => {
+      const utterance = new SpeechSynthesisUtterance(part);
+      if (voice) utterance.voice = voice;
+      utterance.lang = voice?.lang || 'en-CA';
+      // A hair under normal speed with a little lift reads warmer and less clipped.
+      utterance.rate = index === 0 ? 1.02 : 1;
+      utterance.pitch = 1.05;
+      if (index === parts.length - 1) {
+        utterance.onend = () => setPhase('idle');
+      }
+      utterance.onerror = () => setPhase('idle');
+      synth.speak(utterance);
+    });
   };
 
   const ask = async (question) => {
@@ -187,60 +226,17 @@ export default function NexaVoiceChat({ guest = null, profile = null, className,
     setMuted(!muted);
   };
 
-  const busy = phase === 'listening' || phase === 'thinking' || phase === 'speaking';
   const lastQuestion = [...messages].reverse().find((m) => m.role === 'user')?.content;
+  const caption =
+    phase === 'listening'
+      ? interim || 'I am listening…'
+      : phase === 'speaking'
+        ? plainText(answer).slice(0, 220)
+        : lastQuestion || '';
 
   return (
     <div className={cn('overflow-hidden rounded-2xl border border-border/50 bg-card', className)}>
-      <div className="relative aspect-[4/5] w-full overflow-hidden bg-gradient-to-b from-primary/20 via-primary/5 to-foreground/10">
-        <img
-          src={NEXA_PORTRAIT}
-          alt="Nexa"
-          className={cn(
-            'h-full w-full object-cover transition-transform duration-700',
-            phase === 'speaking' && 'scale-105'
-          )}
-        />
-
-        <div className="absolute inset-x-0 top-0 flex items-center justify-between p-3">
-          <div className="flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 backdrop-blur">
-            <span
-              className={cn(
-                'h-1.5 w-1.5 rounded-full',
-                phase === 'listening' && 'bg-emerald-400 animate-pulse',
-                phase === 'speaking' && 'bg-primary animate-pulse',
-                phase === 'thinking' && 'bg-amber-400 animate-pulse',
-                phase === 'idle' && 'bg-white/70'
-              )}
-            />
-            <span className="text-[10px] font-semibold text-white">Nexa</span>
-            <span className="text-[10px] text-white/70">· {STATE_TEXT[phase]}</span>
-          </div>
-          <button
-            onClick={toggleMute}
-            aria-label={muted ? 'Turn her voice back on' : 'Silence her voice'}
-            className="flex h-8 w-8 items-center justify-center rounded-full bg-black/55 text-white backdrop-blur transition-colors hover:bg-black/70"
-          >
-            {muted ? <Volume2 className="h-3.5 w-3.5" /> : <MicOff className="h-3.5 w-3.5" />}
-          </button>
-        </div>
-
-        {phase === 'thinking' && (
-          <div className="absolute inset-0 flex items-center justify-center bg-background/45 backdrop-blur-sm">
-            <Loader2 className="h-6 w-6 animate-spin text-primary" />
-          </div>
-        )}
-
-        {(interim || lastQuestion || (phase === 'speaking' && answer)) && (
-          <div className="absolute inset-x-2 bottom-2 rounded-xl bg-black/65 px-3 py-2 backdrop-blur">
-            <p className="line-clamp-4 text-[11px] leading-relaxed text-white">
-              {phase === 'listening' && (interim || 'I am listening…')}
-              {phase !== 'listening' && phase === 'speaking' && plainText(answer).slice(0, 260)}
-              {(phase === 'idle' || phase === 'thinking') && lastQuestion}
-            </p>
-          </div>
-        )}
-      </div>
+      <NexaPresence phase={phase} caption={caption} muted={muted} onToggleMute={toggleMute} />
 
       {error && (
         <div className="space-y-2 border-t border-border/50 bg-destructive/10 px-3 py-2">
@@ -278,7 +274,7 @@ export default function NexaVoiceChat({ guest = null, profile = null, className,
               className="h-8 gap-1.5 rounded-lg px-3 text-xs"
             >
               {phase === 'listening' ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : <Mic className="h-3.5 w-3.5" />}
-              {phase === 'listening' ? 'Listening…' : busy ? 'Wait' : lastQuestion ? 'Ask again' : 'Start talking'}
+              {phase === 'listening' ? 'Listening…' : lastQuestion ? 'Ask again' : 'Start talking'}
             </Button>
           )}
         </div>

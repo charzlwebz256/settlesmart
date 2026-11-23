@@ -106,6 +106,40 @@
   .footer-link::after { transition: none; }
 }
 
+/* Nexa's presence: gentle breathing, listening pulse, speaking glow and waveform. */
+@keyframes nexa-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.025); }
+}
+.nexa-breathe { animation: nexa-breathe 5.5s ease-in-out infinite; }
+.nexa-breathe-fast { animation: nexa-breathe 2.4s ease-in-out infinite; }
+
+@keyframes nexa-ring {
+  0% { transform: scale(0.82); opacity: 0.5; }
+  100% { transform: scale(1.45); opacity: 0; }
+}
+.nexa-ring { animation: nexa-ring 2.6s ease-out infinite; }
+
+@keyframes nexa-speak-glow {
+  0%, 100% { box-shadow: 0 0 0 0 hsl(var(--primary) / 0.45); }
+  50% { box-shadow: 0 0 0 12px hsl(var(--primary) / 0); }
+}
+.nexa-speak-glow { animation: nexa-speak-glow 1.6s ease-in-out infinite; }
+
+@keyframes nexa-wave {
+  0%, 100% { transform: scaleY(0.35); opacity: 0.7; }
+  50% { transform: scaleY(1.4); opacity: 1; }
+}
+.nexa-wave-bar {
+  transform-origin: center;
+  animation: nexa-wave 0.9s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .nexa-breathe, .nexa-breathe-fast, .nexa-ring, .nexa-speak-glow, .nexa-wave-bar {
+    animation: none;
+  }
+}
+
 @keyframes success-pop {
   0% { transform: scale(0.4); opacity: 0; }
   60% { transform: scale(1.2); opacity: 1; }

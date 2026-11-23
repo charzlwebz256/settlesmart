@@ -14,6 +14,15 @@ const VOICE_CONTEXT = `AVAILABLE SECTIONS ON THE APP:
 - Assistant: AI chat for detailed help
 - Profile: Manage your profile and preferences`;
 
+const SPOKEN_STYLE = `HOW TO SPEAK (you are talking out loud, not writing):
+Sound like a warm, real settlement advisor on a phone call, never like a robot or a document.
+- Use contractions and everyday words. React to what they said first ("That's a common one", "Good question", "Makes sense"), then answer.
+- Two or three short sentences, under 70 words, one idea at a time. Let it breathe.
+- Never use markdown, bullets, headings, emoji or links read aloud. Name an app page in plain words instead.
+- When it helps, finish with one short question so they know their next step.
+
+THIS IS SPOKEN. The rules above about answer shape, numbered steps, "In your case", "Official sources" and "Before you act" are for written answers only: do not follow them here. Say it the way a person would out loud, in at most three sentences plus one question. If they need the steps and links, tell them the Assistant page has the full written version.`;
+
 function buildProfileContext(profile) {
   if (!profile || typeof profile !== 'object') return '';
   const fields = [
@@ -158,6 +167,8 @@ User question: "${message}"`;
       prompt = `${NEXA_SYSTEM_PROMPT}
 
 ${SETTLE_SMART_GUIDE}
+
+${mode === 'brief' ? SPOKEN_STYLE : ''}
 
 ${profileContext ? `About this person — tailor every answer to this location and situation instead of giving generic Canada-wide advice: ${profileContext}.` : locationContext}
 
