@@ -33,6 +33,7 @@ const RELOAD_STOPS_AFTER_M = 400;
  */
 export default function TransitPlanner({ embedded = false, autoLocate = false, refreshSignal = 0 }) {
   const [myAddress, setMyAddress] = useState('');
+  const [myPostal, setMyPostal] = useState('');
   const [resolvingAddress, setResolvingAddress] = useState(false);
   // The start point is set once, then stays put for the whole journey.
   const startLockedRef = useRef(false);
@@ -84,13 +85,13 @@ export default function TransitPlanner({ embedded = false, autoLocate = false, r
   } = useNearbyStops();
 
   const reverseAddress = async (coords) => {
-    if (!coords) return '';
+    if (!coords) return null;
     const { data } = await base44.functions.invoke('localAreaInfo', {
       action: 'reverse_address',
       latitude: coords[0],
       longitude: coords[1],
     });
-    return data?.address || '';
+    return data || null;
   };
 
   // Name the rider's position once, and again only after a real move.
@@ -101,12 +102,13 @@ export default function TransitPlanner({ embedded = false, autoLocate = false, r
     let alive = true;
     setResolvingAddress(true);
     reverseAddress([position.lat, position.lng])
-      .then((address) => {
-        if (!alive || !address) return;
-        setMyAddress(address);
+      .then((place) => {
+        if (!alive || !place?.address) return;
+        setMyAddress(place.address);
+        setMyPostal(place.postal_code || '');
         if (!startLockedRef.current) {
           startLockedRef.current = true;
-          setStartInput(address);
+          setStartInput(place.address);
           setStartCoords([position.lat, position.lng]);
         }
       })
@@ -407,6 +409,7 @@ export default function TransitPlanner({ embedded = false, autoLocate = false, r
             routeLoading={routeLoading}
             canSubmit={Boolean(endInput || endCoords) && Boolean(startCoords || position)}
             myAddress={myAddress}
+            myPostal={myPostal}
             accuracy={accuracy}
             locating={locating}
             resolvingAddress={resolvingAddress}

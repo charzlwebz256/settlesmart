@@ -46,6 +46,13 @@ export function useDeviceLocation({ autoStart = true } = {}) {
 
     if (previous) {
       if (reportedAccuracy != null && reportedAccuracy > MAX_ACCURACY_M) return;
+      // A rougher reading never pulls the pin away from a tighter fix we hold.
+      if (
+        reportedAccuracy != null &&
+        previous.accuracy != null &&
+        reportedAccuracy > previous.accuracy * 1.5 &&
+        reportedAccuracy > previous.accuracy + 15
+      ) return;
       const seconds = Math.max((timestamp - previous.at) / 1000, 0.5);
       const moved = distanceMeters(previous, next);
       if (moved > 150 && moved / seconds > MAX_SPEED_MPS) return;
@@ -75,7 +82,7 @@ export function useDeviceLocation({ autoStart = true } = {}) {
       }
     }
 
-    lastFixRef.current = { ...smoothed, at: timestamp };
+    lastFixRef.current = { ...smoothed, at: timestamp, accuracy: reportedAccuracy };
     setPosition(smoothed);
     setAccuracy(reportedAccuracy);
     setSpeed(Number.isFinite(coords.speed) ? coords.speed : null);

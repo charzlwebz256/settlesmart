@@ -29,6 +29,7 @@ export default function TransitControlPanel({
   routeLoading,
   canSubmit,
   myAddress,
+  myPostal,
   accuracy,
   locating,
   resolvingAddress,
@@ -60,6 +61,7 @@ export default function TransitControlPanel({
 
       <MyLocationCard
         address={myAddress}
+        postalCode={myPostal}
         accuracy={accuracy}
         locating={locating}
         resolving={resolvingAddress}

@@ -1,4 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
+import { secrets } from 'base44:runtime';
 import { cleanText, safeUrl } from '../../shared/safeUrl.ts';
 import { planRoute } from '../../shared/routing.ts';
 
@@ -175,7 +176,7 @@ For each return: name, category (food_bank/clinic/settlement/community), address
       });
     }
 
-    // Street address for a coordinate pair, so the map can name a place instead of numbers.
+    // Street address and postal code for a coordinate pair, so the map can name a place instead of numbers.
     if (action === 'reverse_address') {
       const latitude = Number(payload.latitude);
       const longitude = Number(payload.longitude);
@@ -183,28 +184,71 @@ For each return: name, category (food_bank/clinic/settlement/community), address
         return Response.json({ error: 'Valid coordinates are required.' }, { status: 400 });
       }
 
-      const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1&accept-language=en`;
-      const response = await fetch(url, {
-        headers: { 'User-Agent': 'SettleSmart/1.0 (newcomer settlement app)', 'Accept': 'application/json' },
+      let address = '';
+      let postal = '';
+      let city = '';
+      let province = '';
+
+      // Google's geocoder returns the postal code for the exact block, which the
+      // free geocoder often leaves out outside the big cities.
+      const key = secrets.get('GOOGLE_MAPS_API_KEY');
+      if (key) {
+        try {
+          const gres = await fetch(
+            `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&region=ca&key=${encodeURIComponent(key)}`,
+            { signal: AbortSignal.timeout(8000) }
+          );
+          const gdata = await gres.json().catch(() => null);
+          const found = gdata?.results?.[0];
+          if (found) {
+            address = cleanText(found.formatted_address, 200);
+            (found.address_components || []).forEach((component) => {
+              const types = component.types || [];
+              if (!postal && types.includes('postal_code')) postal = component.long_name;
+              if (!city && types.some((type) => ['locality', 'postal_town', 'administrative_area_level_3'].includes(type))) {
+                city = component.long_name;
+              }
+              if (!province && types.includes('administrative_area_level_1')) province = component.long_name;
+            });
+          }
+        } catch (_e) {
+          // Fall through to the free geocoder.
+        }
+      }
+
+      if (!address || !postal) {
+        const url = `https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1&accept-language=en`;
+        const response = await fetch(url, {
+          headers: { 'User-Agent': 'SettleSmart/1.0 (newcomer settlement app)', 'Accept': 'application/json' },
+        });
+        if (response.ok) {
+          const data = await response.json().catch(() => null);
+          const parts = data?.address || {};
+          const street = [parts.house_number, parts.road].filter(Boolean).join(' ');
+          const locality = parts.city || parts.town || parts.village || parts.hamlet || parts.suburb || '';
+          const joined = [street, locality, parts.state || parts.province || '', parts.postcode || '']
+            .map((part) => String(part || '').trim())
+            .filter(Boolean)
+            .join(', ');
+          const fallback = String(data?.display_name || '')
+            .split(',')
+            .map((part) => part.trim())
+            .filter(Boolean)
+            .slice(0, 3)
+            .join(', ');
+          if (!address) address = cleanText(joined || fallback, 200);
+          if (!postal && parts.postcode) postal = cleanText(parts.postcode, 12);
+          if (!city && locality) city = cleanText(locality, 80);
+          if (!province && (parts.state || parts.province)) province = cleanText(parts.state || parts.province, 80);
+        }
+      }
+
+      return Response.json({
+        address: address || '',
+        postal_code: postal || '',
+        city: city || '',
+        province: province || '',
       });
-      if (!response.ok) return Response.json({ address: '' });
-
-      const data = await response.json().catch(() => null);
-      const address = data?.address || {};
-      const street = [address.house_number, address.road].filter(Boolean).join(' ');
-      const locality = address.city || address.town || address.village || address.hamlet || address.suburb || '';
-      const parts = [street, locality, address.state || address.province || '', address.postcode || '']
-        .map((part) => String(part || '').trim())
-        .filter(Boolean);
-
-      const fallback = String(data?.display_name || '')
-        .split(',')
-        .map((part) => part.trim())
-        .filter(Boolean)
-        .slice(0, 3)
-        .join(', ');
-
-      return Response.json({ address: cleanText(parts.join(', ') || fallback, 200) });
     }
 
     return Response.json({ error: 'Unknown action.' }, { status: 400 });

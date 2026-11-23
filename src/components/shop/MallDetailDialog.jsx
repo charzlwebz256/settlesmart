@@ -1,27 +1,6 @@
-import { useEffect, useState } from 'react';
-import { base44 } from '@/api/base44Client';
 import { Dialog, DialogContent } from '@/components/ui/dialog';
 import { MALL_DETAILS } from '@/data/mallDetails';
 import { MapPin, Clock, Phone, Globe, Store, CalendarDays, Navigation, ExternalLink, Info } from 'lucide-react';
-
-const FALLBACK_IMAGES = [
-  'https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/8f2767d5a_generated_image.png',
-  'https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/b5f519c45_generated_image.png',
-  'https://media.base44.com/images/public/69f2dbb716d886c9c4ab31fc/80cec429b_generated_image.png',
-];
-
-let keyPromise = null;
-const getMapsKey = () => {
-  if (!keyPromise) {
-    keyPromise = base44.functions
-      .invoke('mapsConfig', {})
-      .then((res) => res?.data?.key || null)
-      .catch(() => null);
-  }
-  return keyPromise;
-};
-
-const imageFor = (name) => FALLBACK_IMAGES[[...name].reduce((sum, ch) => sum + ch.charCodeAt(0), 0) % FALLBACK_IMAGES.length];
 
 function Fact({ icon: Icon, label, value, href }) {
   if (!value) return null;
@@ -47,56 +26,25 @@ function Fact({ icon: Icon, label, value, href }) {
   );
 }
 
-// Full detail card for one shopping centre: photo, facts, contact details and a live map.
+// Full detail card for one shopping centre: facts, contact details and a live map.
 export default function MallDetailDialog({ mall, onClose }) {
-  const [streetUrl, setStreetUrl] = useState(null);
-  const [streetFailed, setStreetFailed] = useState(false);
-
   const details = mall ? MALL_DETAILS[mall.name] || {} : {};
   const place = mall ? `${mall.name}, ${mall.city}, ${mall.province}, Canada` : '';
   const mapsSearch = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(place)}`;
   const directions = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(place)}`;
   const hours = details.hours || 'Hours vary by store, check the mall website before you go.';
 
-  // A Street View photo of the actual mall when the maps key allows it.
-  useEffect(() => {
-    setStreetUrl(null);
-    setStreetFailed(false);
-    if (!mall) return;
-    let alive = true;
-    getMapsKey().then((key) => {
-      if (!alive || !key) return;
-      setStreetUrl(
-        `https://maps.googleapis.com/maps/api/streetview?size=900x420&location=${encodeURIComponent(place)}&fov=80&key=${encodeURIComponent(key)}&return_error_code=true`
-      );
-    });
-    return () => {
-      alive = false;
-    };
-  }, [mall, place]);
-
   if (!mall) return null;
-
-  const hero = streetUrl && !streetFailed ? streetUrl : imageFor(mall.name);
 
   return (
     <Dialog open={!!mall} onOpenChange={(open) => !open && onClose()}>
       <DialogContent className="max-w-2xl gap-0 overflow-y-auto p-0 max-h-[92vh]">
-        <div className="relative">
-          <img
-            src={hero}
-            alt={`${mall.name} shopping centre`}
-            className="h-44 w-full object-cover sm:h-52"
-            onError={() => setStreetFailed(true)}
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 p-4">
-            <p className="mb-1 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-white/80">
-              <MapPin className="h-3 w-3" />
-              {mall.city} · {mall.province}
-            </p>
-            <h2 className="font-heading text-lg font-bold leading-tight text-white sm:text-xl">{mall.name}</h2>
-          </div>
+        <div className="border-b border-border/60 bg-primary/10 px-4 pb-3 pt-4 sm:px-5">
+          <p className="mb-1 flex items-center gap-1 text-[11px] font-semibold uppercase tracking-wide text-primary">
+            <MapPin className="h-3 w-3" />
+            {mall.city} · {mall.province}
+          </p>
+          <h2 className="font-heading text-lg font-bold leading-tight text-foreground sm:text-xl">{mall.name}</h2>
         </div>
 
         <div className="space-y-4 p-4 sm:p-5">

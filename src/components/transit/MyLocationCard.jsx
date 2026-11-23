@@ -3,7 +3,7 @@ import { cn } from '@/lib/utils';
 import { formatAccuracy } from '@/lib/geo';
 
 // Shows the address the GPS resolved, and asks the browser for location access.
-export default function MyLocationCard({ address, accuracy, locating, resolving, error, hasPosition, onLocate }) {
+export default function MyLocationCard({ address, postalCode, accuracy, locating, resolving, error, hasPosition, onLocate }) {
   return (
     <section className="rounded-2xl border border-border/60 bg-card p-3">
       <div className="flex items-start gap-2">
@@ -54,6 +54,7 @@ export default function MyLocationCard({ address, accuracy, locating, resolving,
           <span className={cn('w-1.5 h-1.5 rounded-full', hasPosition ? 'bg-green-500 animate-pulse' : 'bg-muted-foreground/40')} />
           {hasPosition ? (accuracy ? `GPS active · ±${formatAccuracy(accuracy)}` : 'GPS active') : 'GPS off'}
         </span>
+        {hasPosition && postalCode && <span className="truncate font-semibold text-foreground">· {postalCode}</span>}
         {hasPosition && <span className="truncate">· used as your starting point</span>}
       </div>
 
