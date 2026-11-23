@@ -33,7 +33,9 @@ export default async function (req) {
         ]
           .filter(Boolean)
           .join('<br>');
-        const note = contact?.note ? `<br><span style="color:#676f7e;font-size:13px">${escapeHtml(contact.note)}</span>` : '';
+        const note = contact?.hours
+          ? `<br><span style="color:#676f7e;font-size:13px">${escapeHtml(contact.hours)}</span>`
+          : '';
         return `<div style="margin:0 0 16px"><strong style="color:#131720">${escapeHtml(contact?.name || 'Contact')}</strong>${note}<br><span style="color:#676f7e;font-size:14px">${lines}</span></div>`;
       })
       .join('');

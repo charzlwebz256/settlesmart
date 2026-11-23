@@ -37,7 +37,7 @@ export default function NexaContactCard({ messages = [] }) {
   const copy = async () => {
     const text = contacts
       .map((contact) =>
-        [contact.name, contact.phone?.label, contact.website?.href, contact.address?.label]
+        [contact.name, contact.website?.href, contact.phone?.label, contact.address?.label, contact.hours]
           .filter(Boolean)
           .join(' · ')
       )
@@ -70,10 +70,15 @@ export default function NexaContactCard({ messages = [] }) {
           contacts.map((contact) => (
             <div key={`${contact.name}-${contact.website?.href || contact.phone?.href}`} className="space-y-1">
               <p className="text-xs font-semibold leading-snug text-foreground">{contact.name}</p>
-              {contact.note && (
-                <p className="flex items-start gap-1.5 text-[11px] leading-relaxed text-muted-foreground">
-                  <Clock className="mt-0.5 h-3 w-3 flex-shrink-0" /> {contact.note}
-                </p>
+              {contact.website && (
+                <a
+                  href={contact.website.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-start gap-1.5 text-[11px] text-primary underline"
+                >
+                  <Globe className="mt-0.5 h-3 w-3 flex-shrink-0" /> {contact.website.label}
+                </a>
               )}
               {contact.phone && (
                 <a
@@ -93,14 +98,14 @@ export default function NexaContactCard({ messages = [] }) {
                   <MapPin className="mt-0.5 h-3 w-3 flex-shrink-0 text-primary" /> {contact.address.label}
                 </a>
               )}
-              {contact.website && (
+              {contact.hours && (
                 <a
-                  href={contact.website.href}
+                  href={`https://www.google.com/search?q=${encodeURIComponent(`${contact.name} opening hours`)}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-start gap-1.5 text-[11px] text-primary underline"
+                  className="flex items-start gap-1.5 text-[11px] text-muted-foreground underline decoration-dotted"
                 >
-                  <Globe className="mt-0.5 h-3 w-3 flex-shrink-0" /> {contact.website.label}
+                  <Clock className="mt-0.5 h-3 w-3 flex-shrink-0 text-primary" /> {contact.hours}
                 </a>
               )}
             </div>
