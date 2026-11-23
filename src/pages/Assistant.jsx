@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import { Sparkles, MapPin, ChevronRight, Pencil, MessageCircle, Mic, Keyboard } from 'lucide-react';
 import NexaQuickStart from '@/components/assistant/NexaQuickStart';
 import StartingPoints from '@/components/assistant/StartingPoints';
-import NexaAvatarCall from '@/components/assistant/NexaAvatarCall';
+import NexaVoiceChat from '@/components/assistant/NexaVoiceChat';
 import NexaTextChat from '@/components/assistant/NexaTextChat';
 import { useAuth } from '@/lib/AuthContext';
 import { useLocation_ } from '@/lib/LocationContext';
@@ -138,7 +138,7 @@ export default function Assistant() {
 
       {mode === 'talk' ? (
       <div className="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,20rem)_1fr] md:items-start">
-        <NexaAvatarCall guest={guestContext} onSwitchToText={() => setMode('type')} />
+        <NexaVoiceChat guest={guestContext} profile={profile} onSwitchToText={() => setMode('type')} />
 
         <div className="space-y-4">
           <div className="rounded-2xl border border-border/50 bg-card p-4">

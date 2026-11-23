@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { X, Mic, Keyboard } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import NexaAvatarCall from '@/components/assistant/NexaAvatarCall';
+import NexaVoiceChat from '@/components/assistant/NexaVoiceChat';
 import NexaTextChat from '@/components/assistant/NexaTextChat';
 import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
 import { cn } from '@/lib/utils';
@@ -45,7 +45,7 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
                 <div>
                   <p className="font-semibold text-sm leading-tight">Nexa</p>
                   <p className="text-[10px] text-white/70">
-                    {mode === 'talk' ? 'Live voice · Settlement help' : 'Text chat · Settlement help'}
+                    {mode === 'talk' ? 'Voice · Settlement help' : 'Text chat · Settlement help'}
                   </p>
                 </div>
               </div>
@@ -81,7 +81,7 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
 
             <div className="max-h-[70vh] overflow-y-auto p-3">
               {mode === 'talk' ? (
-                <NexaAvatarCall guest={guest} onSwitchToText={() => setMode('type')} />
+                <NexaVoiceChat guest={guest} onSwitchToText={() => setMode('type')} />
               ) : (
                 <NexaTextChat guest={guest} className="h-[380px]" />
               )}
