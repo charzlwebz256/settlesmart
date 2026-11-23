@@ -153,23 +153,13 @@
 }
 @keyframes heartbeat-image {
   0%, 100% { transform: scale(1); }
-  8% { transform: scale(1.012); }
-  16% { transform: scale(1.002); }
-  26% { transform: scale(1.02); }
-  42% { transform: scale(1); }
+  50% { transform: scale(1.07); }
 }
 .heartbeat-image {
-  animation: heartbeat-image 1.8s ease-in-out infinite;
-}
-@keyframes heartbeat-wave-shift {
-  from { transform: translateX(0); }
-  to { transform: translateX(-50%); }
-}
-.heartbeat-wave {
-  animation: heartbeat-wave-shift 1.6s linear infinite;
+  animation: heartbeat-image 2.4s ease-in-out infinite;
 }
 @media (prefers-reduced-motion: reduce) {
-  .heartbeat-halo, .heartbeat-dot, .heartbeat-image, .heartbeat-wave { animation: none; }
+  .heartbeat-halo, .heartbeat-dot, .heartbeat-image { animation: none; }
 }
 
 /* Nexa in motion: a gentle bob and a live equaliser while she talks. */

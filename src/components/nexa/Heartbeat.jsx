@@ -32,30 +32,3 @@ export function HeartbeatDot({ active = false, tone = 'nexa', className, childre
     </span>
   );
 }
-
-// A wavy heartbeat trace that drifts sideways while someone is speaking.
-export function HeartbeatWave({ active = false, tone = 'nexa', className }) {
-  return (
-    <div className={cn('pointer-events-none overflow-hidden', className)} aria-hidden="true">
-      <div className={cn('heartbeat-wave flex h-full w-[200%]', !active && 'opacity-0')}>
-        {[0, 1].map((i) => (
-          <svg
-            key={i}
-            viewBox="0 0 200 24"
-            preserveAspectRatio="none"
-            className={cn('h-full w-1/2', tone === 'you' ? 'text-accent' : 'text-primary')}
-          >
-            <polyline
-              points="0,12 28,12 36,12 42,4 48,20 54,12 88,12 98,12 104,7 110,17 116,12 200,12"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
-        ))}
-      </div>
-    </div>
-  );
-}

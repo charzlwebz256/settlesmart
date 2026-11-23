@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { AlertCircle, Mic, PhoneOff } from 'lucide-react';
 import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
 import { playNexaVoice, stopNexaVoice } from '@/lib/nexaVoice';
-import { HeartbeatDot, HeartbeatWave } from '@/components/nexa/Heartbeat';
+import { HeartbeatDot } from '@/components/nexa/Heartbeat';
 import { cn } from '@/lib/utils';
 
 const STATUS_TEXT = {
@@ -107,25 +107,14 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
 
     recognition.onresult = (event) => {
       let heard = '';
-      let confident = false;
       for (let i = event.resultIndex; i < event.results.length; i += 1) {
         const result = event.results[i];
-        const alternative = result[0];
-        if (result.isFinal) said += alternative.transcript;
-        heard += alternative.transcript;
-        if (result.isFinal && (alternative.confidence === 0 || alternative.confidence > 0.45)) confident = true;
+        if (result.isFinal) said += result[0].transcript;
+        heard += result[0].transcript;
       }
-      const words = heard.trim().split(/\s+/).filter(Boolean).length;
-      if (words === 0) return;
+      if (!heard.trim()) return;
       setYouSpeaking(true);
       clearIdle();
-      // Only a person's voice takes the turn: a confident phrase, never a click,
-      // a beep or a machine sound.
-      if (speakingRef.current && (confident || words >= 3)) {
-        stopNexaVoice();
-        speakingRef.current = false;
-        setStatus('listening');
-      }
     };
     recognition.onspeechend = () => setYouSpeaking(false);
     recognition.onerror = (event) => {
@@ -140,9 +129,6 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
       if (!activeRef.current) return;
       const question = said.trim();
       if (question) {
-        // Speaking over Nexa stops her and takes the turn.
-        stopNexaVoice();
-        speakingRef.current = false;
         ask(question);
         return;
       }
@@ -170,10 +156,10 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
         }
         setStatus('listening');
         armIdle();
+        // She always finishes her answer, then listens again.
+        listenForUser();
       },
     });
-    // The microphone stays open, so the visitor can cut in at any moment.
-    listenForUser();
   }
 
   const start = () => {
@@ -216,19 +202,11 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
         )}
 
         <div className="absolute inset-x-0 bottom-0 space-y-2 p-4 text-center">
-          {live && (
-            <HeartbeatWave
-              active={talking}
-              tone={youSpeaking ? 'you' : 'nexa'}
-              className="mx-auto h-6 w-full max-w-[14rem]"
-            />
-          )}
-
           {!live ? (
             <div className="space-y-2">
               <p className="font-heading text-base font-bold text-white">Talk with Nexa by voice</p>
               <p className="mx-auto max-w-[17rem] text-xs leading-relaxed text-white/80">
-                Just speak. She hears you and answers out loud. Talk over her whenever you want to cut in.
+                Just speak. She hears you and answers out loud, then listens again when she is finished.
               </p>
               <Button onClick={start} className="mt-1 gap-1.5 rounded-xl" disabled={!supported}>
                 <Mic className="h-4 w-4" />
@@ -243,7 +221,7 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
           ) : (
             <p className="text-[11px] font-medium text-white/85">
               {status === 'speaking'
-                ? 'Speak whenever you like, she will stop and listen.'
+                ? 'Nexa is answering, she will listen again in a moment.'
                 : 'Go ahead, I am listening.'}
             </p>
           )}

@@ -19,20 +19,29 @@ const ICONS = {
   pets: PawPrint,
 };
 
+// Only organisations that sit at a real location get a map link.
+const MAP_CATEGORIES = new Set(['banking', 'housing', 'malls', 'parks', 'libraries']);
+
 function matches(item, query) {
   if (!query) return true;
   const text = `${item.name} ${item.note || ''}`.toLowerCase();
   return text.includes(query);
 }
 
-function EntryList({ items, emptyText, categoryLabel, province }) {
+function EntryList({ items, emptyText, categoryLabel, province, allowMap = true }) {
   if (items.length === 0) {
     return <p className="text-xs text-muted-foreground">{emptyText}</p>;
   }
   return (
     <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
       {items.map((item) => (
-        <DirectoryEntry key={item.name} item={item} categoryLabel={categoryLabel} province={province} />
+        <DirectoryEntry
+          key={item.name}
+          item={item}
+          categoryLabel={categoryLabel}
+          province={province}
+          allowMap={allowMap}
+        />
       ))}
     </div>
   );
@@ -107,7 +116,7 @@ export default function NationalDirectory() {
         </select>
       </div>
 
-      <div className="-mx-4 mb-4 flex gap-1.5 overflow-x-auto px-4 pb-1">
+      <div className="mb-4 flex flex-wrap gap-1.5">
         {DIRECTORY.map((entry) => {
           const Icon = ICONS[entry.id] || Compass;
           return (
@@ -138,6 +147,7 @@ export default function NationalDirectory() {
             emptyText="No national entry matches that search."
             categoryLabel={category.label}
             province=""
+            allowMap={MAP_CATEGORIES.has(category.id)}
           />
         </section>
       )}
@@ -152,6 +162,7 @@ export default function NationalDirectory() {
             items={provincial}
             categoryLabel={category.label}
             province={activeProvince}
+            allowMap={MAP_CATEGORIES.has(category.id)}
             emptyText={
               Object.keys(category.provinces).length === 0
                 ? 'This service works nationally, see the list above.'

@@ -5,13 +5,18 @@ import { institutionLogo } from '@/data/institutionLogos';
 import { officialLinks } from '@/data/officialLinks';
 
 // One organisation: opens its details on hover, tap or keyboard focus.
-export default function DirectoryEntry({ item, categoryLabel, province }) {
+export default function DirectoryEntry({ item, categoryLabel, province, allowMap = true }) {
   const [open, setOpen] = useState(false);
   const logo = institutionLogo(item.name);
   const links = officialLinks(item.name);
-  const mapsUrl = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
-    [item.name, province].filter(Boolean).join(' ')
-  )}`;
+  // A map only helps for a real organisation with a location, never a hotline.
+  const hotline = /^\d/.test(item.name.trim()) || /^(911|988|211|811|311|511)\b/.test(item.name.trim());
+  const mapsUrl =
+    allowMap && !hotline
+      ? `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
+          [item.name, province].filter(Boolean).join(' ')
+        )}`
+      : null;
 
   return (
     <div
@@ -45,7 +50,7 @@ export default function DirectoryEntry({ item, categoryLabel, province }) {
         <span className="min-w-0 flex-1">
           <span className="block text-sm font-semibold text-foreground">{item.name}</span>
           {item.note && !open && (
-            <span className="mt-0.5 block truncate text-xs text-muted-foreground">{item.note}</span>
+            <span className="mt-0.5 block text-xs leading-relaxed text-muted-foreground">{item.note}</span>
           )}
         </span>
         <ChevronDown
@@ -77,15 +82,17 @@ export default function DirectoryEntry({ item, categoryLabel, province }) {
                 <ExternalLink className="h-3 w-3" />
               </a>
             ))}
-            <a
-              href={mapsUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 rounded-lg border border-border/60 px-2 py-1 text-[11px] font-semibold text-foreground transition-colors hover:bg-muted"
-            >
-              Find on the map
-              <MapPin className="h-3 w-3" />
-            </a>
+            {mapsUrl && (
+              <a
+                href={mapsUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1 rounded-lg border border-border/60 px-2 py-1 text-[11px] font-semibold text-foreground transition-colors hover:bg-muted"
+              >
+                Find on the map
+                <MapPin className="h-3 w-3" />
+              </a>
+            )}
           </div>
         </div>
       </div>
