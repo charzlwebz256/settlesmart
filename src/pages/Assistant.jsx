@@ -22,15 +22,6 @@ const STATUS_LABELS = {
   other: 'Newcomer',
 };
 
-const TOPICS = [
-  'Getting a Social Insurance Number',
-  'A health card and a family doctor',
-  'Finding housing and understanding a lease',
-  'Free English or French classes',
-  'Jobs and getting your credentials recognized',
-  'Benefits, taxes and the Canada Child Benefit',
-];
-
 export default function Assistant() {
   const { isAuthenticated, user } = useAuth();
   const { city: detectedCity, province: detectedProvince } = useLocation_();
@@ -166,17 +157,7 @@ export default function Assistant() {
             </p>
           </div>
 
-          <div className="rounded-2xl border border-border/50 bg-card p-4">
-            <p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Things you can ask her</p>
-            <ul className="space-y-1.5">
-              {TOPICS.map((topic) => (
-                <li key={topic} className="flex gap-2 text-xs leading-relaxed text-foreground">
-                  <span className="text-primary">•</span>
-                  <span>{topic}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          <NexaContactCard messages={chatMessages} />
 
           {guest && <StartingPoints goal={guest.goal} province={guest.province} />}
         </div>
@@ -198,17 +179,7 @@ export default function Assistant() {
               </p>
             </div>
 
-            <div className="rounded-2xl border border-border/50 bg-card p-4">
-              <p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Things you can ask her</p>
-              <ul className="space-y-1.5">
-                {TOPICS.map((topic) => (
-                  <li key={topic} className="flex gap-2 text-xs leading-relaxed text-foreground">
-                    <span className="text-primary">•</span>
-                    <span>{topic}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <NexaContactCard messages={chatMessages} />
 
             {guest && <StartingPoints goal={guest.goal} province={guest.province} />}
           </div>

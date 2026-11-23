@@ -7,19 +7,19 @@ export function nexaUrlTransform(url) {
   return '';
 }
 
-const LINK_PATTERN = /\[([^\]]+)\]\(([^)\s]+)\)/g;
+const LINK_SOURCE = /\[([^\]]+)\]\(([^)\s]+)\)/g;
 const MAPS_PATTERN = /google\.[a-z.]+\/maps/i;
 
-function cleanLabel(line) {
-  return line
-    .replace(LINK_PATTERN, '')
+function cleanText(value) {
+  return String(value || '')
     .replace(/[#*_`>]/g, '')
     .replace(/^[-•\d.\s]+/, '')
-    .replace(/\s*[:\-–]\s*$/, '')
+    .replace(/[|·•\s]+$/, '')
     .trim();
 }
 
-// One contact per line that carries a phone, website or address link.
+// One contact per line that carries a phone, website or address link,
+// with whatever hours or note Nexa wrote on the same line.
 export function extractContacts(messages = []) {
   const contacts = [];
   const seen = new Set();
@@ -30,7 +30,7 @@ export function extractContacts(messages = []) {
       String(message.content || '')
         .split('\n')
         .forEach((line) => {
-          const links = [...line.matchAll(LINK_PATTERN)].map((match) => ({
+          const links = [...line.matchAll(LINK_SOURCE)].map((match) => ({
             label: match[1].trim(),
             href: match[2].trim(),
           }));
@@ -41,14 +41,25 @@ export function extractContacts(messages = []) {
           const address = links.find((link) => MAPS_PATTERN.test(link.href));
           if (!phone && !website && !address) return;
 
+          const firstLinkAt = line.search(LINK_SOURCE);
+          const before = line.slice(0, firstLinkAt);
+          const after = line.replace(new RegExp(LINK_SOURCE.source, 'g'), ' ');
+
           const name =
-            cleanLabel(line) || website?.label || phone?.label || address?.label || 'Contact';
+            cleanText(before).replace(/[:\-–]\s*$/, '') ||
+            website?.label ||
+            phone?.label ||
+            address?.label ||
+            'Contact';
+          const note = cleanText(after).replace(/^[:\-–|·\s]+/, '').slice(0, 110);
+
           const key = `${name}|${phone?.href || ''}|${website?.href || ''}|${address?.href || ''}`;
           if (seen.has(key)) return;
           seen.add(key);
 
           contacts.push({
             name: name.slice(0, 120),
+            note,
             phone: phone || null,
             website: website || null,
             address: address || null,

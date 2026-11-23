@@ -1,9 +1,10 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/lib/AuthContext';
 import { extractContacts } from '@/lib/nexaLinks';
-import { Building2, Check, Copy, Globe, Loader2, Mail, MapPin, Phone } from 'lucide-react';
+import { loadConversations } from '@/lib/nexaHistory';
+import { Building2, Check, Clock, Copy, Globe, Loader2, Mail, MapPin, Phone } from 'lucide-react';
 
 // The organisations Nexa named, with their contact details, ready to be sent.
 export default function NexaContactCard({ messages = [] }) {
@@ -12,7 +13,11 @@ export default function NexaContactCard({ messages = [] }) {
   const [sentTo, setSentTo] = useState('');
   const [copied, setCopied] = useState(false);
   const [error, setError] = useState(null);
-  const contacts = extractContacts(messages);
+  // Falls back to the last saved chat, so the panel keeps what Nexa wrote.
+  const contacts = useMemo(() => {
+    const source = messages.length ? messages : loadConversations()[0]?.messages || [];
+    return extractContacts(source);
+  }, [messages]);
 
   const send = async () => {
     setSending(true);
@@ -58,13 +63,18 @@ export default function NexaContactCard({ messages = [] }) {
       <div className="max-h-72 space-y-2.5 overflow-y-auto p-3">
         {contacts.length === 0 ? (
           <p className="text-xs leading-relaxed text-muted-foreground">
-            When Nexa gives you an organisation&apos;s phone number, address or website, it appears here so she can
-            send it to you.
+            Ask Nexa about an organisation and she writes its website, phone number, address and opening hours here,
+            ready to send to you.
           </p>
         ) : (
           contacts.map((contact) => (
             <div key={`${contact.name}-${contact.website?.href || contact.phone?.href}`} className="space-y-1">
               <p className="text-xs font-semibold leading-snug text-foreground">{contact.name}</p>
+              {contact.note && (
+                <p className="flex items-start gap-1.5 text-[11px] leading-relaxed text-muted-foreground">
+                  <Clock className="mt-0.5 h-3 w-3 flex-shrink-0" /> {contact.note}
+                </p>
+              )}
               {contact.phone && (
                 <a
                   href={contact.phone.href}

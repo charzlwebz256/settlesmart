@@ -33,7 +33,8 @@ export default async function (req) {
         ]
           .filter(Boolean)
           .join('<br>');
-        return `<div style="margin:0 0 16px"><strong style="color:#131720">${escapeHtml(contact?.name || 'Contact')}</strong><br><span style="color:#676f7e;font-size:14px">${lines}</span></div>`;
+        const note = contact?.note ? `<br><span style="color:#676f7e;font-size:13px">${escapeHtml(contact.note)}</span>` : '';
+        return `<div style="margin:0 0 16px"><strong style="color:#131720">${escapeHtml(contact?.name || 'Contact')}</strong>${note}<br><span style="color:#676f7e;font-size:14px">${lines}</span></div>`;
       })
       .join('');
 
