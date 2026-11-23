@@ -1,17 +1,22 @@
 import { useState } from 'react';
-import { MapPin, Store } from 'lucide-react';
+import { ChevronRight, MapPin, Store } from 'lucide-react';
 import { PROVINCES } from '@/data/nationalDirectory';
 import { MALLS_BY_CITY } from '@/data/mallsByCity';
 import { institutionLogo } from '@/data/institutionLogos';
 import { useLocation_ } from '@/lib/LocationContext';
+import MallDetailDialog from '@/components/shop/MallDetailDialog';
 
 const SELECT_CLASS =
   'rounded-xl border border-border/60 bg-background px-3 py-2 text-xs font-semibold text-foreground outline-none focus:border-primary';
 
-function MallRow({ name }) {
+function MallRow({ name, onOpen }) {
   const logo = institutionLogo(name);
   return (
-    <div className="flex items-center gap-2 rounded-xl bg-muted/40 p-2.5">
+    <button
+      type="button"
+      onClick={onOpen}
+      className="group flex w-full items-center gap-2 rounded-xl bg-muted/40 p-2.5 text-left transition-colors hover:bg-primary/10"
+    >
       {logo ? (
         <img
           src={logo}
@@ -26,16 +31,18 @@ function MallRow({ name }) {
           {name.charAt(0)}
         </span>
       )}
-      <p className="text-xs font-semibold leading-tight text-foreground">{name}</p>
-    </div>
+      <p className="min-w-0 flex-1 truncate text-xs font-semibold leading-tight text-foreground">{name}</p>
+      <ChevronRight className="h-3.5 w-3.5 flex-shrink-0 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:text-primary" />
+    </button>
   );
 }
 
-// Major shopping centres, grouped by province and city.
+// Major shopping centres, grouped by province and city; each opens its own detail card.
 export default function MallDirectory() {
   const { province: detectedProvince } = useLocation_();
   const [province, setProvince] = useState('');
   const [city, setCity] = useState('');
+  const [selected, setSelected] = useState(null);
 
   const activeProvince = province || detectedProvince || '';
   const citiesInProvince = MALLS_BY_CITY[activeProvince] || {};
@@ -82,7 +89,7 @@ export default function MallDirectory() {
         </div>
       </div>
       <p className="mb-4 text-xs text-muted-foreground">
-        Browse by province, then narrow to your city to see the centres people actually shop at.
+        Browse by province, then narrow to your city. Tap a mall for its hours, contact details, facts and map.
       </p>
 
       {!activeProvince ? (
@@ -103,13 +110,19 @@ export default function MallDirectory() {
               </p>
               <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
                 {malls.map((mall) => (
-                  <MallRow key={mall} name={mall} />
+                  <MallRow
+                    key={mall}
+                    name={mall}
+                    onOpen={() => setSelected({ name: mall, city: cityName, province: activeProvince })}
+                  />
                 ))}
               </div>
             </div>
           ))}
         </div>
       )}
+
+      <MallDetailDialog mall={selected} onClose={() => setSelected(null)} />
     </section>
   );
 }
