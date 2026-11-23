@@ -1,6 +1,7 @@
 import { ArrowRight, ShoppingBag } from 'lucide-react';
 import PriceComparison from '@/components/shop/PriceComparison';
 import PriceAlertSignup from '@/components/shop/PriceAlertSignup';
+import MallDirectory from '@/components/shop/MallDirectory';
 import { useToast } from '@/components/ui/use-toast';
 
 const CATEGORIES = [
@@ -162,6 +163,8 @@ export default function ShopSmart() {
           </div>
         ))}
       </div>
+
+      <MallDirectory />
 
       <div className="mt-10 bg-card rounded-2xl border border-border/50 p-5">
         <h3 className="font-heading font-bold text-base mb-3">🛡️ Shopping Tips for Newcomers</h3>

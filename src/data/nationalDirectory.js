@@ -18,7 +18,7 @@ export const PROVINCES = [
   'Yukon',
 ];
 
-export const DIRECTORY = [
+const ALL_CATEGORIES = [
   {
     id: 'emergency',
     label: 'Emergency',
@@ -268,3 +268,7 @@ export const DIRECTORY = [
     },
   },
 ];
+
+// Shopping malls belong on the ShopSmart page; the rest forms the services directory.
+export const MALLS = ALL_CATEGORIES.find((entry) => entry.id === 'malls');
+export const SERVICE_DIRECTORY = ALL_CATEGORIES.filter((entry) => entry.id !== 'malls');

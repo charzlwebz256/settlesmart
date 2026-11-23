@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { AlertTriangle, BookOpen, Bus, Compass, Download, FileDown, HeartHandshake, Home, Landmark, MapPin, PawPrint, Search, ShoppingBag, Trees, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { DIRECTORY, PROVINCES } from '@/data/nationalDirectory';
+import { SERVICE_DIRECTORY as DIRECTORY, PROVINCES } from '@/data/nationalDirectory';
 import { institutionLogo } from '@/data/institutionLogos';
 import { downloadDirectoryHtml, downloadDirectoryPdf } from '@/lib/directoryDownload';
 import { useLocation_ } from '@/lib/LocationContext';

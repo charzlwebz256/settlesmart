@@ -1,5 +1,5 @@
 import jsPDF from 'jspdf';
-import { DIRECTORY, PROVINCES } from '@/data/nationalDirectory';
+import { SERVICE_DIRECTORY as DIRECTORY, PROVINCES } from '@/data/nationalDirectory';
 
 const escapeHtml = (value) =>
   String(value).replace(/[&<>"]/g, (char) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[char]));
