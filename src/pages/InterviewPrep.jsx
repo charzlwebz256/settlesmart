@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { currentUser } from '@/lib/guestUser';
 import { Button } from '@/components/ui/button';
 import { MobileSelect as Select, MobileSelectContent as SelectContent, MobileSelectItem as SelectItem, MobileSelectTrigger as SelectTrigger, MobileSelectValue as SelectValue } from '@/components/ui/mobile-select';
 import { Loader2, Mic, Send, RefreshCw, ChevronDown, ChevronUp, Lightbulb, Star, MessageSquare, BookOpen } from 'lucide-react';
@@ -74,7 +75,8 @@ export default function InterviewPrep() {
   const { data: applications = [] } = useQuery({
     queryKey: ['jobApplications'],
     queryFn: async () => {
-      const user = await base44.auth.me();
+      const user = await currentUser();
+      if (!user) return [];
       return base44.entities.JobApplication.filter({ created_by: user.email }, '-created_date', 50);
     },
   });

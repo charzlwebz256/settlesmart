@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { currentUser } from '@/lib/guestUser';
 import { Button } from '@/components/ui/button';
 import { Plus, Briefcase, Loader2, ExternalLink, Calendar, Trash2, Edit3, ChevronDown, ChevronUp, Link as LinkIcon, CheckSquare, Square, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -116,9 +118,15 @@ export default function JobTracker() {
   const [bulkStatus, setBulkStatus] = useState('');
   const [bulkWorking, setBulkWorking] = useState(false);
 
+  const { requireAuth } = useAuth();
+
   const { data: applications = [], isLoading } = useQuery({
     queryKey: ['jobApplications'],
-    queryFn: () => base44.entities.JobApplication.list('-created_date', 200),
+    queryFn: async () => {
+      const user = await currentUser();
+      if (!user) return [];
+      return base44.entities.JobApplication.list('-created_date', 200);
+    },
   });
 
   const deleteMutation = useMutation({
@@ -149,7 +157,7 @@ export default function JobTracker() {
     return acc;
   }, {});
 
-  const handleEdit = (app) => { setEditingApp(app); setShowForm(true); };
+  const handleEdit = (app) => requireAuth(() => { setEditingApp(app); setShowForm(true); });
   const handleClose = () => { setEditingApp(null); setShowForm(false); };
 
   const toggleSelect = (id) => setSelected(prev => { const s = new Set(prev); s.has(id) ? s.delete(id) : s.add(id); return s; });
@@ -157,6 +165,7 @@ export default function JobTracker() {
   const clearSelection = () => { setSelected(new Set()); setBulkStatus(''); };
 
   const handleBulkDelete = async () => {
+    if (!requireAuth()) return;
     setBulkWorking(true);
     await Promise.all([...selected].map(id => base44.entities.JobApplication.delete(id)));
     await queryClient.invalidateQueries({ queryKey: ['jobApplications'] });
@@ -166,6 +175,7 @@ export default function JobTracker() {
 
   const handleBulkStatus = async () => {
     if (!bulkStatus) return;
+    if (!requireAuth()) return;
     setBulkWorking(true);
     await Promise.all([...selected].map(id => base44.entities.JobApplication.update(id, { status: bulkStatus })));
     await queryClient.invalidateQueries({ queryKey: ['jobApplications'] });
@@ -189,7 +199,7 @@ export default function JobTracker() {
           </h1>
           <p className="text-muted-foreground text-sm mt-0.5">Track every application in one place</p>
         </div>
-        <Button onClick={() => setShowForm(true)} className="rounded-xl gap-2 bg-primary">
+        <Button onClick={() => requireAuth(() => setShowForm(true))} className="rounded-xl gap-2 bg-primary">
           <Plus className="w-4 h-4" /> Add Job
         </Button>
       </div>
@@ -295,7 +305,7 @@ export default function JobTracker() {
             {applications.length === 0 ? 'Start tracking your job applications to stay organised.' : 'Try selecting a different status.'}
           </p>
           {applications.length === 0 && (
-            <Button onClick={() => setShowForm(true)} className="rounded-xl gap-2">
+            <Button onClick={() => requireAuth(() => setShowForm(true))} className="rounded-xl gap-2">
               <Plus className="w-4 h-4" /> Add your first application
             </Button>
           )}
@@ -308,8 +318,8 @@ export default function JobTracker() {
             key={app.id}
             app={app}
             onEdit={handleEdit}
-            onDelete={(id) => deleteMutation.mutate(id)}
-            onStatusChange={(id, status) => statusMutation.mutate({ id, status })}
+            onDelete={(id) => requireAuth(() => deleteMutation.mutate(id))}
+            onStatusChange={(id, status) => requireAuth(() => statusMutation.mutate({ id, status }))}
             selected={selected.has(app.id)}
             onToggleSelect={toggleSelect}
           />

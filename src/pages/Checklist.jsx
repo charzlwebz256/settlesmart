@@ -3,6 +3,8 @@ import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { currentUser } from '@/lib/guestUser';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Badge } from '@/components/ui/badge';
@@ -48,10 +50,13 @@ export default function Checklist() {
 
   const { containerRef, pullDistance, isRefreshing, touchHandlers } = usePullToRefresh({ onRefresh: handleRefresh });
 
+  const { requireAuth } = useAuth();
+
   const { data: profile } = useQuery({
     queryKey: ['myProfile'],
     queryFn: async () => {
-      const user = await base44.auth.me();
+      const user = await currentUser();
+      if (!user) return null;
       const results = await base44.entities.UserProfile.filter({ created_by_id: user.id }, '-updated_date');
       return results[0] || null;
     },
@@ -60,7 +65,8 @@ export default function Checklist() {
   const { data: checklist, isLoading } = useQuery({
     queryKey: ['myChecklist'],
     queryFn: async () => {
-      const user = await base44.auth.me();
+      const user = await currentUser();
+      if (!user) return [];
       return base44.entities.ChecklistItem.filter({ created_by_id: user.id }, 'order');
     },
     initialData: [],
@@ -125,11 +131,15 @@ export default function Checklist() {
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['myChecklist'] }),
   });
 
-  const handleSaveTask = async (payload) => { await upsertMutation.mutateAsync(payload); };
-  const openAdd = (period) => { setEditingTask({ day_range: period }); setModalOpen(true); };
-  const openEdit = (item) => { setEditingTask(item); setModalOpen(true); };
+  const handleSaveTask = async (payload) => {
+    if (!requireAuth()) return;
+    await upsertMutation.mutateAsync(payload);
+  };
+  const openAdd = (period) => requireAuth(() => { setEditingTask({ day_range: period }); setModalOpen(true); });
+  const openEdit = (item) => requireAuth(() => { setEditingTask(item); setModalOpen(true); });
 
   const generateChecklist = async () => {
+    if (!requireAuth()) return;
     setGenerating(true);
     try {
       // Instant profile-personalized template (no LLM round-trip), generates in <1s
@@ -290,7 +300,7 @@ export default function Checklist() {
                           )}
                         >
                           <button
-                            onClick={() => toggleMutation.mutate({ id: item.id, is_completed: !item.is_completed })}
+                            onClick={() => requireAuth(() => toggleMutation.mutate({ id: item.id, is_completed: !item.is_completed }))}
                             aria-label={item.is_completed ? 'Mark incomplete' : 'Mark complete'}
                             className="flex-shrink-0 min-h-[44px] min-w-[44px] flex items-center justify-center rounded-lg"
                           >
@@ -324,7 +334,7 @@ export default function Checklist() {
                                   <Pencil className="w-3.5 h-3.5" />
                                 </button>
                                 <button
-                                  onClick={() => deleteMutation.mutate(item.id)}
+                                  onClick={() => requireAuth(() => deleteMutation.mutate(item.id))}
                                   className="p-2 min-w-[44px] min-h-[44px] rounded-md hover:bg-background text-muted-foreground hover:text-destructive flex items-center justify-center"
                                   aria-label="Delete task"
                                 >

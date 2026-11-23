@@ -1,6 +1,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { currentUser } from '@/lib/guestUser';
 import { Button } from '@/components/ui/button';
 import {
   User, MapPin, Globe, BookOpen, Briefcase, Home as HomeIcon,
@@ -63,9 +65,11 @@ export default function Profile() {
   const [saved, setSaved] = useState(false);
   const [saveError, setSaveError] = useState(null);
 
+  const { requireAuth } = useAuth();
+
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => currentUser(),
   });
 
   // Owner-only overview, shown strictly for this admin account.
@@ -79,7 +83,8 @@ export default function Profile() {
   const { data: profile, isLoading } = useQuery({
     queryKey: ['myProfile'],
     queryFn: async () => {
-      const u = await base44.auth.me();
+      const u = await currentUser();
+      if (!u) return null;
       const results = await base44.entities.UserProfile.filter({ created_by_id: u.id }, '-updated_date');
       if (!results || results.length === 0) return null;
       // Match AppLayout: prefer the completed onboarding profile, fall back to
@@ -116,6 +121,7 @@ export default function Profile() {
 
   const handleSave = async () => {
     if (!form) return;
+    if (!requireAuth()) return;
     if (!form.immigration_status || !form.province || !form.city) {
       setSaveError('Please select your immigration status, province, and city before saving.');
       return;
@@ -139,7 +145,8 @@ export default function Profile() {
       const fresh = await queryClient.fetchQuery({
         queryKey: ['myProfile'],
         queryFn: async () => {
-          const u = await base44.auth.me();
+          const u = await currentUser();
+          if (!u) return null;
           const results = await base44.entities.UserProfile.filter({ created_by_id: u.id }, '-updated_date');
           if (!results || results.length === 0) return null;
           return results.find(p => p.onboarding_completed) || results[0];
@@ -177,7 +184,9 @@ export default function Profile() {
     <div className="max-w-2xl mx-auto px-4 py-6 pb-24 md:pb-8">
       <div className="mb-8">
         <h1 className="font-heading font-bold text-2xl md:text-3xl mb-2">Your Profile</h1>
-        <p className="text-muted-foreground text-sm">{user?.full_name || user?.email}</p>
+        <p className="text-muted-foreground text-sm">
+          {user ? (user.full_name || user.email) : 'Browsing as a guest. Sign in to save your profile.'}
+        </p>
       </div>
 
       {isOwner && (
@@ -307,10 +316,12 @@ export default function Profile() {
             {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : saved ? <CheckCircle2 className="w-4 h-4 success-pop" /> : <Save className="w-4 h-4" />}
             {saving ? 'Saving...' : saved ? 'Saved!' : 'Save Changes'}
           </Button>
-          <Button variant="outline" onClick={handleLogout} className="rounded-xl gap-2">
-            <LogOut className="w-4 h-4" />
-            Log Out
-          </Button>
+          {user && (
+            <Button variant="outline" onClick={handleLogout} className="rounded-xl gap-2">
+              <LogOut className="w-4 h-4" />
+              Log Out
+            </Button>
+          )}
         </div>
         {saveError && (
           <p className="text-xs text-destructive -mt-2 px-1">{saveError}</p>
@@ -332,6 +343,7 @@ export default function Profile() {
         </div>
 
         {/* Danger Zone */}
+        {user && (
         <div className="bg-destructive/5 border border-destructive/20 rounded-2xl p-5">
           <h3 className="font-heading font-bold text-sm text-destructive mb-1">Danger Zone</h3>
           <p className="text-xs text-muted-foreground mb-4">Permanently delete your account and all associated data. This cannot be undone.</p>
@@ -361,6 +373,7 @@ export default function Profile() {
             </AlertDialogContent>
           </AlertDialog>
         </div>
+        )}
       </div>
     </div>
   );

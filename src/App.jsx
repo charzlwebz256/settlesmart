@@ -128,19 +128,21 @@ const AuthenticatedApp = () => {
         <Route path="/meet-the-developer" element={<MeetTheDeveloper />} />
         <Route path="/connect" element={<Connect />} />
 
-        {/* Sign in required, personal data & tracked actions */}
+        {/* Open to everyone: browsing is free, signing in is only needed to save */}
+        <Route path="/services" element={<Services />} />
+        <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/checklist" element={<Checklist />} />
+        <Route path="/profile" element={<Profile />} />
+        <Route path="/scholarships" element={<Scholarships />} />
+        <Route path="/jobs" element={<Jobs />} />
+        <Route path="/resume-builder" element={<ResumeBuilder />} />
+        <Route path="/job-tracker" element={<JobTracker />} />
+        <Route path="/interview-prep" element={<InterviewPrep />} />
+        <Route path="/job-coach" element={<JobCoach />} />
+
+        {/* Admin stays restricted to signed-in admins */}
         <Route element={<ProtectedRoute unauthenticatedElement={<ProtectedSignInPrompt />} />}>
-          <Route path="/services" element={<Services />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/checklist" element={<Checklist />} />
-          <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<AdminDashboard />} />
-          <Route path="/scholarships" element={<Scholarships />} />
-          <Route path="/jobs" element={<Jobs />} />
-          <Route path="/resume-builder" element={<ResumeBuilder />} />
-          <Route path="/job-tracker" element={<JobTracker />} />
-          <Route path="/interview-prep" element={<InterviewPrep />} />
-          <Route path="/job-coach" element={<JobCoach />} />
         </Route>
       </Route>
       <Route path="/onboarding" element={<Onboarding />} />

@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { currentUser } from '@/lib/guestUser';
 import { Star, MessageSquare, ChevronDown, ChevronUp, Send } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -31,6 +33,7 @@ function StarRating({ value, onChange, readonly = false, size = 'md' }) {
 }
 
 export default function ServiceReviews({ serviceKey, serviceName, province }) {
+  const { requireAuth } = useAuth();
   const queryClient = useQueryClient();
   const [open, setOpen] = useState(false);
   const [showForm, setShowForm] = useState(false);
@@ -47,7 +50,8 @@ export default function ServiceReviews({ serviceKey, serviceName, province }) {
   const { data: myReview } = useQuery({
     queryKey: ['myServiceReview', serviceKey],
     queryFn: async () => {
-      const user = await base44.auth.me();
+      const user = await currentUser();
+      if (!user) return null;
       const results = await base44.entities.ServiceReview.filter({ service_key: serviceKey, created_by_id: user.id });
       return results[0] || null;
     },
@@ -88,6 +92,7 @@ export default function ServiceReviews({ serviceKey, serviceName, province }) {
     : null;
 
   const handleSubmit = (e) => {
+    if (!requireAuth()) return;
     e.preventDefault();
     if (!rating) return;
     mutation.mutate({

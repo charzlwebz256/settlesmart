@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from 'react';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Loader2, Search, RefreshCw, Briefcase, MapPin, Clock, ExternalLink, Building2, DollarSign, SlidersHorizontal, FileText, ArrowRight, MessageSquare, BotMessageSquare } from 'lucide-react';
@@ -36,8 +37,10 @@ export default function Jobs() {
   const [autoRefreshTimer, setAutoRefreshTimer] = useState(null);
   const [trackerJob, setTrackerJob] = useState(null);
 
+  const { requireAuth } = useAuth();
+
   const handleAddToTracker = (job) => {
-    setTrackerJob({
+    requireAuth(() => setTrackerJob({
       job_title: job.title,
       company: job.company,
       location: job.location || '',
@@ -45,7 +48,7 @@ export default function Jobs() {
       source: job.source ? job.source.charAt(0).toUpperCase() + job.source.slice(1) : '',
       salary_range: job.salary || '',
       status: 'saved',
-    });
+    }));
   };
 
   const fetchJobs = useCallback(async (query = searchQuery, location = city) => {

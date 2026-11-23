@@ -1,6 +1,8 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useCallback } from 'react';
 import { base44 } from '@/api/base44Client';
+import { currentUser } from '@/lib/guestUser';
+import { useAuth } from '@/lib/AuthContext';
 import { usePullToRefresh } from '@/hooks/usePullToRefresh';
 import PullToRefreshIndicator from '@/components/ui/PullToRefreshIndicator';
 import { Link, useNavigate } from 'react-router-dom';
@@ -40,10 +42,18 @@ export default function Dashboard() {
 
   const { containerRef, pullDistance, isRefreshing, touchHandlers } = usePullToRefresh({ onRefresh: handleRefresh });
 
+  const { navigateToLogin } = useAuth();
+
+  const { data: user, isLoading: userLoading } = useQuery({
+    queryKey: ['currentUser'],
+    queryFn: () => currentUser(),
+  });
+
   const { data: profile, isLoading } = useQuery({
     queryKey: ['myProfile'],
     queryFn: async () => {
-      const user = await base44.auth.me();
+      const user = await currentUser();
+      if (!user) return null;
       const results = await base44.entities.UserProfile.filter({ created_by_id: user.id }, '-updated_date');
       return results[0] || null;
     },
@@ -52,7 +62,8 @@ export default function Dashboard() {
   const { data: checklist } = useQuery({
     queryKey: ['myChecklist'],
     queryFn: async () => {
-      const user = await base44.auth.me();
+      const user = await currentUser();
+      if (!user) return [];
       return base44.entities.ChecklistItem.filter({ created_by_id: user.id }, 'order');
     },
     initialData: [],
@@ -61,13 +72,14 @@ export default function Dashboard() {
   const { data: savedResources } = useQuery({
     queryKey: ['savedResources'],
     queryFn: async () => {
-      const user = await base44.auth.me();
+      const user = await currentUser();
+      if (!user) return [];
       return base44.entities.SavedResource.filter({ created_by_id: user.id });
     },
     initialData: [],
   });
 
-  if (isLoading) {
+  if (isLoading || userLoading) {
     return (
       <div className="flex items-center justify-center min-h-[60vh]">
         <Loader2 className="w-6 h-6 animate-spin text-primary" />
@@ -75,7 +87,27 @@ export default function Dashboard() {
     );
   }
 
-  if (!isLoading && !profile) {
+  if (!profile) {
+    if (!user) {
+      return (
+        <div className="max-w-md mx-auto px-4 py-20 text-center animate-fade-in">
+          <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-5">
+            <Sparkles className="w-8 h-8 text-primary" />
+          </div>
+          <h2 className="font-heading font-bold text-2xl mb-2">Your dashboard saves your progress</h2>
+          <p className="text-muted-foreground text-sm mb-7 leading-relaxed">
+            You can browse everything in SettleSmart without an account. Sign in free to keep your
+            checklist, saved services and profile in one place.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-2 justify-center">
+            <Button variant="outline" asChild className="rounded-xl">
+              <Link to="/checklist">Browse the checklist</Link>
+            </Button>
+            <Button onClick={() => navigateToLogin()} className="rounded-xl">Sign in free</Button>
+          </div>
+        </div>
+      );
+    }
     navigate('/onboarding');
     return null;
   }

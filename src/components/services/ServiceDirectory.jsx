@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
+import { useAuth } from '@/lib/AuthContext';
+import { currentUser } from '@/lib/guestUser';
 import { Loader2, AlertTriangle, RotateCcw, SearchX } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ResourceFilters from './ResourceFilters';
@@ -33,9 +35,11 @@ export default function ServiceDirectory({ initialProvince = '', initialCategory
     return () => clearTimeout(t);
   }, [filters.search]);
 
+  const { requireAuth } = useAuth();
+
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
-    queryFn: () => base44.auth.me(),
+    queryFn: () => currentUser(),
     staleTime: 1000 * 60 * 10,
   });
 
@@ -117,6 +121,7 @@ export default function ServiceDirectory({ initialProvince = '', initialCategory
   });
 
   const toggleSave = async (service) => {
+    if (!requireAuth()) return;
     const existing = savedByService[service.id];
     if (existing) {
       await base44.entities.SavedResource.delete(existing.id);
