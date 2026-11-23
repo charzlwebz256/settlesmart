@@ -1,0 +1,35 @@
+{
+  "name": "GeocodeCall",
+  "type": "object",
+  "properties": {
+    "ip_hash": {
+      "type": "string",
+      "description": "Salted hash of the caller's IP address, used for the daily Google lookup allowance"
+    }
+  },
+  "required": [
+    "ip_hash"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

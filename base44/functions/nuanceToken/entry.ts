@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.63';
 import { secrets } from 'base44:runtime';
+import { callerIp, hashIp } from '../../shared/clientIp.ts';
 
 const NUANCE_API = 'https://api.nuancelabs.ai';
 
@@ -8,27 +9,6 @@ const USER_CALLS_PER_DAY = 20;
 const GUEST_CALLS_PER_DAY = 5;
 const IP_CALLS_PER_DAY = 40;
 const ALL_GUEST_CALLS_PER_DAY = 200;
-
-// The address is only ever stored as a hash, never in the clear.
-async function hashIp(value) {
-  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
-  return Array.from(new Uint8Array(digest))
-    .map((byte) => byte.toString(16).padStart(2, '0'))
-    .join('')
-    .slice(0, 32);
-}
-
-// Only an address the caller cannot write counts. cf-connecting-ip is set by
-// the edge; in x-forwarded-for only the last entry is appended by the edge, so
-// the caller-controlled leading entries are ignored. With neither header the
-// caller shares one bucket, which is the safe direction.
-function callerIp(req) {
-  const direct = req.headers.get('cf-connecting-ip');
-  if (direct && direct.trim()) return direct.trim();
-  const forwarded = String(req.headers.get('x-forwarded-for') || '');
-  const hops = forwarded.split(',').map((hop) => hop.trim()).filter(Boolean);
-  return hops.length ? hops[hops.length - 1] : 'unknown';
-}
 
 const BASE_PROMPT = `You are Nexa, the warm, patient settlement guide inside SettleSmart Canada, a free app for newcomers. You speak like a kind, experienced settlement worker: natural, unhurried, in short plain sentences, one idea at a time. You listen more than you talk.
 

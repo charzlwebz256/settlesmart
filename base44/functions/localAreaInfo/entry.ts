@@ -2,6 +2,28 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
 import { secrets } from 'base44:runtime';
 import { cleanText, safeUrl } from '../../shared/safeUrl.ts';
 import { planRoute } from '../../shared/routing.ts';
+import { callerIp, hashIp } from '../../shared/clientIp.ts';
+
+const DAY_MS = 24 * 60 * 60 * 1000;
+const GOOGLE_LOOKUPS_PER_IP_PER_DAY = 40;
+const GOOGLE_LOOKUPS_PER_DAY = 3000;
+
+// Google reverse geocoding is billed per call, so each caller and the app as a
+// whole get a daily allowance. Past it the free geocoder still answers.
+async function claimGoogleLookup(base44, req) {
+  const ipHash = await hashIp(callerIp(req));
+  const since = new Date(Date.now() - DAY_MS).toISOString();
+  const checks = [
+    { query: { ip_hash: ipHash, created_date: { $gte: since } }, limit: GOOGLE_LOOKUPS_PER_IP_PER_DAY },
+    { query: { created_date: { $gte: since } }, limit: GOOGLE_LOOKUPS_PER_DAY },
+  ];
+  for (const check of checks) {
+    const used = await base44.asServiceRole.entities.GeocodeCall.filter(check.query, { limit: check.limit });
+    if ((used?.items?.length || 0) >= check.limit) return false;
+  }
+  await base44.asServiceRole.entities.GeocodeCall.create({ ip_hash: ipHash });
+  return true;
+}
 
 const PLACES_SCHEMA = {
   type: 'object',
@@ -192,7 +214,8 @@ For each return: name, category (food_bank/clinic/settlement/community), address
       // Google's geocoder returns the postal code for the exact block, which the
       // free geocoder often leaves out outside the big cities.
       const key = secrets.get('GOOGLE_MAPS_API_KEY');
-      if (key) {
+      const useGoogle = key ? await claimGoogleLookup(base44, req) : false;
+      if (useGoogle) {
         try {
           const gres = await fetch(
             `https://maps.googleapis.com/maps/api/geocode/json?latlng=${latitude},${longitude}&region=ca&key=${encodeURIComponent(key)}`,
