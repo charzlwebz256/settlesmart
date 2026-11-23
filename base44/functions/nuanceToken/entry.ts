@@ -88,9 +88,28 @@ export default async function (req) {
     });
 
     if (!response.ok) {
-      const detail = (await response.text()).slice(0, 300);
-      console.error(`POST /session-tokens answered ${response.status}: ${detail}`);
-      return Response.json({ error: 'Could not start the conversation', status: response.status, detail }, { status: 502 });
+      const raw = (await response.text()).slice(0, 500);
+      console.error(`POST /session-tokens answered ${response.status}: ${raw}`);
+      let parsed = null;
+      try {
+        parsed = JSON.parse(raw);
+      } catch (_e) {
+        parsed = null;
+      }
+      if (response.status === 429 || parsed?.code === 'credits_spent') {
+        return Response.json(
+          {
+            error: 'Nexa has used all of her voice minutes for today. They renew at 00:00 UTC.',
+            code: 'credits_spent',
+            renews_at: parsed?.renews_at || null,
+          },
+          { status: 429 }
+        );
+      }
+      return Response.json(
+        { error: 'Nexa could not start a voice call just now. Please try again in a moment.', status: response.status },
+        { status: 502 }
+      );
     }
 
     const data = await response.json();

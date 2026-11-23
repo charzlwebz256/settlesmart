@@ -17,17 +17,24 @@ const STATE_TEXT = {
 
 function describeError(error) {
   if (!error) return null;
-  if (error?.name === 'MediaAccessError' || error?.reason === 'permission-denied') {
+  if (error?.code === 'credits_spent' || error?.status === 429) {
+    return 'Nexa has used all of her voice minutes for today. They renew at 00:00 UTC. You can still chat with her by text.';
+  }
+  const name = String(error?.name || '');
+  const reason = String(error?.reason || '');
+  if (name === 'MediaAccessError' || reason === 'permission-denied' || name === 'NotAllowedError') {
     return 'Your browser blocked the microphone. Allow microphone access for this site, then try again.';
   }
-  if (error?.reason === 'device-not-found' || error?.reason === 'device-in-use') {
+  if (reason === 'device-not-found' || reason === 'device-in-use' || name === 'NotFoundError') {
     return 'No microphone is available right now. Check your device and try again.';
   }
-  const message = String(error?.message || '');
-  if (/token|502|conversation/i.test(message)) {
-    return 'The voice assistant could not start. Please try again in a moment.';
+  if (name === 'ActiveSessionError') {
+    return 'A call is already open in another tab. Close it, then start again.';
   }
-  return 'Something went wrong starting the call. Please try again.';
+  if (name === 'WebRTCUnavailableError') {
+    return 'This browser cannot place a live call. Try Chrome, Edge or Safari, or use the text chat.';
+  }
+  return 'Nexa could not start a voice call just now. Please try again in a moment, or use the text chat.';
 }
 
 // Live voice and video conversation with Nexa, powered by Nuance Live.
@@ -70,10 +77,19 @@ export default function NexaAvatarCall({ guest = null, className }) {
 
     const conversation = createNuanceConversation({
       token: async () => {
-        const res = await base44.functions.invoke('nuanceToken', { guest });
-        const token = res?.data?.token;
-        if (!token) throw new Error(res?.data?.error || 'Could not start the conversation');
-        return token;
+        try {
+          const res = await base44.functions.invoke('nuanceToken', { guest });
+          const token = res?.data?.token;
+          if (!token) throw new Error(res?.data?.error || 'Nexa could not start a call');
+          return token;
+        } catch (err) {
+          const data = err?.response?.data || {};
+          const wrapped = new Error(data.error || 'Nexa could not start a call');
+          wrapped.code = data.code;
+          wrapped.status = err?.response?.status;
+          wrapped.renewsAt = data.renews_at;
+          throw wrapped;
+        }
       },
       mediaDevices: { cameraEnabled: false },
     });
