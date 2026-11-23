@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import ResourceFilters from './ResourceFilters';
 import ServiceCard from './ServiceCard';
 import ResourceDetailDialog from './ResourceDetailDialog';
+import { citiesFor } from '@/data/canadaLocations';
 
 const EMPTY_FILTERS = {
   search: '',
@@ -78,8 +79,10 @@ export default function ServiceDirectory({ initialProvince = '', initialCategory
   });
   const { citiesByProvince, languages } = filterOptions;
 
-  // Only offer cities that sit inside the selected province
-  const cities = filters.province ? (citiesByProvince[filters.province] || []) : [];
+  // Every city inside the selected province, plus any city a listing mentions
+  const cities = filters.province
+    ? [...new Set([...citiesFor(filters.province), ...(citiesByProvince[filters.province] || [])])].sort()
+    : [];
 
   const queryKey = ['serviceDirectory', debouncedSearch, filters.province, filters.city, filters.category, filters.eligibility, filters.language, filters.cost];
 
