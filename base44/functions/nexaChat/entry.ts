@@ -136,7 +136,7 @@ ${pageContext ? `${PAGE_CONTEXT} ${pageContext}` : ''}
 ${history ? `Conversation so far:\n${history}\n` : ''}
 Newcomer said: ${message}
 
-This reply is spoken out loud, so answer as natural speech: two or three short sentences, warm and professional, no lists, headings, emoji, links or web addresses at all. Say the name of the office or the page instead of a URL. Answer the question directly first, then give the one next step that matters, then ask one short follow-up question when it would help you guide them better. Name the official office that helps, and say where in SettleSmart to tap to continue, for example "open Explore, then Education".`;
+This reply is spoken out loud, so answer as natural speech: two or three short sentences, warm and professional, no lists, headings, emoji, links or web addresses at all. Say the name of the office or the page instead of a URL. Answer the question directly first, then give the one next step that matters, then ask one short follow-up question when it would help you guide them better. Name the official office that helps, and say where in SettleSmart to tap to continue, for example "open Explore, then Education". If the question is unclear, too vague, or the speech looks garbled, do not guess: ask one short question to confirm what they meant, and nothing else.`;
 
       const answer = await base44.asServiceRole.integrations.Core.InvokeLLM({
         prompt,
