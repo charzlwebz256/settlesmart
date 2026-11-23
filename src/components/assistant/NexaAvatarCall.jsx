@@ -4,7 +4,6 @@ import { createNuanceConversation } from '@nuancelabs/js-sdk';
 import { Button } from '@/components/ui/button';
 import { Mic, MicOff, PhoneOff, Loader2, AlertCircle, Radio, Keyboard } from 'lucide-react';
 import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
-import { playBell } from '@/lib/bellChime';
 import VoiceRings from '@/components/nexa/VoiceRings';
 import { cn } from '@/lib/utils';
 
@@ -47,14 +46,40 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
   const unsubscribersRef = useRef([]);
   const [phase, setPhase] = useState('idle');
   const [state, setState] = useState('idle');
-  const [caption, setCaption] = useState('');
   const [error, setError] = useState(null);
   const [creditsOut, setCreditsOut] = useState(false);
   const [muted, setMuted] = useState(false);
   const [speaking, setSpeaking] = useState(false);
   const [youSpeaking, setYouSpeaking] = useState(false);
 
+  const quietTimerRef = useRef(null);
+
+  const clearQuiet = () => {
+    if (quietTimerRef.current) clearTimeout(quietTimerRef.current);
+    quietTimerRef.current = null;
+  };
+
+  // After a long silence Nexa starts the conversation again with an advice.
+  const resetQuiet = () => {
+    clearQuiet();
+    quietTimerRef.current = setTimeout(() => {
+      const conversation = conversationRef.current;
+      if (!conversation) return;
+      conversation
+        .sendInterfaceEvent({
+          type: 'response.create',
+          response: {
+            instructions:
+              'The conversation has gone quiet. Do not repeat what you already said. Gently start it again with one short, practical SettleSmart tip about settling in Canada, and name the SettleSmart page that helps if it fits.',
+          },
+        })
+        .catch(() => {});
+      resetQuiet();
+    }, 30000);
+  };
+
   const teardown = () => {
+    clearQuiet();
     unsubscribersRef.current.forEach((off) => {
       try {
         off();
@@ -75,7 +100,6 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
     if (conversationRef.current) return;
     setError(null);
     setCreditsOut(false);
-    setCaption('');
     setMuted(false);
     setPhase('starting');
     setState('connecting');
@@ -114,14 +138,9 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
           }
           break;
         case 'speaking-changed':
-          if (event.participant === 'avatar') {
-            setSpeaking(event.isSpeaking);
-            if (event.isSpeaking) setCaption('');
-          }
-          if (event.participant === 'user') {
-            setYouSpeaking(event.isSpeaking);
-            if (event.isSpeaking) playBell();
-          }
+          if (event.participant === 'avatar') setSpeaking(event.isSpeaking);
+          if (event.participant === 'user') setYouSpeaking(event.isSpeaking);
+          resetQuiet();
           break;
         case 'avatar-presented':
           conversation
@@ -141,12 +160,8 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
       }
     });
 
-    const detachInterface = conversation.onInterfaceEvent((event) => {
-      if (event?.type === 'session.output_transcript.delta') {
-        setCaption((prev) => (prev + String(event.delta || '')).slice(-400));
-      }
-    });
-    unsubscribersRef.current = [detachVideo, detachInterface];
+    unsubscribersRef.current = [detachVideo];
+    resetQuiet();
 
     try {
       await conversation.connect();
@@ -238,11 +253,6 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
                 <p className="max-w-[13rem] text-center text-[10px] text-muted-foreground">
                   Getting Nexa ready. This can take a few seconds.
                 </p>
-              </div>
-            )}
-            {caption && (
-              <div className="absolute inset-x-2 bottom-2 rounded-xl bg-black/60 px-3 py-2 backdrop-blur">
-                <p className="line-clamp-3 text-[11px] leading-relaxed text-white">{caption}</p>
               </div>
             )}
           </>

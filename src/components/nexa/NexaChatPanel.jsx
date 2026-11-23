@@ -4,7 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { Plus, History, Volume2, VolumeX, Trash2, AlertCircle, Loader2, Sparkles, ChevronRight } from 'lucide-react';
 import ChatMessage from '@/components/nexa/ChatMessage';
 import VoiceRings from '@/components/nexa/VoiceRings';
-import { playBell } from '@/lib/bellChime';
+import TalkingBars from '@/components/nexa/TalkingBars';
 import NexaComposer from '@/components/nexa/NexaComposer';
 import { useSpeech } from '@/hooks/useSpeech';
 import { loadConversations, saveConversation, deleteConversation, newConversation } from '@/lib/nexaHistory';
@@ -71,6 +71,8 @@ export default function NexaChatPanel({ profile = null, guest = null, className,
   const [uploading, setUploading] = useState(false);
   const [feedback, setFeedback] = useState({});
   const [typingIndex, setTypingIndex] = useState(null);
+  const [youSpeaking, setYouSpeaking] = useState(false);
+  const micSpeechTimer = useRef(null);
   const [speakReplies, setSpeakReplies] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const endRef = useRef(null);
@@ -315,9 +317,10 @@ export default function NexaChatPanel({ profile = null, guest = null, className,
 
         {(speaking || listening) && (
           <div className="flex items-center gap-2">
-            <VoiceRings nexa={speaking} you={listening} className="h-5 w-5">
+            <VoiceRings nexa={speaking} you={youSpeaking} className="h-5 w-5">
               <span className={cn('h-5 w-5 rounded-full', speaking ? 'bg-primary/15' : 'bg-accent/20')} />
             </VoiceRings>
+            <TalkingBars active tone={speaking ? 'nexa' : 'you'} className="h-4" />
             <span className="text-[11px] font-medium text-foreground">
               {speaking ? 'Nexa is reading aloud' : 'Listening to you'}
             </span>
@@ -350,10 +353,15 @@ export default function NexaChatPanel({ profile = null, guest = null, className,
         onMic={() => {
           if (listening) {
             stopListening();
+            setYouSpeaking(false);
             return;
           }
-          playBell();
-          listen(setInput);
+          listen((text) => {
+            setInput(text);
+            setYouSpeaking(true);
+            clearTimeout(micSpeechTimer.current);
+            micSpeechTimer.current = setTimeout(() => setYouSpeaking(false), 1200);
+          });
         }}
         listening={listening}
         micSupported={recognitionSupported}

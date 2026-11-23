@@ -1,9 +1,8 @@
 import { useMemo, useState } from 'react';
-import { AlertTriangle, BookOpen, Bus, Compass, Download, ExternalLink, FileDown, HeartHandshake, Home, Landmark, MapPin, PawPrint, Search, ShoppingBag, Trees, Users } from 'lucide-react';
+import { AlertTriangle, BookOpen, Bus, Compass, Download, FileDown, HeartHandshake, Home, Landmark, MapPin, PawPrint, Search, ShoppingBag, Trees, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SERVICE_DIRECTORY as DIRECTORY, PROVINCES } from '@/data/nationalDirectory';
-import { institutionLogo } from '@/data/institutionLogos';
-import { officialLinks } from '@/data/officialLinks';
+import DirectoryEntry from '@/components/directory/DirectoryEntry';
 import { downloadDirectoryHtml, downloadDirectoryPdf } from '@/lib/directoryDownload';
 import { useLocation_ } from '@/lib/LocationContext';
 
@@ -26,54 +25,15 @@ function matches(item, query) {
   return text.includes(query);
 }
 
-function EntryList({ items, emptyText }) {
+function EntryList({ items, emptyText, categoryLabel, province }) {
   if (items.length === 0) {
     return <p className="text-xs text-muted-foreground">{emptyText}</p>;
   }
   return (
-    <div className="space-y-2">
-      {items.map((item) => {
-        const logo = institutionLogo(item.name);
-        const links = officialLinks(item.name);
-        return (
-          <div key={item.name} className="flex gap-2.5 rounded-xl bg-muted/40 p-3">
-            {logo ? (
-              <img
-                src={logo}
-                alt=""
-                className="mt-0.5 h-7 w-7 flex-shrink-0 rounded-md bg-card object-contain p-0.5"
-                onError={(event) => {
-                  event.currentTarget.style.visibility = 'hidden';
-                }}
-              />
-            ) : (
-              <span className="mt-0.5 flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-md bg-primary/10 text-[11px] font-bold text-primary">
-                {item.name.charAt(0)}
-              </span>
-            )}
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-foreground">{item.name}</p>
-              {item.note && <p className="mt-0.5 text-xs leading-relaxed text-muted-foreground">{item.note}</p>}
-              {links.length > 0 && (
-                <div className="mt-1.5 flex flex-wrap gap-1.5">
-                  {links.map((link) => (
-                    <a
-                      key={link.url}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1 rounded-lg bg-primary/10 px-2 py-1 text-[11px] font-semibold text-primary transition-colors hover:bg-primary/20"
-                    >
-                      {link.label}
-                      <ExternalLink className="h-3 w-3" />
-                    </a>
-                  ))}
-                </div>
-              )}
-            </div>
-          </div>
-        );
-      })}
+    <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+      {items.map((item) => (
+        <DirectoryEntry key={item.name} item={item} categoryLabel={categoryLabel} province={province} />
+      ))}
     </div>
   );
 }
@@ -173,7 +133,12 @@ export default function NationalDirectory() {
       {national.length > 0 && (
         <section className="mb-4 rounded-2xl border border-border/50 bg-card p-4">
           <h2 className="mb-2 font-heading text-sm font-bold">Across Canada</h2>
-          <EntryList items={national} emptyText="No national entry matches that search." />
+          <EntryList
+            items={national}
+            emptyText="No national entry matches that search."
+            categoryLabel={category.label}
+            province=""
+          />
         </section>
       )}
 
@@ -185,6 +150,8 @@ export default function NationalDirectory() {
         {activeProvince ? (
           <EntryList
             items={provincial}
+            categoryLabel={category.label}
+            province={activeProvince}
             emptyText={
               Object.keys(category.provinces).length === 0
                 ? 'This service works nationally, see the list above.'

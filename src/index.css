@@ -122,6 +122,26 @@
   .voice-ring { animation: none; opacity: 0; }
 }
 
+/* Nexa in motion: a gentle bob and a live equaliser while she talks. */
+@keyframes talking-bar {
+  0%, 100% { transform: scaleY(0.4); }
+  50% { transform: scaleY(1); }
+}
+.talking-bar {
+  transform-origin: bottom;
+  animation: talking-bar 0.85s ease-in-out infinite;
+}
+@keyframes nexa-talk-bob {
+  0%, 100% { transform: translateY(0) scale(1); }
+  50% { transform: translateY(-4px) scale(1.02); }
+}
+.nexa-talking {
+  animation: nexa-talk-bob 2.6s ease-in-out infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .talking-bar, .nexa-talking { animation: none; }
+}
+
 @keyframes success-pop {
   0% { transform: scale(0.4); opacity: 0; }
   60% { transform: scale(1.2); opacity: 1; }

@@ -1,11 +1,11 @@
 import { useEffect, useRef, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
-import { AlertCircle, Loader2, Mic, PhoneOff, Volume2 } from 'lucide-react';
+import { AlertCircle, Loader2, Mic, PhoneOff } from 'lucide-react';
 import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
 import { playNexaVoice, stopNexaVoice } from '@/lib/nexaVoice';
-import { playBell } from '@/lib/bellChime';
 import VoiceRings from '@/components/nexa/VoiceRings';
+import TalkingBars from '@/components/nexa/TalkingBars';
 import { cn } from '@/lib/utils';
 
 const STATUS_TEXT = {
@@ -14,39 +14,45 @@ const STATUS_TEXT = {
   speaking: 'Nexa is speaking',
 };
 
+const SILENCE_MS = 30000;
+
+const TIP_PROMPT =
+  'The person has been quiet for a while. Do not repeat anything you already said. Open the conversation again with one short, practical SettleSmart tip about settling in Canada, in one or two spoken sentences, and name the SettleSmart page that helps if it fits.';
+
 // Hands-free voice conversation: speak straight to Nexa, she answers out loud.
 export default function NexaVoiceChat({ guest = null, profile = null, className }) {
   const [status, setStatus] = useState('idle');
-  const [reply, setReply] = useState('');
+  const [youSpeaking, setYouSpeaking] = useState(false);
   const [error, setError] = useState(null);
   const activeRef = useRef(false);
+  const speakingRef = useRef(false);
   const recognitionRef = useRef(null);
+  const idleTimerRef = useRef(null);
   const supported = typeof window !== 'undefined' && Boolean(window.SpeechRecognition || window.webkitSpeechRecognition);
+
+  const clearIdle = () => {
+    if (idleTimerRef.current) clearTimeout(idleTimerRef.current);
+    idleTimerRef.current = null;
+  };
 
   const stop = () => {
     activeRef.current = false;
+    speakingRef.current = false;
+    clearIdle();
     try {
       recognitionRef.current?.abort();
     } catch (_e) {
       // Already stopped.
     }
     stopNexaVoice();
+    setYouSpeaking(false);
     setStatus('idle');
   };
 
   useEffect(() => stop, []);
 
-  const speakReply = (text) => {
-    setStatus('speaking');
-    playNexaVoice(text, {
-      onEnd: () => {
-        if (activeRef.current) startListening();
-        else setStatus('idle');
-      },
-    });
-  };
-
   const ask = async (question) => {
+    clearIdle();
     setStatus('thinking');
     setError(null);
     try {
@@ -61,7 +67,6 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
       });
       const answer = res?.data?.answer;
       if (!answer) throw new Error('No answer');
-      setReply(answer);
       speakReply(answer);
     } catch (_err) {
       activeRef.current = false;
@@ -70,56 +75,97 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
     }
   };
 
-  const startListening = () => {
+  const offerTip = () => {
+    if (!activeRef.current || speakingRef.current) return;
+    ask(TIP_PROMPT);
+  };
+
+  // After a quiet stretch Nexa picks the conversation back up with an advice.
+  const armIdle = () => {
+    clearIdle();
+    idleTimerRef.current = setTimeout(offerTip, SILENCE_MS);
+  };
+
+  function listenForUser() {
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     if (!Recognition || !activeRef.current) return;
+    try {
+      recognitionRef.current?.abort();
+    } catch (_e) {
+      // Starting a fresh turn anyway.
+    }
     const recognition = new Recognition();
     recognition.lang = 'en-CA';
     recognition.continuous = false;
-    recognition.interimResults = false;
+    recognition.interimResults = true;
     let said = '';
-    let chimed = false;
 
     recognition.onresult = (event) => {
-      if (!chimed && (event.results[event.resultIndex]?.[0]?.transcript || '').trim()) {
-        chimed = true;
-        playBell();
-      }
+      let heard = '';
       for (let i = event.resultIndex; i < event.results.length; i += 1) {
         if (event.results[i].isFinal) said += event.results[i][0].transcript;
+        heard += event.results[i][0].transcript;
+      }
+      if (heard.trim()) {
+        setYouSpeaking(true);
+        clearIdle();
       }
     };
+    recognition.onspeechend = () => setYouSpeaking(false);
     recognition.onerror = (event) => {
       if (event.error === 'no-speech' || event.error === 'aborted') return;
       activeRef.current = false;
       setStatus('idle');
+      setYouSpeaking(false);
       setError('Your browser could not use the microphone. Allow microphone access for this site, then try again.');
     };
     recognition.onend = () => {
+      setYouSpeaking(false);
       if (!activeRef.current) return;
       const question = said.trim();
-      if (!question) {
-        startListening();
+      if (question) {
+        // Speaking over Nexa stops her and takes the turn.
+        stopNexaVoice();
+        speakingRef.current = false;
+        ask(question);
         return;
       }
-      ask(question);
+      listenForUser();
     };
 
     recognitionRef.current = recognition;
-    setStatus('listening');
+    if (!speakingRef.current) setStatus('listening');
     try {
       recognition.start();
     } catch (_e) {
-      // The loop restarts on the next silence.
+      // The next turn restarts it.
     }
-  };
+  }
+
+  function speakReply(text) {
+    speakingRef.current = true;
+    setStatus('speaking');
+    playNexaVoice(text, {
+      onEnd: () => {
+        speakingRef.current = false;
+        if (!activeRef.current) {
+          setStatus('idle');
+          return;
+        }
+        setStatus('listening');
+        armIdle();
+      },
+    });
+    // The microphone stays open, so the visitor can cut in at any moment.
+    listenForUser();
+  }
 
   const start = () => {
     if (!supported) return;
     activeRef.current = true;
-    setReply('');
     setError(null);
-    startListening();
+    armIdle();
+    listenForUser();
   };
 
   const live = status !== 'idle';
@@ -127,11 +173,14 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
   return (
     <div className={cn('overflow-hidden rounded-2xl border border-border/50 bg-card', className)}>
       <div className="relative flex aspect-[4/5] w-full flex-col items-center justify-center gap-3 overflow-hidden bg-gradient-to-b from-primary/20 via-primary/5 to-foreground/10 p-6 text-center">
-        <VoiceRings nexa={status === 'speaking'} you={status === 'listening'} className="h-28 w-28">
+        <VoiceRings nexa={status === 'speaking'} you={youSpeaking} className="h-28 w-28">
           <img
             src={NEXA_PORTRAIT}
             alt="Nexa"
-            className="h-28 w-28 rounded-full object-cover shadow-lg ring-4 ring-white/70 dark:ring-white/10"
+            className={cn(
+              'h-28 w-28 rounded-full object-cover shadow-lg ring-4 ring-white/70 dark:ring-white/10',
+              status === 'speaking' && 'nexa-talking'
+            )}
           />
         </VoiceRings>
 
@@ -140,7 +189,7 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
             <div>
               <p className="font-heading text-base font-bold text-foreground">Talk with Nexa by voice</p>
               <p className="mx-auto mt-1 max-w-[16rem] text-xs leading-relaxed text-muted-foreground">
-                Just speak. She hears you and answers out loud, nothing is typed. Her portrait stays in view.
+                Just speak. She hears you and answers out loud. Talk over her whenever you want to cut in.
               </p>
             </div>
             <Button onClick={start} className="mt-1 gap-1.5 rounded-xl" disabled={!supported}>
@@ -158,23 +207,17 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
             <div className="flex items-center gap-1.5 rounded-full bg-black/55 px-3 py-1 backdrop-blur">
               {status === 'thinking' ? (
                 <Loader2 className="h-3 w-3 animate-spin text-white" />
-              ) : status === 'speaking' ? (
-                <Volume2 className="h-3 w-3 text-white" />
               ) : (
-                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-emerald-400" />
+                <TalkingBars active={status === 'speaking' || youSpeaking} tone={youSpeaking ? 'you' : 'nexa'} className="h-3" />
               )}
               <span className="text-[10px] font-semibold text-white">{STATUS_TEXT[status] || 'Live'}</span>
             </div>
             <p className="max-w-[16rem] text-[11px] leading-relaxed text-foreground/80">
-              {status === 'listening' ? 'Go ahead, I am listening.' : 'Speak again whenever you are ready.'}
+              {status === 'speaking'
+                ? 'Speak whenever you like, she will stop and listen.'
+                : 'Go ahead, I am listening.'}
             </p>
           </>
-        )}
-
-        {reply && (
-          <div className="absolute inset-x-2 bottom-2 rounded-xl bg-black/60 px-3 py-2 backdrop-blur">
-            <p className="line-clamp-4 text-left text-[11px] leading-relaxed text-white">{reply}</p>
-          </div>
         )}
       </div>
 
