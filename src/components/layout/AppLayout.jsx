@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, ChevronDown, Moon, Sun, Heart, Info, GraduationCap, Wallet, LogIn, LogOut, Plug, Bus, Clock, Clapperboard, Sparkles, Plane, BarChart3 } from 'lucide-react';
+import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, ChevronDown, Moon, Sun, Heart, Info, GraduationCap, Wallet, LogIn, LogOut, Plug, Bus, Clock, Clapperboard, Sparkles, Plane, BarChart3, Building2 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -18,6 +18,7 @@ import GlobalSearch from '@/components/search/GlobalSearch';
 const TAB_CHILDREN = {
   '/explore': [
     { path: '/healthcare', icon: Heart, label: 'Healthcare' },
+    { path: '/housing', icon: Building2, label: 'Housing' },
     { path: '/benefits', icon: Wallet, label: 'Benefits' },
     { path: '/services', icon: Search, label: 'Settlement Services' },
     { path: '/near-me', icon: MapPin, label: 'Near Me' },

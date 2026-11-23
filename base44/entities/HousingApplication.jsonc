@@ -1,0 +1,94 @@
+{
+  "name": "HousingApplication",
+  "type": "object",
+  "properties": {
+    "property_name": {
+      "type": "string",
+      "description": "Building, unit or listing name"
+    },
+    "address": {
+      "type": "string",
+      "description": "Street address of the property"
+    },
+    "city": {
+      "type": "string"
+    },
+    "province": {
+      "type": "string"
+    },
+    "rent": {
+      "type": "number",
+      "description": "Monthly rent in Canadian dollars"
+    },
+    "bedrooms": {
+      "type": "number"
+    },
+    "source": {
+      "type": "string",
+      "description": "Platform the listing was found on, e.g. Rentals.ca, Kijiji"
+    },
+    "listing_url": {
+      "type": "string",
+      "description": "Link to the original listing"
+    },
+    "landlord_contact": {
+      "type": "string",
+      "description": "Landlord or property manager name, phone or email"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "saved",
+        "contacted",
+        "viewing",
+        "applied",
+        "approved",
+        "waitlisted",
+        "rejected"
+      ],
+      "enumColors": [
+        "gray",
+        "blue",
+        "yellow",
+        "purple",
+        "green",
+        "pink",
+        "red"
+      ],
+      "default": "saved",
+      "description": "Where this application stands"
+    },
+    "applied_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date the application was submitted"
+    },
+    "follow_up_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Date to follow up with the landlord"
+    },
+    "notes": {
+      "type": "string",
+      "maxLength": 1000,
+      "description": "Viewing notes, documents requested, deposit details"
+    }
+  },
+  "required": [
+    "property_name"
+  ],
+  "rls": {
+    "create": {
+      "created_by_id": "{{user.id}}"
+    },
+    "read": {
+      "created_by_id": "{{user.id}}"
+    },
+    "update": {
+      "created_by_id": "{{user.id}}"
+    },
+    "delete": {
+      "created_by_id": "{{user.id}}"
+    }
+  }
+}

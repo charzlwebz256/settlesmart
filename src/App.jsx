@@ -33,6 +33,7 @@ import CanadianNewsUpdates from './pages/CanadianNewsUpdates';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import Education from './pages/Education';
+import Housing from './pages/Housing';
 import Healthcare from './pages/Healthcare';
 import Benefits from './pages/Benefits';
 import PrivacyPolicy from './pages/PrivacyPolicy';
@@ -113,6 +114,7 @@ const AuthenticatedApp = () => {
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
         <Route path="/education" element={<Education />} />
+        <Route path="/housing" element={<Housing />} />
         <Route path="/healthcare" element={<Healthcare />} />
         <Route path="/benefits" element={<Benefits />} />
         <Route path="/privacy" element={<PrivacyPolicy />} />
