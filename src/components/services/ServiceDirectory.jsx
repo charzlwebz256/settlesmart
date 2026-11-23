@@ -96,7 +96,13 @@ export default function ServiceDirectory({ initialProvince = '', initialCategory
         }));
       }
       if (filters.province) query.province = filters.province;
-      if (filters.city) query.city = filters.city;
+      // A city shows its own listings plus everything that covers the whole
+      // province or country, so every city has matching information.
+      if (filters.city && filters.province) {
+        query.province = { $in: [filters.province, 'Canada-wide'] };
+      } else if (filters.city) {
+        query.city = filters.city;
+      }
       if (filters.category) query.category = filters.category;
       if (filters.eligibility) query.eligibility = filters.eligibility;
       if (filters.language) query.languages_offered = filters.language;
@@ -104,7 +110,9 @@ export default function ServiceDirectory({ initialProvince = '', initialCategory
       if (filters.cost === 'paid') query.is_free = false;
 
       const page = await base44.entities.Service.filter(query, { limit: 200 });
-      return (page.items || []).sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+      const items = page.items || [];
+      const scoped = filters.city ? items.filter(s => !s.city || s.city === filters.city) : items;
+      return scoped.sort((a, b) => (a.name || '').localeCompare(b.name || ''));
     },
   });
 
