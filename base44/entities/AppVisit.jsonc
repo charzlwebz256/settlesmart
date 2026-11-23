@@ -1,0 +1,29 @@
+{
+  "name": "AppVisit",
+  "type": "object",
+  "properties": {
+    "path": {
+      "type": "string",
+      "description": "Page the visitor opened"
+    }
+  },
+  "required": [],
+  "rls": {
+    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

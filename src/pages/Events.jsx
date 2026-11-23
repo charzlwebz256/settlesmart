@@ -2,7 +2,7 @@ import { useState, useMemo } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { base44 } from '@/api/base44Client';
 import { isSameDay, parseISO, startOfDay, format } from 'date-fns';
-import { Loader2, CalendarDays, MapPin, Plus, RefreshCw } from 'lucide-react';
+import { Loader2, CalendarDays, MapPin, Plus } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import AddEventModal from '@/components/events/AddEventModal';
 import { cn } from '@/lib/utils';
@@ -13,7 +13,6 @@ import YearCalendarView from '@/components/events/YearCalendarView';
 import EventCard from '@/components/events/EventCard';
 import UpcomingReminders from '@/components/events/UpcomingReminders';
 import EventbriteFeed from '@/components/events/EventbriteFeed';
-import GoogleCalendarSync from '@/components/events/GoogleCalendarSync';
 import { useLocation_ } from '@/lib/LocationContext';
 
 const CATEGORIES = [
@@ -35,8 +34,6 @@ export default function Events() {
   const [viewAll, setViewAll] = useState(false);
   const [calView, setCalView] = useState('strip'); // 'strip' | 'month' | 'year'
   const [showAddModal, setShowAddModal] = useState(false);
-  const [syncing, setSyncing] = useState(false);
-  const [syncStatus, setSyncStatus] = useState(null);
   const { city, province, isDetecting: cityLoading } = useLocation_();
   const source = city ? 'gps' : null;
 
@@ -112,22 +109,6 @@ export default function Events() {
     queryClient.invalidateQueries({ queryKey: ['savedEvents'] });
   };
 
-  const handleSyncCalendar = async () => {
-    setSyncing(true);
-    try {
-      const res = await base44.functions.invoke('syncGoogleCalendarHolidays', {});
-      setSyncStatus({ success: true, count: res.data.imported, events: res.data.events });
-      queryClient.invalidateQueries({ queryKey: ['events'] });
-      setTimeout(() => setSyncStatus(null), 5000);
-    } catch (error) {
-      const msg = error?.response?.data?.error || error?.response?.data?.details || error?.message || 'Unknown error';
-      setSyncStatus({ success: false, error: msg });
-      setTimeout(() => setSyncStatus(null), 5000);
-    } finally {
-      setSyncing(false);
-    }
-  };
-
   const eventDates = events.map(e => e.date).filter(Boolean);
 
   const filtered = useMemo(() => {
@@ -153,16 +134,6 @@ export default function Events() {
           </h1>
           {user?.role === 'admin' && (
             <div className="flex gap-2">
-              <Button 
-                size="sm" 
-                onClick={handleSyncCalendar} 
-                disabled={syncing}
-                className="gap-1.5 rounded-xl"
-                variant="outline"
-              >
-                <RefreshCw className={cn("w-4 h-4", syncing && "animate-spin")} />
-                {syncing ? 'Syncing...' : 'Sync Holidays'}
-              </Button>
               <Button size="sm" onClick={() => setShowAddModal(true)} className="gap-1.5 rounded-xl">
                 <Plus className="w-4 h-4" />
                 Add Event
@@ -182,24 +153,6 @@ export default function Events() {
           )}
         </div>
       </div>
-
-      {/* Google Calendar connection and sync */}
-      <GoogleCalendarSync />
-
-      {/* Sync status message */}
-      {syncStatus && (
-        <div className={cn(
-          "mb-6 p-3 rounded-xl text-sm font-medium",
-          syncStatus.success 
-            ? "bg-green-500/10 text-green-700 dark:text-green-400 border border-green-500/20"
-            : "bg-red-500/10 text-red-700 dark:text-red-400 border border-red-500/20"
-        )}>
-          {syncStatus.success 
-            ? `✅ Successfully imported ${syncStatus.count} event${syncStatus.count !== 1 ? 's' : ''} from Google Calendar: ${syncStatus.events.join(', ')}`
-            : `❌ Sync failed: ${syncStatus.error}`
-          }
-        </div>
-      )}
 
       {/* Reminders panel */}
       {savedEvents.length > 0 && (

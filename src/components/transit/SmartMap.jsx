@@ -459,15 +459,16 @@ export default function SmartMap({
             <button
               onClick={() => setFollow((on) => !on)}
               aria-pressed={follow}
+              aria-label={follow ? 'Turn follow me off' : 'Turn follow me on'}
+              title={follow ? 'Following your location' : 'Follow me'}
               className={cn(
-                'flex min-h-[40px] items-center gap-1.5 rounded-full px-3 py-2 text-[11px] font-bold shadow-lg transition-colors',
+                'flex h-12 w-12 items-center justify-center rounded-full shadow-xl transition-all active:scale-95',
                 follow
-                  ? 'bg-primary text-primary-foreground'
+                  ? 'bg-primary text-primary-foreground ring-4 ring-primary/25'
                   : 'border border-border/60 bg-card/95 text-foreground hover:bg-card'
               )}
             >
-              <Navigation className="h-3.5 w-3.5" />
-              {follow ? 'Following' : 'Follow me'}
+              <Navigation className={cn('h-5 w-5', follow && 'fill-current')} />
             </button>
             <button
               onClick={recentre}

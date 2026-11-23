@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import {
   User, MapPin, Globe, BookOpen, Briefcase, Home as HomeIcon,
   Scale, Heart, Sparkles, Save, LogOut, Loader2, CheckCircle2, Trash2,
-  ExternalLink
+  ExternalLink, BarChart3
 } from 'lucide-react';
 import {
   AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent,
@@ -66,6 +66,14 @@ export default function Profile() {
   const { data: user } = useQuery({
     queryKey: ['currentUser'],
     queryFn: () => base44.auth.me(),
+  });
+
+  // Owner-only overview, shown strictly for this admin account.
+  const isOwner = user?.email === 'charzlwebz256@gmail.com';
+  const { data: visitCount } = useQuery({
+    queryKey: ['appVisitCount'],
+    queryFn: () => base44.entities.AppVisit.count({}),
+    enabled: isOwner,
   });
 
   const { data: profile, isLoading } = useQuery({
@@ -171,6 +179,17 @@ export default function Profile() {
         <h1 className="font-heading font-bold text-2xl md:text-3xl mb-2">Your Profile</h1>
         <p className="text-muted-foreground text-sm">{user?.full_name || user?.email}</p>
       </div>
+
+      {isOwner && (
+        <div className="mb-6 rounded-2xl border border-border/50 bg-card p-5">
+          <h3 className="mb-1 flex items-center gap-2 font-heading text-sm font-bold">
+            <BarChart3 className="w-4 h-4 text-primary" />
+            Admin overview
+          </h3>
+          <p className="font-heading text-3xl font-bold">{visitCount ?? '—'}</p>
+          <p className="text-xs text-muted-foreground">Total visits to SettleSmart</p>
+        </div>
+      )}
 
       <div className="space-y-6">
         {/* Location */}

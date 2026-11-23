@@ -139,6 +139,11 @@ export default function AppLayout() {
     setNavMenu(null);
   }, [location.pathname]);
 
+  // One record per app load, so the owner can see the total number of visits.
+  useEffect(() => {
+    base44.entities.AppVisit.create({ path: window.location.pathname }).catch(() => {});
+  }, []);
+
   // Close the nav dropdown on an outside click
   useEffect(() => {
     if (!navMenu) return;

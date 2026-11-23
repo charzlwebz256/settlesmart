@@ -5,6 +5,7 @@ import { MapPin, Phone, Mail, Globe, ExternalLink, Bookmark, Flag, Users, CheckC
 import { cn } from '@/lib/utils';
 import { safeHref } from '@/lib/safeUrl';
 import ReportResourceDialog from './ReportResourceDialog';
+import ServiceReviews from './ServiceReviews';
 
 const ELIGIBILITY_LABELS = {
   permanent_resident: 'Permanent Resident',
@@ -22,6 +23,8 @@ export default function ResourceDetailDialog({ service, open, onOpenChange, save
   const website = safeHref(service.website);
   const source = safeHref(service.source_url);
   const eligibility = service.eligibility || [];
+  const mapQuery = service.address || [service.city, service.province].filter(Boolean).join(', ');
+  const reviewKey = [service.province, service.category, service.name].filter(Boolean).join('|');
 
   return (
     <>
@@ -92,6 +95,18 @@ export default function ResourceDetailDialog({ service, open, onOpenChange, save
               )}
             </div>
 
+            {mapQuery && (
+              <div className="overflow-hidden rounded-xl border border-border/50">
+                <iframe
+                  title={`Map of ${service.name}`}
+                  src={`https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`}
+                  className="h-44 w-full border-0"
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                />
+              </div>
+            )}
+
             {source && (
               <div className="rounded-xl border border-border/50 p-3 text-[11px] text-muted-foreground">
                 <p className="flex items-center gap-1.5">
@@ -126,6 +141,8 @@ export default function ResourceDetailDialog({ service, open, onOpenChange, save
                 Report an issue
               </Button>
             </div>
+
+            <ServiceReviews serviceKey={reviewKey} serviceName={service.name} province={service.province} />
           </div>
         </DialogContent>
       </Dialog>
