@@ -1,0 +1,39 @@
+{
+  "name": "VoiceTokenGrant",
+  "type": "object",
+  "properties": {
+    "subject": {
+      "type": "string",
+      "description": "Who the voice-session token was issued to: user:<id>, or guest for a signed-out visitor"
+    },
+    "ip_hash": {
+      "type": "string",
+      "description": "Salted hash of the caller's IP address, used for the per-address daily allowance"
+    }
+  },
+  "required": [
+    "subject"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

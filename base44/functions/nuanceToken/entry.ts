@@ -3,6 +3,25 @@ import { secrets } from 'base44:runtime';
 
 const NUANCE_API = 'https://api.nuancelabs.ai';
 
+const DAY_MS = 24 * 60 * 60 * 1000;
+const USER_CALLS_PER_DAY = 20;
+const GUEST_CALLS_PER_DAY = 5;
+const IP_CALLS_PER_DAY = 40;
+
+// The address is only ever stored as a hash, never in the clear.
+async function hashIp(value) {
+  const digest = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(value));
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, '0'))
+    .join('')
+    .slice(0, 32);
+}
+
+function callerIp(req) {
+  const header = req.headers.get('x-forwarded-for') || req.headers.get('cf-connecting-ip') || '';
+  return String(header).split(',')[0].trim() || 'unknown';
+}
+
 const BASE_PROMPT = `You are Nexa, the warm, patient settlement guide inside SettleSmart Canada, a free app for newcomers. You speak like a kind, experienced settlement worker: natural, unhurried, in short plain sentences, one idea at a time. You listen more than you talk.
 
 You help newcomers with everyday Canadian systems: a Social Insurance Number, opening a bank account, finding housing, health cards and family doctors, free language classes such as LINC, jobs and credential recognition, benefits like the GST credit and the Canada Child Benefit, tenants' rights, transit, and settling into a new city.
@@ -81,6 +100,35 @@ export default async function (req) {
     }
 
     const endUserId = user?.id ? String(user.id) : 'guest';
+
+    // A small daily allowance per person and per address, so one script cannot
+    // burn the app's paid voice credits. The provider's daily cap stays the backstop.
+    const ipHash = await hashIp(callerIp(req));
+    const since = new Date(Date.now() - DAY_MS).toISOString();
+    const subject = user?.id ? `user:${user.id}` : 'guest';
+    const checks = user
+      ? [
+          { query: { subject, created_date: { $gte: since } }, limit: USER_CALLS_PER_DAY },
+          { query: { ip_hash: ipHash, created_date: { $gte: since } }, limit: IP_CALLS_PER_DAY },
+        ]
+      : [{ query: { ip_hash: ipHash, created_date: { $gte: since } }, limit: GUEST_CALLS_PER_DAY }];
+
+    for (const check of checks) {
+      const used = await base44.asServiceRole.entities.VoiceTokenGrant.filter(check.query, { limit: check.limit });
+      if ((used?.items?.length || 0) >= check.limit) {
+        return Response.json(
+          {
+            error: user
+              ? 'Nexa has used up her voice calls for today on this account. She can still help you in the text chat, and calls return tomorrow.'
+              : 'Nexa has used up her free voice calls for today. Sign in to keep talking with her, or use the text chat.',
+            code: 'quota_reached',
+          },
+          { status: 429 }
+        );
+      }
+    }
+
+    await base44.asServiceRole.entities.VoiceTokenGrant.create({ subject, ip_hash: ipHash });
 
     const response = await fetch(`${NUANCE_API}/session-tokens`, {
       method: 'POST',
