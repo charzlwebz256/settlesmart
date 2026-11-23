@@ -1,95 +1,15 @@
-import { useState, useRef, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
-import { Button } from '@/components/ui/button';
-import { MessageCircle, X, Send, Loader2, Sparkles, ChevronDown, ChevronRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useAuth } from '@/lib/AuthContext';
-import ReactMarkdown from 'react-markdown';
-import TypewriterContent from '@/components/assistant/TypewriterContent';
+import { useState } from 'react';
+import { X, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import NexaAvatarCall from '@/components/assistant/NexaAvatarCall';
 
-const QUICK_QUESTIONS = [
-  "What's the nearest emergency shelter?",
-  "How do I get a transit card?",
-  "Where can I get free food assistance?",
-  "How do I find a family doctor?",
-  "What is 211 Canada?",
-  "How do I call for emergency help?",
-];
-
-
-
+// Floating entry point to the live voice-and-video assistant.
 export default function NewcomerChatWidget({ userCity, userProvince }) {
-  const { isAuthenticated } = useAuth();
-  const navigate = useNavigate();
   const [open, setOpen] = useState(false);
-  const [messages, setMessages] = useState([]);
-  const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
-  const bottomRef = useRef(null);
-  const inputRef = useRef(null);
-
-  // Load messages from localStorage on mount
-  useEffect(() => {
-    const savedMessages = localStorage.getItem('newcomerChatMessages');
-    if (savedMessages) {
-      try {
-        setMessages(JSON.parse(savedMessages));
-      } catch (e) {
-        console.error('Failed to load chat history:', e);
-      }
-    }
-  }, []);
-
-  // Save messages to localStorage whenever they change
-  useEffect(() => {
-    if (messages.length > 0) {
-      localStorage.setItem('newcomerChatMessages', JSON.stringify(messages.map(({ typing, ...rest }) => rest)));
-    }
-  }, [messages]);
-
-  useEffect(() => {
-    if (open && messages.length === 0) {
-      const greeting = {
-        role: 'assistant',
-        content: `Hi! I'm Nexa, your settlement guide 🍁\n\nI can help you find **emergency contacts**, **nearby services**, **benefits you may qualify for**, and answers to common settlement questions${userCity ? ` for **${userCity}**` : ''}.\n\nWhat do you need help with?`,
-      };
-      setMessages([greeting]);
-    }
-  }, [open, userCity]);
-
-  useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading]);
-
-  useEffect(() => {
-    if (open) setTimeout(() => inputRef.current?.focus(), 300);
-  }, [open]);
-
-  const sendMessage = async (text) => {
-    const query = (text || input).trim();
-    if (!query || loading) return;
-    setInput('');
-    const userMsg = { role: 'user', content: query };
-    setMessages(prev => [...prev, userMsg]);
-    setLoading(true);
-
-    const { data } = await base44.functions.invoke('nexaChat', {
-      message: query,
-      history: [...messages, userMsg].slice(-8),
-      city: userCity,
-      province: userProvince,
-      mode: 'brief',
-    });
-
-    setMessages(prev => [...prev, { role: 'assistant', content: data?.answer || '', typing: true }]);
-    setLoading(false);
-  };
+  const guest = userCity || userProvince ? { city: userCity, province: userProvince } : null;
 
   return (
     <>
-      {/* Floating Button */}
       <AnimatePresence>
         {!open && (
           <motion.button
@@ -97,18 +17,17 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0, opacity: 0 }}
             onClick={() => setOpen(true)}
-            aria-label="Open newcomer assistant chat"
+            aria-label="Talk with Nexa, the settlement guide"
             className="fixed bottom-24 right-4 md:bottom-8 md:right-6 z-40 w-12 h-12 rounded-full bg-primary shadow-lg shadow-primary/30 flex items-center justify-center hover:bg-primary/90 transition-colors"
           >
-            <MessageCircle className="w-4 h-4 text-primary-foreground" />
+            <Sparkles className="w-4 h-4 text-primary-foreground" />
             <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-accent flex items-center justify-center">
-              <Sparkles className="w-2 h-2 text-accent-foreground" />
+              <span className="w-1.5 h-1.5 rounded-full bg-accent-foreground" />
             </span>
           </motion.button>
         )}
       </AnimatePresence>
 
-      {/* Chat Panel */}
       <AnimatePresence>
         {open && (
           <motion.div
@@ -116,123 +35,29 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: 40, scale: 0.95 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 w-[calc(100vw-2rem)] max-w-sm h-[520px] bg-card rounded-2xl shadow-2xl border border-border/50 flex flex-col overflow-hidden"
+            className="fixed bottom-20 right-4 md:bottom-6 md:right-6 z-40 w-[calc(100vw-2rem)] max-w-sm bg-card rounded-2xl shadow-2xl border border-border/50 overflow-hidden"
           >
-            {/* Header */}
-            <div className="flex items-center justify-between px-4 py-3 bg-primary text-primary-foreground flex-shrink-0">
+            <div className="flex items-center justify-between px-4 py-2.5 bg-primary text-primary-foreground">
               <div className="flex items-center gap-2">
                 <div className="w-8 h-8 rounded-full bg-white/20 flex items-center justify-center">
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
                   <p className="font-semibold text-sm leading-tight">Nexa</p>
-                  <p className="text-[10px] text-white/70">Settlement • Services • Emergency</p>
+                  <p className="text-[10px] text-white/70">Live voice · Settlement help</p>
                 </div>
               </div>
-              <button onClick={() => setOpen(false)} aria-label="Close chat" className="p-1.5 rounded-lg hover:bg-white/10 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center">
+              <button
+                onClick={() => setOpen(false)}
+                aria-label="Close assistant"
+                className="p-1.5 rounded-lg hover:bg-white/10 transition-colors min-w-[44px] min-h-[44px] flex items-center justify-center"
+              >
                 <X className="w-4 h-4" />
               </button>
             </div>
 
-            {/* Messages */}
-            <div className="flex-1 overflow-y-auto px-4 py-3 space-y-3">
-              {messages.map((msg, i) => (
-                <div key={i} className={cn("flex gap-2", msg.role === 'user' ? "justify-end" : "justify-start")}>
-                  {msg.role === 'assistant' && (
-                    <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0 mt-1">
-                      <Sparkles className="w-3 h-3 text-primary" />
-                    </div>
-                  )}
-                  <div className={cn(
-                    "max-w-[85%] rounded-2xl px-3 py-2 text-sm",
-                    msg.role === 'user'
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-muted text-foreground"
-                  )}>
-                    {msg.role === 'user' ? (
-                      <p>{msg.content}</p>
-                    ) : msg.typing ? (
-                      <TypewriterContent
-                        content={msg.content}
-                        className="prose prose-sm max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_p]:my-1 [&_ul]:my-1 [&_li]:my-0.5 [&_strong]:font-semibold"
-                        onDone={() => setMessages(prev => prev.map((m, idx) => idx === i ? { ...m, typing: false } : m))}
-                        onTick={() => bottomRef.current?.scrollIntoView({ block: 'end' })}
-                      />
-                    ) : (
-                      <ReactMarkdown className="prose prose-sm max-w-none [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 [&_p]:my-1 [&_ul]:my-1 [&_li]:my-0.5 [&_strong]:font-semibold">
-                        {msg.content}
-                      </ReactMarkdown>
-                    )}
-                  </div>
-                </div>
-              ))}
-
-              {loading && (
-                <div className="flex gap-2">
-                  <div className="w-6 h-6 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
-                    <Sparkles className="w-3 h-3 text-primary" />
-                  </div>
-                  <div className="bg-muted rounded-2xl px-3 py-2">
-                    <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
-                  </div>
-                </div>
-              )}
-              <div ref={bottomRef} />
-            </div>
-
-            {/* Signed-out visitors: three questions instead of a blank chat */}
-            {!isAuthenticated && messages.length <= 1 && !loading && (
-              <div className="px-4 pb-2 flex-shrink-0">
-                <button
-                  onClick={() => { setOpen(false); navigate('/assistant'); }}
-                  className="w-full flex items-center gap-2.5 p-2.5 rounded-xl bg-primary/10 border border-primary/20 text-left hover:bg-primary/15 transition-colors"
-                >
-                  <Sparkles className="w-4 h-4 text-primary flex-shrink-0" />
-                  <span className="min-w-0">
-                    <span className="block text-xs font-semibold text-primary">Not sure where to start?</span>
-                    <span className="block text-[10px] text-muted-foreground">Answer 3 quick questions for a personal plan</span>
-                  </span>
-                  <ChevronRight className="w-4 h-4 text-primary ml-auto flex-shrink-0" />
-                </button>
-              </div>
-            )}
-
-            {/* Quick questions */}
-            {messages.length <= 1 && !loading && (
-              <div className="px-4 pb-2 flex gap-1.5 overflow-x-auto scrollbar-hide flex-shrink-0">
-                {QUICK_QUESTIONS.map(q => (
-                  <button
-                    key={q}
-                    onClick={() => sendMessage(q)}
-                    className="flex-shrink-0 text-[10px] px-2.5 py-1.5 rounded-lg bg-primary/8 border border-primary/15 text-primary font-medium hover:bg-primary/15 transition-colors whitespace-nowrap"
-                  >
-                    {q}
-                  </button>
-                ))}
-              </div>
-            )}
-
-            {/* Input */}
-            <div className="p-3 border-t border-border/50 flex-shrink-0">
-              <form onSubmit={e => { e.preventDefault(); sendMessage(); }} className="flex gap-2">
-                <input
-                  ref={inputRef}
-                  value={input}
-                  onChange={e => setInput(e.target.value)}
-                  placeholder="Ask about services, emergencies, transit..."
-                  className="flex-1 px-3 py-2 rounded-xl border border-border/50 bg-background text-sm focus:ring-2 focus:ring-primary/20 focus:outline-none"
-                  disabled={loading}
-                />
-                <Button
-                  type="submit"
-                  size="icon"
-                  aria-label="Send message"
-                  className="rounded-xl h-9 w-9 bg-primary hover:bg-primary/90 flex-shrink-0"
-                  disabled={!input.trim() || loading}
-                >
-                  <Send className="w-3.5 h-3.5" />
-                </Button>
-              </form>
+            <div className="p-3">
+              <NexaAvatarCall guest={guest} />
             </div>
           </motion.div>
         )}
