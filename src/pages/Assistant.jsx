@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Sparkles, MapPin, ChevronRight, Pencil, MessageCircle, Mic, Keyboard } from 'lucide-react';
+import { Sparkles, MapPin, ChevronRight, Pencil, MessageCircle, Mic, Keyboard, Volume2 } from 'lucide-react';
 import NexaQuickStart from '@/components/assistant/NexaQuickStart';
 import StartingPoints from '@/components/assistant/StartingPoints';
 import NexaAvatarCall from '@/components/assistant/NexaAvatarCall';
+import NexaVoiceChat from '@/components/assistant/NexaVoiceChat';
 import NexaChatPanel from '@/components/nexa/NexaChatPanel';
 import { useAuth } from '@/lib/AuthContext';
 import { useLocation_ } from '@/lib/LocationContext';
@@ -34,12 +35,8 @@ export default function Assistant() {
   const { city: detectedCity, province: detectedProvince } = useLocation_();
   const [guest, setGuest] = useState(null);
   const [mode, setMode] = useState('talk');
-  const [chatAutoListen, setChatAutoListen] = useState(false);
 
-  const useChat = (withVoice) => {
-    setChatAutoListen(Boolean(withVoice));
-    setMode('type');
-  };
+  const useChat = (withVoice) => setMode(withVoice ? 'voice' : 'type');
 
   const { data: profile } = useQuery({
     queryKey: ['myProfile'],
@@ -125,10 +122,7 @@ export default function Assistant() {
 
       <div className="mb-4 inline-flex rounded-xl border border-border/50 bg-card p-1">
         <button
-          onClick={() => {
-            setMode('talk');
-            setChatAutoListen(false);
-          }}
+          onClick={() => setMode('talk')}
           className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
             mode === 'talk' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
           }`}
@@ -136,10 +130,15 @@ export default function Assistant() {
           <Mic className="h-3.5 w-3.5" /> Talk
         </button>
         <button
-          onClick={() => {
-            setMode('type');
-            setChatAutoListen(false);
-          }}
+          onClick={() => setMode('voice')}
+          className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+            mode === 'voice' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <Volume2 className="h-3.5 w-3.5" /> Voice chat
+        </button>
+        <button
+          onClick={() => setMode('type')}
           className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
             mode === 'type' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
           }`}
@@ -180,11 +179,42 @@ export default function Assistant() {
           {guest && <StartingPoints goal={guest.goal} province={guest.province} />}
         </div>
       </div>
+      ) : mode === 'voice' ? (
+        <div className="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,20rem)_1fr] md:items-start">
+          <NexaVoiceChat guest={guestContext} profile={profile} />
+
+          <div className="space-y-4">
+            <div className="rounded-2xl border border-border/50 bg-card p-4">
+              <h2 className="mb-1 flex items-center gap-1.5 font-heading text-sm font-bold">
+                <Volume2 className="h-4 w-4 text-primary" />
+                Hands-free voice chat
+              </h2>
+              <p className="text-xs leading-relaxed text-muted-foreground">
+                Press start and speak. Nexa hears you, answers out loud and keeps listening, so there is nothing to type.
+                She knows {place ? `you are in ${place}` : 'the basics of settling in Canada'} and will point you to the
+                right page of SettleSmart when a local detail matters.
+              </p>
+            </div>
+
+            <div className="rounded-2xl border border-border/50 bg-card p-4">
+              <p className="mb-2 text-[10px] font-bold uppercase tracking-wide text-muted-foreground">Things you can ask her</p>
+              <ul className="space-y-1.5">
+                {TOPICS.map((topic) => (
+                  <li key={topic} className="flex gap-2 text-xs leading-relaxed text-foreground">
+                    <span className="text-primary">•</span>
+                    <span>{topic}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {guest && <StartingPoints goal={guest.goal} province={guest.province} />}
+          </div>
+        </div>
       ) : (
         <NexaChatPanel
           guest={guestContext}
           profile={profile}
-          autoListen={chatAutoListen}
           className="h-[calc(100vh-20rem)] min-h-[420px]"
         />
       )}

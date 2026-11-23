@@ -1,7 +1,8 @@
 import { useState } from 'react';
-import { X, Mic, Keyboard } from 'lucide-react';
+import { X, Mic, Keyboard, Volume2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NexaAvatarCall from '@/components/assistant/NexaAvatarCall';
+import NexaVoiceChat from '@/components/assistant/NexaVoiceChat';
 import NexaChatPanel from '@/components/nexa/NexaChatPanel';
 import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
 import { cn } from '@/lib/utils';
@@ -10,13 +11,9 @@ import { cn } from '@/lib/utils';
 export default function NewcomerChatWidget({ userCity, userProvince }) {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState('talk');
-  const [chatAutoListen, setChatAutoListen] = useState(false);
   const guest = userCity || userProvince ? { city: userCity, province: userProvince } : null;
 
-  const useChat = (withVoice) => {
-    setChatAutoListen(Boolean(withVoice));
-    setMode('type');
-  };
+  const useChat = (withVoice) => setMode(withVoice ? 'voice' : 'type');
 
   return (
     <>
@@ -51,7 +48,11 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
                 <div>
                   <p className="font-semibold text-sm leading-tight">Nexa</p>
                   <p className="text-[10px] text-white/70">
-                    {mode === 'talk' ? 'Live voice · Settlement help' : 'Text chat · Settlement help'}
+                    {mode === 'talk'
+                      ? 'Live voice · Settlement help'
+                      : mode === 'voice'
+                        ? 'Voice chat · Settlement help'
+                        : 'Text chat · Settlement help'}
                   </p>
                 </div>
               </div>
@@ -66,10 +67,7 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
 
             <div className="flex gap-1 border-b border-border/50 p-1.5">
               <button
-                onClick={() => {
-                  setMode('talk');
-                  setChatAutoListen(false);
-                }}
+                onClick={() => setMode('talk')}
                 className={cn(
                   'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-semibold transition-colors',
                   mode === 'talk' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
@@ -78,10 +76,16 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
                 <Mic className="h-3.5 w-3.5" /> Talk
               </button>
               <button
-                onClick={() => {
-                  setMode('type');
-                  setChatAutoListen(false);
-                }}
+                onClick={() => setMode('voice')}
+                className={cn(
+                  'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-semibold transition-colors',
+                  mode === 'voice' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
+                )}
+              >
+                <Volume2 className="h-3.5 w-3.5" /> Voice
+              </button>
+              <button
+                onClick={() => setMode('type')}
                 className={cn(
                   'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-semibold transition-colors',
                   mode === 'type' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
@@ -94,8 +98,10 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
             <div className="max-h-[70vh] overflow-y-auto p-3">
               {mode === 'talk' ? (
                 <NexaAvatarCall guest={guest} onUseChat={useChat} />
+              ) : mode === 'voice' ? (
+                <NexaVoiceChat guest={guest} />
               ) : (
-                <NexaChatPanel guest={guest} compact autoListen={chatAutoListen} className="h-[380px]" />
+                <NexaChatPanel guest={guest} compact className="h-[380px]" />
               )}
             </div>
           </motion.div>

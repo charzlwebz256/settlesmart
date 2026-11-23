@@ -100,6 +100,7 @@ const AuthenticatedApp = () => {
         <Route path="/workplace-rights" element={<WorkplaceRights />} />
         <Route path="/resources" element={<Resources />} />
         <Route path="/directory" element={<NationalDirectory />} />
+        <Route path="/resources/directory" element={<NationalDirectory />} />
         <Route path="/time-zones" element={<TimeZones />} />
         <Route path="/assistant" element={<Assistant />} />
         <Route path="/transit-map" element={<TransitMap />} />

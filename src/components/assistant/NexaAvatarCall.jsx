@@ -245,8 +245,8 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
         <div className="space-y-2 border-t border-border/50 bg-accent/10 px-3 py-3">
           <p className="flex items-start gap-2 text-[11px] font-medium leading-relaxed text-foreground">
             <AlertCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-accent" />
-            Nexa's live video minutes are used up for today. They renew at 00:00 UTC, and she can still help you right
-            now by text or by voice in the chat.
+            Nexa's live video minutes are used up for today. They renew at 00:00 UTC. She can still help you right now
+            in the voice chat, hands-free, or by text.
           </p>
           <div className="flex flex-wrap gap-1.5">
             <Button
@@ -264,7 +264,7 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
               className="h-8 gap-1.5 rounded-lg px-2.5 text-xs"
             >
               <Mic className="h-3.5 w-3.5" />
-              Chat by voice
+              Talk by voice
             </Button>
           </div>
         </div>
