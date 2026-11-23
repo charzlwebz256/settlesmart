@@ -54,6 +54,7 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
   const [youSpeaking, setYouSpeaking] = useState(false);
 
   const quietTimerRef = useRef(null);
+  const pausedRef = useRef(false);
 
   const clearQuiet = () => {
     if (quietTimerRef.current) clearTimeout(quietTimerRef.current);
@@ -102,6 +103,8 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
     setError(null);
     setCreditsOut(false);
     setMuted(false);
+    pausedRef.current = false;
+    setPaused(false);
     setPhase('starting');
     setState('connecting');
 
@@ -140,7 +143,12 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
           break;
         case 'speaking-changed':
           if (event.participant === 'avatar') setSpeaking(event.isSpeaking);
-          if (event.participant === 'user') setYouSpeaking(event.isSpeaking);
+          if (event.participant === 'user') {
+            setYouSpeaking(event.isSpeaking);
+            // She keeps hearing the visitor while paused, so a new question
+            // brings her straight back.
+            if (event.isSpeaking && pausedRef.current) resumePlayback();
+          }
           resetQuiet();
           break;
         case 'avatar-presented':
@@ -179,6 +187,8 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
 
   const end = async () => {
     const conversation = conversationRef.current;
+    pausedRef.current = false;
+    setPaused(false);
     setPhase('ended');
     setState('disconnected');
     try {
@@ -201,21 +211,31 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
     }
   };
 
-  // Pause holds her picture and voice; resume picks the live call back up.
-  const togglePause = () => {
-    const next = !paused;
+  // Pause holds her picture and voice, but the microphone stays open.
+  function resumePlayback() {
+    pausedRef.current = false;
+    setPaused(false);
     try {
-      if (next) {
-        audioRef.current?.pause();
-        videoRef.current?.pause();
-      } else {
-        audioRef.current?.play();
-        videoRef.current?.play();
-      }
+      audioRef.current?.play();
+      videoRef.current?.play();
     } catch (_e) {
       // The call keeps running either way.
     }
-    setPaused(next);
+  }
+
+  const togglePause = () => {
+    if (pausedRef.current) {
+      resumePlayback();
+      return;
+    }
+    pausedRef.current = true;
+    setPaused(true);
+    try {
+      audioRef.current?.pause();
+      videoRef.current?.pause();
+    } catch (_e) {
+      // The call keeps running either way.
+    }
   };
 
   const live = phase === 'live' || phase === 'starting';

@@ -60,6 +60,12 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
   const ask = async (question) => {
     clearIdle();
     setError(null);
+    // A new question drops whatever she had paused and answers from here.
+    if (pausedRef.current) {
+      pausedRef.current = false;
+      setPaused(false);
+      stopNexaVoice();
+    }
     const history = historyRef.current.slice(-6);
     try {
       const res = await base44.functions.invoke('nexaChat', {
@@ -90,18 +96,14 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
     ask(TIP_PROMPT);
   };
 
-  // Pause holds Nexa mid-sentence and stops the microphone until she is resumed.
+  // Pause holds Nexa mid-sentence but keeps the microphone open, so speaking
+  // again starts a new question instead of waiting for her.
   const pause = () => {
     pausedRef.current = true;
     setPaused(true);
     clearIdle();
-    try {
-      recognitionRef.current?.abort();
-    } catch (_e) {
-      // Already stopped.
-    }
-    setYouSpeaking(false);
     pauseNexaVoice();
+    listenForUser();
     setStatus('paused');
   };
 
@@ -126,7 +128,7 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
 
   function listenForUser() {
     const Recognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!Recognition || !activeRef.current || pausedRef.current) return;
+    if (!Recognition || !activeRef.current) return;
     try {
       recognitionRef.current?.abort();
     } catch (_e) {
@@ -159,7 +161,7 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
     };
     recognition.onend = () => {
       setYouSpeaking(false);
-      if (!activeRef.current || pausedRef.current) return;
+      if (!activeRef.current) return;
       const question = said.trim();
       if (question) {
         ask(question);
@@ -260,7 +262,7 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
               {status === 'speaking'
                 ? 'Nexa is answering, she will listen again in a moment.'
                 : status === 'paused'
-                  ? 'Paused. Press resume when you are ready.'
+                  ? 'Paused, but still listening. Speak to start a new question.'
                   : 'Go ahead, I am listening.'}
             </p>
           )}
@@ -278,7 +280,7 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
         <div className="flex items-center justify-between gap-2 border-t border-border/50 px-3 py-2">
           <span className="text-[10px] font-medium text-muted-foreground">
             {status === 'paused'
-              ? 'Nexa is paused'
+              ? 'Paused, still listening to you'
               : status === 'listening'
                 ? 'Your microphone is on'
                 : 'Hands-free, just speak'}
