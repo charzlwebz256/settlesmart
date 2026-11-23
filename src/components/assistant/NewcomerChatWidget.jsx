@@ -10,7 +10,13 @@ import { cn } from '@/lib/utils';
 export default function NewcomerChatWidget({ userCity, userProvince }) {
   const [open, setOpen] = useState(false);
   const [mode, setMode] = useState('talk');
+  const [chatAutoListen, setChatAutoListen] = useState(false);
   const guest = userCity || userProvince ? { city: userCity, province: userProvince } : null;
+
+  const useChat = (withVoice) => {
+    setChatAutoListen(Boolean(withVoice));
+    setMode('type');
+  };
 
   return (
     <>
@@ -60,7 +66,10 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
 
             <div className="flex gap-1 border-b border-border/50 p-1.5">
               <button
-                onClick={() => setMode('talk')}
+                onClick={() => {
+                  setMode('talk');
+                  setChatAutoListen(false);
+                }}
                 className={cn(
                   'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-semibold transition-colors',
                   mode === 'talk' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
@@ -69,7 +78,10 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
                 <Mic className="h-3.5 w-3.5" /> Talk
               </button>
               <button
-                onClick={() => setMode('type')}
+                onClick={() => {
+                  setMode('type');
+                  setChatAutoListen(false);
+                }}
                 className={cn(
                   'flex flex-1 items-center justify-center gap-1.5 rounded-lg px-2 py-1.5 text-xs font-semibold transition-colors',
                   mode === 'type' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
@@ -81,9 +93,9 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
 
             <div className="max-h-[70vh] overflow-y-auto p-3">
               {mode === 'talk' ? (
-                <NexaAvatarCall guest={guest} />
+                <NexaAvatarCall guest={guest} onUseChat={useChat} />
               ) : (
-                <NexaChatPanel guest={guest} compact className="h-[380px]" />
+                <NexaChatPanel guest={guest} compact autoListen={chatAutoListen} className="h-[380px]" />
               )}
             </div>
           </motion.div>

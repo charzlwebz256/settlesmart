@@ -58,7 +58,7 @@ const QUICK_LINKS = [
   { label: 'See benefits you may qualify for', to: '/benefits' },
 ];
 
-export default function NexaChatPanel({ profile = null, guest = null, className, compact = false }) {
+export default function NexaChatPanel({ profile = null, guest = null, className, compact = false, autoListen = false }) {
   const { pathname } = useLocation();
   const [conversations, setConversations] = useState(() => loadConversations());
   const [active, setActive] = useState(() => loadConversations()[0] || newConversation());
@@ -78,6 +78,11 @@ export default function NexaChatPanel({ profile = null, guest = null, className,
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   }, [active.messages.length, sending]);
+
+  // Opened from the call screen when live minutes are spent: start the microphone once.
+  useEffect(() => {
+    if (autoListen && recognitionSupported) listen(setInput);
+  }, [autoListen]);
 
   useEffect(() => {
     if (!active.messages.length) return;

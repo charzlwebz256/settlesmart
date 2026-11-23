@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createNuanceConversation } from '@nuancelabs/js-sdk';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, PhoneOff, Loader2, AlertCircle, Radio } from 'lucide-react';
+import { Mic, MicOff, PhoneOff, Loader2, AlertCircle, Radio, Keyboard } from 'lucide-react';
 import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
 import { cn } from '@/lib/utils';
 
@@ -38,7 +38,7 @@ function describeError(error) {
 }
 
 // Live voice and video conversation with Nexa, powered by Nuance Live.
-export default function NexaAvatarCall({ guest = null, className }) {
+export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
   const videoRef = useRef(null);
   const audioRef = useRef(null);
   const conversationRef = useRef(null);
@@ -47,6 +47,7 @@ export default function NexaAvatarCall({ guest = null, className }) {
   const [state, setState] = useState('idle');
   const [caption, setCaption] = useState('');
   const [error, setError] = useState(null);
+  const [creditsOut, setCreditsOut] = useState(false);
   const [muted, setMuted] = useState(false);
   const [speaking, setSpeaking] = useState(false);
 
@@ -70,6 +71,7 @@ export default function NexaAvatarCall({ guest = null, className }) {
   const start = async () => {
     if (conversationRef.current) return;
     setError(null);
+    setCreditsOut(false);
     setCaption('');
     setMuted(false);
     setPhase('starting');
@@ -143,7 +145,9 @@ export default function NexaAvatarCall({ guest = null, className }) {
       await conversation.connect();
       setPhase('live');
     } catch (err) {
-      setError(describeError(err));
+      const spent = err?.code === 'credits_spent' || err?.status === 429;
+      setCreditsOut(spent);
+      setError(spent ? null : describeError(err));
       setPhase('idle');
       setState('idle');
       teardown();
@@ -234,6 +238,35 @@ export default function NexaAvatarCall({ guest = null, className }) {
         <div className="flex items-start gap-2 border-t border-border/50 bg-destructive/10 px-3 py-2">
           <AlertCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-destructive" />
           <p className="text-[11px] leading-relaxed text-destructive">{error}</p>
+        </div>
+      )}
+
+      {creditsOut && (
+        <div className="space-y-2 border-t border-border/50 bg-accent/10 px-3 py-3">
+          <p className="flex items-start gap-2 text-[11px] font-medium leading-relaxed text-foreground">
+            <AlertCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-accent" />
+            Nexa's live video minutes are used up for today. They renew at 00:00 UTC, and she can still help you right
+            now by text or by voice in the chat.
+          </p>
+          <div className="flex flex-wrap gap-1.5">
+            <Button
+              size="sm"
+              onClick={() => onUseChat?.(false)}
+              className="h-8 gap-1.5 rounded-lg px-2.5 text-xs"
+            >
+              <Keyboard className="h-3.5 w-3.5" />
+              Chat by text
+            </Button>
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => onUseChat?.(true)}
+              className="h-8 gap-1.5 rounded-lg px-2.5 text-xs"
+            >
+              <Mic className="h-3.5 w-3.5" />
+              Chat by voice
+            </Button>
+          </div>
         </div>
       )}
 

@@ -34,6 +34,12 @@ export default function Assistant() {
   const { city: detectedCity, province: detectedProvince } = useLocation_();
   const [guest, setGuest] = useState(null);
   const [mode, setMode] = useState('talk');
+  const [chatAutoListen, setChatAutoListen] = useState(false);
+
+  const useChat = (withVoice) => {
+    setChatAutoListen(Boolean(withVoice));
+    setMode('type');
+  };
 
   const { data: profile } = useQuery({
     queryKey: ['myProfile'],
@@ -119,7 +125,10 @@ export default function Assistant() {
 
       <div className="mb-4 inline-flex rounded-xl border border-border/50 bg-card p-1">
         <button
-          onClick={() => setMode('talk')}
+          onClick={() => {
+            setMode('talk');
+            setChatAutoListen(false);
+          }}
           className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
             mode === 'talk' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
           }`}
@@ -127,7 +136,10 @@ export default function Assistant() {
           <Mic className="h-3.5 w-3.5" /> Talk
         </button>
         <button
-          onClick={() => setMode('type')}
+          onClick={() => {
+            setMode('type');
+            setChatAutoListen(false);
+          }}
           className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
             mode === 'type' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
           }`}
@@ -138,7 +150,7 @@ export default function Assistant() {
 
       {mode === 'talk' ? (
       <div className="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,20rem)_1fr] md:items-start">
-        <NexaAvatarCall guest={guestContext} />
+        <NexaAvatarCall guest={guestContext} onUseChat={useChat} />
 
         <div className="space-y-4">
           <div className="rounded-2xl border border-border/50 bg-card p-4">
@@ -169,7 +181,12 @@ export default function Assistant() {
         </div>
       </div>
       ) : (
-        <NexaChatPanel guest={guestContext} profile={profile} className="h-[calc(100vh-20rem)] min-h-[420px]" />
+        <NexaChatPanel
+          guest={guestContext}
+          profile={profile}
+          autoListen={chatAutoListen}
+          className="h-[calc(100vh-20rem)] min-h-[420px]"
+        />
       )}
     </div>
   );
