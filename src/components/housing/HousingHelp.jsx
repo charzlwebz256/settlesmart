@@ -4,6 +4,7 @@ import { PROVINCES } from '@/data/nationalDirectory';
 import { useLocation_ } from '@/lib/LocationContext';
 import { Building2, ExternalLink, Info, LifeBuoy } from 'lucide-react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import SiteLogo from '@/components/housing/SiteLogo';
 
 // Government and subsidized housing programs, plus where to get help fast.
 export default function HousingHelp() {
@@ -49,14 +50,19 @@ export default function HousingHelp() {
               rel="noopener noreferrer"
               className="rounded-xl border border-border/60 p-3 transition-colors hover:border-primary/40"
             >
-              <p className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
-                {program.name}
-                <ExternalLink className="h-3 w-3 text-primary" />
-              </p>
-              <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-primary">
-                {program.province || 'Canada-wide'}
-              </p>
-              <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{program.description}</p>
+              <div className="flex items-center gap-2">
+                <SiteLogo url={program.url} name={program.name} className="h-8 w-8" />
+                <div className="min-w-0">
+                  <p className="flex items-center gap-1.5 truncate text-xs font-semibold text-foreground">
+                    {program.name}
+                    <ExternalLink className="h-3 w-3 flex-shrink-0 text-primary" />
+                  </p>
+                  <p className="mt-0.5 text-[10px] font-medium uppercase tracking-wide text-primary">
+                    {program.province || 'Canada-wide'}
+                  </p>
+                </div>
+              </div>
+              <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">{program.description}</p>
             </a>
           ))}
         </div>
@@ -76,11 +82,14 @@ export default function HousingHelp() {
               rel="noopener noreferrer"
               className="rounded-xl bg-muted/50 p-3 transition-colors hover:bg-muted"
             >
-              <p className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
-                {item.name}
-                <ExternalLink className="h-3 w-3 flex-shrink-0 text-primary" />
-              </p>
-              <p className="mt-1 text-[11px] leading-relaxed text-muted-foreground">{item.description}</p>
+              <div className="flex items-center gap-2">
+                <SiteLogo url={item.url} name={item.name} className="h-7 w-7" />
+                <p className="flex items-center gap-1.5 text-xs font-semibold text-foreground">
+                  {item.name}
+                  <ExternalLink className="h-3 w-3 flex-shrink-0 text-primary" />
+                </p>
+              </div>
+              <p className="mt-1.5 text-[11px] leading-relaxed text-muted-foreground">{item.description}</p>
             </a>
           ))}
         </div>

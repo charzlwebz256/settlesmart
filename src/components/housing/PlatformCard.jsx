@@ -1,13 +1,17 @@
 import { ExternalLink } from 'lucide-react';
+import SiteLogo from '@/components/housing/SiteLogo';
 
 // One rental platform: what it lists, what it is good at, and a link out.
 export default function PlatformCard({ platform }) {
   return (
     <div className="flex flex-col rounded-2xl border border-border/60 bg-card p-4">
       <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0">
-          <p className="truncate font-heading text-sm font-bold leading-tight">{platform.name}</p>
-          <p className="mt-0.5 text-[11px] text-muted-foreground">{platform.kind}</p>
+        <div className="flex min-w-0 items-center gap-2.5">
+          <SiteLogo url={platform.url} name={platform.name} className="h-9 w-9" />
+          <div className="min-w-0">
+            <p className="truncate font-heading text-sm font-bold leading-tight">{platform.name}</p>
+            <p className="mt-0.5 text-[11px] text-muted-foreground">{platform.kind}</p>
+          </div>
         </div>
         {platform.recommended && (
           <span className="flex-shrink-0 rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
