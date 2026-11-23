@@ -60,7 +60,14 @@ const QUICK_LINKS = [
   { label: 'See benefits you may qualify for', to: '/benefits' },
 ];
 
-export default function NexaChatPanel({ profile = null, guest = null, className, compact = false, autoListen = false }) {
+export default function NexaChatPanel({
+  profile = null,
+  guest = null,
+  className,
+  compact = false,
+  autoListen = false,
+  onMessagesChange,
+}) {
   const { pathname } = useLocation();
   const [conversations, setConversations] = useState(() => loadConversations());
   const [active, setActive] = useState(() => loadConversations()[0] || newConversation());
@@ -93,6 +100,7 @@ export default function NexaChatPanel({ profile = null, guest = null, className,
     if (!active.messages.length) return;
     const saved = saveConversation(active);
     if (saved) setConversations(saved);
+    onMessagesChange?.(active.messages);
   }, [active]);
 
   const send = async () => {

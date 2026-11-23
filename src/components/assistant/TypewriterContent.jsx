@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import ReactMarkdown from 'react-markdown';
+import { nexaUrlTransform } from '@/lib/nexaLinks';
 
 export default function TypewriterContent({ content, className = '', speed = 38, charsPerTick = 1, onDone, onTick }) {
   const [displayed, setDisplayed] = useState('');
@@ -34,7 +35,7 @@ export default function TypewriterContent({ content, className = '', speed = 38,
 
   return (
     <div className={className}>
-      <ReactMarkdown>{displayed}</ReactMarkdown>
+      <ReactMarkdown urlTransform={nexaUrlTransform}>{displayed}</ReactMarkdown>
       {displayed.length < (content?.length || 0) && (
         <span className="inline-block w-1.5 h-4 bg-primary animate-pulse ml-0.5 -mb-0.5 rounded-sm" />
       )}

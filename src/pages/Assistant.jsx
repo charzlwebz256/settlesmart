@@ -8,6 +8,7 @@ import StartingPoints from '@/components/assistant/StartingPoints';
 import NexaAvatarCall from '@/components/assistant/NexaAvatarCall';
 import NexaVoiceChat from '@/components/assistant/NexaVoiceChat';
 import NexaChatPanel from '@/components/nexa/NexaChatPanel';
+import NexaContactCard from '@/components/nexa/NexaContactCard';
 import { useAuth } from '@/lib/AuthContext';
 import { useLocation_ } from '@/lib/LocationContext';
 
@@ -35,6 +36,7 @@ export default function Assistant() {
   const { city: detectedCity, province: detectedProvince } = useLocation_();
   const [guest, setGuest] = useState(null);
   const [mode, setMode] = useState('talk');
+  const [chatMessages, setChatMessages] = useState([]);
 
   const useChat = (withVoice) => setMode(withVoice ? 'voice' : 'type');
 
@@ -212,11 +214,15 @@ export default function Assistant() {
           </div>
         </div>
       ) : (
-        <NexaChatPanel
-          guest={guestContext}
-          profile={profile}
-          className="h-[calc(100vh-20rem)] min-h-[420px]"
-        />
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,1fr)_18rem] lg:items-start">
+          <NexaChatPanel
+            guest={guestContext}
+            profile={profile}
+            onMessagesChange={setChatMessages}
+            className="h-[calc(100vh-20rem)] min-h-[420px]"
+          />
+          <NexaContactCard messages={chatMessages} />
+        </div>
       )}
     </div>
   );
