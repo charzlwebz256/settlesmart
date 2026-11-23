@@ -1,5 +1,6 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.54';
 import { NEXA_SYSTEM_PROMPT } from '../../shared/nexaPrompt.ts';
+import { SETTLE_SMART_GUIDE } from '../../shared/settleSmartGuide.ts';
 import { cleanText } from '../../shared/safeUrl.ts';
 
 const VOICE_CONTEXT = `AVAILABLE SECTIONS ON THE APP:
@@ -155,6 +156,8 @@ User question: "${message}"`;
       }
 
       prompt = `${NEXA_SYSTEM_PROMPT}
+
+${SETTLE_SMART_GUIDE}
 
 ${profileContext ? `About this person — tailor every answer to this location and situation instead of giving generic Canada-wide advice: ${profileContext}.` : locationContext}
 

@@ -93,7 +93,7 @@ export default function NexaTextChat({ guest = null, profile = null, className }
               )}
             >
               {m.role === 'assistant' ? (
-                <div className="space-y-1.5 [&_a]:font-medium [&_a]:text-primary [&_a]:underline [&_li]:ml-4 [&_li]:list-disc [&_p]:leading-relaxed [&_strong]:font-semibold">
+                <div className="space-y-1.5 [&_a]:font-medium [&_a]:text-primary [&_a]:underline [&_h3]:mt-2 [&_h3]:font-heading [&_h3]:text-sm [&_h3]:font-bold [&_h3]:text-foreground [&_li]:ml-4 [&_li]:list-disc [&_p]:leading-relaxed [&_strong]:font-semibold">
                   <ReactMarkdown>{m.content}</ReactMarkdown>
                 </div>
               ) : (
