@@ -6,7 +6,7 @@ import { Sparkles, MapPin, ChevronRight, Pencil, MessageCircle, Mic, Keyboard } 
 import NexaQuickStart from '@/components/assistant/NexaQuickStart';
 import StartingPoints from '@/components/assistant/StartingPoints';
 import NexaAvatarCall from '@/components/assistant/NexaAvatarCall';
-import NexaTextChat from '@/components/assistant/NexaTextChat';
+import NexaChatPanel from '@/components/nexa/NexaChatPanel';
 import { useAuth } from '@/lib/AuthContext';
 import { useLocation_ } from '@/lib/LocationContext';
 
@@ -169,7 +169,7 @@ export default function Assistant() {
         </div>
       </div>
       ) : (
-        <NexaTextChat guest={guestContext} profile={profile} className="h-[calc(100vh-20rem)] min-h-[420px]" />
+        <NexaChatPanel guest={guestContext} profile={profile} className="h-[calc(100vh-20rem)] min-h-[420px]" />
       )}
     </div>
   );

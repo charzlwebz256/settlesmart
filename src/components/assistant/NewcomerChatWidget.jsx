@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { X, Mic, Keyboard } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import NexaAvatarCall from '@/components/assistant/NexaAvatarCall';
-import NexaTextChat from '@/components/assistant/NexaTextChat';
+import NexaChatPanel from '@/components/nexa/NexaChatPanel';
 import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
 import { cn } from '@/lib/utils';
 
@@ -83,7 +83,7 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
               {mode === 'talk' ? (
                 <NexaAvatarCall guest={guest} />
               ) : (
-                <NexaTextChat guest={guest} className="h-[380px]" />
+                <NexaChatPanel guest={guest} compact className="h-[380px]" />
               )}
             </div>
           </motion.div>
