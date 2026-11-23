@@ -15,35 +15,11 @@ const STATE_TEXT = {
   failed: 'Could not connect',
 };
 
-function formatRenewal(iso) {
-  if (!iso) return null;
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return null;
-  return date.toLocaleString(undefined, { dateStyle: 'medium', timeStyle: 'short' });
-}
-
-const CREDIT_MESSAGE = "The voice assistant has used today's call credits. You can still chat with Nexa by text.";
-
 // Reads the token endpoint's own refusal so the person sees the real reason.
 function refusalMessage(body) {
   if (!body || typeof body !== 'object') return null;
-  const detail = typeof body.detail === 'string' ? body.detail : '';
-  let code = body.code || '';
-  let renewsAt = '';
-  if (detail) {
-    try {
-      const parsed = JSON.parse(detail);
-      code = code || parsed.code || '';
-      renewsAt = parsed.renews_at || '';
-    } catch (_e) {
-      // Not JSON: the generic message below stands.
-    }
-  }
-  if (code === 'credits_spent') {
-    const when = formatRenewal(renewsAt);
-    return when ? `The voice assistant has used today's call credits. They renew ${when}. You can still chat with Nexa by text.` : CREDIT_MESSAGE;
-  }
-  if (body.status === 503) return 'The voice assistant is not configured yet. You can still chat with Nexa by text.';
+  if (body.status === 429) return 'Nexa cannot take voice calls right now. You can still chat with her by text.';
+  if (body.status === 503) return 'The voice assistant is not available right now. You can still chat with Nexa by text.';
   return null;
 }
 
@@ -71,10 +47,7 @@ function describeError(error) {
   if (error?.name === 'LegalRequiredError') {
     return 'The voice assistant is not available right now. You can still chat with Nexa by text.';
   }
-  if (error?.status === 429) {
-    const when = formatRenewal(error.renewsAt);
-    return when ? `The voice assistant has used today's call credits. They renew ${when}. You can still chat with Nexa by text.` : CREDIT_MESSAGE;
-  }
+  if (error?.status === 429) return 'Nexa cannot take voice calls right now. You can still chat with her by text.';
   if (error?.status === 401) return 'The call session expired. Please start the call again.';
   if (error?.status === 503) return 'The voice service is busy right now. Please try again in a moment.';
   return 'Something went wrong starting the call. You can still chat with Nexa by text.';
