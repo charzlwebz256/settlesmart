@@ -1,0 +1,43 @@
+{
+  "name": "ResourceSearch",
+  "type": "object",
+  "properties": {
+    "query": {
+      "type": "string",
+      "description": "What the visitor searched for in the settlement directory"
+    },
+    "category": {
+      "type": "string",
+      "description": "Directory category the search ran in"
+    },
+    "province": {
+      "type": "string",
+      "description": "Province filter at the time of the search"
+    },
+    "result_count": {
+      "type": "number",
+      "description": "How many directory entries matched the search"
+    }
+  },
+  "required": [
+    "query"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

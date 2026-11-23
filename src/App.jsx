@@ -22,6 +22,7 @@ import TimeZones from './pages/TimeZones';
 import Assistant from './pages/Assistant';
 import Checklist from './pages/Checklist';
 import Profile from './pages/Profile';
+import AdminDashboard from './pages/AdminDashboard';
 import TransitMap from './pages/TransitMap';
 import Events from './pages/Events';
 import Jobs from './pages/Jobs';
@@ -131,6 +132,7 @@ const AuthenticatedApp = () => {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/checklist" element={<Checklist />} />
           <Route path="/profile" element={<Profile />} />
+          <Route path="/admin" element={<AdminDashboard />} />
           <Route path="/scholarships" element={<Scholarships />} />
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/resume-builder" element={<ResumeBuilder />} />

@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation, useNavigate } from 'react-router-dom';
 import { useEffect } from 'react';
-import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, ChevronDown, Moon, Sun, Heart, Info, GraduationCap, Wallet, LogIn, LogOut, Plug, Bus, Clock, Clapperboard, Sparkles, Plane } from 'lucide-react';
+import { Home, Compass, Briefcase, BookOpen, AlertTriangle, Menu, X, ChevronLeft, User, MessageCircle, Newspaper, Scale, Search, ShoppingBag, MapPin, ChevronDown, Moon, Sun, Heart, Info, GraduationCap, Wallet, LogIn, LogOut, Plug, Bus, Clock, Clapperboard, Sparkles, Plane, BarChart3 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { useState, useRef, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -53,6 +53,7 @@ const secondaryNav = [
   { path: '/assistant', icon: MessageCircle, label: 'Ask Nexa' },
   { path: '/checklist', icon: BookOpen, label: 'Checklist' },
   { path: '/profile', icon: User, label: 'My Profile' },
+  { path: '/admin', icon: BarChart3, label: 'Admin Overview', adminOnly: true },
   { path: '/support-us', icon: Heart, label: 'Support Us' },
   { path: '/meet-the-developer', icon: Info, label: 'Meet the Developer' },
   { path: '/connect', icon: Plug, label: 'Connect AI Assistants' },
@@ -338,7 +339,7 @@ export default function AppLayout() {
 
               {/* Secondary nav */}
               <div className="border-t border-border/40 pt-1.5 mt-1 space-y-0.5">
-                {secondaryNav.map(item => (
+                {secondaryNav.filter(item => !item.adminOnly || user?.role === 'admin').map(item => (
                   <Link key={item.path} to={item.path} onClick={() => setMenuOpen(false)}
                     className={cn("flex items-center gap-3 px-4 py-2 rounded-xl text-sm font-medium transition-all",
                       location.pathname === item.path ? "bg-primary/10 text-primary" : "text-muted-foreground hover:text-foreground hover:bg-muted")}>

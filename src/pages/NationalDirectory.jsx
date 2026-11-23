@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { base44 } from '@/api/base44Client';
 import { AlertTriangle, BookOpen, Bus, Compass, Download, FileDown, HeartHandshake, Home, Landmark, MapPin, PawPrint, Search, ShoppingBag, Trees, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { SERVICE_DIRECTORY as DIRECTORY, PROVINCES } from '@/data/nationalDirectory';
@@ -62,6 +63,24 @@ export default function NationalDirectory() {
     () => (category.provinces[activeProvince] || []).filter((item) => matches(item, search)),
     [category, activeProvince, search]
   );
+
+  // What people look up, so the admin overview can rank the most searched resources.
+  const loggedSearches = useRef(new Set());
+  useEffect(() => {
+    if (search.length < 3) return;
+    const timer = setTimeout(() => {
+      const key = `${search}|${categoryId}|${activeProvince}`;
+      if (loggedSearches.current.has(key)) return;
+      loggedSearches.current.add(key);
+      base44.entities.ResourceSearch.create({
+        query: search,
+        category: category.label || categoryId,
+        province: activeProvince,
+        result_count: national.length + provincial.length,
+      }).catch(() => {});
+    }, 1200);
+    return () => clearTimeout(timer);
+  }, [search, categoryId, activeProvince, category.label, national.length, provincial.length]);
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-6 pb-24 md:pb-8">
