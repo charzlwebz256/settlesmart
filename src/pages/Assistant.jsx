@@ -2,10 +2,11 @@ import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
-import { Sparkles, MapPin, ChevronRight, Pencil, MessageCircle } from 'lucide-react';
+import { Sparkles, MapPin, ChevronRight, Pencil, MessageCircle, Mic, Keyboard } from 'lucide-react';
 import NexaQuickStart from '@/components/assistant/NexaQuickStart';
 import StartingPoints from '@/components/assistant/StartingPoints';
 import NexaAvatarCall from '@/components/assistant/NexaAvatarCall';
+import NexaTextChat from '@/components/assistant/NexaTextChat';
 import { useAuth } from '@/lib/AuthContext';
 import { useLocation_ } from '@/lib/LocationContext';
 
@@ -32,6 +33,7 @@ export default function Assistant() {
   const { isAuthenticated, user } = useAuth();
   const { city: detectedCity, province: detectedProvince } = useLocation_();
   const [guest, setGuest] = useState(null);
+  const [mode, setMode] = useState('talk');
 
   const { data: profile } = useQuery({
     queryKey: ['myProfile'],
@@ -115,6 +117,26 @@ export default function Assistant() {
         </div>
       </div>
 
+      <div className="mb-4 inline-flex rounded-xl border border-border/50 bg-card p-1">
+        <button
+          onClick={() => setMode('talk')}
+          className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+            mode === 'talk' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <Mic className="h-3.5 w-3.5" /> Talk
+        </button>
+        <button
+          onClick={() => setMode('type')}
+          className={`flex items-center gap-1.5 rounded-lg px-3 py-1.5 text-xs font-semibold transition-colors ${
+            mode === 'type' ? 'bg-primary/10 text-primary' : 'text-muted-foreground hover:text-foreground'
+          }`}
+        >
+          <Keyboard className="h-3.5 w-3.5" /> Type
+        </button>
+      </div>
+
+      {mode === 'talk' ? (
       <div className="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,20rem)_1fr] md:items-start">
         <NexaAvatarCall guest={guestContext} />
 
@@ -146,6 +168,9 @@ export default function Assistant() {
           {guest && <StartingPoints goal={guest.goal} province={guest.province} />}
         </div>
       </div>
+      ) : (
+        <NexaTextChat guest={guestContext} profile={profile} className="h-[calc(100vh-20rem)] min-h-[420px]" />
+      )}
     </div>
   );
 }

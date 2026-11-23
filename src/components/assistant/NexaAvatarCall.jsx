@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createNuanceConversation } from '@nuancelabs/js-sdk';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, PhoneOff, Loader2, Sparkles, AlertCircle, Radio } from 'lucide-react';
+import { Mic, MicOff, PhoneOff, Loader2, AlertCircle, Radio } from 'lucide-react';
+import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
 import { cn } from '@/lib/utils';
 
 const STATE_TEXT = {
@@ -168,9 +169,11 @@ export default function NexaAvatarCall({ guest = null, className }) {
         {/* Idle cover */}
         {!live && (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-primary/15 to-background/90 p-6 text-center">
-            <div className="flex h-16 w-16 items-center justify-center rounded-full bg-primary/15">
-              <Sparkles className="h-7 w-7 text-primary" />
-            </div>
+            <img
+              src={NEXA_PORTRAIT}
+              alt="Nexa"
+              className="h-24 w-24 rounded-full object-cover shadow-lg ring-4 ring-white/70 dark:ring-white/10"
+            />
             <div>
               <p className="font-heading text-base font-bold text-foreground">Talk with Nexa</p>
               <p className="mx-auto mt-1 max-w-[15rem] text-xs leading-relaxed text-muted-foreground">
