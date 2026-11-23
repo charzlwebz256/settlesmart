@@ -138,7 +138,7 @@ export default function Assistant() {
 
       {mode === 'talk' ? (
       <div className="grid grid-cols-1 gap-5 md:grid-cols-[minmax(0,20rem)_1fr] md:items-start">
-        <NexaAvatarCall guest={guestContext} />
+        <NexaAvatarCall guest={guestContext} onSwitchToText={() => setMode('type')} />
 
         <div className="space-y-4">
           <div className="rounded-2xl border border-border/50 bg-card p-4">

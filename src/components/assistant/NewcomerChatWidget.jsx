@@ -81,7 +81,7 @@ export default function NewcomerChatWidget({ userCity, userProvince }) {
 
             <div className="max-h-[70vh] overflow-y-auto p-3">
               {mode === 'talk' ? (
-                <NexaAvatarCall guest={guest} />
+                <NexaAvatarCall guest={guest} onSwitchToText={() => setMode('type')} />
               ) : (
                 <NexaTextChat guest={guest} className="h-[380px]" />
               )}
