@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { playNexaVoice, stopNexaVoice } from '@/lib/nexaVoice';
 
 // Browser speech input and spoken replies for Nexa.
 export function useSpeech() {
@@ -10,8 +11,9 @@ export function useSpeech() {
 
   useEffect(() => {
     setRecognitionSupported(Boolean(window.SpeechRecognition || window.webkitSpeechRecognition));
-    setSpeechSupported(typeof window !== 'undefined' && 'speechSynthesis' in window);
+    setSpeechSupported(typeof window !== 'undefined');
     return () => {
+      stopNexaVoice();
       try {
         recognitionRef.current?.stop();
         window.speechSynthesis?.cancel();
@@ -62,29 +64,16 @@ export function useSpeech() {
   }, []);
 
   const stopSpeaking = useCallback(() => {
-    try {
-      window.speechSynthesis?.cancel();
-    } catch (_e) {
-      // Nothing playing.
-    }
+    stopNexaVoice();
     setSpeaking(false);
   }, []);
 
   const speak = useCallback((text) => {
-    if (!('speechSynthesis' in window) || !text) return;
-    window.speechSynthesis.cancel();
-    const plain = String(text)
-      .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
-      .replace(/[#*_`>]/g, '')
-      .replace(/\n{2,}/g, '. ')
-      .slice(0, 1200);
-    const utterance = new SpeechSynthesisUtterance(plain);
-    utterance.lang = 'en-CA';
-    utterance.rate = 1;
-    utterance.onend = () => setSpeaking(false);
-    utterance.onerror = () => setSpeaking(false);
-    setSpeaking(true);
-    window.speechSynthesis.speak(utterance);
+    if (!text) return;
+    playNexaVoice(text, {
+      onStart: () => setSpeaking(true),
+      onEnd: () => setSpeaking(false),
+    });
   }, []);
 
   return { listen, stopListening, listening, recognitionSupported, speak, stopSpeaking, speaking, speechSupported };

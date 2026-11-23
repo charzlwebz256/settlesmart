@@ -3,6 +3,7 @@ import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { AlertCircle, Loader2, Mic, PhoneOff, Volume2 } from 'lucide-react';
 import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
+import { playNexaVoice, stopNexaVoice } from '@/lib/nexaVoice';
 import { cn } from '@/lib/utils';
 
 const STATUS_TEXT = {
@@ -10,13 +11,6 @@ const STATUS_TEXT = {
   thinking: 'Thinking',
   speaking: 'Nexa is speaking',
 };
-
-const plainSpeech = (text) =>
-  String(text)
-    .replace(/\[([^\]]+)\]\([^)]*\)/g, '$1')
-    .replace(/[#*_`>]/g, '')
-    .replace(/\n{2,}/g, '. ')
-    .slice(0, 1200);
 
 // Hands-free voice conversation: speak straight to Nexa, she answers out loud.
 export default function NexaVoiceChat({ guest = null, profile = null, className }) {
@@ -34,33 +28,20 @@ export default function NexaVoiceChat({ guest = null, profile = null, className 
     } catch (_e) {
       // Already stopped.
     }
-    try {
-      window.speechSynthesis?.cancel();
-    } catch (_e) {
-      // Nothing playing.
-    }
+    stopNexaVoice();
     setStatus('idle');
   };
 
   useEffect(() => stop, []);
 
   const speakReply = (text) => {
-    if (!('speechSynthesis' in window)) {
-      if (activeRef.current) startListening();
-      return;
-    }
-    const utterance = new SpeechSynthesisUtterance(plainSpeech(text));
-    utterance.lang = 'en-CA';
-    utterance.rate = 1;
-    utterance.onend = () => {
-      if (activeRef.current) startListening();
-    };
-    utterance.onerror = () => {
-      if (activeRef.current) startListening();
-    };
     setStatus('speaking');
-    window.speechSynthesis.cancel();
-    window.speechSynthesis.speak(utterance);
+    playNexaVoice(text, {
+      onEnd: () => {
+        if (activeRef.current) startListening();
+        else setStatus('idle');
+      },
+    });
   };
 
   const ask = async (question) => {

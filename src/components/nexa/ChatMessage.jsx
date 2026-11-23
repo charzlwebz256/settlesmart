@@ -1,12 +1,13 @@
 import ReactMarkdown from 'react-markdown';
 import { ThumbsUp, ThumbsDown, Volume2, Paperclip } from 'lucide-react';
+import TypewriterContent from '@/components/assistant/TypewriterContent';
 import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
 import { cn } from '@/lib/utils';
 
 const markdownStyles =
   'space-y-2 text-sm leading-relaxed [&_a]:font-medium [&_a]:text-primary [&_a]:underline [&_h1]:text-base [&_h1]:font-bold [&_h2]:text-sm [&_h2]:font-bold [&_h3]:text-sm [&_h3]:font-semibold [&_li]:ml-4 [&_li]:list-disc [&_ol_li]:list-decimal [&_p]:leading-relaxed [&_strong]:font-semibold';
 
-export default function ChatMessage({ message, index, feedback, onFeedback, onSpeak }) {
+export default function ChatMessage({ message, index, feedback, onFeedback, onSpeak, typing = false, onTypingDone, onTypingTick }) {
   const isUser = message.role === 'user';
 
   if (isUser) {
@@ -31,17 +32,28 @@ export default function ChatMessage({ message, index, feedback, onFeedback, onSp
       <img src={NEXA_PORTRAIT} alt="Nexa" className="h-8 w-8 flex-shrink-0 rounded-full object-cover" />
       <div className="min-w-0 max-w-[85%] space-y-1.5">
         <div className="rounded-2xl rounded-tl-sm bg-secondary px-3 py-2 text-secondary-foreground">
-          <div className={markdownStyles}>
-            <ReactMarkdown
-              components={{
-                a: ({ node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" />,
-              }}
-            >
-              {message.content}
-            </ReactMarkdown>
-          </div>
+          {typing ? (
+            <TypewriterContent
+              content={message.content}
+              className={markdownStyles}
+              speed={14}
+              charsPerTick={3}
+              onDone={onTypingDone}
+              onTick={onTypingTick}
+            />
+          ) : (
+            <div className={markdownStyles}>
+              <ReactMarkdown
+                components={{
+                  a: ({ node, ...props }) => <a {...props} target="_blank" rel="noopener noreferrer" />,
+                }}
+              >
+                {message.content}
+              </ReactMarkdown>
+            </div>
+          )}
         </div>
-        <div className="flex items-center gap-1">
+        <div className={cn('flex items-center gap-1', typing && 'hidden')}>
           <button
             onClick={() => onFeedback(index, 'up')}
             aria-label="Helpful answer"

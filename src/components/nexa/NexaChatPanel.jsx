@@ -68,6 +68,7 @@ export default function NexaChatPanel({ profile = null, guest = null, className,
   const [attachment, setAttachment] = useState(null);
   const [uploading, setUploading] = useState(false);
   const [feedback, setFeedback] = useState({});
+  const [typingIndex, setTypingIndex] = useState(null);
   const [speakReplies, setSpeakReplies] = useState(false);
   const [historyOpen, setHistoryOpen] = useState(false);
   const endRef = useRef(null);
@@ -115,6 +116,7 @@ export default function NexaChatPanel({ profile = null, guest = null, className,
       });
       const answer = res?.data?.answer;
       if (!answer) throw new Error('No answer');
+      setTypingIndex(active.messages.length + 1);
       setActive((prev) => ({ ...prev, messages: [...prev.messages, { role: 'assistant', content: answer }] }));
       if (speakReplies) speak(answer);
     } catch (_err) {
@@ -139,6 +141,7 @@ export default function NexaChatPanel({ profile = null, guest = null, className,
 
   const startNewChat = () => {
     setActive(newConversation());
+    setTypingIndex(null);
     setInput('');
     setAttachment(null);
     setError(null);
@@ -149,6 +152,7 @@ export default function NexaChatPanel({ profile = null, guest = null, className,
 
   const openConversation = (conversation) => {
     setActive(conversation);
+    setTypingIndex(null);
     setError(null);
     setFeedback({});
     setHistoryOpen(false);
@@ -291,6 +295,9 @@ export default function NexaChatPanel({ profile = null, guest = null, className,
             feedback={feedback[index]}
             onFeedback={handleFeedback}
             onSpeak={speak}
+            typing={index === typingIndex}
+            onTypingDone={() => setTypingIndex(null)}
+            onTypingTick={() => endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })}
           />
         ))}
 
