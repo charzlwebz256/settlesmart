@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { createNuanceConversation } from '@nuancelabs/js-sdk';
 import { Button } from '@/components/ui/button';
-import { Mic, MicOff, PhoneOff, Loader2, AlertCircle, Radio, Keyboard } from 'lucide-react';
+import { Mic, MicOff, PhoneOff, Loader2, AlertCircle, Radio } from 'lucide-react';
 import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
 import { cn } from '@/lib/utils';
 
@@ -15,46 +15,23 @@ const STATE_TEXT = {
   failed: 'Could not connect',
 };
 
-// Reads the token endpoint's own refusal so the person sees the real reason.
-function refusalMessage(body) {
-  if (!body || typeof body !== 'object') return null;
-  if (body.status === 429) return 'Nexa cannot take voice calls right now. You can still chat with her by text.';
-  if (body.status === 503) return 'The voice assistant is not available right now. You can still chat with Nexa by text.';
-  return null;
-}
-
 function describeError(error) {
   if (!error) return null;
-  if (error.friendly) return error.friendly;
   if (error?.name === 'MediaAccessError' || error?.reason === 'permission-denied') {
     return 'Your browser blocked the microphone. Allow microphone access for this site, then try again.';
   }
   if (error?.reason === 'device-not-found' || error?.reason === 'device-in-use') {
     return 'No microphone is available right now. Check your device and try again.';
   }
-  if (error?.name === 'ActiveSessionError') {
-    return 'Another Nexa call is already open in this browser. End it, then try again.';
+  const message = String(error?.message || '');
+  if (/token|502|conversation/i.test(message)) {
+    return 'The voice assistant could not start. Please try again in a moment.';
   }
-  if (error?.name === 'GuestLimitError') {
-    return 'The free call limit for this device has been reached. You can still chat with Nexa by text.';
-  }
-  if (error?.name === 'JoinTimeoutError') {
-    return 'The call could not connect. A VPN or a privacy extension can block calls, so try again on a normal connection.';
-  }
-  if (error?.name === 'MaintenanceError') {
-    return error.message || 'The voice service is under maintenance. Please try again later.';
-  }
-  if (error?.name === 'LegalRequiredError') {
-    return 'The voice assistant is not available right now. You can still chat with Nexa by text.';
-  }
-  if (error?.status === 429) return 'Nexa cannot take voice calls right now. You can still chat with her by text.';
-  if (error?.status === 401) return 'The call session expired. Please start the call again.';
-  if (error?.status === 503) return 'The voice service is busy right now. Please try again in a moment.';
-  return 'Something went wrong starting the call. You can still chat with Nexa by text.';
+  return 'Something went wrong starting the call. Please try again.';
 }
 
 // Live voice and video conversation with Nexa, powered by Nuance Live.
-export default function NexaAvatarCall({ guest = null, className, onSwitchToText }) {
+export default function NexaAvatarCall({ guest = null, className }) {
   const videoRef = useRef(null);
   const audioRef = useRef(null);
   const conversationRef = useRef(null);
@@ -93,23 +70,9 @@ export default function NexaAvatarCall({ guest = null, className, onSwitchToText
 
     const conversation = createNuanceConversation({
       token: async () => {
-        let res;
-        try {
-          res = await base44.functions.invoke('nuanceToken', { guest });
-        } catch (err) {
-          const friendly = refusalMessage(err?.data || err?.response?.data);
-          throw Object.assign(new Error('token'), {
-            friendly: friendly || 'The voice assistant could not start. You can still chat with Nexa by text.',
-          });
-        }
-        const friendly = refusalMessage(res?.data);
-        if (friendly) throw Object.assign(new Error('token'), { friendly });
+        const res = await base44.functions.invoke('nuanceToken', { guest });
         const token = res?.data?.token;
-        if (!token) {
-          throw Object.assign(new Error('token'), {
-            friendly: res?.data?.error || 'The voice assistant could not start. You can still chat with Nexa by text.',
-          });
-        }
+        if (!token) throw new Error(res?.data?.error || 'Could not start the conversation');
         return token;
       },
       mediaDevices: { cameraEnabled: false },
@@ -122,12 +85,11 @@ export default function NexaAvatarCall({ guest = null, className, onSwitchToText
           setState(event.state);
           break;
         case 'tracks-changed':
-          try {
-            const avatar = conversation.avatar;
-            if (avatar.videoTrack && videoRef.current) avatar.videoTrack.attach(videoRef.current);
-            if (avatar.audioTrack && audioRef.current) avatar.audioTrack.attach(audioRef.current);
-          } catch (_e) {
-            // A call that is not up yet has no tracks; the next change re-reads them.
+          if (conversation.avatar.videoTrack && videoRef.current) {
+            conversation.avatar.videoTrack.attach(videoRef.current);
+          }
+          if (conversation.avatar.audioTrack && audioRef.current) {
+            conversation.avatar.audioTrack.attach(audioRef.current);
           }
           break;
         case 'speaking-changed':
@@ -185,9 +147,9 @@ export default function NexaAvatarCall({ guest = null, className, onSwitchToText
   };
 
   const toggleMute = async () => {
+    const user = conversationRef.current?.user;
+    if (!user) return;
     try {
-      const user = conversationRef.current?.user;
-      if (!user) return;
       if (muted) await user.unmuteAudio();
       else await user.muteAudio();
       setMuted(!muted);
@@ -253,21 +215,9 @@ export default function NexaAvatarCall({ guest = null, className, onSwitchToText
       </div>
 
       {error && (
-        <div className="space-y-2 border-t border-border/50 bg-destructive/10 px-3 py-2">
-          <div className="flex items-start gap-2">
-            <AlertCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-destructive" />
-            <p className="text-[11px] leading-relaxed text-destructive">{error}</p>
-          </div>
-          {onSwitchToText && (
-            <Button
-              size="sm"
-              variant="outline"
-              onClick={onSwitchToText}
-              className="h-8 gap-1.5 rounded-lg px-2.5 text-xs"
-            >
-              <Keyboard className="h-3.5 w-3.5" /> Chat by text instead
-            </Button>
-          )}
+        <div className="flex items-start gap-2 border-t border-border/50 bg-destructive/10 px-3 py-2">
+          <AlertCircle className="mt-0.5 h-3.5 w-3.5 flex-shrink-0 text-destructive" />
+          <p className="text-[11px] leading-relaxed text-destructive">{error}</p>
         </div>
       )}
 
