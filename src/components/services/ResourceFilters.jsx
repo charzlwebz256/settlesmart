@@ -78,7 +78,10 @@ export default function ResourceFilters({ filters, onChange, cities = [], langua
           value={filters.province}
           onChange={set('province')}
           placeholder="All provinces"
-          options={PROVINCES.map(p => ({ value: p, label: `${PROVINCE_EMOJIS[p] || '🍁'} ${p}` }))}
+          options={[
+            { value: 'Canada-wide', label: '🍁 Canada-wide' },
+            ...PROVINCES.map(p => ({ value: p, label: `${PROVINCE_EMOJIS[p] || '🍁'} ${p}` })),
+          ]}
         />
         <FilterSelect
           label="City"
