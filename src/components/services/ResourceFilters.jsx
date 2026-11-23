@@ -87,7 +87,7 @@ export default function ResourceFilters({ filters, onChange, cities = [], langua
           label="City"
           value={filters.city}
           onChange={set('city')}
-          placeholder={filters.province ? 'All cities' : 'All cities'}
+          placeholder={filters.province ? 'All cities' : 'Select province first'}
           options={cities.map(c => ({ value: c, label: c }))}
         />
         <FilterSelect

@@ -52,26 +52,34 @@ export default function ServiceDirectory({ initialProvince = '', initialCategory
 
   // Service carries a field-level read rule, so distinct queries are rejected:
   // read every page and collect the unique values in code instead.
-  const { data: filterOptions = { cities: [], languages: [] } } = useQuery({
+  const { data: filterOptions = { citiesByProvince: {}, languages: [] } } = useQuery({
     queryKey: ['serviceFilterOptions'],
     queryFn: async () => {
-      const cities = new Set();
+      const citySets = {};
       const languages = new Set();
       let cursor;
       for (let i = 0; i < 20; i++) {
         const page = await base44.entities.Service.list({ limit: 500, cursor });
         (page.items || []).forEach(s => {
-          if (s.city) cities.add(s.city);
+          if (s.city && s.province) {
+            if (!citySets[s.province]) citySets[s.province] = new Set();
+            citySets[s.province].add(s.city);
+          }
           (s.languages_offered || []).forEach(l => { if (l) languages.add(l); });
         });
         if (!page.has_more || !page.next_cursor) break;
         cursor = page.next_cursor;
       }
-      return { cities: [...cities].sort(), languages: [...languages].sort() };
+      const citiesByProvince = {};
+      Object.keys(citySets).forEach(p => { citiesByProvince[p] = [...citySets[p]].sort(); });
+      return { citiesByProvince, languages: [...languages].sort() };
     },
     staleTime: 1000 * 60 * 30,
   });
-  const { cities, languages } = filterOptions;
+  const { citiesByProvince, languages } = filterOptions;
+
+  // Only offer cities that sit inside the selected province
+  const cities = filters.province ? (citiesByProvince[filters.province] || []) : [];
 
   const queryKey = ['serviceDirectory', debouncedSearch, filters.province, filters.city, filters.category, filters.eligibility, filters.language, filters.cost];
 
