@@ -3,6 +3,7 @@ import {
   Layers,
   Loader2,
   LocateFixed,
+  Navigation,
   Map as MapIcon,
   MapPinOff,
   Mountain,
@@ -104,8 +105,7 @@ export default function SmartMap({
   const mapRef = useRef(null);
   const mapsRef = useRef(null);
   const overlays = useRef({ user: null, accuracy: null, route: null, routeLines: [], routeStops: [], points: [] });
-  // Only navigation follows the rider; otherwise the map stays where they left it.
-  const followRef = useRef(false);
+  // Follow me keeps the rider in view until they take the map by hand.
   const handlers = useRef({ onPickDestination, onStopSelect });
   handlers.current = { onPickDestination, onStopSelect };
 
@@ -113,6 +113,7 @@ export default function SmartMap({
   const [failure, setFailure] = useState(null);
   const [mapType, setMapType] = useState('roadmap');
   const [centred, setCentred] = useState(false);
+  const [follow, setFollow] = useState(false);
   const [attempt, setAttempt] = useState(0);
   const autoRetried = useRef(false);
 
@@ -179,15 +180,12 @@ export default function SmartMap({
         return;
       }
 
-      // On a phone the map covers most of the screen, so a one-finger drag has to
-      // scroll the page instead of trapping the rider on the map. Two fingers move it.
-      const coarsePointer = window.matchMedia?.('(pointer: coarse)').matches;
-
+      // One finger pans the map everywhere, phone included.
       const map = new maps.Map(container, {
         center: userPosition || FALLBACK_CENTER,
         zoom: userPosition ? 15 : 12,
         disableDefaultUI: true,
-        gestureHandling: coarsePointer ? 'cooperative' : 'greedy',
+        gestureHandling: 'greedy',
         clickableIcons: false,
         mapTypeId: 'roadmap',
         keyboardShortcuts: false,
@@ -198,9 +196,9 @@ export default function SmartMap({
         handlers.current.onPickDestination?.({ lat: event.latLng.lat(), lng: event.latLng.lng() });
       });
 
-      // Taking the map by hand ends the follow, until they tap locate again.
+      // Taking the map by hand ends the follow, until they tap follow again.
       map.addListener('dragstart', () => {
-        followRef.current = false;
+        setFollow(false);
       });
 
       // Let Google measure the canvas once the layout has settled.
@@ -365,31 +363,28 @@ export default function SmartMap({
     map.fitBounds(bounds, fitPadding());
   }, [ready, routeLegs, routePath]);
 
-  // Navigating: frame the rider up close and keep them centred as they move.
+  // Starting navigation frames the rider up close and switches follow on.
   useEffect(() => {
-    if (!ready || !mapRef.current) return;
-    if (!navigating) {
-      followRef.current = false;
-      return;
-    }
-    followRef.current = true;
+    if (!ready || !mapRef.current || !navigating) return;
+    setFollow(true);
     if (userPosition) {
       mapRef.current.setCenter(userPosition);
       mapRef.current.setZoom(zoomForAccuracy(accuracy));
     }
   }, [navigating]);
 
+  // Follow me: the map keeps the rider in view as they move along the journey.
   useEffect(() => {
-    if (!ready || !navigating || !followRef.current || !userPosition || !mapRef.current) return;
+    if (!ready || !follow || !userPosition || !mapRef.current) return;
     mapRef.current.panTo(userPosition);
-  }, [ready, navigating, userPosition?.lat, userPosition?.lng]);
+  }, [ready, follow, userPosition?.lat, userPosition?.lng]);
 
   const recentre = () => {
     if (userPosition) {
       mapRef.current?.panTo(userPosition);
       mapRef.current?.setZoom(zoomForAccuracy(accuracy));
     }
-    if (navigating) followRef.current = true;
+    setFollow(true);
     if (!userPosition || !Number.isFinite(accuracy) || accuracy > 50) onLocate?.();
   };
 
@@ -461,6 +456,19 @@ export default function SmartMap({
           </div>
 
           <div className="absolute right-3 z-10 flex flex-col items-end gap-2" style={{ bottom: SAFE_BOTTOM }}>
+            <button
+              onClick={() => setFollow((on) => !on)}
+              aria-pressed={follow}
+              className={cn(
+                'flex min-h-[40px] items-center gap-1.5 rounded-full px-3 py-2 text-[11px] font-bold shadow-lg transition-colors',
+                follow
+                  ? 'bg-primary text-primary-foreground'
+                  : 'border border-border/60 bg-card/95 text-foreground hover:bg-card'
+              )}
+            >
+              <Navigation className="h-3.5 w-3.5" />
+              {follow ? 'Following' : 'Follow me'}
+            </button>
             <button
               onClick={recentre}
               aria-label="Locate me"

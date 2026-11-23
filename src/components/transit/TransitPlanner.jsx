@@ -8,6 +8,7 @@ import TransitAppPromo from '@/components/transit/TransitAppPromo';
 import LocationStatusBar from '@/components/transit/LocationStatusBar';
 import NearbyTransitPanel from '@/components/transit/NearbyTransitPanel';
 import NavigationBanner from '@/components/transit/NavigationBanner';
+import JourneyProgress from '@/components/transit/JourneyProgress';
 import { useDeviceLocation } from '@/hooks/useDeviceLocation';
 import { useDeviceOrientation } from '@/hooks/useDeviceOrientation';
 import useVoiceGuidance from '@/hooks/useVoiceGuidance';
@@ -33,7 +34,8 @@ const RELOAD_STOPS_AFTER_M = 400;
 export default function TransitPlanner({ embedded = false, autoLocate = false, refreshSignal = 0 }) {
   const [myAddress, setMyAddress] = useState('');
   const [resolvingAddress, setResolvingAddress] = useState(false);
-  const startTouchedRef = useRef(false);
+  // The start point is set once, then stays put for the whole journey.
+  const startLockedRef = useRef(false);
   const geocodedAtRef = useRef(null);
 
   const [error, setError] = useState(null);
@@ -102,7 +104,8 @@ export default function TransitPlanner({ embedded = false, autoLocate = false, r
       .then((address) => {
         if (!alive || !address) return;
         setMyAddress(address);
-        if (!startTouchedRef.current) {
+        if (!startLockedRef.current) {
+          startLockedRef.current = true;
           setStartInput(address);
           setStartCoords([position.lat, position.lng]);
         }
@@ -151,7 +154,7 @@ export default function TransitPlanner({ embedded = false, autoLocate = false, r
       setStartInput(myAddress);
       return;
     }
-    startTouchedRef.current = false;
+    startLockedRef.current = true;
     setStartInput('My current location');
   };
 
@@ -172,13 +175,13 @@ export default function TransitPlanner({ embedded = false, autoLocate = false, r
   };
 
   const handleStartChange = (value) => {
-    startTouchedRef.current = true;
+    startLockedRef.current = true;
     setStartInput(value);
     getPlaceSuggestions(value, setStartSuggestions, setShowStartSuggestions);
   };
 
   const handleStartSelect = (place) => {
-    startTouchedRef.current = true;
+    startLockedRef.current = true;
     setStartInput(place.address);
     setStartCoords([place.lat, place.lng]);
     setShowStartSuggestions(false);
@@ -303,8 +306,17 @@ export default function TransitPlanner({ embedded = false, autoLocate = false, r
   // Memoised so the map only redraws the route when a new one is calculated.
   const routePath = useMemo(() => activeRoute?.waypoints || [], [activeRoute]);
   const routeLegs = useMemo(() => activeRoute?.journey || [], [activeRoute]);
-  // Both ends' closest stops share the map; memoised so markers are not rebuilt.
-  const mapStops = useMemo(() => [...destStops, ...stops], [destStops, stops]);
+  // Both ends' closest stops share the map, nearest to the rider first, so the
+  // closest options are the ones that get drawn when the list is capped.
+  const mapStops = useMemo(() => {
+    const all = [...destStops, ...stops].filter((stop) => Number.isFinite(stop.lat) && Number.isFinite(stop.lng));
+    if (!position) return all;
+    return all.sort(
+      (a, b) =>
+        distanceMeters(position, { lat: a.lat, lng: a.lng }) -
+        distanceMeters(position, { lat: b.lat, lng: b.lng })
+    );
+  }, [destStops, stops, position?.lat, position?.lng]);
 
   const destinationPoint = endCoords ? { lat: endCoords[0], lng: endCoords[1] } : null;
   // Only worth listing the destination's stops when it is not already next door.
@@ -349,6 +361,12 @@ export default function TransitPlanner({ embedded = false, autoLocate = false, r
           navigating={navigating}
         />
         <TransitAppPromo />
+        <JourneyProgress
+          navigating={navigating}
+          arrived={arrived}
+          guidance={guidance}
+          route={activeRoute}
+        />
         <NavigationBanner
           route={activeRoute}
           guidance={guidance}

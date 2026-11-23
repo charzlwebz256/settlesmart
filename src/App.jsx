@@ -17,6 +17,7 @@ import Services from './pages/Services';
 import Explore from './pages/Explore';
 import Work from './pages/Work';
 import Resources from './pages/Resources';
+import NationalDirectory from './pages/NationalDirectory';
 import TimeZones from './pages/TimeZones';
 import Assistant from './pages/Assistant';
 import Checklist from './pages/Checklist';
@@ -98,6 +99,7 @@ const AuthenticatedApp = () => {
         <Route path="/career-support" element={<CareerSupport />} />
         <Route path="/workplace-rights" element={<WorkplaceRights />} />
         <Route path="/resources" element={<Resources />} />
+        <Route path="/directory" element={<NationalDirectory />} />
         <Route path="/time-zones" element={<TimeZones />} />
         <Route path="/assistant" element={<Assistant />} />
         <Route path="/transit-map" element={<TransitMap />} />
