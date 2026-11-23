@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { Plus, History, Volume2, VolumeX, Trash2, AlertCircle, Loader2, Sparkles, ChevronRight } from 'lucide-react';
 import ChatMessage from '@/components/nexa/ChatMessage';
-import VoiceRings from '@/components/nexa/VoiceRings';
+import { HeartbeatDot } from '@/components/nexa/Heartbeat';
 import TalkingBars from '@/components/nexa/TalkingBars';
 import NexaComposer from '@/components/nexa/NexaComposer';
 import { useSpeech } from '@/hooks/useSpeech';
@@ -317,9 +317,9 @@ export default function NexaChatPanel({ profile = null, guest = null, className,
 
         {(speaking || listening) && (
           <div className="flex items-center gap-2">
-            <VoiceRings nexa={speaking} you={youSpeaking} className="h-5 w-5">
-              <span className={cn('h-5 w-5 rounded-full', speaking ? 'bg-primary/15' : 'bg-accent/20')} />
-            </VoiceRings>
+            <HeartbeatDot active={speaking || youSpeaking} tone={speaking ? 'nexa' : 'you'} className="h-5 w-5">
+              <span className={cn('h-2.5 w-2.5 rounded-full', speaking ? 'bg-primary' : 'bg-accent')} />
+            </HeartbeatDot>
             <TalkingBars active tone={speaking ? 'nexa' : 'you'} className="h-4" />
             <span className="text-[11px] font-medium text-foreground">
               {speaking ? 'Nexa is reading aloud' : 'Listening to you'}

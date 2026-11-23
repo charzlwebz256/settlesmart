@@ -141,6 +141,7 @@ This reply is spoken out loud, so answer as natural speech: two or three short s
       const answer = await base44.asServiceRole.integrations.Core.InvokeLLM({
         prompt,
         add_context_from_internet: true,
+        model: 'gemini_3_flash',
       });
       return Response.json({ answer: spokenText(answer) });
     }

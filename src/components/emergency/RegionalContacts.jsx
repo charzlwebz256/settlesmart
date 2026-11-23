@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react';
+import { ExternalLink, Phone } from 'lucide-react';
 
 // Official 211 service per province/territory. Territories fall back to the
 // national 211.ca directory.
@@ -219,7 +219,9 @@ export function RegionalContacts({ province }) {
                   <p className="text-sm font-semibold">{item.label}</p>
                   <p className="text-xs text-muted-foreground">{item.note}</p>
                 </div>
-                <ExternalLink className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
+                <span className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-rose-500 text-white">
+                  <Phone className="h-3.5 w-3.5" />
+                </span>
               </a>
             );
           })}

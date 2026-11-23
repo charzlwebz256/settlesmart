@@ -4,7 +4,7 @@ import { createNuanceConversation } from '@nuancelabs/js-sdk';
 import { Button } from '@/components/ui/button';
 import { Mic, MicOff, PhoneOff, Loader2, AlertCircle, Radio, Keyboard } from 'lucide-react';
 import { NEXA_PORTRAIT } from '@/data/nexaPortrait';
-import VoiceRings from '@/components/nexa/VoiceRings';
+import { HeartbeatDot } from '@/components/nexa/Heartbeat';
 import { cn } from '@/lib/utils';
 
 const STATE_TEXT = {
@@ -210,23 +210,20 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
 
         {/* Idle cover */}
         {!live && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 bg-gradient-to-b from-primary/15 to-background/90 p-6 text-center">
-            <img
-              src={NEXA_PORTRAIT}
-              alt="Nexa"
-              className="h-24 w-24 rounded-full object-cover shadow-lg ring-4 ring-white/70 dark:ring-white/10"
-            />
-            <div>
-              <p className="font-heading text-base font-bold text-foreground">Talk with Nexa</p>
-              <p className="mx-auto mt-1 max-w-[15rem] text-xs leading-relaxed text-muted-foreground">
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
+            <img src={NEXA_PORTRAIT} alt="Nexa" className="absolute inset-0 h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/20" />
+            <div className="relative mt-auto space-y-2">
+              <p className="font-heading text-base font-bold text-white">Talk with Nexa</p>
+              <p className="mx-auto max-w-[16rem] text-xs leading-relaxed text-white/80">
                 A face-to-face voice conversation. She listens, speaks and answers like a person.
               </p>
             </div>
-            <Button onClick={start} className="mt-1 gap-1.5 rounded-xl" disabled={phase === 'starting'}>
+            <Button onClick={start} className="relative mt-1 gap-1.5 rounded-xl" disabled={phase === 'starting'}>
               {phase === 'starting' ? <Loader2 className="h-4 w-4 animate-spin" /> : <Mic className="h-4 w-4" />}
               {phase === 'ended' ? 'Start again' : 'Start talking'}
             </Button>
-            <p className="text-[10px] text-muted-foreground">Microphone access is needed. Your camera stays off.</p>
+            <p className="relative text-[10px] text-white/70">Microphone access is needed. Your camera stays off.</p>
           </div>
         )}
 
@@ -234,16 +231,16 @@ export default function NexaAvatarCall({ guest = null, className, onUseChat }) {
         {live && (
           <>
             <div className="absolute left-3 top-3 flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 backdrop-blur">
-              <VoiceRings nexa={speaking} className="h-2.5 w-2.5">
+              <HeartbeatDot active={speaking} className="h-3 w-3">
                 <span className={cn('h-1.5 w-1.5 rounded-full', speaking ? 'bg-emerald-400' : 'bg-white/70')} />
-              </VoiceRings>
+              </HeartbeatDot>
               <span className="text-[10px] font-semibold text-white">Nexa</span>
               <span className="text-[10px] text-white/70">· {STATE_TEXT[state] || 'Live'}</span>
             </div>
             <div className="absolute right-3 top-3 flex items-center gap-1.5 rounded-full bg-black/55 px-2.5 py-1 backdrop-blur">
-              <VoiceRings you={youSpeaking} className="h-2.5 w-2.5">
+              <HeartbeatDot active={youSpeaking} tone="you" className="h-3 w-3">
                 <span className={cn('h-1.5 w-1.5 rounded-full', youSpeaking ? 'bg-accent' : 'bg-white/70')} />
-              </VoiceRings>
+              </HeartbeatDot>
               <span className="text-[10px] font-semibold text-white">You</span>
             </div>
             {state !== 'connected' && (

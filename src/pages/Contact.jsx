@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Mail, MessageSquare, Send, CheckCircle2, Loader2, MapPin, ExternalLink } from 'lucide-react';
+import { Mail, MessageSquare, Send, CheckCircle2, Loader2, MapPin, Phone } from 'lucide-react';
 import { motion } from 'framer-motion';
 
 export default function Contact() {
@@ -80,16 +80,28 @@ export default function Contact() {
 
             <div className="bg-card border border-border/50 rounded-2xl p-5">
               <h2 className="font-heading font-bold text-base mb-2 flex items-center gap-2">
-                <ExternalLink className="w-4 h-4 text-primary" />
+                <Phone className="w-4 h-4 text-primary" />
                 Emergency Resources
               </h2>
               <p className="text-xs text-muted-foreground mb-2">
-                For urgent settlement needs, please contact:
+                Tap a number to call straight away:
               </p>
               <ul className="text-xs space-y-1 text-muted-foreground">
-                <li><span className="font-semibold text-foreground">911</span>: Police, Fire, Ambulance</li>
-                <li><span className="font-semibold text-foreground">211</span>: Social Services Helpline</li>
-                <li><span className="font-semibold text-foreground">1-800-O-Canada</span>: Government Info</li>
+                <li>
+                  <a href="tel:911" className="inline-flex items-center gap-1 font-semibold text-foreground hover:text-primary">
+                    <Phone className="w-3 h-3" /> 911
+                  </a>: Police, Fire, Ambulance
+                </li>
+                <li>
+                  <a href="tel:211" className="inline-flex items-center gap-1 font-semibold text-foreground hover:text-primary">
+                    <Phone className="w-3 h-3" /> 211
+                  </a>: Social Services Helpline
+                </li>
+                <li>
+                  <a href="tel:18006226232" className="inline-flex items-center gap-1 font-semibold text-foreground hover:text-primary">
+                    <Phone className="w-3 h-3" /> 1-800-O-Canada
+                  </a>: Government Info
+                </li>
               </ul>
             </div>
           </div>

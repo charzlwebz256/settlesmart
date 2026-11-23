@@ -122,6 +122,56 @@
   .voice-ring { animation: none; opacity: 0; }
 }
 
+/* Heartbeat: a soft double beat in place of pulse rings. */
+@keyframes heartbeat-halo {
+  0% { transform: scale(1); opacity: 0.45; }
+  10% { transform: scale(1.08); opacity: 0.28; }
+  20% { transform: scale(1.02); opacity: 0.4; }
+  34% { transform: scale(1.14); opacity: 0.16; }
+  68% { transform: scale(1.2); opacity: 0; }
+  100% { transform: scale(1.2); opacity: 0; }
+}
+.heartbeat-halo {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  animation: heartbeat-halo 1.7s ease-in-out infinite;
+}
+.heartbeat-halo-late {
+  animation-delay: 0.22s;
+}
+@keyframes heartbeat-dot {
+  0% { transform: scale(1); opacity: 0.55; }
+  12% { transform: scale(1.5); opacity: 0.35; }
+  24% { transform: scale(1.15); opacity: 0.5; }
+  38% { transform: scale(1.7); opacity: 0.2; }
+  70% { transform: scale(1.9); opacity: 0; }
+  100% { transform: scale(1.9); opacity: 0; }
+}
+.heartbeat-dot {
+  animation: heartbeat-dot 1.6s ease-in-out infinite;
+}
+@keyframes heartbeat-image {
+  0%, 100% { transform: scale(1); }
+  8% { transform: scale(1.012); }
+  16% { transform: scale(1.002); }
+  26% { transform: scale(1.02); }
+  42% { transform: scale(1); }
+}
+.heartbeat-image {
+  animation: heartbeat-image 1.8s ease-in-out infinite;
+}
+@keyframes heartbeat-wave-shift {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+.heartbeat-wave {
+  animation: heartbeat-wave-shift 1.6s linear infinite;
+}
+@media (prefers-reduced-motion: reduce) {
+  .heartbeat-halo, .heartbeat-dot, .heartbeat-image, .heartbeat-wave { animation: none; }
+}
+
 /* Nexa in motion: a gentle bob and a live equaliser while she talks. */
 @keyframes talking-bar {
   0%, 100% { transform: scaleY(0.4); }
